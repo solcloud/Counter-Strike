@@ -1,0 +1,104 @@
+<?php
+
+namespace cs\Net;
+
+use cs\Core\Game;
+use cs\Core\Player;
+
+abstract class Protocol
+{
+
+    /** @var array<string,int> [methodName => maxCallCountPerTick] */
+    public const playerControlMethods = [
+        'attack'   => 1,
+        'attack2'  => 1,
+        'backward' => 1,
+        'buy'      => 9,
+        'crouch'   => 1,
+        'drop'     => 1,
+        'equip'    => 1,
+        'forward'  => 1,
+        'jump'     => 1,
+        'left'     => 1,
+        'lookAt'   => 1,
+        'reload'   => 1,
+        'right'    => 1,
+        'run'      => 1,
+        'stand'    => 1,
+        'use'      => 1,
+        'walk'     => 1,
+    ];
+
+    /** @var array<string,int> [methodName => paramCount] */
+    public const playerControlMethodParamCount = [
+        'attack'   => 0,
+        'attack2'  => 0,
+        'backward' => 0,
+        'buy'      => 1,
+        'crouch'   => 0,
+        'drop'     => 0,
+        'equip'    => 1,
+        'forward'  => 0,
+        'jump'     => 0,
+        'left'     => 0,
+        'lookAt'   => 2,
+        'reload'   => 0,
+        'right'    => 0,
+        'run'      => 0,
+        'stand'    => 0,
+        'use'      => 0,
+        'walk'     => 0,
+    ];
+
+    /** @var array<string,int> [methodName => methodNumber] */
+    public const playerMethodByName = [
+        'attack'   => 0,
+        'attack2'  => 1,
+        'backward' => 2,
+        'buy'      => 3,
+        'crouch'   => 4,
+        'drop'     => 5,
+        'equip'    => 6,
+        'forward'  => 7,
+        'jump'     => 8,
+        'left'     => 9,
+        'lookAt'   => 10,
+        'reload'   => 11,
+        'right'    => 12,
+        'run'      => 13,
+        'stand'    => 14,
+        'use'      => 17,
+        'walk'     => 18,
+    ];
+
+    /** @var array<int,string> [methodNumber => methodName] */
+    public const playerMethodByNumber = [
+        0  => 'attack',
+        1  => 'attack2',
+        2  => 'backward',
+        3  => 'buy',
+        4  => 'crouch',
+        5  => 'drop',
+        6  => 'equip',
+        7  => 'forward',
+        8  => 'jump',
+        9  => 'left',
+        10 => 'lookAt',
+        11 => 'reload',
+        12 => 'right',
+        13 => 'run',
+        14 => 'stand',
+        17 => 'use',
+        18 => 'walk',
+    ];
+
+    public abstract function serializeGameSetting(Player $player, ServerSetting $setting, Game $game): string;
+
+    public abstract function serializeGameState(Game $game): string;
+
+    /**
+     * @return array<int,array<string|int>>
+     */
+    public abstract function parsePlayerControlCommands(string $msg): array;
+
+}

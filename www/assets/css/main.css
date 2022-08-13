@@ -1,0 +1,163 @@
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+
+body, html {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+p {
+    margin: 20px 0;
+}
+
+progress {
+    width: 100%;
+    display: block;
+}
+
+#hud, #ui {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+header {
+    width: 90%;
+    max-width: 900px;
+    margin: 1.2em auto 0;
+}
+
+footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    font-size: 12px;
+    color: #dadada;
+    font-style: italic;
+    padding: 4px 6px;
+}
+
+footer a {
+    text-decoration: none;
+    color: #b38585;
+}
+
+footer a:hover {
+    color: #a46464;
+}
+
+h1, h2 {
+    font-size: 4rem;
+    color: #e3e3e3;
+    font-family: Arial;
+    font-weight: bolder;
+    font-style: italic;
+    letter-spacing: 8px;
+    padding: 20px 40px;
+    text-shadow: 1px -2px 6px #111111;
+}
+
+h2 {
+    margin-top: -40px;
+    font-size: 5rem;
+    text-align: right;
+    margin-bottom: 40px;
+}
+
+.emojis {
+    padding: 0 10px 0 4px;
+    font-size: 74%
+}
+
+.text-danger {
+    color: #9a0438;
+}
+
+.text-warning {
+    color: #9a7704;
+}
+
+#ui {
+    background: rgba(0, 0, 0, .2) url("/assets/imgs/bg1.jpg") center center;
+    background-size: cover;
+    box-shadow: inset 0 0 50px #000000;
+}
+
+#menu {
+    margin: 0 auto;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 30%;
+    max-height: 300px;
+}
+
+button {
+    width: 100%;
+    outline: none;
+    border: none;
+    background: rgba(0, 0, 0, 0.86);
+    font-size: 3rem;
+    color: white;
+    padding: 20px 40px;
+    margin: 20px 0 0 0;
+    border-bottom: 4px solid #0d460d;
+}
+
+button:hover {
+    background: #e3e3e3;
+    color: #000000;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+textarea {
+    font-size: 2.2rem;
+    padding: 16px 8px;
+    resize: none;
+}
+
+#modal {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.86);
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modal > div {
+    margin: 10%;
+    padding: 40px 20px;
+    width: 80%;
+    background: rgb(97, 31, 31);
+    border-radius: 10px;
+}
+
+#modal > div * {
+    display: block;
+    width: 100%;
+}
+
+.flex {
+    display: flex !important;
+}
+
+.row::after {
+    content: "";
+    display: block;
+    clear: both;
+}

@@ -1,0 +1,75 @@
+<!Doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+    <script src="/assets/threejs/three.js"></script>
+    <script src="/assets/js/utils.js"></script>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    let camera, scene, renderer;
+
+    function init() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xdadada)
+
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99);
+        camera.position.z = 9;
+        camera.position.y = 7;
+        camera.lookAt(0, 3, 0)
+
+        const gridHelper = new THREE.GridHelper(9, 9);
+        scene.add(gridHelper);
+
+        renderer = new THREE.WebGLRenderer({antialias: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        renderer.setAnimationLoop(animation);
+    }
+
+    let body, player
+
+    function object() {
+
+        const head = new THREE.Mesh(
+            new THREE.SphereGeometry(1),
+            new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(
+                    '/resources/face.png'
+                )
+            })
+        );
+        head.name = "head"
+        head.position.y = 5 + 1
+
+        body = new THREE.Mesh(
+            new THREE.CylinderGeometry(1, 1, 5, 32),
+            new THREE.MeshBasicMaterial({color: 0x0000FF})
+        );
+        body.translateY(body.geometry.parameters.height / 2)
+        body.name = "body"
+
+        player = new THREE.Object3D();
+        head.rotation.reorder("YXZ")
+        head.rotateY(degreeToRadian(90))
+        player.add(head, body)
+        scene.add(player)
+    }
+
+    function animation(time) {
+        player.rotation.y -= 0.004
+        renderer.render(scene, camera);
+    }
+
+    init()
+    object()
+</script>
+</body>
+</html>

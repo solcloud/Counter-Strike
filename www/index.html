@@ -1,0 +1,106 @@
+<!Doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Counter-Strike: Football</title>
+    <link rel="stylesheet" href="./assets/css/main.css">
+    <link rel="stylesheet" href="./assets/css/hud.css">
+</head>
+<body oncontextmenu="return false">
+<canvas id="canvas"></canvas>
+<div id="hud"></div>
+<div id="ui">
+    <header>
+        <h1>Counter-Strike</h1>
+        <h2>F<span class="emojis">🏉💣</span>tball</h2>
+    </header>
+    <div id="menu">
+        <button onclick="showModal('modal-join')">Play</button>
+        <button>Settings</button>
+        <button>Quit</button>
+    </div>
+    <footer>Created by <a target="_blank" href="https://github.com/solcloud">solcloud</a> using awesome <a target="_blank" href="https://threejs.org/">three.js</a> 3D library</footer>
+</div>
+<div id="modal" class="hidden">
+    <div data-name="modal-join" class="hidden">
+        <p class="text-warning">Currently, there is no official public server available, but you can run server locally.</p>
+        <textarea id="join-url">ws://localhost:8081?map=default&code=acode</textarea>
+        <p class="flex">
+            <button onclick="closeModal()" class="btn">× Close</button>
+            <span></span>
+            <button onclick="joinGameUrl(document.getElementById('join-url').value)" class="btn">↳ Join</button>
+        </p>
+    </div>
+</div>
+
+<script src="assets/threejs/three.js?v=143"></script>
+<script src="assets/threejs/pointer-lock.js?v=143"></script>
+<script src="./assets/js/utils.js"></script>
+<script>
+    const modal = document.getElementById('modal')
+    const ui = document.getElementById('ui')
+    const hud = document.getElementById('hud')
+
+    function router() {
+        const hash = window.location.hash.substring(1)
+        if (hash === '') {
+            return
+        }
+        const params = new URLSearchParams(hash)
+        if (!params.has('action')) {
+            return
+        }
+
+        switch (params.get('action')) {
+            case 'join':
+                joinGame(params.get('map'), params.get('url'), params.get('code'))
+                break
+        }
+    }
+
+    function joinGameUrl(url) {
+        const query = url.substring(url.indexOf('?') + 1)
+        const params = new URLSearchParams(query)
+        joinGame(params.get('map'), url.substring(0, url.indexOf('?')), params.get('code'))
+    }
+
+    function joinGame(map, url, code) {
+        if (!map || !url || !code) {
+            alert("Invalid parameters")
+            return
+        }
+
+        modal.remove()
+        ui.remove()
+        console.log("Launching game")
+        import("/assets/js/start.js").then((ns) => {
+            ns.launchGame(hud, map, url, code)
+        })
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden')
+        modal.querySelectorAll('[data-name]').forEach(function (el) {
+            el.classList.add('hidden')
+        })
+    }
+
+    function showModal(name) {
+        const menu = modal.querySelector(`[data-name="${name}"]`)
+        if (!menu) {
+            return false
+        }
+
+        modal.classList.remove('hidden')
+        menu.classList.remove('hidden')
+    }
+
+    window.addEventListener('beforeunload', (e) => {
+        e.preventDefault();
+        return "Are you sure to leave this page?"
+    });
+    window.addEventListener('hashchange', router);
+    router()
+</script>
+</body>
+</html>

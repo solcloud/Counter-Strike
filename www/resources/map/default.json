@@ -1,0 +1,84 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "e35e694f-9365-4ed2-bb36-1af200629165",
+			"type": "BoxGeometry",
+			"width": 3,
+			"height": 1,
+			"depth": 1,
+			"widthSegments": 1,
+			"heightSegments": 1,
+			"depthSegments": 1
+		},
+		{
+			"uuid": "f606186a-ba1b-464e-b71c-676098e09b74",
+			"type": "BoxGeometry",
+			"width": 1,
+			"height": 1,
+			"depth": 1,
+			"widthSegments": 1,
+			"heightSegments": 1,
+			"depthSegments": 1
+		}],
+	"materials": [
+		{
+			"uuid": "196e1e69-fa97-4100-9711-be89af34e585",
+			"type": "MeshBasicMaterial",
+			"color": 16760431,
+			"reflectivity": 1,
+			"refractionRatio": 0.98,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"colorWrite": true,
+			"stencilWrite": false,
+			"stencilWriteMask": 255,
+			"stencilFunc": 519,
+			"stencilRef": 0,
+			"stencilFuncMask": 255,
+			"stencilFail": 7680,
+			"stencilZFail": 7680,
+			"stencilZPass": 7680
+		}],
+	"object": {
+		"uuid": "11e2d44a-0a26-4cab-b529-8738cdd52d8a",
+		"type": "Group",
+		"name": "map",
+		"layers": 1,
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "6a1329d3-a0f6-4f77-98cb-51c8317bc922",
+				"type": "Mesh",
+				"name": "Box",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,9.5,0.5,-7.5,1],
+				"geometry": "e35e694f-9365-4ed2-bb36-1af200629165",
+				"material": "196e1e69-fa97-4100-9711-be89af34e585"
+			},
+			{
+				"uuid": "7e409983-18a5-4618-99a8-add44d1a8b4a",
+				"type": "Mesh",
+				"name": "Box",
+				"layers": 1,
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,3.5,0.5,-7.5,1],
+				"geometry": "e35e694f-9365-4ed2-bb36-1af200629165",
+				"material": "196e1e69-fa97-4100-9711-be89af34e585",
+				"children": [
+					{
+						"uuid": "a26a689f-1b8a-4cd7-8c70-9b8a32599aa6",
+						"type": "Mesh",
+						"name": "Box",
+						"layers": 1,
+						"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,1,0,1],
+						"geometry": "f606186a-ba1b-464e-b71c-676098e09b74",
+						"material": "196e1e69-fa97-4100-9711-be89af34e585"
+					}]
+			}]
+	}
+}

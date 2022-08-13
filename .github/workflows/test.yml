@@ -1,0 +1,36 @@
+name: "Tests"
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'cli/'
+      - 'www/'
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'cli/'
+      - 'www/'
+
+jobs:
+  composer-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install Linux dependencies"
+        timeout-minutes: 1
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            composer
+
+      - name: "Install Composer dependencies"
+        timeout-minutes: 1
+        run: |
+          composer install -o
+
+      - name: "Run Composer check"
+        timeout-minutes: 1
+        run: |
+          composer check

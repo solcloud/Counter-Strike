@@ -1,0 +1,80 @@
+/*
+namespace cs\Net\Protocol;
+
+use cs\Core\Game;
+use cs\Core\GameException;
+use cs\Net\Protocol;
+use cs\Net\ProtocolException;
+use cs\Net\ServerSetting;
+
+class BinaryProtocol extends Protocol
+{
+
+    // Params are always unsigned int with little endian byte order
+    public const UINT_8 = 'C';
+    public const UINT_16 = 'v';
+    //public const UINT_32 = 'V';
+
+    const TYPE_GAMEPLAY = "\x00";
+    const TYPE_GAME = "\x01";
+    const METHOD_SEPARATOR = "\xFF";
+
+    const RESPONSE_EVENT = "\x00";
+    const RESPONSE_ERROR = "\x01";
+
+    /** @var array<string,string[]> [methodName => [param1type, param2type] */
+    public const methodMap = [
+        'duck'   => [self::UINT_8],
+        'equip'  => [self::UINT_8],
+        'jump'   => [],
+        'move'   => [self::UINT_8],
+        'lookAt' => [self::UINT_16, self::UINT_16],
+    ];
+    /** @var array<string,int> */
+    public const paramLengthBytes = [
+        self::UINT_8  => 1,
+        self::UINT_16 => 2,
+    ];
+
+    public function parsePlayerControlCommands(string $msg): array
+    {
+        // TODO endianness, stability, etc - once TextProtocol is stable
+        $commands = [];
+        foreach (explode(self::METHOD_SEPARATOR, $msg) as $line) {
+            $command = [];
+            $offset = 0;
+
+            $format = self::UINT_8;
+            $methodNumber = $this->parseInt($line, $format, $offset);
+            $offset += self::paramLengthBytes[$format];
+            $method = self::playerMethodByNumber[$methodNumber];
+            $command[] = $method;
+
+            $params = self::methodMap[$method];
+            if (isset($params[0])) {
+                $format = $params[0];
+                $command[] = $this->parseInt($line, $format, $offset);
+                $offset += self::paramLengthBytes[$format];
+            }
+            if (isset($params[1])) {
+                $format = $params[1];
+                $command[] = $this->parseInt($line, $format, $offset);
+                $offset += self::paramLengthBytes[$format];
+            }
+
+            $commands[] = $command;
+        }
+
+        return $commands;
+    }
+
+    private function parseInt(string $binary, string $unpackFormat, int $binaryOffset): int
+    {
+        $data = @unpack($unpackFormat, substr($binary, $binaryOffset, self::paramLengthBytes[$unpackFormat]));
+        if ($data === false) {
+            throw new ProtocolException("Parse error: " . bin2hex($binary));
+        }
+        return (int)$data[1];
+    }
+
+}

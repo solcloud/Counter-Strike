@@ -1,0 +1,202 @@
+#hud {
+    font-family: Arial;
+    pointer-events: none;
+    user-select: none;
+}
+
+#hud #equipped-item {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#hud #equipped-item img {
+    width: 30vw;
+}
+
+#hud #cross {
+    position: absolute;
+    color: #d31b1b;
+    font-size: 2rem;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#hud section {
+    text-shadow: 0px 0px 2px #626262;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
+#hud .left, #hud .right {
+    width: 30%;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#hud .right {
+    text-align: right;
+    padding-right: 4px;
+}
+
+#hud .middle {
+    width: 40%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: center;
+}
+
+#hud #scoreboard {
+    padding: 1rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.86);
+    height: 40%;
+    max-height: 600px;
+    width: 60%;
+    max-width: 700px;
+    color: white;
+}
+
+#hud .radar {
+    margin-bottom: 2rem;
+}
+
+#hud .bg {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#hud .health {
+    padding: .6rem .8rem;
+    max-width: 250px;
+    color: #ddb9b9;
+}
+
+#hud .hp {
+    padding-right: 1rem;
+    float: left;
+    width: 50%;
+}
+
+#hud .hp:last-child {
+    padding-right: 0;
+}
+
+#hud .money {
+    display: inline;
+    padding: .2rem .4rem;
+    color: #9a0438;
+    font-weight: bold;
+}
+
+#hud .timer {
+    margin: 0 auto;
+    display: flex;
+    width: 200px;
+    height: 60px;
+    flex-direction: row;
+    justify-content: center;
+    padding-top: 2px;
+}
+
+#hud .team-me-alive, #hud .team-opponent-alive {
+    width: 50px;
+    line-height: 60px;
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #f5f5f5;
+}
+
+#hud .team-me-alive {
+    background-color: #afde68;
+}
+
+#hud .team-me-score {
+    color: #afde68;
+    border-right: 1px solid #dadada;
+}
+
+#hud .team-opponent-alive {
+    background-color: #de6868;
+}
+
+#hud .team-opponent-score {
+    color: #de6868;
+}
+
+#hud #time {
+    padding: 2px 0 4px 0;
+    color: white;
+    font-weight: bold;
+    border-bottom: 1px solid #dadada;
+}
+
+#hud .timer-center {
+    width: 100px;
+    font-size: 1rem;
+}
+
+#hud .timer-center .row * {
+    float: left;
+    width: 50%;
+    padding: 2px 4px;
+}
+
+#hud #message-top {
+    padding: 2rem 0;
+    flex-grow: 1;
+    font-size: 130%;
+}
+
+#hud #message-bottom {
+    padding-bottom: 4rem;
+    font-size: 90%;
+    font-style: italic;
+}
+
+#hud .ammo {
+    display: inline;
+    padding: 2px 4px;
+}
+
+#hud .kill-feed {
+    max-height: 220px;
+    font-size: .9rem;
+    line-height: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #ffffff;
+    padding: 12px 4px;
+}
+
+#hud .kill-feed .highlight {
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, .3);
+}
+
+#hud .inventory {
+    font-size: 80%;
+}
+
+#hud .inventory .highlight {
+    font-weight: bold;
+    color: #ffebc5;
+}
+
+#hud .kill-feed .team-me {
+    color: #afde68;
+}
+
+#hud .kill-feed .team-opponent {
+    color: #de6868;
+}
+
