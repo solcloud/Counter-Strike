@@ -105,7 +105,7 @@ class MovementTest extends BaseTestCase
         $this->assertSame(Player::headHeightCrouch, $game->getPlayer(1)->getHeadHeight());
     }
 
-    public function TODOtestPlayerSlowMovementWhenTouchingWall(): void // TODO
+    public function testPlayerSlowMovementWhenTouchingWall(): void
     {
         $game = $this->createOneRoundGame();
         $game->onTick(function (GameState $state) {
@@ -113,8 +113,37 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->moveLeft();
         });
         $game->start();
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
         $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
         $this->assertLessThan(Player::speedMove, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testPlayerSlowMovementWhenTouchingWallAngle(): void
+    {
+        $game = $this->createOneRoundGame();
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->getSight()->lookHorizontal(-44);
+            $state->getPlayer(1)->moveForward();
+            $state->getPlayer(1)->moveLeft();
+        });
+        $game->start();
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertLessThan(Player::speedMove, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testPlayerSlowMovementWhenTouchingWallAngle1(): void
+    {
+        $game = $this->createOneRoundGame();
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->getSight()->lookHorizontal(91);
+            $state->getPlayer(1)->moveForward();
+            $state->getPlayer(1)->moveRight();
+        });
+        $game->start();
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertLessThan(Player::speedMove, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testPlayerMultiJump(): void

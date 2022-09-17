@@ -38,4 +38,12 @@ abstract class BoxMap extends Map
         return $walls;
     }
 
+    /**
+     * @return Box[]
+     */
+    public function getBoxes(): array
+    {
+        return $this->boxes;
+    }
+
 }

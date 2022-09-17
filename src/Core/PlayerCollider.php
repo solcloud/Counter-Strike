@@ -82,4 +82,17 @@ class PlayerCollider
         return $this->player->getId();
     }
 
+    public function collide(Point $base, int $radius, int $height): bool
+    {
+        $pp = $this->player->getPositionImmutable();
+        if ($pp->y > $base->y + $height) {
+            return false;
+        }
+        if ($pp->y + $this->player->getHeadHeight() < $base->y) {
+            return false;
+        }
+
+        return Collision::circleWithCircle($base->to2D('xz'), $radius, $pp->to2D('xz'), $this->player->getBoundingRadius());
+    }
+
 }

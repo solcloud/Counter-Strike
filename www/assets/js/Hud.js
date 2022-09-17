@@ -161,8 +161,8 @@ export class HUD {
         this.#elements.messageTop.innerText = this.#messages.top
         this.#elements.messageBottom.innerHTML = this.#messages.bottom
 
-        let myTeam = player.playingOnAttackers ? 'attackers' : 'defenders'
-        let otherTeam = player.playingOnAttackers ? 'defenders' : 'attackers'
+        let myTeam = player.isAttacker ? 'attackers' : 'defenders'
+        let otherTeam = player.isAttacker ? 'defenders' : 'attackers'
         this.#elements.scoreMyTeam.innerHTML = this.#game.score[myTeam]
         this.#elements.scoreOpponentTeam.innerHTML = this.#game.score[otherTeam]
         this.#elements.aliveMyTeam.innerHTML = this.#game.alivePlayers[myTeam]

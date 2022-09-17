@@ -12,29 +12,10 @@ class Wall extends Plane
         }
 
         if ($widthOnXAxis) {
-            parent::__construct($start, new Point($start->getX() + $width, $start->getY() + $height, $start->getZ()));
+            parent::__construct($start, new Point($start->getX() + $width, $start->getY() + $height, $start->getZ()), 'xy');
         } else {
-            parent::__construct($start, new Point($start->getX(), $start->getY() + $height, $start->getZ() + $width));
+            parent::__construct($start, new Point($start->getX(), $start->getY() + $height, $start->getZ() + $width), 'zy');
         }
-    }
-
-    public function intersect(Point $point): bool
-    {
-        if ($this->widthOnXAxis) {
-            if ($this->getStart()->z <= $point->z && $this->getEnd()->z >= $point->z) {
-                if ($this->getStart()->x <= $point->x && $this->getEnd()->x >= $point->x) {
-                    return true;
-                }
-            }
-        } else {
-            if ($this->getStart()->x <= $point->x && $this->getEnd()->x >= $point->x) {
-                if ($this->getStart()->z <= $point->z && $this->getEnd()->z >= $point->z) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public function getBase(): int

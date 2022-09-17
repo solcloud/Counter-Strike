@@ -83,13 +83,15 @@ class World
             return new Wall(new Point(-1, -1, -1), $point->z < 0);
         }
 
+        $candidateZ = new Point2D($point->x, $point->y);
         foreach (($this->walls[self::WALL_Z][$point->getZ()] ?? []) as $wall) {
-            if ($wall->intersect($point)) {
+            if ($wall->intersect($candidateZ)) {
                 return $wall;
             }
         }
+        $candidateX = new Point2D($point->z, $point->y);
         foreach (($this->walls[self::WALL_X][$point->getX()] ?? []) as $wall) {
-            if ($wall->intersect($point)) {
+            if ($wall->intersect($candidateX)) {
                 return $wall;
             }
         }
@@ -97,36 +99,35 @@ class World
         return null;
     }
 
-    public function findFloor(Point $point): ?Floor
+    public function findFloor(Point $point, int $radius = 0): ?Floor
     {
         if ($point->y < 0) {
             throw new GameException("Y value cannot be lower than zero");
         }
 
-        foreach (($this->floors[$point->getY()] ?? []) as $floor) {
-            if ($floor->intersect($point)) {
-                return $floor;
+        $floors = $this->floors[$point->getY()] ?? [];
+        if ($floors === []) {
+            return null;
+        }
+        $candidate = new Point2D($point->x, $point->z);
+        for ($r = 0; $r <= $radius; $r++) { // TODO performance overkill to find the closest?
+            foreach ($floors as $floor) {
+                if ($floor->intersect($candidate, $r)) {
+                    return $floor;
+                }
             }
         }
 
         return null;
     }
 
-    public function isOnFloor(Floor $floor, Point $position): bool
+    public function isOnFloor(Floor $floor, Point $position, int $radius): bool
     {
         if ($floor->getY() !== $position->getY()) {
             return false;
         }
 
-        if ($floor->getStart()->x > $position->x || $floor->getEnd()->x < $position->x) {
-            return false;
-        }
-
-        if ($floor->getStart()->z > $position->z || $floor->getEnd()->z < $position->z) {
-            return false;
-        }
-
-        return true;
+        return Collision::circleWithPlane(new Point2D($position->x, $position->z), $radius, $floor);
     }
 
     public function getPlayerSpawnPosition(bool $isAttacker, bool $randomizeSpawnPosition): Point
@@ -212,11 +213,15 @@ class World
 
     public function checkXSideWallCollision(Point $base, int $zMin, int $zMax): ?Wall
     {
+        if ($base->x < 0) {
+            return new Wall(new Point(-1, -1, -1), false);
+        }
+
         foreach (($this->walls[self::WALL_X][$base->x] ?? []) as $wall) {
             if ($wall->getStart()->z > $zMax || $wall->getEnd()->z < $zMin) {
                 continue;
             }
-            if($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
+            if ($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
                 continue;
             }
             return $wall;
@@ -227,18 +232,70 @@ class World
 
     public function checkZSideWallCollision(Point $base, mixed $xMin, mixed $xMax): ?Wall
     {
+        if ($base->z < 0) {
+            return new Wall(new Point(-1, -1, -1), true);
+        }
+
         foreach (($this->walls[self::WALL_Z][$base->z] ?? []) as $wall) {
             if ($wall->getStart()->x > $xMax || $wall->getEnd()->x < $xMin) {
                 continue;
             }
-            if($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
+            if ($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
                 continue;
             }
+
             return $wall;
         }
 
         return null;
     }
 
+    public function isCollisionWithOtherPlayers(int $playerId, Point $point, int $radius, int $height): bool
+    {
+        foreach ($this->playersColliders as $collider) {
+            if ($collider->getPlayerId() === $playerId) {
+                continue;
+            }
+
+            if ($collider->collide($point, $radius, $height)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     * @internal
+     */
+    public function getWalls(): array
+    {
+        $output = [];
+        foreach ($this->walls as $_groupIndex => $wallGroup) {
+            foreach ($wallGroup as $_baseCoordinate => $walls) {
+                foreach ($walls as $wall) {
+                    $output[] = $wall->toArray();
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    /**
+     * @return array<int,array<string,mixed>>
+     * @internal
+     */
+    public function getFloors(): array
+    {
+        $output = [];
+        foreach ($this->floors as $_yCoordinate => $floors) {
+            foreach ($floors as $floor) {
+                $output[] = $floor->toArray();
+            }
+        }
+        return $output;
+    }
 
 }

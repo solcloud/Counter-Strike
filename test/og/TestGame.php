@@ -4,6 +4,7 @@ namespace Test;
 
 use Closure;
 use cs\Core\Game;
+use cs\Net\Protocol\TextProtocol;
 
 /**
  * @deprecated OG test only
@@ -13,14 +14,19 @@ class TestGame extends Game
     private int $tickMax = 1;
     private ?Closure $onTickCallback = null;
     private ?Closure $onEventsCallback = null;
+    /** @var string[] */
+    private array $gameStates = [];
 
     public function setTickMax(int $tickMax): void
     {
         $this->tickMax = $tickMax;
     }
 
-    public function start(): void
+    public function start(bool $debug = false): void
     {
+        if ($debug) {
+            $protocol = new TextProtocol();
+        }
         for ($tickId = 0; $tickId < $this->tickMax; $tickId++) {
             if ($this->onTickCallback) {
                 call_user_func($this->onTickCallback, $this->getState());
@@ -29,6 +35,9 @@ class TestGame extends Game
             $events = $this->consumeTickEvents();
             if ($this->onEventsCallback && $events !== []) {
                 call_user_func($this->onEventsCallback, $events);
+            }
+            if ($debug) {
+                $this->gameStates[$tickId] = json_decode($protocol->serializeGameState($this));
             }
         }
     }
@@ -51,5 +60,17 @@ class TestGame extends Game
         $this->onEventsCallback = $callback;
     }
 
-}
+    public function saveDebugData(string $path): void
+    {
+        file_put_contents(
+            $path,
+            json_encode([
+                'states' => $this->gameStates,
+                'floors' => $this->getWorld()->getFloors(),
+                'walls'  => $this->getWorld()->getWalls(),
+            ])
+        );
+        $this->gameStates = [];
+    }
 
+}

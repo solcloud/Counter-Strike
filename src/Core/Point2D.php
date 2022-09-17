@@ -5,12 +5,11 @@ namespace cs\Core;
 /**
  * @property-read int $x
  * @property-read int $y
- * @property-read int $z
  */
-class Point
+class Point2D
 {
 
-    public function __construct(private int $x = 0, private int $y = 0, private int $z = 0)
+    public function __construct(private int $x = 0, private int $y = 0)
     {
     }
 
@@ -21,9 +20,6 @@ class Point
         }
         if ($name === 'y') {
             return $this->getY();
-        }
-        if ($name === 'z') {
-            return $this->getZ();
         }
 
         throw new GameException("Invalid field '{$name}' given");
@@ -39,19 +35,14 @@ class Point
         return $this->y;
     }
 
-    public function getZ(): int
-    {
-        return $this->z;
-    }
-
     public function isOrigin(): bool
     {
-        return ($this->x === 0 && $this->y === 0 && $this->z === 0);
+        return ($this->x === 0 && $this->y === 0);
     }
 
     public function equals(self $point): bool
     {
-        return ($this->x === $point->x && $this->y === $point->y && $this->z === $point->z);
+        return ($this->x === $point->x && $this->y === $point->y);
     }
 
     public function addX(int $amount): self
@@ -78,38 +69,20 @@ class Point
         return $this;
     }
 
-    public function addZ(int $amount): self
-    {
-        $this->z += $amount;
-        return $this;
-    }
-
-    public function setZ(int $int): self
-    {
-        $this->z = $int;
-        return $this;
-    }
-
     public function __toString(): string
     {
-        return "Point({$this->x},{$this->y},{$this->z})";
+        return "Point2D({$this->x},{$this->y})";
     }
 
     public function clone(): self
     {
-        return new self($this->x, $this->y, $this->z);
+        return new self($this->x, $this->y);
     }
 
     public function setFrom(self $point): void
     {
         $this->setX($point->x);
         $this->setY($point->y);
-        $this->setZ($point->z);
-    }
-
-    public function to2D(string $XYaxis): Point2D
-    {
-        return new Point2D($this->{$XYaxis[0]}, $this->{$XYaxis[1]});
     }
 
     /**
@@ -120,7 +93,6 @@ class Point
         return [
             "x" => $this->getX(),
             "y" => $this->getY(),
-            "z" => $this->getZ(),
         ];
     }
 

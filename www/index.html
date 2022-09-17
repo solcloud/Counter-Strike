@@ -64,10 +64,14 @@
         joinGame(params.get('map'), url.substring(0, url.indexOf('?')), params.get('code'))
     }
 
+    const validMaps = ['default']
     function joinGame(map, url, code) {
         if (!map || !url || !code) {
             alert("Invalid parameters")
             return
+        }
+        if (!validMaps.includes(map)) {
+            alert("Invalid map given")
         }
 
         modal.remove()
