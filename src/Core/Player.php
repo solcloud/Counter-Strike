@@ -21,7 +21,7 @@ final class Player
     public const speedMove = 50; // TODO: linear movement or ease-in-out?
     public const speedMoveWalk = 40;
     public const speedMoveCrouch = 30;
-    public const speedJump = 20;
+    public const speedJump = 30;
     public const tickCountJump = 5;
     public const tickCountCrouch = 10;
     public const headHeightStand = 190;
@@ -31,8 +31,10 @@ final class Player
     public const obstacleOvercomeHeight = 20;
     public const playerBoundingRadius = self::bodyRadius;
     public const fallDamageThreshold = 3 * self::headHeightStand;
+    public const jumpHeight = self::speedJump * self::tickCountJump;
     public const headRadius = 30;
-    public const bodyRadius = 50;
+    public const bodyRadius = self::speedMove - 6;
+    public const jumpMovementSlowDown = 1;
 
     private Point $position;
     private PlayerCamera $sight;
@@ -161,6 +163,11 @@ final class Player
     public function getBoundingRadius(): int
     {
         return $this->playerBoundingRadius;
+    }
+
+    public function getFloorBoundingRadius(): int
+    {
+        return (int)round($this->getBoundingRadius() / 2);
     }
 
     public function lowerArmor(int $armorDamage): void

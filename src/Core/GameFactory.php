@@ -34,7 +34,7 @@ class GameFactory
         $properties->max_rounds = 22;
         $properties->freeze_time_sec = 0;
         $properties->half_time_freeze_sec = 0;
-        $properties->round_time_ms = 30123;
+        $properties->round_time_ms = 982123;
         $properties->randomize_spawn_position = false;
 
         return new Game($properties);

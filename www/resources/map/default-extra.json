@@ -1,0 +1,229 @@
+{
+    "metadata": {
+        "version": 4.5,
+        "type": "Object",
+        "generator": "Object3D.toJSON"
+    },
+    "geometries": [
+        {
+            "uuid": "b15e823f-b549-43b8-8686-98b1ef78bbda",
+            "type": "SphereGeometry",
+            "radius": 90,
+            "widthSegments": 32,
+            "heightSegments": 16,
+            "phiStart": 0,
+            "phiLength": 6.283185307179586,
+            "thetaStart": 0,
+            "thetaLength": 3.141592653589793
+        }
+    ],
+    "materials": [
+        {
+            "uuid": "24c4e72f-25b5-42dc-9018-46e0d18354b0",
+            "type": "MeshBasicMaterial",
+            "color": 16777215,
+            "reflectivity": 1,
+            "refractionRatio": 0.98,
+            "depthFunc": 3,
+            "depthTest": true,
+            "depthWrite": true,
+            "colorWrite": true,
+            "stencilWrite": false,
+            "stencilWriteMask": 255,
+            "stencilFunc": 519,
+            "stencilRef": 0,
+            "stencilFuncMask": 255,
+            "stencilFail": 7680,
+            "stencilZFail": 7680,
+            "stencilZPass": 7680
+        }
+    ],
+    "object": {
+        "uuid": "130ebea7-dd2a-4835-bf5c-4899745d41b6",
+        "type": "Group",
+        "name": "extra",
+        "layers": 1,
+        "matrix": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+        ],
+        "children": [
+            {
+                "uuid": "2804ae7c-9806-4a8b-a31a-74e2990d1d12",
+                "type": "SpotLight",
+                "castShadow": true,
+                "layers": 1,
+                "matrix": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1395,
+                    2372.5,
+                    -1395,
+                    1
+                ],
+                "color": 16777215,
+                "intensity": 0.6,
+                "distance": 0,
+                "angle": 1.0471975511965976,
+                "decay": 1,
+                "penumbra": 0,
+                "shadow": {
+                    "mapSize": [
+                        2048,
+                        2048
+                    ],
+                    "camera": {
+                        "uuid": "511945e1-ecaf-46e1-8e1b-92175647c842",
+                        "type": "PerspectiveCamera",
+                        "layers": 1,
+                        "fov": 119.99999999999999,
+                        "zoom": 1,
+                        "near": 1,
+                        "far": 900601,
+                        "focus": 10,
+                        "aspect": 1,
+                        "filmGauge": 35,
+                        "filmOffset": 0
+                    }
+                }
+            },
+            {
+                "uuid": "aa2d9faf-8021-4e7d-ae9f-6df70c13f7b8",
+                "type": "DirectionalLight",
+                "layers": 1,
+                "matrix": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1
+                ],
+                "color": 16771778,
+                "intensity": 0.6,
+                "shadow": {
+                    "camera": {
+                        "uuid": "0d568d2d-d917-4542-8339-6f0f7bdbe2e8",
+                        "type": "OrthographicCamera",
+                        "layers": 1,
+                        "zoom": 1,
+                        "left": -5,
+                        "right": 5,
+                        "top": 5,
+                        "bottom": -5,
+                        "near": 0.5,
+                        "far": 500
+                    }
+                }
+            },
+            {
+                "uuid": "f3b5731b-2cb4-49ee-bdfd-a3fbfb1b33f4",
+                "type": "AmbientLight",
+                "layers": 1,
+                "matrix": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "color": 14342874,
+                "intensity": 0.8
+            },
+            {
+                "uuid": "02c4459e-e63d-4cae-9037-b0093ae1c54f",
+                "type": "Object3D",
+                "name": "light-target",
+                "layers": 1,
+                "matrix": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1395,
+                    0,
+                    -1395,
+                    1
+                ]
+            },
+            {
+                "uuid": "942dd746-7d9b-41a0-bac8-ac51fcecd36f",
+                "type": "Mesh",
+                "layers": 1,
+                "matrix": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1395,
+                    979,
+                    -1395,
+                    1
+                ],
+                "geometry": "b15e823f-b549-43b8-8686-98b1ef78bbda",
+                "material": "24c4e72f-25b5-42dc-9018-46e0d18354b0"
+            }
+        ]
+    }
+}

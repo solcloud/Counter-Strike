@@ -12,9 +12,21 @@ export class World {
 
         const scene = this.#scene
         const mapLoader = new THREE.ObjectLoader()
-        mapLoader.load(`/resources/map/${this.#map}.json`, function (object) {
-            object.scale.set(modelData.scaleX, modelData.scaleY, modelData.scaleZ)
-            scene.add(object)
+        mapLoader.load(`/resources/map/${this.#map}.json`, function (mapData) {
+            scene.add(mapData)
+        })
+        mapLoader.load(`/resources/map/${this.#map}-extra.json`, function (mapData) {
+            // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
+            const lightTarget = mapData.getObjectByName('light-target')
+            mapData.traverse(function (object) {
+                if (object.type !== 'SpotLight') {
+                    return
+                }
+
+                object.target = lightTarget
+            })
+
+            scene.add(mapData)
         })
     }
 
@@ -26,34 +38,12 @@ export class World {
         const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 4999);
         camera.rotation.reorder("YXZ")
 
-        if (true) {
-            const gridHelper = new THREE.GridHelper(9999, 999);
-            scene.add(gridHelper);
-
-            const wallHeight = 300
-            const wallWidth = 800
-            const wallXZero = new THREE.Mesh(new THREE.PlaneGeometry(wallWidth, wallHeight), new THREE.MeshBasicMaterial({
-                color: 0xffaabb,
-                side: THREE.DoubleSide
-            }));
-            wallXZero.translateY(wallXZero.geometry.parameters.height / 2)
-            wallXZero.translateZ(-wallXZero.geometry.parameters.width / 2)
-            wallXZero.rotateY(degreeToRadian(90))
-            scene.add(wallXZero)
-
-            const wallZZero = new THREE.Mesh(new THREE.PlaneGeometry(wallWidth, wallHeight), new THREE.MeshBasicMaterial({
-                color: 0xF2FFa2,
-                side: THREE.DoubleSide
-            }));
-            wallZZero.translateY(wallZZero.geometry.parameters.height / 2)
-            wallZZero.rotateY(degreeToRadian(180))
-            scene.add(wallZZero)
-        }
-
         const renderer = new THREE.WebGLRenderer({
             canvas: document.getElementById('canvas'),
             antialias: true
         });
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
 

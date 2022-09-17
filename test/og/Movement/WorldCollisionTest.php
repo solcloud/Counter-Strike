@@ -9,6 +9,7 @@ use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Core\Wall;
+use cs\Enum\Color;
 use Test\BaseTestCase;
 
 class WorldCollisionTest extends BaseTestCase
@@ -44,7 +45,38 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->moveForward();
         });
         $game->start();
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
         $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testPlayerCollisionWithBoxDoubleMovement(): void
+    {
+        $game = $this->createOneRoundGame(3);
+        $game->getPlayer(1)->playerBoundingRadius = Player::playerBoundingRadius;
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Player::playerBoundingRadius + 1), 10 * Player::speedMove, Player::headHeightStand, 1));
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->moveForward();
+            $state->getPlayer(1)->moveLeft();
+        });
+        $game->start();
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
+    }
+
+    public function testPlayerCollisionWithBoxDoubleMovement2(): void
+    {
+        $game = $this->createOneRoundGame(3);
+        $game->getPlayer(1)->playerBoundingRadius = Player::playerBoundingRadius;
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Player::playerBoundingRadius + 10), 10 * Player::speedMove, Player::headHeightStand, 1));
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->getSight()->lookHorizontal(1);
+            $state->getPlayer(1)->moveForward();
+            $state->getPlayer(1)->moveRight();
+        });
+        $game->start();
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertSame(9, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testPlayerCollisionWithBoxAngle2(): void
@@ -58,6 +90,7 @@ class WorldCollisionTest extends BaseTestCase
         });
         $game->start();
         $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testPlayerDieOnFallDamage(): void
@@ -131,6 +164,33 @@ class WorldCollisionTest extends BaseTestCase
         }
         $this->playPlayer($game, $playerCommands);
         $this->assertPlayerPosition($game, new Point(3 * Player::speedMove - 1, 0, 0));
+    }
+
+    public function testPlayerCollisionWithOtherPlayer(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->playerBoundingRadius = 0;
+        $game = $this->createOneRoundGame(10);
+        $game->addPlayer($player2);
+
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->start();
+        $this->assertPositionSame($player2->getPositionImmutable(), new Point(0, 0, Player::speedMove));
+        $this->assertSame($player2->getPositionImmutable()->z - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testPlayerCollisionWithOtherPlayerRadius(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->playerBoundingRadius = 10;
+        $game = $this->createOneRoundGame(10);
+        $game->addPlayer($player2);
+        $game->getPlayer(1)->playerBoundingRadius = 4;
+
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->start();
+        $this->assertPositionSame($player2->getPositionImmutable(), new Point(0, 0, Player::speedMove));
+        $this->assertSame($player2->getPositionImmutable()->z - 10 - 1 - 4, $game->getPlayer(1)->getPositionImmutable()->z);
     }
 
     public function testGravity(): void
@@ -207,8 +267,117 @@ class WorldCollisionTest extends BaseTestCase
         $game = $this->createOneRoundGame(Player::tickCountJump);
         $game->getWorld()->addFloor($ceiling);
         $game->getPlayer(1)->jump();
-        $game->onTick(fn(GameState $state) => $this->assertLessThan($ceiling->getY(), $state->getPlayer(1)->getPositionImmutable()->y));
+        $game->onTick(function (GameState $state) use ($ceiling): void {
+            $this->assertTrue($state->getPlayer(1)->isJumping());
+            $this->assertTrue($state->getPlayer(1)->isFlying());
+            if ($state->getTickId() > 0) {
+                $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionImmutable()->y);
+            }
+            $this->assertLessThan($ceiling->getY(), $state->getPlayer(1)->getPositionImmutable()->y);
+        });
         $game->start();
+    }
+
+    public function testJumpSpeed(): void
+    {
+        $playerCommands = [
+            function (Player $p): void {
+                $p->moveRight();
+                $p->jump();
+            },
+            $this->endGame(),
+        ];
+
+        $game = $this->createGame();
+        $this->playPlayer($game, $playerCommands);
+        $this->assertSame(1, $game->getTickId());
+        $this->assertPlayerPosition($game, new Point(Player::speedMove, 2 * Player::speedJump, 0));
+    }
+
+    public function testCanJumpOnBox(): void
+    {
+        $tickCount = Player::tickCountJump + 4;
+        $game = $this->createOneRoundGame($tickCount);
+        $game->onTick(function (GameState $state): void {
+            if ($state->getTickId() === 0) {
+                $state->getPlayer(1)->jump();
+            }
+            $state->getPlayer(1)->moveRight();
+        });
+        $box = new Box(new Point(Player::speedMove / 2, 0, 0), $tickCount * Player::speedMove, Player::headHeightCrouch, 1);
+        $game->getWorld()->addBox($box);
+        $game->start();
+        $this->assertGreaterThan(0, $box->heightY);
+        $this->assertFalse($game->getPlayer(1)->isFlying());
+        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertLessThan(Player::speedMove * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(Player::speedMove * ($tickCount - ceil($box->heightY / Player::speedJump)), $game->getPlayer(1)->getPositionImmutable()->x);
+    }
+
+    public function testCanJumpOnBoxBoundingRadius(): void
+    {
+        $tickCount = Player::tickCountJump + 4;
+        $game = $this->createOneRoundGame($tickCount);
+        $game->getPlayer(1)->playerBoundingRadius = Player::bodyRadius;
+        $game->onTick(function (GameState $state): void {
+            if ($state->getTickId() === 1) {
+                $state->getPlayer(1)->jump();
+            }
+            $state->getPlayer(1)->moveRight();
+        });
+        $box = new Box(new Point((int)floor(Player::speedMove * 2.5), 0, 0), $tickCount * Player::speedMove, Player::headHeightCrouch, 1);
+        $game->getWorld()->addBox($box);
+        $game->start();
+        $this->assertGreaterThan(0, $box->heightY);
+        $this->assertFalse($game->getPlayer(1)->isFlying());
+        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertLessThan(Player::speedMove * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(Player::speedMove * ($tickCount - ceil($box->heightY / Player::speedJump)), $game->getPlayer(1)->getPositionImmutable()->x);
+    }
+
+    public function testCanJumpOverWall(): void
+    {
+        $tickCount = Player::tickCountJump * 2;
+        $game = $this->createOneRoundGame($tickCount);
+        $game->onTick(function (GameState $state): void {
+            if ($state->getTickId() === 1) {
+                $state->getPlayer(1)->jump();
+            }
+            if ($state->getTickId() === 1 + Player::tickCountJump) {
+                $this->assertSame(Player::jumpHeight - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+            }
+            $state->getPlayer(1)->moveRight();
+        });
+        $box = new Box(new Point(Player::speedMove, 0, 0), Player::speedMove, Player::jumpHeight - 1, 1);
+        $game->getWorld()->addBox($box);
+        $game->start();
+        $this->assertGreaterThan(0, $box->heightY);
+        $this->assertFalse($game->getPlayer(1)->isFlying());
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionImmutable()->x);
+    }
+
+    public function testCanJumpOverWallBoundingRadius(): void
+    {
+        $tickCount = Player::tickCountJump * 2 + 2;
+        $game = $this->createOneRoundGame($tickCount);
+        $game->getPlayer(1)->playerBoundingRadius = Player::bodyRadius;
+        $game->onTick(function (GameState $state): void {
+            if ($state->getTickId() === 1) {
+                $state->getPlayer(1)->jump();
+            }
+            if ($state->getTickId() === 1 + Player::tickCountJump) {
+                $this->assertSame(Player::jumpHeight - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+            }
+            $state->getPlayer(1)->moveRight();
+        });
+        $box = new Box(new Point(Player::speedMove, 0, 0), Player::speedMove, Player::jumpHeight - 1, 1);
+        $game->getWorld()->addBox($box);
+        $game->start();
+        $this->assertGreaterThan(0, $box->heightY);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertFalse($game->getPlayer(1)->isFlying());
     }
 
     public function testJumpCourse(): void
@@ -240,10 +409,18 @@ class WorldCollisionTest extends BaseTestCase
         $steps = 4;
         $game = $this->createGame();
         for ($i = 1; $i <= $steps; $i++) {
-            $game->getWorld()->addFloor(new Floor(new Point(0, $i, $i * Player::speedMove)));
+            $floor = new Floor(
+                new Point(
+                    0,
+                    $i * Player::speedJump,
+                    (int)ceil($i * Player::speedMove * Player::jumpMovementSlowDown)
+                ),
+                1, Player::speedMove
+            );
+            $game->getWorld()->addFloor($floor);
         }
         $this->playPlayer($game, $playerCommands);
-        $this->assertPositionSame(new Point(0, $steps, $steps * Player::speedMove), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, $floor->getY(), $floor->getStart()->z), $game->getPlayer(1)->getPositionImmutable());
     }
 
 
