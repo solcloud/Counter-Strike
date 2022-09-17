@@ -3,6 +3,8 @@
 Competitive multiplayer game where two football fans teams, each team have 5 players, fights in 15 rounds with goal to wins more rounds than opponents team.
 Teams are attackers and defenders. Defenders team has goal of protecting their fan base sanctuary every round from desecrate by attackers using their graffiti bomb ball.
 
+![week1](https://user-images.githubusercontent.com/74121353/190862209-653e8339-acb1-4feb-ac08-93bcdd944272.png)
+
 Defenders win round by:
 - eliminated all attackers players before bomb planted (touchdown)
 - defusing bomb before it blows (graffiti fireworks)
