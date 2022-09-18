@@ -3,9 +3,6 @@
 namespace cs\Map;
 
 use cs\Core\Box;
-use cs\Core\Floor;
-use cs\Core\Point;
-use cs\Core\Wall;
 
 abstract class BoxMap extends Map
 {
@@ -19,7 +16,7 @@ abstract class BoxMap extends Map
 
     public function getFloors(): array
     {
-        $floors = [new Floor(new Point(), PHP_INT_MAX, PHP_INT_MAX)];
+        $floors = parent::getFloors();
         foreach ($this->boxes as $box) {
             $floors = [...$floors, ...$box->getFloors()];
         }
@@ -28,10 +25,7 @@ abstract class BoxMap extends Map
 
     public function getWalls(): array
     {
-        $walls = [
-            new Wall(new Point(0, 0, -1), true, PHP_INT_MAX),
-            new Wall(new Point(-1, 0, 0), false, PHP_INT_MAX),
-        ];
+        $walls = parent::getWalls();
         foreach ($this->boxes as $box) {
             $walls = [...$walls, ...$box->getWalls()];
         }

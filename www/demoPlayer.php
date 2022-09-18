@@ -1,19 +1,298 @@
 <?php
+
+use cs\Core\Player;
+
+if (getenv('DEVTOKEN') !== 'dev') {
+    exit;
+}
 require __DIR__ . '/../vendor/autoload.php';
 ////////
-//$data = file_get_contents('/tmp/cs.demo.json');
+$data = @file_get_contents('/tmp/cs.demo.json');
 ////////
+
+if ($data === false) {
+    throw new Exception("No data found");
+}
+$data = json_decode($data, true);
+$frameIdStart = null;
+$frameIdEnd = null;
 ?>
 <!Doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Demo player</title>
+    <style>
+        body {
+            margin: 0;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .container {
+            position: absolute;
+            background-color: rgba(196, 196, 196, 0.75);
+            width: 100%;
+            padding-top: 12px;
+            text-align: center;
+        }
+
+        .container button {
+            font-size: 1.2rem;
+            padding: 4px 8px;
+            text-align: center;
+        }
+
+        .container .progress {
+            padding: 2px 8px;
+        }
+
+        .container .progress * {
+            display: block;
+            width: 100%;
+        }
+    </style>
     <script src="/assets/threejs/three.js"></script>
     <script src="/assets/threejs/orbit-control.js"></script>
+    <script src="/assets/js/utils.js"></script>
 </head>
-<body style="margin:0">
+<body>
 <script>
+    const frames = []
+    <?php foreach ($data['states'] as $frameId => $state) : ?>
+    <?php
+    if ($frameIdStart === null) {
+        $frameIdStart = $frameId;
+    }
+    $frameIdEnd = $frameId;
+    ?>
+    frames[<?= $frameId ?>] = JSON.parse('<?= json_encode($state, JSON_THROW_ON_ERROR) ?>');
+    <?php endforeach; ?>
+</script>
+<div class="container">
+    <div>
+        Frame: <span id="frameId">0</span>/<?= $frameIdEnd ?>
+        <button onclick="driver.goToFrame(<?= $frameIdStart ?>)">Go to Start</button>
+        <button onclick="driver.previousFrame()">Prev</button>
+        <button onclick="driver.playPause()">Play/Pause</button>
+        <button onclick="driver.nextFrame()">Next</button>
+        <button onclick="driver.goToFrame(<?= $frameIdEnd ?>)">Go to End</button>
+        &nbsp;
+        Speed: <span id="speedLimit"></span>ms</span>
+        <button onclick="driver.changeSpeed(50)">Slower</button>
+        <button onclick="driver.changeSpeed()">Default</button>
+        <button onclick="driver.changeSpeed(-50)">Faster</button>
+    </div>
+    <div class="progress">
+        <input type="range" id="progress" min="0" value="0" max="<?= $frameIdEnd ?>">
+    </div>
+</div>
+<script>
+
+    const renderer = {
+        gl: null,
+        scene: null,
+        camera: null,
+        initialize: function (floors, walls) {
+            this.scene = new THREE.Scene();
+            this.scene.background = new THREE.Color(0xdddddd);
+            this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
+            this.camera.position.y = 1500
+
+            this.gl = new THREE.WebGLRenderer({antialias: true});
+            this.gl.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(this.gl.domElement);
+
+            this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
+            const lastObject = this.fillWorld(floors, walls)
+            this.camera.lookAt(lastObject)
+            new THREE.OrbitControls(this.camera, this.gl.domElement);
+        },
+        fillWorld: function (floors, walls) {
+            let lastMesh
+            const scene = this.scene
+            const materialFloor = new THREE.MeshBasicMaterial({color: 0xFF0000, wireframe: true, transparent: true, opacity: 0.4, side: THREE.DoubleSide})
+            const materialWall = new THREE.MeshBasicMaterial({color: 0x0000FF, wireframe: true, transparent: true, opacity: 0.3, side: THREE.DoubleSide})
+            floors.forEach(function (floor) {
+                const mesh = new THREE.Mesh(
+                    new THREE.PlaneGeometry(floor.end.x - floor.start.x, floor.end.z - floor.start.z, 4, 4),
+                    materialFloor
+                )
+                mesh.rotateX(degreeToRadian(-90))
+                mesh.position.set(floor.start.x, floor.start.y, -floor.start.z)
+                mesh.translateX(mesh.geometry.parameters.width / 2)
+                mesh.translateY(mesh.geometry.parameters.height / 2)
+                scene.add(mesh)
+                lastMesh = mesh
+            })
+            walls.forEach(function (wall) {
+                const width = wall.axis === 'xy' ? wall.end.x - wall.start.x : wall.end.z - wall.start.z
+                const mesh = new THREE.Mesh(
+                    new THREE.PlaneGeometry(width, wall.end.y - wall.start.y, 4, 2),
+                    materialWall
+                )
+                if (wall.axis === 'xy') {
+                    // no rotation needed
+                } else if (wall.axis === 'zy') {
+                    mesh.rotateY(degreeToRadian(90))
+                } else {
+                    throw new Error("Bad wall axis: " + wall.axis)
+                }
+                mesh.position.set(wall.start.x, wall.start.y, -wall.start.z)
+                mesh.translateX(mesh.geometry.parameters.width / 2)
+                mesh.translateY(mesh.geometry.parameters.height / 2)
+                scene.add(mesh)
+                lastMesh = mesh
+            })
+
+            return lastMesh
+        },
+        animate: function () {
+            this.gl.render(this.scene, this.camera);
+        },
+        players: [],
+        spawnPlayer: function (id, color, isAttacker) {
+            const radiusHead = <?= Player::headRadius ?>;
+            const sightHeight = <?= Player::headHeightStand - Player::headRadius ?>;
+            const head = new THREE.Mesh(
+                new THREE.SphereGeometry(radiusHead),
+                new THREE.MeshBasicMaterial({color: 0xFF6600})
+            );
+            head.name = "head"
+            head.rotation.y = degreeToRadian(90)
+            head.position.y = sightHeight
+
+            const radiusBody = <?= Player::bodyRadius ?>;
+            const heightBody = <?= Player::headHeightStand ?>;
+            const body = new THREE.Mesh(
+                new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 16),
+                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+            );
+            body.translateY(body.geometry.parameters.height / 2)
+            body.name = "body"
+
+            const player = new THREE.Object3D();
+            player.rotation.reorder("YXZ")
+            player.add(head, body)
+            this.scene.add(player)
+            return player
+        },
+        renderFrame: function (frameId, state) {
+            const self = this
+            if (state.events.length) {
+                console.log(state.events)
+            }
+            state.players.forEach(function (playerState) {
+                let player = self.players[playerState.id]
+                if (player === undefined) {
+                    player = self.spawnPlayer(playerState.id, playerState.color, playerState.isAttacker)
+                    self.players[playerState.id] = player
+                }
+
+                console.debug(frameId, playerState.position)
+                player.getObjectByName('head').position.y = playerState.heightSight
+                player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
+            })
+        }
+    }
+
+    function createDriver(renderer) {
+
+        const driver = {
+            frameId: <?= $frameIdStart ?>,
+            defaultAnimationSpeedMs: 500,
+            getFrameId: function () {
+                return this.frameId;
+            }
+        };
+
+        /////
+        const progress = document.getElementById('progress');
+        const frameIdCaption = document.getElementById('frameId');
+        const speedLimitCaption = document.getElementById('speedLimit');
+        let frameId = driver.getFrameId();
+        let frameMaxId = <?= $frameIdEnd ?>;
+        let animationSpeed = driver.defaultAnimationSpeedMs;
+        let animationId = null;
+        speedLimitCaption.innerText = animationSpeed;
+        /////
+
+        driver.goToFrame = function (goToFrameId) {
+            if (goToFrameId === undefined || goToFrameId < 0 || goToFrameId > frameMaxId) {
+                driver.pause();
+                return false;
+            }
+
+            frameId = goToFrameId;
+            driver.frameId = frameId;
+            frameIdCaption.innerText = frameId
+            progress.value = frameId
+            renderer.renderFrame(frameId, frames[frameId])
+        }
+
+        driver.previousFrame = function () {
+            driver.goToFrame(frameId - 1);
+        }
+
+        driver.nextFrame = function () {
+            driver.goToFrame(frameId + 1);
+        }
+
+        driver.playPause = function () {
+            if (animationId) {
+                driver.pause();
+            } else {
+                driver.play();
+            }
+        }
+
+        driver.play = function () {
+            if (animationId) {
+                return;
+            }
+
+            animationId = setInterval(function () {
+                driver.nextFrame();
+            }, animationSpeed);
+        }
+
+        driver.pause = function () {
+            clearInterval(animationId);
+            animationId = undefined;
+        }
+
+        driver.changeSpeed = function (speedDelta) {
+            if (speedDelta === undefined) {
+                animationSpeed = driver.defaultAnimationSpeedMs;
+            } else {
+                animationSpeed += speedDelta;
+            }
+
+            speedLimitCaption.innerText = animationSpeed;
+            driver.pause();
+            driver.play();
+        }
+
+        return driver;
+    }
+
+    renderer.initialize(JSON.parse('<?= json_encode($data['floors']) ?>'), JSON.parse('<?= json_encode($data['walls']) ?>'))
+    window.driver = createDriver(renderer)
+    document.getElementById('progress').addEventListener('input', function () {
+        if (driver.frameId === this.value) {
+            return
+        }
+        driver.goToFrame(this.value)
+    })
+    driver.goToFrame(0)
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.animate();
+    }
+
+    animate()
+
 </script>
 </body>
 </html>

@@ -36,8 +36,8 @@ abstract class Map
     public function getWalls(): array
     {
         return [
-            new Wall(new Point(0, 0, -1), true, PHP_INT_MAX),
-            new Wall(new Point(-1, 0, 0), false, PHP_INT_MAX),
+            new Wall(new Point(0, 0, -1), true, 99999),
+            new Wall(new Point(-1, 0, 0), false, 99999),
         ];
     }
 
@@ -46,7 +46,7 @@ abstract class Map
      */
     public function getFloors(): array
     {
-        return [new Floor(new Point(), PHP_INT_MAX, PHP_INT_MAX)];
+        return [new Floor(new Point(), 99999, 99999)];
     }
 
     /**

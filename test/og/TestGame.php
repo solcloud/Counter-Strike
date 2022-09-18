@@ -14,7 +14,7 @@ class TestGame extends Game
     private int $tickMax = 1;
     private ?Closure $onTickCallback = null;
     private ?Closure $onEventsCallback = null;
-    /** @var string[] */
+    /** @var array<int,mixed> */
     private array $gameStates = [];
 
     public function setTickMax(int $tickMax): void
@@ -60,8 +60,9 @@ class TestGame extends Game
         $this->onEventsCallback = $callback;
     }
 
-    public function saveDebugData(string $path): void
+    public function startDebug(string $path= '/tmp/cs.demo.json'): void
     {
+        $this->start(true);
         file_put_contents(
             $path,
             json_encode([

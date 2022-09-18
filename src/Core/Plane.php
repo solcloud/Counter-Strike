@@ -7,7 +7,7 @@ abstract class Plane extends SolidSurface
     private Point2D $point2DStart;
     private Point2D $point2DEnd;
 
-    public function __construct(private Point $start, private Point $end, string $axis2d)
+    public function __construct(private Point $start, private Point $end, private string $axis2d)
     {
         $this->point2DStart = $this->start->to2D($axis2d);
         $this->point2DEnd = $this->end->to2D($axis2d);
@@ -44,13 +44,14 @@ abstract class Plane extends SolidSurface
     }
 
     /**
-     * @return array<string,array<string,int>>
+     * @return array<string,string|array<string,int>>
      */
     public function toArray(): array
     {
         return [
             'start' => $this->start->toArray(),
             'end'   => $this->end->toArray(),
+            'axis'  => $this->axis2d,
         ];
     }
 

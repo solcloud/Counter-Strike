@@ -73,13 +73,13 @@ class WallTest extends BaseTestCase
         $player->playerBoundingRadius = Player::obstacleOvercomeHeight;
 
         $ramp = new Ramp(
-            new Point(0, 0, $player->getBoundingRadius() * 2),
+            new Point(0, 0, $player::bodyRadius * 2),
             new Point2D(0, 1),
             $numOfBoxes * 3,
             10,
             true,
-            $player->getBoundingRadius(),
-            $player->getBoundingRadius() * 2
+            Player::obstacleOvercomeHeight,
+            Player::obstacleOvercomeHeight * 2
         );
         foreach ($ramp->getBoxes() as $box) {
             $game->getWorld()->addBox($box);
@@ -127,7 +127,7 @@ class WallTest extends BaseTestCase
         for ($i = 1; $i <= $numOfBoxes; $i++) {
             $game->getWorld()->addBox(
                 new Box(
-                    $base->clone()->setZ($i * Player::speedMove + $i),
+                    $base->clone()->setZ($i * Player::speedMove),
                     20,
                     Player::obstacleOvercomeHeight,
                     Player::speedMove
@@ -135,7 +135,7 @@ class WallTest extends BaseTestCase
             );
             $base->addY(Player::obstacleOvercomeHeight);
         }
-        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 1) + $player->getFloorBoundingRadius()), 10, $base->y + 999999, 10);
+        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 2)), 10, $base->y, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
@@ -164,7 +164,7 @@ class WallTest extends BaseTestCase
             );
             $base->addY(Player::obstacleOvercomeHeight);
         }
-        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 1) + $player->getFloorBoundingRadius()), 10, $base->y, 10);
+        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 2) + $player->getBoundingRadius()), 10, $base->y, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(function (GameState $state) use ($numOfBoxes) {
@@ -174,7 +174,7 @@ class WallTest extends BaseTestCase
             }
         });
         $game->start();
-        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1), $player->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1 - $player->getBoundingRadius()), $player->getPositionImmutable());
         $this->assertFalse($player->isAlive());
     }
 
