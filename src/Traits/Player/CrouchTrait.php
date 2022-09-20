@@ -2,6 +2,7 @@
 
 namespace cs\Traits\Player;
 
+use cs\Core\Point;
 use cs\Event\CrouchEvent;
 
 trait CrouchTrait
@@ -13,9 +14,6 @@ trait CrouchTrait
             $event = $this->eventsCache[$this->eventIdCrouch];
             $event->directionDown = $directionDown;
             $event->reset();
-            $event->onComplete[] = function () use ($directionDown): void {
-                $this->headHeight = $directionDown ? self::headHeightCrouch : self::headHeightStand; // TODO crouch ceil hit boxes
-            };
             $this->addEvent($event, $this->eventIdCrouch);
             return;
         }
@@ -27,8 +25,15 @@ trait CrouchTrait
                     $this->headHeight = self::headHeightCrouch;
                 }
             } else {
-                // TODO crouch ceil hit boxes
-                $this->headHeight += $event->moveOffset;
+                $targetHeadHeight = $this->headHeight + $event->moveOffset;
+                $candidate = new Point($this->position->x, $this->position->y, $this->position->z);
+                for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, self::headHeightStand); $h++) {
+                    $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getFloorBoundingRadius());
+                    if ($floorCandidate) {
+                        break;
+                    }
+                    $this->headHeight = $h;
+                }
                 if ($this->headHeight > self::headHeightStand) {
                     $this->headHeight = self::headHeightStand;
                 }

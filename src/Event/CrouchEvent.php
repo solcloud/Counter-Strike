@@ -12,7 +12,7 @@ final class CrouchEvent extends TickEvent
     public function __construct(public bool $directionDown, Closure $callback)
     {
         parent::__construct($callback, Player::tickCountCrouch);
-        $this->moveOffset = (Player::headHeightStand - Player::headHeightCrouch) / $this->maxTickCount;
+        $this->moveOffset = (int)ceil((Player::headHeightStand - Player::headHeightCrouch) / $this->maxTickCount);
     }
 
 }

@@ -48,6 +48,20 @@ class MovementTest extends BaseTestCase
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - $boundingRadius - 1));
     }
 
+    public function testPlayerStopOnWallBoundingRadius2(): void
+    {
+        $boundingRadius = rand(1, 999);
+        $wall = new Wall(new Point(0, 0, 2 * Player::speedMove + $boundingRadius), true);
+        $game = $this->createOneRoundGame(5);
+        $game->getPlayer(1)->playerBoundingRadius = $boundingRadius;
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->getWorld()->addWall($wall);
+        $game->start();
+        $this->assertSame($boundingRadius, $game->getPlayer(1)->playerBoundingRadius);
+        $this->assertGreaterThan(0, $wall->getBase());
+        $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - $boundingRadius - 1));
+    }
+
     public function testPlayerIncrementYBySteppingOnSmallWall(): void
     {
         $wall = new Wall(new Point(0, 0, (int)ceil(Player::speedMove / 3)), true, 1, Player::obstacleOvercomeHeight);

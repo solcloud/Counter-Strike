@@ -3,7 +3,11 @@
 namespace Test\World;
 
 use cs\Core\Floor;
+use cs\Core\GameState;
+use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Point2D;
+use cs\Core\Ramp;
 use cs\Core\World;
 use Test\BaseTestCase;
 
@@ -28,6 +32,19 @@ class WorldTest extends BaseTestCase
         $this->assertNotNull($world->findFloor(new Point(11, 1, 0), 2));
         $this->assertNotNull($world->findFloor(new Point(12, 1, 0), 2));
         $this->assertNull($world->findFloor(new Point(15, 1, 0), 3));
+    }
+
+    public function testStairCase(): void
+    {
+        $steps = 20;
+        $ramp = new Ramp(new Point(Player::playerBoundingRadius, 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Player::speedMove);
+
+        $game = $this->createTestGame($steps);
+        $game->getWorld()->addRamp($ramp);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
+
+        $game->start();
+        $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionImmutable()->y);
     }
 
 }

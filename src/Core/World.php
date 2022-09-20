@@ -53,6 +53,13 @@ class World
         }
     }
 
+    public function addRamp(Ramp $ramp): void
+    {
+        foreach ($ramp->getBoxes() as $box) {
+            $this->addBox($box);
+        }
+    }
+
     public function addBox(Box $box): void
     {
         foreach ($box->getWalls() as $wall) {
@@ -211,7 +218,7 @@ class World
         $this->game->playerFallDamageKilledEvent($playerDead);
     }
 
-    public function checkXSideWallCollision(Point $base, int $zMin, int $zMax): ?Wall
+    public function checkXSideWallCollision(Point $base, int $height, int $zMin, int $zMax): ?Wall
     {
         if ($base->x < 0) {
             return new Wall(new Point(-1, -1, -1), false);
@@ -230,17 +237,20 @@ class World
         return null;
     }
 
-    public function checkZSideWallCollision(Point $base, mixed $xMin, mixed $xMax): ?Wall
+    public function checkZSideWallCollision(Point $base, int $height, mixed $xMin, mixed $xMax): ?Wall
     {
         if ($base->z < 0) {
             return new Wall(new Point(-1, -1, -1), true);
         }
 
         foreach (($this->walls[self::WALL_Z][$base->z] ?? []) as $wall) {
+            if ($wall->getCeiling() === $base->y) {
+                continue;
+            }
             if ($wall->getStart()->x > $xMax || $wall->getEnd()->x < $xMin) {
                 continue;
             }
-            if ($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
+            if ($wall->getStart()->y > $base->y + $height || $wall->getEnd()->y < $base->y) {
                 continue;
             }
 

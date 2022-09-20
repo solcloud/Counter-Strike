@@ -27,9 +27,6 @@ final class GameStartEvent extends TickEvent
             'setting'      => $this->gameSetting->toArray(),
             'player'       => $this->player->serialize(),
             'playerModel'  => [
-                'scaleX'       => $this->player->getBoundingRadius(),
-                'scaleY'       => $this->player::boxHeightCrouchCover,
-                'scaleZ'       => $this->player->getBoundingRadius(),
                 'headRadius'  => $this->player::headRadius,
                 'bodyRadius'  => $this->player::bodyRadius,
                 'bodyHeight'  => $this->player->getBodyHeight(),

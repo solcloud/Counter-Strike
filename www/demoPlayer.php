@@ -71,7 +71,8 @@ $frameIdEnd = null;
 </script>
 <div class="container">
     <div>
-        Frame: <span id="frameId">0</span>/<?= $frameIdEnd ?>
+        <i>Frame start state for frame:</i>
+        <strong><span id="frameId">0</span></strong> / <?= $frameIdEnd ?>
         <button onclick="driver.goToFrame(<?= $frameIdStart ?>)">Go to Start</button>
         <button onclick="driver.previousFrame()">Prev</button>
         <button onclick="driver.playPause()">Play/Pause</button>
@@ -166,14 +167,26 @@ $frameIdEnd = null;
             const heightBody = <?= Player::headHeightStand ?>;
             const body = new THREE.Mesh(
                 new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 16),
-                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2), transparent: true, opacity: .4})
             );
             body.translateY(body.geometry.parameters.height / 2)
             body.name = "body"
 
+            const body0 = new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1, heightBody, 16),
+                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+            );
+            body0.translateY(body0.geometry.parameters.height / 2)
+
+            const boundingRadius = new THREE.Mesh(
+                new THREE.CircleGeometry(<?= Player::playerBoundingRadius ?>, 16),
+                new THREE.MeshBasicMaterial({color: 0xFF6600, side: THREE.DoubleSide})
+            );
+            boundingRadius.rotateX(degreeToRadian(90))
+
             const player = new THREE.Object3D();
             player.rotation.reorder("YXZ")
-            player.add(head, body)
+            player.add(head, body, body0, boundingRadius)
             this.scene.add(player)
             return player
         },
@@ -200,7 +213,7 @@ $frameIdEnd = null;
 
         const driver = {
             frameId: <?= $frameIdStart ?>,
-            defaultAnimationSpeedMs: 500,
+            defaultAnimationSpeedMs: 250,
             getFrameId: function () {
                 return this.frameId;
             }
@@ -279,7 +292,7 @@ $frameIdEnd = null;
     renderer.initialize(JSON.parse('<?= json_encode($data['floors']) ?>'), JSON.parse('<?= json_encode($data['walls']) ?>'))
     window.driver = createDriver(renderer)
     document.getElementById('progress').addEventListener('input', function () {
-        if (driver.frameId === this.value) {
+        if (driver.getFrameId() === this.value) {
             return
         }
         driver.goToFrame(this.value)

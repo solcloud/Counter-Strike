@@ -28,6 +28,9 @@ class TestGame extends Game
             $protocol = new TextProtocol();
         }
         for ($tickId = 0; $tickId < $this->tickMax; $tickId++) {
+            if ($debug) {
+                $this->gameStates[$tickId] = json_decode($protocol->serializeGameState($this));
+            }
             if ($this->onTickCallback) {
                 call_user_func($this->onTickCallback, $this->getState());
             }
@@ -36,15 +39,14 @@ class TestGame extends Game
             if ($this->onEventsCallback && $events !== []) {
                 call_user_func($this->onEventsCallback, $events);
             }
-            if ($debug) {
-                $this->gameStates[$tickId] = json_decode($protocol->serializeGameState($this));
-            }
+        }
+        if ($debug) {
+            $this->gameStates[$tickId] = json_decode($protocol->serializeGameState($this));
         }
     }
 
     /**
      * @param Closure $callback function(GameState $state):void {}
-     * @deprecated
      */
     public function onTick(Closure $callback): void
     {
@@ -60,7 +62,7 @@ class TestGame extends Game
         $this->onEventsCallback = $callback;
     }
 
-    public function startDebug(string $path= '/tmp/cs.demo.json'): void
+    public function startDebug(string $path = '/tmp/cs.demo.json'): void
     {
         $this->start(true);
         file_put_contents(

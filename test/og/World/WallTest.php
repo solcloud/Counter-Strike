@@ -42,7 +42,7 @@ class WallTest extends BaseTestCase
     {
         $stepDepth = 2;
         $stepHeight = 8;
-        $ramp = new Ramp(new Point(0, 0, 0), new Point2D(0, 1), 10, 10, true, $stepHeight, $stepDepth);
+        $ramp = new Ramp(new Point(0, 0, 0), new Point2D(0, 1), 10, 10, true, $stepDepth, $stepHeight);
         $boxes = $ramp->getBoxes();
         $this->assertCount(10, $boxes);
         $depth = 0;
@@ -68,22 +68,20 @@ class WallTest extends BaseTestCase
     public function testPlayerRampSpeed(): void
     {
         $numOfBoxes = 20;
-        $game = $this->createOneRoundGame($numOfBoxes);
+        $game = $this->createTestGame($numOfBoxes);
         $player = $game->getPlayer(1);
         $player->playerBoundingRadius = Player::obstacleOvercomeHeight;
 
         $ramp = new Ramp(
-            new Point(0, 0, $player::bodyRadius * 2),
+            new Point(0, 0, $player::bodyRadius),
             new Point2D(0, 1),
             $numOfBoxes * 3,
             10,
             true,
+            Player::speedMove,
             Player::obstacleOvercomeHeight,
-            Player::obstacleOvercomeHeight * 2
         );
-        foreach ($ramp->getBoxes() as $box) {
-            $game->getWorld()->addBox($box);
-        }
+        $game->getWorld()->addRamp($ramp);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
@@ -113,7 +111,7 @@ class WallTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPlayerPosition($game, new Point(0, Player::obstacleOvercomeHeight * ($numOfBoxes - 1), Player::speedMove * $numOfBoxes));
+        $this->assertPlayerPosition($game, new Point(0, Player::obstacleOvercomeHeight * $numOfBoxes, Player::speedMove * $numOfBoxes));
     }
 
     public function testPlayerRunningStairsToDeath(): void

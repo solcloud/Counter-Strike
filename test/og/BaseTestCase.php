@@ -66,11 +66,23 @@ abstract class BaseTestCase extends TestCase
         $game->setTickMax($tickMax);
 
         $testPlayer = new Player(1, Color::BLUE, true);
-        $testPlayer->playerBoundingRadius = 0; // TODO
-        $testPlayer->equipKnife(); // TODO
+        $testPlayer->playerBoundingRadius = 0;
+        $testPlayer->equipKnife();
         $game->addPlayer($testPlayer);
 
-        $this->assertPlayerPosition($game, new Point(0, 0, 0));
+        return $game;
+    }
+
+    protected function createTestGame(?int $tickMax = null, GameProperty $gameProperty = new GameProperty()): TestGame
+    {
+        $game = new TestGame($gameProperty);
+        $game->setTickMax($tickMax ?? PHP_INT_MAX);
+        $game->loadMap(new TestMap());
+
+        $testPlayer = new Player(1, Color::GREEN, true);
+        $testPlayer->equipKnife();
+        $game->addPlayer($testPlayer);
+
         return $game;
     }
 
@@ -85,7 +97,15 @@ abstract class BaseTestCase extends TestCase
     /**
      * @param array<Closure|int|false> $commands
      */
-    protected function playPlayer(TestGame $game, array $commands, int $playerId = 1): void
+    protected function playPlayerDebug(TestGame $game, array $commands, int $playerId = 1): void
+    {
+        $this->playPlayer($game, $commands, $playerId, true);
+    }
+
+    /**
+     * @param array<Closure|int|false> $commands
+     */
+    protected function playPlayer(TestGame $game, array $commands, int $playerId = 1, bool $debug = false): void
     {
         $i = 0;
         $skipNTicks = 0;
@@ -113,7 +133,11 @@ abstract class BaseTestCase extends TestCase
             $commands[$i]($state->getPlayer($playerId));
             $i++;
         });
-        $game->start();
+        if ($debug) {
+            $game->startDebug();
+        } else {
+            $game->start();
+        }
         if (isset($commands[$i])) {
             throw new InvalidArgumentException("Some command(s) were not processed, starting from tick '{$i}'");
         }

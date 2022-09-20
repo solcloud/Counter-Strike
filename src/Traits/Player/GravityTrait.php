@@ -21,9 +21,6 @@ trait GravityTrait
         if ($this->isJumping()) {
             return;
         }
-        if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $point, $this->getBoundingRadius())) {
-            $this->setActiveFloor(null);
-        }
         if (null === $this->activeFloor) {
             $floorCandidate = $this->world->findFloor($point, $this->getFloorBoundingRadius());
             if ($floorCandidate) {
@@ -46,7 +43,7 @@ trait GravityTrait
                 $targetYPosition = $floorCandidate->getY();
                 break;
             }
-            if ($this->collisionWithPlayer($candidate, $this->playerBoundingRadius)) {
+            if ($this->collisionWithPlayer($candidate, $this->getBoundingRadius())) {
                 break;
             }
         }
