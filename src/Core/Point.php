@@ -90,6 +90,11 @@ class Point
         return $this;
     }
 
+    public function add(Point $other): self
+    {
+        return $this->addX($other->x)->addY($other->y)->addZ($other->z);
+    }
+
     public function __toString(): string
     {
         return "Point({$this->x},{$this->y},{$this->z})";
@@ -113,7 +118,15 @@ class Point
     }
 
     /**
-     * @return array<string,int>
+     * @param array{x: int, y: int, z: int} $data
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self($data['x'], $data['y'], $data['z']);
+    }
+
+    /**
+     * @return array{x: int, y: int, z: int}
      */
     public function toArray(): array
     {

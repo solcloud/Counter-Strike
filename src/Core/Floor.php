@@ -15,4 +15,12 @@ class Floor extends Plane
         return $this->getStart()->getY();
     }
 
+    public static function fromArray(array $data): self
+    {
+        $start = new Point($data['s']['x'], $data['s']['y'], $data['s']['z']);
+        $end = new Point($data['e']['x'], $data['e']['y'], $data['e']['z']);
+
+        return new self($start, $end->x - $start->x, $end->z - $start->z);
+    }
+
 }

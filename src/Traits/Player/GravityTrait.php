@@ -22,12 +22,7 @@ trait GravityTrait
             return;
         }
         if (null === $this->activeFloor) {
-            $floorCandidate = $this->world->findFloor($point, $this->getFloorBoundingRadius());
-            if ($floorCandidate) {
-                $this->setActiveFloor($floorCandidate);
-            } else {
-                $point->setY($this->calculateGravity($point, static::speedFall));
-            }
+            $point->setY($this->calculateGravity($point, static::speedFall));
         }
     }
 
@@ -37,7 +32,7 @@ trait GravityTrait
         $candidate = new Point($start->x, $start->y, $start->z);
         for ($y = $start->y; $y >= $targetYPosition; $y--) {
             $candidate->setY($y);
-            $floorCandidate = $this->world->findFloor($candidate, $this->getFloorBoundingRadius());
+            $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
             if ($floorCandidate) {
                 $this->setActiveFloor($floorCandidate);
                 $targetYPosition = $floorCandidate->getY();

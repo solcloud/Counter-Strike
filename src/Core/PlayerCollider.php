@@ -44,21 +44,12 @@ class PlayerCollider
             return false;
         }
 
-        $point = $bullet->getPosition();
-        $lowPoint = $this->player->getPositionImmutable();
-        $radius = $this->player->getBoundingRadius();
-
-        if ($point->y < $lowPoint->y || $point->y > $lowPoint->y + $this->player->getHeadHeight()) {
-            return false;
-        }
-        if ($point->x < $lowPoint->x - $radius || $point->x > $lowPoint->x + $radius) {
-            return false;
-        }
-        if ($point->z < $lowPoint->z - $radius || $point->z > $lowPoint->z + $radius) {
-            return false;
-        }
-
-        return true;
+        return Collision::pointWithCylinder(
+            $bullet->getPosition(),
+            $this->player->getPositionImmutable(),
+            $this->player->getBoundingRadius(),
+            $this->player->getHeadHeight()
+        );
     }
 
     public function tryHitPlayer(Bullet $bullet): ?Hittable
@@ -82,17 +73,12 @@ class PlayerCollider
         return $this->player->getId();
     }
 
-    public function collide(Point $base, int $radius, int $height): bool
+    public function collide(Point $point, int $radius, int $height): bool
     {
-        $pp = $this->player->getPositionImmutable();
-        if ($pp->y > $base->y + $height) {
-            return false;
-        }
-        if ($pp->y + $this->player->getHeadHeight() < $base->y) {
-            return false;
-        }
-
-        return Collision::circleWithCircle($base->to2D('xz'), $radius, $pp->to2D('xz'), $this->player->getBoundingRadius());
+        return Collision::cylinderWithCylinder(
+            $this->player->getPositionImmutable(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
+            $point, $radius, $height
+        );
     }
 
 }

@@ -49,10 +49,15 @@ abstract class Plane extends SolidSurface
     public function toArray(): array
     {
         return [
-            'start' => $this->start->toArray(),
-            'end'   => $this->end->toArray(),
-            'axis'  => $this->axis2d,
+            's' => $this->start->toArray(),
+            'e'   => $this->end->toArray(),
+            'p'  => $this->axis2d,
         ];
     }
+
+    /**
+     * @param array{s: array{x: int, y: int, z: int}, e: array{x: int, y: int, z: int}, p: string} $data
+     */
+    public abstract static function fromArray(array $data): self;
 
 }

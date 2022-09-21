@@ -208,15 +208,23 @@ trait MovementTrait
             $oneSideCandidate = $candidate->clone()->addZ($offset);
             if ($oneSideCandidate->equals($start)) {
                 $oneSideCandidate->addX($angle > 180 ? -1 : 1);
-                $xWall = $this->world->checkXSideWallCollision($oneSideCandidate, $this->getHeadHeight(), $candidate->z + $offset - $radius, $candidate->z +
-                    $offset + $radius);
+                $xWall = $this->world->checkXSideWallCollision(
+                    $oneSideCandidate,
+                    $this->getHeadHeight(),
+                    $candidate->z + $offset - $radius,
+                    $candidate->z + $offset + $radius
+                );
                 if ($xWall) {
                     return false;
                 }
             }
 
-            $zWall = $this->world->checkZSideWallCollision($oneSideCandidate, $this->getHeadHeight(), $candidate->x + $offset - $radius, $candidate->x +
-                $offset + $radius);
+            $zWall = $this->world->checkZSideWallCollision(
+                $oneSideCandidate,
+                $this->getHeadHeight(),
+                $candidate->x + $offset - $radius,
+                $candidate->x + $offset + $radius
+            );
             if (!$zWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
                 $candidate->setFrom($oneSideCandidate);
             }
@@ -227,15 +235,23 @@ trait MovementTrait
             $oneSideCandidate = $candidate->clone()->addX($offset);
             if ($oneSideCandidate->equals($start)) {
                 $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1);
-                $zWall = $this->world->checkZSideWallCollision($oneSideCandidate, $this->getHeadHeight(), $candidate->x + $offset - $radius, $candidate->x +
-                    $offset + $radius);
+                $zWall = $this->world->checkZSideWallCollision(
+                    $oneSideCandidate,
+                    $this->getHeadHeight(),
+                    $candidate->x + $offset - $radius,
+                    $candidate->x + $offset + $radius
+                );
                 if ($zWall) {
                     return false;
                 }
             }
 
-            $xWall = $this->world->checkXSideWallCollision($oneSideCandidate, $this->getHeadHeight(), $candidate->z + $offset - $radius, $candidate->z +
-                $offset + $radius);
+            $xWall = $this->world->checkXSideWallCollision(
+                $oneSideCandidate,
+                $this->getHeadHeight(),
+                $candidate->z + $offset - $radius,
+                $candidate->z + $offset + $radius
+            );
             if (!$xWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
                 $candidate->setFrom($oneSideCandidate);
             }

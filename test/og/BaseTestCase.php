@@ -5,18 +5,15 @@ declare(strict_types=1);
 namespace Test;
 
 use Closure;
-use cs\Core\Game;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
-use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Map\TestMap;
 use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 
-abstract class BaseTestCase extends TestCase
+abstract class BaseTestCase extends BaseTest
 {
     private int $testTicRate = 10;
 
@@ -164,21 +161,6 @@ abstract class BaseTestCase extends TestCase
         }
 
         return $waitTick;
-    }
-
-    protected function assertPositionSame(Point $expected, Point $actual, string $extraMsg = ''): void
-    {
-        $this->assertTrue($expected->equals($actual), "Expected: {$expected} <> {$actual} actual." . $extraMsg);
-    }
-
-    protected function assertPositionNotSame(Point $expected, Point $actual, string $extraMsg = ''): void
-    {
-        $this->assertFalse($expected->equals($actual), "Expected: {$expected} is equal {$actual} actual." . $extraMsg);
-    }
-
-    protected function assertPlayerPosition(Game $game, Point $expectedPosition, int $playerId = 1): void
-    {
-        $this->assertPositionSame($expectedPosition, $game->getPlayer($playerId)->getPositionImmutable());
     }
 
 }

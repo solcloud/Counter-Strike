@@ -2,12 +2,14 @@
 
 namespace Test\World;
 
+use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
+use cs\Core\Wall;
 use cs\Core\World;
 use Test\BaseTestCase;
 
@@ -45,6 +47,45 @@ class WorldTest extends BaseTestCase
 
         $game->start();
         $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionImmutable()->y);
+    }
+
+    public function testWallPenetration(): void
+    {
+        $game = $this->createTestGame(5);
+        $p = $game->getPlayer(1);
+        $box = new Box($p->getPositionImmutable()->clone()->addZ(Player::speedMove), $p->getBoundingRadius(), 50, $p->getBoundingRadius());
+        $game->getWorld()->addBox($box);
+        $wall = new Wall(new Point(-200, -10, $box->getBase()->z + $box->depthZ), true, 400, 400);
+        $game->getWorld()->addWall($wall);
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->jump();
+            $state->getPlayer(1)->moveForward();
+        });
+
+        $game->start();
+        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertSame($wall->getBase() - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testBoxPenetration(): void
+    {
+        $game = $this->createTestGame(50);
+        $p = $game->getPlayer(1);
+        $box = new Box($p->getPositionImmutable()->clone()->addZ(2 * Player::speedMove), 700, 50, 3*$p->getBoundingRadius());
+        $game->getWorld()->addBox($box);
+        $depth = $box->getBase()->z + $box->depthZ;
+        $wall = new Box(new Point(-100, 0, -$depth), 800, 400, 2 * $depth);
+        $game->getWorld()->addBox($wall);
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->getSight()->lookHorizontal(15);
+            $state->getPlayer(1)->jump();
+            $state->getPlayer(1)->moveForward();
+            $state->getPlayer(1)->moveRight();
+        });
+
+        $game->start();
+        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertSame($box->getBase()->z + $box->depthZ - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
     }
 
 }

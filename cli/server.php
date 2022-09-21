@@ -27,6 +27,9 @@ $game->loadMap(new DefaultMap());
 
 $server = new Server($game, $settings, $net);
 $server->setLogger($logger);
+if ($debug) {
+    $server->storeRequests();
+}
 
 $server->start();
 sleep(1);

@@ -34,6 +34,7 @@ class Server
     private array $loggedPlayers = [];
     /** @var array<string,int> [ipAddress => 1] */
     private array $blockList = [];
+    private ?string $saveRequestsPath = null;
 
     public function __construct(
         private Game          $game,
@@ -94,6 +95,9 @@ class Server
 
     protected function startGame(): int
     {
+        if ($this->saveRequestsPath) {
+            $this->saveRequestMetaData();
+        }
         $this->sendGameStateToClients();
 
         $tickId = 0;
@@ -169,6 +173,10 @@ class Server
         if ([] === $commands) {
             $this->log("Player '{$playerId}' send invalid request", LogLevel::WARNING);
             return;
+        }
+        if ($this->saveRequestsPath) {
+            $data = "{$this->game->getTickId()}~{$playerId}~{$msg}\n";
+            file_put_contents($this->saveRequestsPath, $data, FILE_APPEND);
         }
 
         $this->tickCommands[$playerId] = function (PlayerControl $control) use ($commands): void {
@@ -268,6 +276,27 @@ class Server
     private function log(string $msg, string $level = LogLevel::INFO): void
     {
         $this->logger->log($level, $msg);
+    }
+
+    private function saveRequestMetaData(): void
+    {
+        $players = [];
+        foreach ($this->game->getPlayers() as $player) {
+            $players[$player->getId()] = $player->toArray();
+        }
+        file_put_contents($this->saveRequestsPath . '.json', json_encode([
+            'protocol'   => get_class($this->protocol),
+            'properties' => serialize($this->game->getProperties()),
+            'players'    => $players,
+            'walls'      => $this->game->getWorld()->getWalls(),
+            'floors'     => $this->game->getWorld()->getFloors(),
+        ], JSON_THROW_ON_ERROR));
+    }
+
+    public function storeRequests(string $path = '/tmp/cs.server.req'): void
+    {
+        $this->saveRequestsPath = $path;
+        file_put_contents($this->saveRequestsPath, '');
     }
 
 }

@@ -65,9 +65,10 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerCollisionWithBoxDoubleMovement2(): void
     {
-        $game = $this->createOneRoundGame(3);
-        $game->getPlayer(1)->playerBoundingRadius = Player::playerBoundingRadius;
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Player::playerBoundingRadius + 10), 10 * Player::speedMove, Player::headHeightStand, 1));
+        $ticks = 3;
+        $game = $this->createTestGame($ticks);
+        $box = new Box((new Point())->setZ(Player::playerBoundingRadius + 10), 10 * Player::speedMove, Player::headHeightStand, 1);
+        $game->getWorld()->addBox($box);
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->getSight()->lookHorizontal(1);
             $state->getPlayer(1)->moveForward();
@@ -75,8 +76,8 @@ class WorldCollisionTest extends BaseTestCase
         });
         $game->start();
         $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertSame(9, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame($box->getBase()->z - Player::playerBoundingRadius - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan($ticks, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testPlayerCollisionWithBoxAngle2(): void

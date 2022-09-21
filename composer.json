@@ -34,6 +34,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Test\\Simulation\\": "test/simulation/",
             "Test\\": "test/og/"
         }
     }

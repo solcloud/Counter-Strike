@@ -5,7 +5,12 @@ namespace cs\Core;
 class Wall extends Plane
 {
 
-    public function __construct(Point $start, private bool $widthOnXAxis = true, int $width = 1, int $height = 20 * Player::headHeightStand)
+    public function __construct(
+        Point        $start,
+        private bool $widthOnXAxis = true,
+        public       readonly int $width = 1,
+        public       readonly int $height = 20 * Player::headHeightStand
+    )
     {
         if ($width <= 0 || $height <= 0) {
             throw new GameException("Width and height cannot be lower than or equal zero");
@@ -36,6 +41,21 @@ class Wall extends Plane
     public function getCeiling(): int
     {
         return $this->getEnd()->y;
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $start = new Point($data['s']['x'], $data['s']['y'], $data['s']['z']);
+        $end = new Point($data['e']['x'], $data['e']['y'], $data['e']['z']);
+        $axis = $data['p'];
+        $widthOnXAxis = true;
+        $width = $end->x - $start->x;
+        if ($axis === 'zy') {
+            $widthOnXAxis = false;
+            $width = $end->z - $start->z;
+        }
+
+        return new self($start, $widthOnXAxis, $width, $end->y - $start->y);
     }
 
 }

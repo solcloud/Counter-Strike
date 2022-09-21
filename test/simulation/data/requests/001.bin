@@ -1,0 +1,148 @@
+3~1~lookAt 0 0
+7~1~lookAt 14 -1
+8~1~lookAt 82 -6
+9~1~forward|lookAt 121 -8
+10~1~forward|equip 0|lookAt 125 -7
+11~1~forward
+12~1~forward|lookAt 117 -7
+13~1~forward
+14~1~forward|lookAt 112 -7
+15~1~forward|lookAt 111 -7
+16~1~forward
+17~1~forward
+18~1~forward|lookAt 117 -8
+19~1~forward
+20~1~forward
+21~1~forward
+22~1~forward
+23~1~forward|lookAt 117 -9
+24~1~forward|lookAt 116 -12
+25~1~forward|lookAt 115 -14
+26~1~forward|lookAt 115 -16
+27~1~forward|lookAt 115 -19
+28~1~forward|lookAt 115 -21
+29~1~forward|lookAt 115 -23
+30~1~forward|lookAt 114 -26
+31~1~forward|lookAt 114 -29
+32~1~forward|lookAt 113 -33
+33~1~forward|lookAt 113 -36
+34~1~forward|lookAt 113 -37
+35~1~forward|left
+36~1~forward|left
+37~1~forward|left|lookAt 114 -39
+38~1~forward|left|lookAt 116 -41
+39~1~forward|lookAt 118 -41
+40~1~forward|lookAt 119 -42
+41~1~forward|lookAt 120 -42
+42~1~forward|left
+43~1~forward|left|lookAt 121 -43
+44~1~forward|left
+45~1~forward|left|lookAt 122 -43
+46~1~forward|left
+47~1~forward|left
+48~1~forward|left|lookAt 121 -42
+49~1~forward|left|lookAt 121 -39
+50~1~forward|left|lookAt 121 -36
+51~1~forward|left|lookAt 122 -33
+52~1~forward|left|lookAt 124 -31
+53~1~forward|lookAt 127 -29
+54~1~forward|lookAt 131 -26
+55~1~forward|lookAt 132 -25
+56~1~forward|lookAt 134 -23
+57~1~forward|lookAt 134 -21
+58~1~forward|left|lookAt 134 -20
+59~1~forward|left
+60~1~forward|left|lookAt 134 -19
+61~1~forward|left|lookAt 135 -19
+62~1~forward|left
+63~1~forward|left|jump|lookAt 135 -20
+64~1~forward|left|lookAt 136 -27
+65~1~forward|left|lookAt 137 -34
+66~1~forward|left|lookAt 137 -39
+67~1~forward|left|lookAt 138 -41
+68~1~forward|left|lookAt 138 -42
+69~1~forward|left|lookAt 138 -43
+70~1~forward|lookAt 140 -46
+71~1~forward|lookAt 141 -48
+72~1~lookAt 142 -50
+73~1~lookAt 143 -50
+74~1~right|lookAt 152 -56
+75~1~right|lookAt 177 -62
+76~1~right|lookAt 198 -61
+77~1~right|lookAt 203 -58
+78~1~forward|right|lookAt 205 -57
+79~1~forward|right
+80~1~forward|right|lookAt 204 -57
+81~1~forward|right|lookAt 202 -59
+82~1~forward|right|lookAt 190 -62
+83~1~forward|left|lookAt 148 -58
+84~1~forward|left|lookAt 108 -41
+85~1~forward|left|lookAt 90 -27
+86~1~forward|lookAt 88 -24
+87~1~forward|lookAt 90 -24
+88~1~forward|lookAt 108 -34
+89~1~forward|lookAt 122 -44
+90~1~forward|lookAt 139 -53
+91~1~forward|lookAt 145 -56
+92~1~forward
+93~1~forward|lookAt 143 -52
+94~1~forward|lookAt 137 -40
+95~1~forward|left|jump|lookAt 136 -35
+96~1~forward|left|lookAt 136 -39
+97~1~forward|left|lookAt 138 -67
+98~1~forward|left|lookAt 141 -71
+99~1~forward|lookAt 144 -73
+100~1~forward
+101~1~forward
+102~1~forward|lookAt 144 -72
+103~1~forward|lookAt 141 -70
+104~1~forward|lookAt 139 -69
+105~1~forward
+106~1~forward|lookAt 138 -69
+107~1~forward|lookAt 139 -68
+108~1~forward|lookAt 135 -46
+109~1~forward|lookAt 134 -44
+110~1~forward
+111~1~forward
+112~1~forward
+113~1~forward
+114~1~forward
+115~1~forward|left
+116~1~forward|left
+117~1~forward|left
+118~1~forward|left|lookAt 135 -44
+119~1~forward|left|lookAt 136 -44
+120~1~forward|left
+121~1~forward|left|lookAt 137 -45
+122~1~forward|lookAt 146 -47
+123~1~forward|lookAt 153 -47
+124~1~forward|lookAt 154 -47
+125~1~forward|lookAt 155 -47
+126~1~forward|lookAt 156 -47
+127~1~forward|left
+128~1~left|lookAt 157 -46
+129~1~lookAt 158 -46
+130~1~lookAt 162 -44
+131~1~lookAt 165 -42
+132~1~lookAt 167 -40
+133~1~lookAt 168 -39
+136~1~right
+137~1~right
+138~1~right
+139~1~right
+140~1~right
+141~1~right
+145~1~lookAt 172 -34
+146~1~crouch|lookAt 176 -30
+147~1~lookAt 176 -28
+148~1~lookAt 175 -26
+154~1~lookAt 176 -26
+155~1~lookAt 178 -26
+177~1~lookAt 179 -27
+183~1~lookAt 180 -43
+184~1~lookAt 180 -54
+185~1~forward
+186~1~forward
+191~1~lookAt 180 -51
+192~1~lookAt 180 -50
+193~1~lookAt 179 -50

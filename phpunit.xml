@@ -2,7 +2,7 @@
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-        bootstrap="vendor/autoload.php"
+        bootstrap="test/bootstrap.php"
         stderr="true"
         colors="true"
         cacheResult="false"
@@ -12,6 +12,9 @@
     <testsuites>
         <testsuite name="OG tests">
             <directory>./test/og/</directory>
+        </testsuite>
+        <testsuite name="Simulation tests">
+            <directory>./test/simulation/</directory>
         </testsuite>
     </testsuites>
     <coverage>

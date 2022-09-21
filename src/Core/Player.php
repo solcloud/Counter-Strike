@@ -204,6 +204,27 @@ final class Player
     }
 
     /**
+     * @param array{id: int, color: int, isAttacker: bool, position: array{x: int, y: int, z: int}} $data
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self($data['id'], Color::from($data['color']), $data['isAttacker']);
+    }
+
+    /**
+     * @return array{id: int, color: int, isAttacker: bool, position: array{x: int, y: int, z: int}}
+     */
+    public function toArray(): array
+    {
+        return [
+            'id'         => $this->getId(),
+            'color'      => $this->getColor()->value,
+            'isAttacker' => $this->isPlayingOnAttackerSide(),
+            'position'   => $this->position->toArray(),
+        ];
+    }
+
+    /**
      * @return array<string,mixed>
      */
     public function serialize(): array

@@ -117,11 +117,14 @@ class World
             return null;
         }
         $candidate = new Point2D($point->x, $point->z);
-        for ($r = 0; $r <= $radius; $r++) { // TODO performance overkill to find the closest?
+        for ($r = 0; $r <= $radius; $r++) {
             foreach ($floors as $floor) {
                 if ($floor->intersect($candidate, $r)) {
                     return $floor;
                 }
+            }
+            if ($r > 3 && $r < $radius) {
+                $r = min($r + 8, $radius - 1);
             }
         }
 
@@ -224,37 +227,35 @@ class World
             return new Wall(new Point(-1, -1, -1), false);
         }
 
+        $candidate = new Point2D($zMin, $base->y);
+        $candidateWidth = $zMax - $zMin;
         foreach (($this->walls[self::WALL_X][$base->x] ?? []) as $wall) {
-            if ($wall->getStart()->z > $zMax || $wall->getEnd()->z < $zMin) {
+            if ($wall->getCeiling() === $base->y) {
                 continue;
             }
-            if ($wall->getStart()->y > $base->y || $wall->getEnd()->y < $base->y) {
-                continue;
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidate, $candidateWidth, $height)) {
+                return $wall;
             }
-            return $wall;
         }
 
         return null;
     }
 
-    public function checkZSideWallCollision(Point $base, int $height, mixed $xMin, mixed $xMax): ?Wall
+    public function checkZSideWallCollision(Point $base, int $height, int $xMin, int $xMax): ?Wall
     {
         if ($base->z < 0) {
             return new Wall(new Point(-1, -1, -1), true);
         }
 
+        $candidate = new Point2D($xMin, $base->y);
+        $candidateWidth = $xMax - $xMin;
         foreach (($this->walls[self::WALL_Z][$base->z] ?? []) as $wall) {
             if ($wall->getCeiling() === $base->y) {
                 continue;
             }
-            if ($wall->getStart()->x > $xMax || $wall->getEnd()->x < $xMin) {
-                continue;
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidate, $candidateWidth, $height)) {
+                return $wall;
             }
-            if ($wall->getStart()->y > $base->y + $height || $wall->getEnd()->y < $base->y) {
-                continue;
-            }
-
-            return $wall;
         }
 
         return null;

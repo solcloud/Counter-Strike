@@ -116,30 +116,30 @@ $frameIdEnd = null;
             const materialWall = new THREE.MeshBasicMaterial({color: 0x0000FF, wireframe: true, transparent: true, opacity: 0.3, side: THREE.DoubleSide})
             floors.forEach(function (floor) {
                 const mesh = new THREE.Mesh(
-                    new THREE.PlaneGeometry(floor.end.x - floor.start.x, floor.end.z - floor.start.z, 4, 4),
+                    new THREE.PlaneGeometry(floor.e.x - floor.s.x, floor.e.z - floor.s.z, 4, 4),
                     materialFloor
                 )
                 mesh.rotateX(degreeToRadian(-90))
-                mesh.position.set(floor.start.x, floor.start.y, -floor.start.z)
+                mesh.position.set(floor.s.x, floor.s.y, -floor.s.z)
                 mesh.translateX(mesh.geometry.parameters.width / 2)
                 mesh.translateY(mesh.geometry.parameters.height / 2)
                 scene.add(mesh)
                 lastMesh = mesh
             })
             walls.forEach(function (wall) {
-                const width = wall.axis === 'xy' ? wall.end.x - wall.start.x : wall.end.z - wall.start.z
+                const width = wall.p === 'xy' ? wall.e.x - wall.s.x : wall.e.z - wall.s.z
                 const mesh = new THREE.Mesh(
-                    new THREE.PlaneGeometry(width, wall.end.y - wall.start.y, 4, 2),
+                    new THREE.PlaneGeometry(width, wall.e.y - wall.s.y, 4, 2),
                     materialWall
                 )
-                if (wall.axis === 'xy') {
+                if (wall.p === 'xy') {
                     // no rotation needed
-                } else if (wall.axis === 'zy') {
+                } else if (wall.p === 'zy') {
                     mesh.rotateY(degreeToRadian(90))
                 } else {
-                    throw new Error("Bad wall axis: " + wall.axis)
+                    throw new Error("Bad wall axis: " + wall.p)
                 }
-                mesh.position.set(wall.start.x, wall.start.y, -wall.start.z)
+                mesh.position.set(wall.s.x, wall.s.y, -wall.s.z)
                 mesh.translateX(mesh.geometry.parameters.width / 2)
                 mesh.translateY(mesh.geometry.parameters.height / 2)
                 scene.add(mesh)
@@ -192,9 +192,6 @@ $frameIdEnd = null;
         },
         renderFrame: function (frameId, state) {
             const self = this
-            if (state.events.length) {
-                console.log(state.events)
-            }
             state.players.forEach(function (playerState) {
                 let player = self.players[playerState.id]
                 if (player === undefined) {
@@ -300,8 +297,8 @@ $frameIdEnd = null;
     driver.goToFrame(0)
 
     function animate() {
-        requestAnimationFrame(animate);
         renderer.animate();
+        requestAnimationFrame(animate);
     }
 
     animate()

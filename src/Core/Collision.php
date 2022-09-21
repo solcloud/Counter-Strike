@@ -32,6 +32,79 @@ class Collision
         return static::pointWithCircle($circleCenterA, $circleCenterB, $circleRadiusA + $circleRadiusB);
     }
 
+    public static function pointWithSphere(Point $point, Point $sphereCenter, int $sphereRadius): bool
+    {
+        if ($point->x < $sphereCenter->x - $sphereRadius || $point->x > $sphereCenter->x + $sphereRadius) {
+            return false;
+        }
+
+        if ($point->y < $sphereCenter->y - $sphereRadius || $point->y > $sphereCenter->y + $sphereRadius) {
+            return false;
+        }
+
+        if ($point->z < $sphereCenter->z - $sphereRadius || $point->z > $sphereCenter->z + $sphereRadius) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function cylinderWithCylinder(
+        Point $cylinderBottomCenterA,
+        int   $cylinderRadiusA,
+        int   $cylinderHeightA,
+        Point $cylinderBottomCenterB,
+        int   $cylinderRadiusB,
+        int   $cylinderHeightB,
+    ): bool
+    {
+        return (
+            self::pointWithCylinder(
+                $cylinderBottomCenterB,
+                $cylinderBottomCenterA,
+                $cylinderRadiusA + $cylinderRadiusB,
+                $cylinderHeightA
+            )
+            ||
+            self::pointWithCylinder(
+                $cylinderBottomCenterB->clone()->addY($cylinderHeightB),
+                $cylinderBottomCenterA,
+                $cylinderRadiusA + $cylinderRadiusB,
+                $cylinderHeightA
+            )
+        );
+    }
+
+    public static function pointWithCylinder(Point $point, Point $cylinderBottomCenter, int $cylinderRadius, int $cylinderHeight): bool
+    {
+        if ($point->x < $cylinderBottomCenter->x - $cylinderRadius || $point->x > $cylinderBottomCenter->x + $cylinderRadius) {
+            return false;
+        }
+
+        if ($point->y < $cylinderBottomCenter->y || $point->y > $cylinderBottomCenter->y + $cylinderHeight) {
+            return false;
+        }
+
+        if ($point->z < $cylinderBottomCenter->z - $cylinderRadius || $point->z > $cylinderBottomCenter->z + $cylinderRadius) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, Point2D $pointB, int $planeWidthB, int $planeHeightB): bool
+    {
+        return (
+            $pointA->x + $planeWidthA >= $pointB->x
+            &&
+            $pointA->x <= $pointB->x + $planeWidthB
+            &&
+            $pointA->y + $planeHeightA >= $pointB->y
+            &&
+            $pointA->y <= $pointB->y + $planeHeightB
+        );
+    }
+
     public static function circleWithPlane(Point2D $circleCenter, int $circleRadius, Plane $plane): bool
     {
         if ($circleRadius === 0) {
