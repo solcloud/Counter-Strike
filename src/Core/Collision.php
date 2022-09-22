@@ -58,20 +58,16 @@ class Collision
         int   $cylinderHeightB,
     ): bool
     {
-        return (
-            self::pointWithCylinder(
-                $cylinderBottomCenterB,
-                $cylinderBottomCenterA,
-                $cylinderRadiusA + $cylinderRadiusB,
-                $cylinderHeightA
-            )
-            ||
-            self::pointWithCylinder(
-                $cylinderBottomCenterB->clone()->addY($cylinderHeightB),
-                $cylinderBottomCenterA,
-                $cylinderRadiusA + $cylinderRadiusB,
-                $cylinderHeightA
-            )
+        $yTop = min($cylinderBottomCenterA->y + $cylinderHeightA, $cylinderBottomCenterB->y + $cylinderHeightB);
+        $yBottom = max($cylinderBottomCenterA->y, $cylinderBottomCenterB->y);
+        if ($yTop - $yBottom < 0) {
+            return false;
+        }
+
+        return self::pointWithCircle(
+            $cylinderBottomCenterA->to2D('xz'),
+            $cylinderBottomCenterB->to2D('xz'),
+            $cylinderRadiusA + $cylinderRadiusB
         );
     }
 

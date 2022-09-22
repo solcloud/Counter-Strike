@@ -28,7 +28,7 @@ trait CrouchTrait
                 $targetHeadHeight = $this->headHeight + $event->moveOffset;
                 $candidate = new Point($this->position->x, $this->position->y, $this->position->z);
                 for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, self::headHeightStand); $h++) {
-                    $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getFloorBoundingRadius());
+                    $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getBoundingRadius());
                     if ($floorCandidate) {
                         break;
                     }

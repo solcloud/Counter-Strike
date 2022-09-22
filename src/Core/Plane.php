@@ -40,7 +40,7 @@ abstract class Plane extends SolidSurface
 
     public function __toString(): string
     {
-        return sprintf("%s(\n start%s\n end%s\n)", get_class($this), $this->getStart(), $this->getEnd());
+        return sprintf("%s(\n start%s\n end%s\n axis: %s\n)", get_class($this), $this->getStart(), $this->getEnd(), $this->axis2d);
     }
 
     /**

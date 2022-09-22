@@ -67,6 +67,9 @@ class Server
         }
 
         $this->log("All players connected, starting game.");
+        if ($this->saveRequestsPath) {
+            $this->saveRequestMetaData();
+        }
         $tickCount = $this->startGame();
         $this->log("Game ended! Ticks: {$tickCount}, Lag: {$this->serverLag}.");
     }
@@ -95,9 +98,6 @@ class Server
 
     protected function startGame(): int
     {
-        if ($this->saveRequestsPath) {
-            $this->saveRequestMetaData();
-        }
         $this->sendGameStateToClients();
 
         $tickId = 0;
@@ -286,7 +286,7 @@ class Server
         }
         file_put_contents($this->saveRequestsPath . '.json', json_encode([
             'protocol'   => get_class($this->protocol),
-            'properties' => serialize($this->game->getProperties()),
+            'properties' => $this->game->getProperties()->toArray(),
             'players'    => $players,
             'walls'      => $this->game->getWorld()->getWalls(),
             'floors'     => $this->game->getWorld()->getFloors(),

@@ -165,11 +165,6 @@ final class Player
         return $this->playerBoundingRadius;
     }
 
-    public function getFloorBoundingRadius(): int
-    {
-        return (int)round($this->getBoundingRadius() / 2);
-    }
-
     public function lowerArmor(int $armorDamage): void
     {
         $this->armor -= abs($armorDamage);

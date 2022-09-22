@@ -129,7 +129,7 @@ trait MovementTrait
         $candidate = $target->clone();
         for ($i = 1; $i <= $distanceTarget; $i++) {
             [$x, $z] = Util::horizontalMovementXZ($angle, $i);
-            $candidate->setX($orig->x + $x)->setZ($orig->z + $z);
+            $candidate->setX($orig->x + $x)->setZ($orig->z + $z); // TODO check or enforce that candidate is growing only by 1 from previous target
             if ($candidate->equals($target)) {
                 continue;
             }
@@ -166,13 +166,13 @@ trait MovementTrait
         if ($start->x <> $candidate->x) {
             $xGrowing = ($start->x < $candidate->x);
             $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
-            $xWall = $this->world->checkXSideWallCollision($baseX, $this->getHeadHeight(), $candidate->z - $radius, $candidate->z + $radius);
+            $xWall = $this->world->checkXSideWallCollision($baseX, $this->getHeadHeight(), $radius);
         }
         $zWall = null;
         if ($start->z <> $candidate->z) {
             $zGrowing = ($start->z < $candidate->z);
             $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
-            $zWall = $this->world->checkZSideWallCollision($baseZ, $this->getHeadHeight(), $candidate->x - $radius, $candidate->x + $radius);
+            $zWall = $this->world->checkZSideWallCollision($baseZ, $this->getHeadHeight(), $radius);
         }
         if (!$xWall && !$zWall) {
             return true;
@@ -203,57 +203,23 @@ trait MovementTrait
         }
 
         // Try to move 1 unit in one axis at least if possible
-        if (isset($zGrowing) && !$xWall) {
-            $offset = ($zGrowing ? -1 : 1);
-            $oneSideCandidate = $candidate->clone()->addZ($offset);
-            if ($oneSideCandidate->equals($start)) {
-                $oneSideCandidate->addX($angle > 180 ? -1 : 1);
-                $xWall = $this->world->checkXSideWallCollision(
-                    $oneSideCandidate,
-                    $this->getHeadHeight(),
-                    $candidate->z + $offset - $radius,
-                    $candidate->z + $offset + $radius
-                );
-                if ($xWall) {
-                    return false;
-                }
-            }
-
-            $zWall = $this->world->checkZSideWallCollision(
-                $oneSideCandidate,
-                $this->getHeadHeight(),
-                $candidate->x + $offset - $radius,
-                $candidate->x + $offset + $radius
-            );
-            if (!$zWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
-                $candidate->setFrom($oneSideCandidate);
+        if (isset($zGrowing) && !$xWall) { // Try to move in X axis
+            $oneSideCandidate = $candidate->clone()->setZ($start->z); // reset to previous Z
+            $oneSideCandidate->addX($angle > 180 ? -1 : 1); // try 1 unit in X
+            $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
+            $xWall = $this->world->checkXSideWallCollision($oneSideCandidateX, $this->getHeadHeight(), $radius);
+            if (!$xWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
+                $candidate->setFrom($oneSideCandidate); // side effect for caller
             }
             return false;
         }
-        if (isset($xGrowing) && !$zWall) {
-            $offset = ($xGrowing ? -1 : 1);
-            $oneSideCandidate = $candidate->clone()->addX($offset);
-            if ($oneSideCandidate->equals($start)) {
-                $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1);
-                $zWall = $this->world->checkZSideWallCollision(
-                    $oneSideCandidate,
-                    $this->getHeadHeight(),
-                    $candidate->x + $offset - $radius,
-                    $candidate->x + $offset + $radius
-                );
-                if ($zWall) {
-                    return false;
-                }
-            }
-
-            $xWall = $this->world->checkXSideWallCollision(
-                $oneSideCandidate,
-                $this->getHeadHeight(),
-                $candidate->z + $offset - $radius,
-                $candidate->z + $offset + $radius
-            );
-            if (!$xWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
-                $candidate->setFrom($oneSideCandidate);
+        if (isset($xGrowing) && !$zWall) { // Try to move in Z axis
+            $oneSideCandidate = $candidate->clone()->setX($start->x); // reset to previous X
+            $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1); // try 1 unit in Z
+            $oneSideCandidateZ = $oneSideCandidate->clone()->addZ(($angle > 270 || $angle < 90) ? $radius : -$radius);
+            $zWall = $this->world->checkZSideWallCollision($oneSideCandidateZ, $this->getHeadHeight(), $radius);
+            if (!$zWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
+                $candidate->setFrom($oneSideCandidate); // side effect for caller
             }
             return false;
         }

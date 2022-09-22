@@ -25,7 +25,7 @@ trait JumpTrait
             $this->setActiveFloor(null);
             $targetYPosition = $this->position->y + static::speedJump;
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
-                $floorCandidate = $this->world->findFloor(new Point($this->position->getX(), $y, $this->position->getZ()), $this->getFloorBoundingRadius());
+                $floorCandidate = $this->world->findFloor(new Point($this->position->getX(), $y, $this->position->getZ()), $this->getBoundingRadius());
                 if ($floorCandidate) {
                     $targetYPosition = $y - 1;
                     break;

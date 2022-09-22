@@ -7,12 +7,13 @@ use cs\Core\Game;
 use cs\Net\Protocol\TextProtocol;
 
 /**
- * @deprecated OG test only
+ * @internal test only
  */
 class TestGame extends Game
 {
     private int $tickMax = 1;
     private ?Closure $onTickCallback = null;
+    private ?Closure $afterTickCallback = null;
     private ?Closure $onEventsCallback = null;
     /** @var array<int,mixed> */
     private array $gameStates = [];
@@ -39,6 +40,9 @@ class TestGame extends Game
             if ($this->onEventsCallback && $events !== []) {
                 call_user_func($this->onEventsCallback, $events);
             }
+            if ($this->afterTickCallback) {
+                call_user_func($this->afterTickCallback, $this->getState());
+            }
         }
         if ($debug) {
             $this->gameStates[$tickId] = json_decode($protocol->serializeGameState($this));
@@ -53,6 +57,13 @@ class TestGame extends Game
         $this->onTickCallback = $callback;
     }
 
+    /**
+     * @param Closure $callback function(GameState $state):void {}
+     */
+    public function onAfterTick(Closure $callback): void
+    {
+        $this->afterTickCallback = $callback;
+    }
 
     /**
      * @param Closure $callback function(array $events):void {}

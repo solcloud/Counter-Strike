@@ -19,7 +19,7 @@ class FloorTest extends BaseTestCase
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 2, $p->getBoundingRadius()));
 
-        $base = new Point($p->getPositionImmutable()->x, $floorHeight, 0);
+        $base = new Point($p->getPositionImmutable()->x - $p->getBoundingRadius() / 2, $floorHeight, 0);
         for ($i = 1; $i <= Player::speedMove * 2; $i++) {
             $game->getWorld()->addFloor(new Floor($base->clone()->addX(rand(-$p->getBoundingRadius() + 1, $p->getBoundingRadius() - 1)), 100, 2));
             $base->addZ($p->getBoundingRadius());

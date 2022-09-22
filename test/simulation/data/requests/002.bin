@@ -1,0 +1,340 @@
+3~1~lookAt 0 0
+10~1~equip 0|lookAt 7 0
+11~1~lookAt 47 0
+12~1~lookAt 65 0
+13~1~lookAt 83 0
+14~1~lookAt 96 1
+17~1~forward|lookAt 95 0
+18~1~forward|lookAt 88 -1
+19~1~forward|lookAt 85 -2
+20~1~forward
+21~1~forward
+22~1~forward
+23~1~forward
+24~1~forward
+25~1~forward|left|lookAt 83 -2
+26~1~forward|lookAt 61 -3
+27~1~forward|lookAt 58 -4
+28~1~forward
+29~1~forward
+30~1~forward|lookAt 59 -5
+31~1~forward|lookAt 68 -6
+32~1~forward|lookAt 70 -6
+33~1~forward|lookAt 71 -6
+34~1~forward
+35~1~forward
+36~1~forward
+37~1~forward|lookAt 73 -7
+38~1~forward|lookAt 76 -8
+39~1~forward
+40~1~forward|lookAt 77 -8
+41~1~forward|lookAt 84 -7
+42~1~forward|lookAt 87 -7
+43~1~forward
+44~1~forward
+45~1~forward
+46~1~forward
+47~1~forward
+48~1~forward
+49~1~forward
+50~1~forward
+51~1~forward
+52~1~forward
+53~1~forward
+54~1~forward|lookAt 87 -6
+55~1~forward
+56~1~forward
+57~1~forward
+58~1~forward
+59~1~forward
+60~1~forward|lookAt 86 -7
+61~1~forward|lookAt 85 -7
+62~1~forward|lookAt 84 -7
+63~1~forward|lookAt 82 -8
+64~1~forward|lookAt 81 -8
+65~1~forward|lookAt 79 -8
+66~1~forward|lookAt 74 -10
+67~1~forward|lookAt 73 -10
+68~1~forward|lookAt 72 -11
+69~1~forward|lookAt 71 -11
+70~1~forward
+71~1~forward|right|lookAt 71 -12
+72~1~forward|right|lookAt 70 -13
+73~1~forward|lookAt 68 -16
+74~1~forward|right|lookAt 66 -18
+75~1~forward|right|lookAt 66 -19
+76~1~forward|right|lookAt 66 -20
+77~1~forward|lookAt 61 -22
+78~1~forward|lookAt 27 -28
+79~1~forward|lookAt 22 -29
+80~1~forward|jump|lookAt 20 -31
+81~1~forward|lookAt 18 -41
+82~1~forward|lookAt 20 -63
+83~1~forward|lookAt 23 -74
+84~1~forward|lookAt 24 -74
+85~1~forward|lookAt 25 -74
+86~1~forward|lookAt 27 -69
+87~1~forward|lookAt 28 -67
+88~1~forward|lookAt 29 -65
+89~1~forward|lookAt 29 -63
+90~1~forward|lookAt 30 -63
+91~1~forward|left
+92~1~forward|left|lookAt 31 -63
+93~1~forward|left|lookAt 32 -64
+94~1~forward|left|jump|lookAt 31 -67
+95~1~forward|left
+96~1~forward|left|lookAt 30 -67
+97~1~forward|left|lookAt 25 -65
+98~1~forward|left|lookAt 19 -62
+99~1~forward|left|lookAt 14 -61
+100~1~forward|left|lookAt 12 -62
+101~1~forward|left|lookAt 11 -65
+102~1~forward|left|lookAt 11 -67
+103~1~forward|left|lookAt 10 -68
+104~1~forward|left|jump|lookAt 9 -68
+105~1~forward|left|lookAt 13 -68
+106~1~forward|left|lookAt 26 -61
+107~1~forward|lookAt 30 -57
+108~1~forward|lookAt 32 -56
+109~1~forward|lookAt 33 -56
+110~1~forward|left|lookAt 32 -56
+111~1~forward|left|jump|lookAt 23 -57
+112~1~forward|left|lookAt 18 -59
+113~1~forward|left|lookAt 15 -61
+114~1~forward|left|lookAt 10 -64
+115~1~forward|left|lookAt 6 -66
+116~1~forward|left|lookAt 3 -66
+117~1~forward|left
+118~1~forward|left
+119~1~forward|left
+120~1~forward|left|jump
+121~1~forward|left|lookAt 7 -66
+122~1~forward|left|lookAt 18 -64
+123~1~forward|left|lookAt 28 -60
+124~1~forward|left|lookAt 30 -59
+125~1~forward|left|lookAt 31 -59
+126~1~forward|left
+127~1~forward|left|lookAt 30 -59
+128~1~forward|left|lookAt 18 -62
+129~1~forward|left|lookAt 9 -63
+130~1~forward|left
+131~1~forward|left|jump|lookAt 10 -63
+132~1~forward|left|lookAt 13 -63
+133~1~forward|left|lookAt 14 -63
+134~1~forward|left
+135~1~forward|left|lookAt 11 -65
+136~1~forward|left|lookAt 7 -70
+137~1~forward|left|lookAt 14 -76
+138~1~forward|left|lookAt 23 -79
+139~1~forward|left|lookAt 29 -81
+140~1~forward|left|lookAt 30 -82
+141~1~forward
+142~1~forward|lookAt 31 -81
+143~1~forward|lookAt 32 -74
+144~1~forward|lookAt 30 -69
+145~1~forward|left
+146~1~forward|left|jump|lookAt 30 -73
+147~1~forward|left|lookAt 29 -77
+148~1~forward|left|lookAt 28 -81
+149~1~forward|left|lookAt 28 -84
+150~1~forward|left|lookAt 28 -85
+151~1~forward|left
+152~1~forward|left
+153~1~forward|left
+154~1~forward|left
+155~1~forward|left|lookAt 25 -84
+156~1~forward|left|lookAt 21 -82
+157~1~forward|left
+158~1~forward|left
+159~1~forward|left
+160~1~forward|left|jump|lookAt 20 -82
+161~1~forward|left|lookAt 18 -87
+162~1~forward|left|lookAt 18 -89
+163~1~forward|left
+164~1~forward|left
+165~1~forward|left
+166~1~forward|left|lookAt 17 -89
+167~1~forward|left|lookAt 3 -87
+168~1~forward|left|lookAt 358 -86
+169~1~forward|left
+170~1~forward|left
+171~1~forward|left
+172~1~forward|left|jump
+173~1~forward|left
+174~1~forward|left|lookAt 0 -86
+175~1~forward|left|lookAt 3 -87
+176~1~forward|left|lookAt 4 -87
+177~1~forward|left|lookAt 5 -87
+178~1~forward|left
+179~1~forward|left
+180~1~forward|left
+181~1~forward|left
+182~1~forward|left|lookAt 4 -87
+183~1~forward|left|jump
+184~1~forward|left
+185~1~forward|left
+186~1~forward|left
+187~1~forward|left
+188~1~forward|left
+189~1~forward|left
+190~1~forward|left
+191~1~forward|left
+192~1~forward|left
+193~1~forward|left
+194~1~forward|left|jump
+195~1~forward|left
+196~1~forward|left|lookAt 4 -86
+197~1~forward|left|lookAt 5 -86
+198~1~forward|left
+199~1~forward|left
+200~1~forward|left
+201~1~forward|left
+202~1~forward|left
+203~1~forward|left
+204~1~forward|left
+205~1~forward|left
+206~1~forward|left|lookAt 13 -78
+207~1~forward|left|lookAt 17 -74
+208~1~forward|left|jump
+209~1~forward|left
+210~1~forward|left
+211~1~forward|left
+212~1~forward|left
+213~1~forward|left
+214~1~forward|left
+215~1~forward|left|lookAt 13 -73
+216~1~forward|left|lookAt 8 -72
+217~1~forward|left|lookAt 6 -72
+218~1~forward|left
+219~1~forward|left
+220~1~forward|left
+221~1~forward|left
+222~1~forward|left
+223~1~forward|left|jump
+224~1~forward|left
+225~1~forward|left
+226~1~forward|left
+227~1~forward|left|lookAt 10 -75
+228~1~forward|left
+229~1~forward|left
+230~1~forward|left
+231~1~forward|left
+232~1~forward|left
+233~1~forward|left
+234~1~forward|left
+235~1~forward|left
+236~1~forward|left|jump|lookAt 22 -64
+237~1~forward|left|lookAt 39 -43
+238~1~forward|left|lookAt 53 -24
+239~1~forward|left|lookAt 55 -21
+240~1~forward|left|lookAt 53 -19
+241~1~forward|left|lookAt 52 -18
+242~1~forward|left|lookAt 50 -17
+243~1~forward|left|lookAt 48 -16
+244~1~forward|left|lookAt 44 -16
+245~1~forward|left|lookAt 32 -17
+246~1~forward|left|lookAt 10 -18
+247~1~forward|left|lookAt 4 -19
+248~1~forward|left|lookAt 8 -20
+249~1~forward|lookAt 30 -19
+250~1~forward|lookAt 46 -16
+251~1~forward
+252~1~forward
+253~1~forward|lookAt 42 -14
+254~1~forward|lookAt 40 -13
+255~1~forward|lookAt 38 -16
+256~1~forward|lookAt 39 -24
+257~1~forward|lookAt 42 -29
+258~1~forward|lookAt 43 -30
+259~1~forward
+260~1~forward
+261~1~forward
+262~1~forward
+263~1~forward|lookAt 45 -27
+264~1~forward|left|lookAt 47 -22
+265~1~forward|left|lookAt 47 -21
+266~1~forward|left|lookAt 46 -19
+267~1~forward|left|lookAt 45 -17
+268~1~forward|left|jump|lookAt 43 -18
+269~1~forward|left|lookAt 39 -26
+270~1~forward|left|lookAt 39 -37
+271~1~forward|left|lookAt 41 -45
+272~1~forward|left|lookAt 42 -49
+273~1~forward|left|lookAt 43 -50
+274~1~forward|left|lookAt 40 -48
+275~1~forward|left
+276~1~forward|left|lookAt 39 -48
+277~1~forward|left|lookAt 39 -49
+278~1~forward|left|lookAt 41 -50
+279~1~forward|left|jump|lookAt 43 -52
+280~1~forward|left|lookAt 47 -54
+281~1~forward|left|lookAt 49 -58
+282~1~forward|left|lookAt 49 -64
+283~1~forward|left|lookAt 48 -66
+284~1~forward|left|lookAt 45 -67
+285~1~forward|left|lookAt 34 -65
+286~1~forward|left|lookAt 19 -59
+287~1~forward|left|lookAt 10 -48
+288~1~forward|left|lookAt 8 -42
+289~1~forward|left|lookAt 12 -36
+290~1~forward|left|lookAt 20 -29
+291~1~forward|left|lookAt 36 -21
+292~1~forward|left|jump|lookAt 37 -20
+293~1~forward|left
+294~1~forward|left
+295~1~forward|left|lookAt 34 -19
+296~1~forward|left|lookAt 33 -19
+297~1~forward|left|lookAt 30 -19
+298~1~forward|left|lookAt 27 -20
+299~1~forward|left|lookAt 24 -21
+300~1~forward|left|lookAt 23 -25
+301~1~forward|left|lookAt 23 -29
+302~1~forward|left|lookAt 24 -35
+303~1~forward|left|lookAt 25 -37
+304~1~forward|left|lookAt 25 -38
+305~1~forward|left|jump
+306~1~forward|left
+307~1~forward|left
+308~1~forward|left
+309~1~forward|left|lookAt 22 -37
+310~1~forward|left|lookAt 21 -37
+311~1~forward|left
+312~1~forward|left
+313~1~forward|left
+314~1~forward|left
+315~1~forward|left|lookAt 23 -40
+316~1~forward|left|lookAt 23 -41
+317~1~forward|left
+318~1~forward|left
+319~1~forward|left
+320~1~forward|left
+321~1~forward|left
+322~1~forward|left
+323~1~forward|left
+324~1~forward|left
+325~1~forward|left
+326~1~forward|left
+327~1~forward|left|lookAt 24 -42
+328~1~forward|left|lookAt 34 -63
+329~1~forward|left|lookAt 37 -74
+330~1~forward|left|lookAt 39 -77
+331~1~forward|left|lookAt 40 -77
+332~1~forward|left
+333~1~forward|lookAt 41 -77
+334~1~forward|lookAt 50 -75
+335~1~forward|lookAt 56 -75
+336~1~forward|lookAt 59 -75
+337~1~forward|lookAt 60 -76
+338~1~forward|lookAt 66 -77
+339~1~forward|lookAt 77 -73
+340~1~forward|lookAt 79 -72
+341~1~forward
+342~1~forward
+343~1~forward
+344~1~forward
+345~1~forward|lookAt 75 -68
+346~1~forward|lookAt 70 -63
+347~1~forward|lookAt 62 -52
+348~1~forward|lookAt 34 -33
+349~1~forward|lookAt 9 -23
+350~1~forward|lookAt 7 -22
