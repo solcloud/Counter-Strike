@@ -13,7 +13,9 @@ return new class extends SimulationTester {
         if ($pp->y === 0 && $pp->x > 1156 && $pp->x < 1270 && $pp->z < 80) {
             $this->fail("Inside Box, tick: $tick");
         }
-        $this->assertPositionNotSame(new Point(1245, 0, 50), $state->getPlayer(1)->getPositionImmutable(), "Tick: $tick");
+        if ($pp->y === 0 && $pp->x === 1245 && $pp->z === 50) {
+            $this->fail("Inside Box, tick: $tick");
+        }
     }
 
     public function onGameEnd(Game $game): void

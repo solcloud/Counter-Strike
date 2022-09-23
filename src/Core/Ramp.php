@@ -22,7 +22,7 @@ class Ramp
             ||
             ($direction->x === 0 && $direction->y === 0)
         ) {
-            throw new GameException("Invalid growDirection given");
+            throw new GameException("Invalid direction given");
         }
 
         $heightSum = $stepHeight;

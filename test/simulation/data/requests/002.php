@@ -9,9 +9,18 @@ return new class extends SimulationTester {
 
     public function onTickEnd(GameState $state, int $tick): void
     {
-        $this->assertPositionNotSame(new Point(1169, 0, 2435), $state->getPlayer(1)->getPositionImmutable(), "Tick: $tick");
-        $this->assertPositionNotSame(new Point(1157, 0, 2435), $state->getPlayer(1)->getPositionImmutable(), "Tick: $tick");
-        $this->assertPositionNotSame(new Point(1163, 0, 2435), $state->getPlayer(1)->getPositionImmutable(), "Tick: $tick");
+        $pp = $state->getPlayer(1)->getPositionImmutable();
+        if ($pp->y === 0 && $pp->z === 2435) {
+            if ($pp->x === 1169) {
+                $this->fail("Inside Box, tick: $tick");
+            }
+            if ($pp->x === 1157) {
+                $this->fail("Inside Box, tick: $tick");
+            }
+            if ($pp->x === 1163) {
+                $this->fail("Inside Box, tick: $tick");
+            }
+        }
     }
 
     public function onGameEnd(Game $game): void

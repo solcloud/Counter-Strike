@@ -15,7 +15,7 @@ class World
     private ?Map $map;
     /** @var PlayerCollider[] */
     private array $playersColliders = [];
-    /** @var array<int,array<int,Wall[]>> xCoordinate:Wall[] */
+    /** @var array<int,array<int,Wall[]>> (x|z)BaseCoordinate:Wall[] */
     private array $walls = [];
     /** @var array<int,Floor[]> yCoordinate:Floor[] */
     private array $floors = [];
@@ -90,14 +90,14 @@ class World
             return new Wall(new Point(-1, -1, -1), $point->z < 0);
         }
 
-        $candidateZ = new Point2D($point->x, $point->y);
-        foreach (($this->walls[self::WALL_Z][$point->getZ()] ?? []) as $wall) {
+        $candidateZ = $point->to2D('xy');
+        foreach (($this->walls[self::WALL_Z][$point->z] ?? []) as $wall) {
             if ($wall->intersect($candidateZ)) {
                 return $wall;
             }
         }
-        $candidateX = new Point2D($point->z, $point->y);
-        foreach (($this->walls[self::WALL_X][$point->getX()] ?? []) as $wall) {
+        $candidateX = $point->to2D('zy');
+        foreach (($this->walls[self::WALL_X][$point->x] ?? []) as $wall) {
             if ($wall->intersect($candidateX)) {
                 return $wall;
             }
@@ -116,7 +116,7 @@ class World
         if ($floors === []) {
             return null;
         }
-        $candidate = new Point2D($point->x, $point->z);
+        $candidate = $point->to2D('xz');
         for ($r = 0; $r <= $radius; $r++) {
             foreach ($floors as $floor) {
                 if ($floor->intersect($candidate, $r)) {
@@ -137,7 +137,7 @@ class World
             return false;
         }
 
-        return Collision::circleWithPlane(new Point2D($position->x, $position->z), $radius, $floor);
+        return Collision::circleWithPlane($position->to2D('xz'), $radius, $floor);
     }
 
     public function getPlayerSpawnPosition(bool $isAttacker, bool $randomizeSpawnPosition): Point
@@ -221,18 +221,18 @@ class World
         $this->game->playerFallDamageKilledEvent($playerDead);
     }
 
-    public function checkXSideWallCollision(Point $base, int $height, int $radius): ?Wall
+    public function checkXSideWallCollision(Point $center, int $height, int $radius): ?Wall
     {
-        if ($base->x < 0) {
+        if ($center->x < 0) {
             return new Wall(new Point(-1, -1, -1), false);
         }
 
-        $candidate = $base->to2D('zy')->addX(-$radius);
-        foreach (($this->walls[self::WALL_X][$base->x] ?? []) as $wall) {
-            if ($wall->getCeiling() === $base->y) {
+        $candidatePlane = $center->to2D('zy')->addX(-$radius);
+        foreach (($this->walls[self::WALL_X][$center->x] ?? []) as $wall) {
+            if ($wall->getCeiling() === $center->y) {
                 continue;
             }
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidate, 2 * $radius, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, 2 * $radius, $height)) {
                 return $wall;
             }
         }
@@ -240,18 +240,18 @@ class World
         return null;
     }
 
-    public function checkZSideWallCollision(Point $base, int $height, int $radius): ?Wall
+    public function checkZSideWallCollision(Point $center, int $height, int $radius): ?Wall
     {
-        if ($base->z < 0) {
+        if ($center->z < 0) {
             return new Wall(new Point(-1, -1, -1), true);
         }
 
-        $candidate = $base->to2D('xy')->addX(-$radius);
-        foreach (($this->walls[self::WALL_Z][$base->z] ?? []) as $wall) {
-            if ($wall->getCeiling() === $base->y) {
+        $candidatePlane = $center->to2D('xy')->addX(-$radius);
+        foreach (($this->walls[self::WALL_Z][$center->z] ?? []) as $wall) {
+            if ($wall->getCeiling() === $center->y) {
                 continue;
             }
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidate, 2 * $radius, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, 2 * $radius, $height)) {
                 return $wall;
             }
         }

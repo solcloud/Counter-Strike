@@ -96,7 +96,7 @@ trait MovementTrait
         if ($this->isJumping()) {
             $speed *= static::jumpMovementSlowDown;
         } elseif ($this->isFlying()) {
-            $speed *= 0.8;
+            $speed *= static::flyingMovementSlowDown;
         }
 
         return (int)ceil($speed);
@@ -186,10 +186,13 @@ trait MovementTrait
         if ($xWall && !$floor) {
             $floor = $this->canStepOverWall($xWall, $candidate);
         }
-        if ($floor && false === $this->collisionWithPlayer($candidate, $radius)) {
-            $candidate->setY($floor->getY());
-            $this->setActiveFloor($floor);
-            return true;
+        if ($floor) {
+            $candidateY = $candidate->clone()->setY($floor->getY());
+            if (!$this->collisionWithPlayer($candidateY, $radius)) {
+                $candidate->setY($floor->getY());
+                $this->setActiveFloor($floor);
+                return true;
+            }
         }
 
         // Tall walls everywhere
@@ -203,7 +206,7 @@ trait MovementTrait
         }
 
         // Try to move 1 unit in one axis at least if possible
-        if (isset($zGrowing) && !$xWall) { // Try to move in X axis
+        if ($xWall === null) { // Try to move in X axis
             $oneSideCandidate = $candidate->clone()->setZ($start->z); // reset to previous Z
             $oneSideCandidate->addX($angle > 180 ? -1 : 1); // try 1 unit in X
             $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
@@ -213,7 +216,7 @@ trait MovementTrait
             }
             return false;
         }
-        if (isset($xGrowing) && !$zWall) { // Try to move in Z axis
+        if ($zWall === null) { // Try to move in Z axis
             $oneSideCandidate = $candidate->clone()->setX($start->x); // reset to previous X
             $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1); // try 1 unit in Z
             $oneSideCandidateZ = $oneSideCandidate->clone()->addZ(($angle > 270 || $angle < 90) ? $radius : -$radius);
@@ -223,8 +226,6 @@ trait MovementTrait
             }
             return false;
         }
-
-        return false;
     }
 
     private function collisionWithPlayer(Point $candidate, int $radius): bool

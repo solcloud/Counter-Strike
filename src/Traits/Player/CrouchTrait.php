@@ -2,7 +2,6 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Point;
 use cs\Event\CrouchEvent;
 
 trait CrouchTrait
@@ -26,7 +25,7 @@ trait CrouchTrait
                 }
             } else {
                 $targetHeadHeight = $this->headHeight + $event->moveOffset;
-                $candidate = new Point($this->position->x, $this->position->y, $this->position->z);
+                $candidate = $this->position->clone();
                 for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, self::headHeightStand); $h++) {
                     $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getBoundingRadius());
                     if ($floorCandidate) {
@@ -55,6 +54,9 @@ trait CrouchTrait
 
     public function crouch(): void
     {
+        if ($this->getHeadHeight() === self::headHeightCrouch) {
+            return;
+        }
         if (!$this->canCrouch()) {
             return;
         }

@@ -15,12 +15,12 @@ use InvalidArgumentException;
 
 abstract class BaseTestCase extends BaseTest
 {
-    private int $testTicRate = 10;
+    private int $testTickRateMs = 10;
 
     public function __construct()
     {
         parent::__construct(...func_get_args());
-        Util::$TICK_RATE = $this->testTicRate;
+        Util::$TICK_RATE = $this->testTickRateMs;
     }
 
     /**

@@ -33,8 +33,9 @@ final class Player
     public const fallDamageThreshold = 3 * self::headHeightStand;
     public const jumpHeight = self::speedJump * self::tickCountJump;
     public const headRadius = 30;
-    public const bodyRadius = self::speedMove - 6;
+    public const bodyRadius = 44;
     public const jumpMovementSlowDown = 1;
+    public const flyingMovementSlowDown = 0.8;
 
     private Point $position;
     private PlayerCamera $sight;

@@ -64,16 +64,18 @@ class StoreRequestTest extends BaseTest
         });
         $game->onTick(function (GameState $state) use ($tester, &$playerRequests, &$playerControls): void {
             $tester->onTickStart($state, $state->getTickId());
-            if (isset($playerRequests[$state->getTickId()])) {
-                foreach ($playerRequests[$state->getTickId()] as $playerId => $commands) {
-                    if (!isset($playerControls[$playerId])) {
-                        $playerControls[$playerId] = new PlayerControl($state->getPlayer($playerId), $state);
-                    }
+            if (!isset($playerRequests[$state->getTickId()])) {
+                return;
+            }
 
-                    foreach ($commands as $command) {
-                        $method = array_shift($command);
-                        $playerControls[$playerId]->{$method}(...$command);
-                    }
+            foreach ($playerRequests[$state->getTickId()] as $playerId => $commands) {
+                if (!isset($playerControls[$playerId])) {
+                    $playerControls[$playerId] = new PlayerControl($state->getPlayer($playerId), $state);
+                }
+
+                foreach ($commands as $command) {
+                    $method = array_shift($command);
+                    $playerControls[$playerId]->{$method}(...$command);
                 }
             }
         });

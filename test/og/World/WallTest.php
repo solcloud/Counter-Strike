@@ -38,6 +38,38 @@ class WallTest extends BaseTestCase
         $this->assertNull($world->isWallAt(new Point(1, 1, 1)));
     }
 
+    public function testZWallCollision(): void
+    {
+        $z = 8;
+        $world = new World(new Game());
+        $world->addWall(new Wall(new Point(20, 11, $z), true, 10, 20));
+
+        $this->assertNull($world->checkZSideWallCollision(new Point(20, 32, $z), 1, 9));
+        $this->assertNotNull($world->checkZSideWallCollision(new Point(20, 20, $z), 2, 9));
+        $this->assertNull($world->checkZSideWallCollision(new Point(18, 32, $z), 1, 2));
+        $this->assertNotNull($world->checkZSideWallCollision(new Point(15, 20, $z), 2, 5));
+        $this->assertNull($world->checkZSideWallCollision(new Point(18, 9, $z), 1, 22));
+        $this->assertNotNull($world->checkZSideWallCollision(new Point(15, 9, $z), 2, 5));
+        $this->assertNull($world->checkZSideWallCollision(new Point(0, 0, $z), 10, 22));
+        $this->assertNotNull($world->checkZSideWallCollision(new Point(0, 0, $z), 12, 20));
+    }
+
+    public function testXWallCollision(): void
+    {
+        $x = 8;
+        $world = new World(new Game());
+        $world->addWall(new Wall(new Point($x, 11, 20), false, 10, 20));
+
+        $this->assertNull($world->checkXSideWallCollision(new Point($x, 32, 20), 1, 9));
+        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 20, 20), 2, 9));
+        $this->assertNull($world->checkXSideWallCollision(new Point($x, 32, 18), 1, 2));
+        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 20, 15), 2, 5));
+        $this->assertNull($world->checkXSideWallCollision(new Point($x, 9, 18), 1, 22));
+        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 9, 15), 2, 5));
+        $this->assertNull($world->checkXSideWallCollision(new Point($x, 0, 0), 10, 22));
+        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 0, 0), 12, 20));
+    }
+
     public function testRampGenerate(): void
     {
         $stepDepth = 2;

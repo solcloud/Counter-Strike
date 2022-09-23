@@ -29,7 +29,7 @@ trait GravityTrait
     private function calculateGravity(Point $start, int $amount): int
     {
         $targetYPosition = $start->y - $amount;
-        $candidate = new Point($start->x, $start->y, $start->z);
+        $candidate = $start->clone();
         for ($y = $start->y; $y >= $targetYPosition; $y--) {
             $candidate->setY($y);
             $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());

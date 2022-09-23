@@ -2,7 +2,6 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Point;
 use cs\Event\JumpEvent;
 
 trait JumpTrait
@@ -24,8 +23,9 @@ trait JumpTrait
         $event = new JumpEvent(function (): void {
             $this->setActiveFloor(null);
             $targetYPosition = $this->position->y + static::speedJump;
+            $candidate = $this->position->clone();
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
-                $floorCandidate = $this->world->findFloor(new Point($this->position->getX(), $y, $this->position->getZ()), $this->getBoundingRadius());
+                $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->getBoundingRadius());
                 if ($floorCandidate) {
                     $targetYPosition = $y - 1;
                     break;
