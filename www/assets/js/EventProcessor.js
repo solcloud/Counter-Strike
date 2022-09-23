@@ -5,7 +5,7 @@ export class EventProcessor {
 
     constructor(game) {
         this.game = game
-        this.#callbacks = this.#loadCallbacks()
+        this.#loadCallbacks()
     }
 
     process(event) {
@@ -96,6 +96,6 @@ export class EventProcessor {
             game.playerKilled(data.playerDead, data.playerCulprit, data.headshot, data.itemId)
         }
 
-        return eventsCallback
+        this.#callbacks = eventsCallback
     }
 }

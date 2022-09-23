@@ -8,6 +8,9 @@ use Stringable;
 class ConsoleLogger extends AbstractLogger
 {
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function log(mixed $level, Stringable|string $message, array $context = []): void // @phpstan-ignore-line
     {
         if (!is_string($level)) {

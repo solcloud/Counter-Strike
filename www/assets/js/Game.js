@@ -28,6 +28,7 @@ export class Game {
     }
 
     pause(msg, timeMs) {
+        this.#started = true
         this.#paused = true
         console.log("Pause: " + msg + " for " + timeMs + "ms")
         this.#hud.pause(msg, timeMs)
@@ -47,7 +48,6 @@ export class Game {
     }
 
     roundStart(aliveAttackers, aliveDefenders) {
-        this.#started = true
         console.log("Starting round " + this.#round)
         this.alivePlayers.attackers = aliveAttackers
         this.alivePlayers.defenders = aliveDefenders

@@ -9,6 +9,10 @@
             "@putenv TEST_ENVIRONMENT=true",
             "@unit"
         ],
+        "coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@unit --coverage-html www/coverage"
+        ],
         "check": [
             "@composer dumpautoload --optimize",
             "@stan",

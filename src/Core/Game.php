@@ -238,26 +238,31 @@ class Game
             return;
         }
 
-        $this->world->roundReset();
-        foreach ($this->players as $player) {
-            $player->roundReset();
-            $player->getInventory()->earnMoney(1000); // TODO
-            $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
-            $player->setPosition($spawnPosition);
-        }
+        $roundResetCallback = function () {
+            $this->world->roundReset();
+            foreach ($this->players as $player) {
+                $player->roundReset();
+                $player->getInventory()->earnMoney(1000); // TODO
+                $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
+                $player->setPosition($spawnPosition);
+            }
+        };
 
-        $this->paused = true;
         $startRoundFreezeTime = $this->startRoundFreezeTime;
         $startRoundFreezeTime->reset();
 
         $isHalftime = $this->properties->max_rounds > 2 && (((int)floor($this->properties->max_rounds / 2)) === $this->roundNumber);
         if ($isHalftime) {
             $callback = function () use ($startRoundFreezeTime): void {
+                $this->paused = true;
+                // $roundResetCallback(); todo switch sides and reset world
                 $this->addEvent($startRoundFreezeTime);
             };
             $event = new PauseStartEvent(PauseReason::HALF_TIME, $callback, $this->properties->half_time_freeze_sec * 1000);
         } else {
-            $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime): void {
+            $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime, $roundResetCallback): void {
+                $this->paused = true;
+                $roundResetCallback();
                 $this->addEvent($startRoundFreezeTime);
             }, $this->properties->round_end_cool_down_sec * 1000);
         }

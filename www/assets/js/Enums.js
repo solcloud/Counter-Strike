@@ -47,6 +47,7 @@ const Color = {
     5: 0xFFA500,
 }
 
+// server/src/Enum/Color.php
 const ColorNames = {
     1: 'Blue',
     2: 'Green',

@@ -75,6 +75,10 @@ class PlayerCollider
 
     public function collide(Point $point, int $radius, int $height): bool
     {
+        if (!$this->player->isAlive()) {
+            return false;
+        }
+
         return Collision::cylinderWithCylinder(
             $this->player->getPositionImmutable(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
             $point, $radius, $height
