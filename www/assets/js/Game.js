@@ -28,6 +28,13 @@ export class Game {
     }
 
     pause(msg, timeMs) {
+        const game = this
+        this.players.forEach(function (player) {
+            if (player.data.id === game.playerMe.id) {
+                return
+            }
+            player.object.visible = true
+        })
         this.#started = true
         this.#paused = true
         console.log("Pause: " + msg + " for " + timeMs + "ms")
@@ -98,6 +105,7 @@ export class Game {
     }
 
     playerKilled(playerIdDead, playerIdCulprit, wasHeadshot, killItemId) {
+        this.players[playerIdDead].object.visible = false
         this.#hud.showKill(
             this.players[playerIdCulprit].data,
             this.players[playerIdDead].data,

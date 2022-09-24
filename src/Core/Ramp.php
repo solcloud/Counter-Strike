@@ -39,7 +39,7 @@ class Ramp
             // todo use only walls and floors for fewer walls and floors or use box $sides param
             $this->boxes[] = new Box($point->clone(), $width, $heightSum, $depth);
 
-            $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight;
+            $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight; // TODO fix going down
             if ($direction->x <> 0) {
                 $point->addX(($direction->x > 0 ? 1 : -1) * $stepDepth);
             } else {
