@@ -44,6 +44,8 @@ foreach ($map->getBoxes() as $box) {
 </div>
 <script>
     let camera, scene, renderer, controls;
+    const worldMaterial = new THREE.MeshPhongMaterial({color: 0x9f998e})
+    const material = new THREE.MeshPhongMaterial({color: 0x664b17})
 
     function init() {
         scene = new THREE.Scene();
@@ -60,6 +62,16 @@ foreach ($map->getBoxes() as $box) {
         scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
     }
 
+    function createRamp(startX = 1507.1, startY = 0, endX = 1676, endY = 140.1, depth = 80) {
+        const shape = new THREE.Shape();
+        shape.moveTo(startX, startY);
+        shape.lineTo(endX, startY);
+        shape.lineTo(endX, endY);
+        shape.lineTo(startX, startY);
+
+        return new THREE.Mesh(new THREE.ExtrudeGeometry(shape, {steps: 2, depth: depth,}), material);
+    }
+
     function object() {
         const json = '<?= json_encode($boxes, JSON_THROW_ON_ERROR) ?>';
         const data = JSON.parse(json);
@@ -67,8 +79,6 @@ foreach ($map->getBoxes() as $box) {
         extra.name = 'extra'
         const map = new THREE.Group()
         map.name = 'map'
-        const worldMaterial = new THREE.MeshPhongMaterial({color: 0x9f998e})
-        const material = new THREE.MeshPhongMaterial({color: 0x664b17})
 
         let first = true, center, maxHeight
         data.forEach(function (box) {
@@ -119,6 +129,9 @@ foreach ($map->getBoxes() as $box) {
         const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
         const a1 = new THREE.AmbientLight(0xDADADA, .8)
         extra.add(s1, d1, a1, lightTarget, bulb);
+        const ramp1 = createRamp()
+        ramp1.position.z = -80.1
+        extra.add(ramp1)
 
         scene.add(map, extra)
         renderer.render(scene, camera);

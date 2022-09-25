@@ -19,21 +19,29 @@ class DefaultMap extends BoxMap
         $radiusHalf = Player::playerBoundingRadius / 2;
         $boxHeight = Player::boxHeightCrouchCover;
 
-        $this->addBox(new Box(new Point(), 31 * $scale, 5 * Player::headHeightStand, 31 * $scale));
-        foreach ([3, 9, 15, 21, 27] as $x) {
-            $attackers[] = new Point($x * $scale + $radiusHalf, 0, 6 * $scale);
-            $this->addBox(new Box(new Point(($x - 1) * $scale, 0, 7 * $scale), 3 * $scale, $boxHeight, $scale));
-            $this->addBox(new Box(new Point(($x) * $scale, $boxHeight, 7 * $scale), 1 * $scale, $boxHeight, $scale));
+        $this->addBox(new Box(new Point(), 43 * $scale, 5 * Player::headHeightStand, 32 * $scale));
+        foreach ([5, 13, 21, 29, 37] as $x) {
+            $attackers[] = new Point($x * $scale + $radiusHalf, 0, 4 * $scale);
+            $this->addBox(new Box(new Point(($x - 1) * $scale, 0, 5 * $scale), 3 * $scale, $boxHeight, $scale));
+            $this->addBox(new Box(new Point(($x) * $scale, $boxHeight, 5 * $scale), 1 * $scale, $boxHeight, $scale));
 
-            $defenders[] = new Point($x * $scale + $radiusHalf, 0, 28 * $scale + $scaleHalf);
-            $this->addBox(new Box(new Point(($x - 1) * $scale, 0, 27 * $scale), 3 * $scale, $boxHeight, $scale));
-            $this->addBox(new Box(new Point(($x) * $scale, $boxHeight, 27 * $scale), 1 * $scale, $boxHeight, $scale));
+            $defenders[] = new Point($x * $scale + $radiusHalf, 0, 27 * $scale + $scaleHalf);
+            $this->addBox(new Box(new Point(($x - 1) * $scale, 0, 26 * $scale), 3 * $scale, $boxHeight, $scale));
+            $this->addBox(new Box(new Point(($x) * $scale, $boxHeight, 26 * $scale), 1 * $scale, $boxHeight, $scale));
         }
-        $this->addBox(new Box(new Point(15 * $scale, 0, 0 * $scale), $scale, Player::headHeightCrouch, $scale));
-        $this->addBox(new Box(new Point(15 * $scale, 0, 30 * $scale), $scale, Player::headHeightCrouch, $scale));
-        $ramp = new Ramp(new Point(5 * $scale, 0, 0 * $scale), new Point2D(1, 0), 20, $scale);
-        foreach ($ramp->getBoxes() as $box) {
-            $this->addBox($box);
+
+        $stepHeight = 10;
+        $stepCount = Player::headHeightCrouch / $stepHeight;
+        foreach ([0, 31] as $z) {
+            $ramp1 = new Ramp(new Point(19 * $scale, 0, $z * $scale), new Point2D(1, 0), $stepCount, $scale, true, 12, $stepHeight);
+            foreach ($ramp1->getBoxes() as $box) {
+                $this->addBox($box);
+            }
+            $this->addBox(new Box(new Point(21 * $scale, 0, $z * $scale), $scale, Player::headHeightCrouch, $scale));
+            $ramp2 = new Ramp(new Point(24 * $scale - 20, 0, $z * $scale), new Point2D(-1, 0), $stepCount, $scale, true, 12, $stepHeight);
+            foreach ($ramp2->getBoxes() as $box) {
+                $this->addBox($box);
+            }
         }
 
         $this->setAttackersSpawnPositions($attackers);
