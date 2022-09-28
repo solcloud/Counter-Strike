@@ -41,7 +41,7 @@ final class Player
     private PlayerCamera $sight;
     private Inventory $inventory;
     private World $world;
-    private ?Floor $activeFloor;
+    private ?Floor $activeFloor = null;
     /** @var Event[] */
     private array $eventsCache = [];
     /** @var Event[] */
@@ -65,11 +65,12 @@ final class Player
         private int   $id,
         private Color $color,
         private bool  $isPlayingOnAttackerSide,
+        Point         $position = new Point(),
     )
     {
         $this->inventory = new Inventory($this->isPlayingOnAttackerSide);
         $this->sight = new PlayerCamera();
-        $this->position = new Point();
+        $this->position = $position;
 
         $this->initialize();
     }
@@ -237,6 +238,7 @@ final class Player
             "isAttacker"  => $this->isPlayingOnAttackerSide(),
             "heightSight" => $this->getSightHeight(),
             "heightBody"  => $this->getBodyHeight(),
+            "height"      => $this->getHeadHeight(),
             "armor"       => 0, //TODO
         ];
     }

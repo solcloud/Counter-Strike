@@ -3,43 +3,49 @@ import * as Enum from "./Enums.js";
 export class World {
     #scene;
     #camera;
-    #map;
     #renderer;
     #playerModel;
+    #objectLoader;
 
-    setPlayerModelAttributes(modelData) {
-        this.#playerModel = modelData
-
-        const scene = this.#scene
-        const mapLoader = new THREE.ObjectLoader()
-        mapLoader.load(`/resources/map/${this.#map}.json`, function (mapData) {
-            scene.add(mapData)
-        })
-        mapLoader.load(`/resources/map/${this.#map}-extra.json`, function (mapData) {
-            // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
-            const lightTarget = mapData.getObjectByName('light-target')
-            mapData.traverse(function (object) {
-                if (object.type !== 'SpotLight') {
-                    return
-                }
-
-                object.target = lightTarget
-            })
-
-            scene.add(mapData)
-        })
+    constructor() {
+        this.#objectLoader = new THREE.ObjectLoader()
     }
 
-    init(map, fov = 70) {
-        this.#map = map
+    async #loadMap(scene, map) {
+        const mapData = await this.#loadJSON(`/resources/map/${map}.json`)
+        scene.add(mapData)
+
+        const mapDataExtra = await this.#loadJSON(`/resources/map/${map}-extra.json`)
+        // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
+        const lightTarget = mapDataExtra.getObjectByName('light-target')
+        mapDataExtra.traverse(function (object) {
+            if (object.type !== 'SpotLight') {
+                return
+            }
+
+            object.target = lightTarget
+        })
+        scene.add(mapDataExtra)
+    }
+
+    #loadJSON(url) {
+        const loader = this.#objectLoader;
+        return new Promise(resolve => {
+            loader.load(url, resolve);
+        });
+    }
+
+    async init(map, fov = 70) {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xdadada);
+
+        this.#playerModel = await this.#loadJSON('/resources/model/player.json')
+        await this.#loadMap(scene, map)
 
         const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 4999);
         camera.rotation.reorder("YXZ")
 
         const renderer = new THREE.WebGLRenderer({
-            canvas: document.getElementById('canvas'),
             antialias: true
         });
         renderer.shadowMap.enabled = true;
@@ -57,6 +63,25 @@ export class World {
         this.#scene = scene
         this.#camera = camera
         this.#renderer = renderer
+
+        return renderer.domElement
+    }
+
+    createPlayerMe() {
+        const me = new THREE.Object3D()
+        me.visible = false
+        const head = new THREE.Object3D()
+        head.name = "head"
+        head.add(this.getCamera())
+        me.add(head)
+
+        // TODO spawn into more interesting warmup place, like some credits area, walls with actual map of map, etc.
+        //      if client also implement moving and shooting warmup aim arena would be cool (some place with random spawning targets to warmup aim)
+        me.position.y = 9999
+        me.position.z = -9999
+
+        this.#scene.add(me)
+        return me
     }
 
     spawnPlayer(id, colorIndex, isOpponent) {
@@ -67,48 +92,26 @@ export class World {
     }
 
     #createPlayer(colorIndex, isOpponent) {
-        const radiusHead = this.#playerModel.headRadius
-        const sightHeight = this.#playerModel.sightHeight
-        const radiusBody = this.#playerModel.bodyRadius
-        const heightBody = this.#playerModel.bodyHeight
-
         const color = new THREE.Color(Enum.Color[colorIndex])
-        const colorStart = isOpponent ? '#FF6600' : '#75b359'
-        const colorEnd = isOpponent ? '#9b190c' : '#399b0c'
-
-        const head = new THREE.Mesh(
-            new THREE.SphereGeometry(radiusHead),
-            new THREE.MeshBasicMaterial({
-                map: new THREE.TextureLoader().load(
-                    '/resources/face.png'
-                )
-            })
-        );
-        head.name = "head"
-        head.rotation.y = degreeToRadian(90)
-        head.position.y = sightHeight
-
+        const headMaterial = new THREE.MeshPhongMaterial({
+            map: new THREE.TextureLoader().load(
+                '/resources/face.png'
+            )
+        })
         const bodyTexture = new THREE.Texture(
             this.#generateTexture(
                 Enum.ColorNames[colorIndex],
                 '#' + color.getHexString(),
-                colorStart,
-                colorEnd
+                isOpponent ? '#FF6600' : '#75b359',
+                isOpponent ? '#9b190c' : '#399b0c'
             )
         );
         bodyTexture.needsUpdate = true;
-        const body = new THREE.Mesh(
-            new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 32),
-            new THREE.MeshBasicMaterial({
-                map: bodyTexture
-            })
-        );
-        body.translateY(body.geometry.parameters.height / 2)
-        body.name = "body"
 
-        const player = new THREE.Object3D();
+        const player = this.#playerModel.clone()
+        player.getObjectByName('head').children[0].material = headMaterial
+        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({map: bodyTexture})
         player.rotation.reorder("YXZ")
-        player.add(head, body)
         return player
     }
 
@@ -120,13 +123,13 @@ export class World {
         const ctx = canvas.getContext("2d");
         ctx.rect(0, 0, resolution, resolution);
         const gradient = ctx.createLinearGradient(0, 0, resolution, resolution);
-        gradient.addColorStop(0, colorStart); // todo add more steps .5?
+        gradient.addColorStop(0, colorStart);
         gradient.addColorStop(1, colorEnd);
         ctx.fillStyle = gradient;
         ctx.fill();
 
         ctx.fillStyle = playerColor
-        ctx.font = '90px Arial';
+        ctx.font = '60px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(playerText, resolution / 2, resolution / 2)
 
@@ -139,12 +142,9 @@ export class World {
 
     updatePlayerModel(player, data) {
         const body = player.getObjectByName('body')
-        if (body.geometry.parameters.height !== data.heightBody) { // update body height if changed
-            const oldParams = body.geometry.parameters
-            let newGeometry = new THREE.CylinderGeometry(oldParams.radiusTop, oldParams.radiusBottom, data.heightBody, oldParams.radialSegments)
-            body.geometry.dispose()
-            body.geometry = newGeometry
-            body.position.setY(newGeometry.parameters.height / 2)
+        if (body.position.y !== data.heightBody) { // update body height position if changed
+            // TODO probably keyframe time based animation from userData like body.position = body.userData.animation[data.playerAnimationId]
+            body.position.y = data.heightBody
         }
     }
 

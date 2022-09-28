@@ -34,19 +34,11 @@ class Collision
 
     public static function pointWithSphere(Point $point, Point $sphereCenter, int $sphereRadius): bool
     {
-        if ($point->x < $sphereCenter->x - $sphereRadius || $point->x > $sphereCenter->x + $sphereRadius) {
-            return false;
-        }
-
         if ($point->y < $sphereCenter->y - $sphereRadius || $point->y > $sphereCenter->y + $sphereRadius) {
             return false;
         }
 
-        if ($point->z < $sphereCenter->z - $sphereRadius || $point->z > $sphereCenter->z + $sphereRadius) {
-            return false;
-        }
-
-        return true;
+        return self::pointWithCircle($point->to2D('xz'), $sphereCenter->to2D('xz'), $sphereRadius);
     }
 
     public static function cylinderWithCylinder(
@@ -73,19 +65,11 @@ class Collision
 
     public static function pointWithCylinder(Point $point, Point $cylinderBottomCenter, int $cylinderRadius, int $cylinderHeight): bool
     {
-        if ($point->x < $cylinderBottomCenter->x - $cylinderRadius || $point->x > $cylinderBottomCenter->x + $cylinderRadius) {
-            return false;
-        }
-
         if ($point->y < $cylinderBottomCenter->y || $point->y > $cylinderBottomCenter->y + $cylinderHeight) {
             return false;
         }
 
-        if ($point->z < $cylinderBottomCenter->z - $cylinderRadius || $point->z > $cylinderBottomCenter->z + $cylinderRadius) {
-            return false;
-        }
-
-        return true;
+        return self::pointWithCircle($point->to2D('xz'), $cylinderBottomCenter->to2D('xz'), $cylinderRadius);
     }
 
     public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, Point2D $pointB, int $planeWidthB, int $planeHeightB): bool

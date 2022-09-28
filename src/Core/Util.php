@@ -2,7 +2,7 @@
 
 namespace cs\Core;
 
-class Util
+final class Util
 {
     public static int $TICK_RATE = 20;
     /** @var float[] */
@@ -207,7 +207,34 @@ class Util
         return $angleDegree;
     }
 
-    public static function sine(int $angleDegree): float
+    private static function sin(int $angleDegree): float
+    {
+        if ($angleDegree < 0) {
+            $angleDegree += 360;
+        }
+
+        if ($angleDegree < 90) {
+            return self::$sines[$angleDegree];
+        }
+        if ($angleDegree <= 180) {
+            return self::$sines[$angleDegree];
+        }
+        return -1 * self::$sines[$angleDegree - 180];
+    }
+
+    private static function cos(int $angleDegree): float
+    {
+        $base = abs(self::sin($angleDegree - 90));
+        if ($angleDegree < 90) {
+            return $base;
+        }
+        if ($angleDegree < 270) {
+            return -1 * $base;
+        }
+        return $base;
+    }
+
+    private static function sine(int $angleDegree): float
     {
         $angleDegree = $angleDegree % 360;
         $multiplier = +1;
@@ -239,7 +266,7 @@ class Util
         } elseif ($angle === 270) {
             return [-$distance, 0];
         } else {
-            $x = $distance * static::sine($angle);
+            $x = $distance * self::sine($angle);
             $z = (int)round(sqrt($distance * $distance - $x * $x));
             $x = (int)round($x);
 
@@ -275,6 +302,22 @@ class Util
             $y = (int)round($distance * Util::sine($angleVertical));
             return [$x, $y, $z];
         }
+    }
+
+    public static function distanceFromOrigin(Point2D $point): int
+    {
+        return (int)round(sqrt(pow($point->x, 2) + pow($point->y, 2)));
+    }
+
+    /**
+     * @return int[] new [$x, $z]
+     */
+    public static function rotatePointY(int $angle, int $x, int $z, int $centerX = 0, int $centerZ = 0, bool $clockWise = true): array
+    {
+        $newX = $centerX + (int)round(self::cos($angle) * ($x - $centerX) + self::sin($angle) * ($z - $centerZ));
+        $newZ = $centerZ + (int)round(($clockWise ? -1 : 1) * self::sin($angle) * ($x - $centerX) + self::cos($angle) * ($z - $centerZ));
+
+        return [$newX, $newZ];
     }
 
 }

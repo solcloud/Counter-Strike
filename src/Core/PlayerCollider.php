@@ -3,6 +3,7 @@
 namespace cs\Core;
 
 use cs\Enum\HitBoxType;
+use cs\HitGeometry;
 use cs\Interface\Hittable;
 
 class PlayerCollider
@@ -13,21 +14,36 @@ class PlayerCollider
 
     public function __construct(private Player $player)
     {
-        // TODO: LOL hit boxes, only first count so do good geometry and array priorities
+        // TODO: create real football player geometry in 3D software - fill it with bunch of rigid body spheres, bake it and export spheres coordinates
+        // TODO: crouch, move animation
+        // NOTE: only first hit box count so do good geometry and array priorities
 
         // HEAD
         $this->hitBoxes[] = new HitBox(
             $this->player,
             HitBoxType::HEAD,
-            new HitBoxHead(
-                Player::headRadius,
-            )
+            new HitGeometry\HitBoxHead(Player::headRadius)
         );
+
         // BODY
         $this->hitBoxes[] = new HitBox(
             $this->player,
+            HitBoxType::STOMACH,
+            new HitGeometry\HitBoxBody($this->player->getBoundingRadius() - 2)
+        );
+
+        // Chest
+        $this->hitBoxes[] = new HitBox(
+            $this->player,
             HitBoxType::CHEST,
-            new HitBoxBody(new Point(), Player::bodyRadius)
+            new HitGeometry\HitBoxChest()
+        );
+
+        // Legs
+        $this->hitBoxes[] = new HitBox(
+            $this->player,
+            HitBoxType::LEG,
+            new HitGeometry\HitBoxLegs(Player::headHeightStand - Player::headHeightCrouch)
         );
     }
 
@@ -83,6 +99,14 @@ class PlayerCollider
             $this->player->getPositionImmutable(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
             $point, $radius, $height
         );
+    }
+
+    /**
+     * @return HitBox[]
+     */
+    public function getHitBoxes(): array
+    {
+        return $this->hitBoxes;
     }
 
 }

@@ -154,17 +154,13 @@ foreach ($map->getBoxes() as $box) {
         spawnAttackers.forEach(function (point) {
             const spawn = new THREE.Mesh(geometry, spawnMaterialAttackers);
             spawn.position.set(point.x, point.y, -point.z)
-            spawn.translateX(radius / 2)
             spawn.translateY(height / 2)
-            spawn.translateZ(radius / -2)
             scene.add(spawn);
         })
         spawnDefenders.forEach(function (point) {
             const spawn = new THREE.Mesh(geometry, spawnMaterialDefenders);
             spawn.position.set(point.x, point.y, -point.z)
-            spawn.translateX(radius / 2)
             spawn.translateY(height / 2)
-            spawn.translateZ(radius / -2)
             scene.add(spawn);
         })
     }

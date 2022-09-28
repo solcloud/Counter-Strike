@@ -19,16 +19,17 @@ let launchGame
 ////////////
 
 
-    launchGame = function (elementHud, map, address, code) {
+    launchGame = async function (canvasParent, elementHud, map, address, code) {
         if (initialized) {
             throw new Error("Game already launched")
         }
 
         initialized = true
+        const canvas = await world.init(map)
         hud.createHud(elementHud)
-        world.init(map)
         control.init(world.getCamera())
         document.addEventListener("click", () => control.requestLock())
+        canvasParent.appendChild(canvas)
 
         let connector = new WebSocketConnector(game)
         game.onEnd(function (msg) {

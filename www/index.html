@@ -6,9 +6,8 @@
     <link rel="stylesheet" href="./assets/css/main.css">
     <link rel="stylesheet" href="./assets/css/hud.css">
 </head>
-<body oncontextmenu="return false">
-<canvas id="canvas"></canvas>
-<div id="hud"></div>
+<body oncontextmenu="return false" style="background:#000000">
+<div id="hud"><p style="font-size:120px;text-align:center;color:#FFF;padding:90px 40px">Loading....</p></div>
 <div id="ui">
     <header>
         <h1>Counter-Strike</h1>
@@ -77,8 +76,8 @@
         modal.remove()
         ui.remove()
         console.log("Launching game")
-        import("/assets/js/start.js").then((ns) => {
-            ns.launchGame(hud, map, url, code)
+        import("/assets/js/start.js").then(async (ns) => {
+            await ns.launchGame(document.body, hud, map, url, code)
         })
     }
 
