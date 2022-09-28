@@ -189,7 +189,7 @@ trait MovementTrait
         if ($floor) {
             $candidateY = $candidate->clone()->setY($floor->getY());
             if (!$this->collisionWithPlayer($candidateY, $radius)) {
-                $candidate->setY($floor->getY());
+                $candidate->setY($floor->getY()); // side effect
                 $this->setActiveFloor($floor);
                 return true;
             }

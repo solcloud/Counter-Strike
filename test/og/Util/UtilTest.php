@@ -5,6 +5,7 @@ namespace Test\Util;
 use cs\Core\GameProperty;
 use cs\Core\Player;
 use cs\Core\PlayerCamera;
+use cs\Core\Point2D;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Weapon\RifleAk;
@@ -73,6 +74,27 @@ class UtilTest extends BaseTestCase
         $this->assertSame([3, -5, 6], Util::movementXYZ(22, -47, 7));
         $this->assertSame([58, 34, 13], Util::movementXYZ(77, 35, 60));
         $this->assertSame([2, 2, 5], Util::movementXYZ(18, 23, 5));
+    }
+
+    public function testRotatePointY(): void
+    {
+        $data = [
+            45  => [-10, 67],
+            65  => [11, 73],
+            149 => [79, 18],
+            192 => [69, -28],
+            322 => [-47, -10],
+        ];
+
+        foreach ($data as $angle => $xz) {
+            $this->assertSame($xz, Util::rotatePointY($angle, -45, 32, 15, 8));
+        }
+    }
+
+    public function testPointToOriginDistance(): void
+    {
+        $this->assertSame(4, Util::distanceFromOrigin(new Point2D(4, 1)));
+        $this->assertSame(4, Util::distanceFromOrigin(new Point2D(0, 4)));
     }
 
 }

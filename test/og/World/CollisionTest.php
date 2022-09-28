@@ -106,6 +106,40 @@ class CollisionTest extends BaseTest
         }
     }
 
+    public function testPointWithCylinderTrue(): void
+    {
+        $cylinderBottom = new Point(3, -1, 0);
+        $radius = 3;
+        $height = 6;
+        $points = [
+            new Point(0, 0, 0),
+            new Point(3, 0, 0),
+            new Point(3, 0, 1),
+            new Point(4, 2, 0),
+            new Point(4, 1, 1),
+            new Point(6, 0, 0),
+        ];
+        foreach ($points as $point) {
+            $this->assertTrue(Collision::pointWithCylinder($point, $cylinderBottom, $radius, $height), "Point: {$point}");
+        }
+    }
+
+    public function testPointWithCylinderFalse(): void
+    {
+        $cylinderBottom = new Point(3, -1, 0);
+        $radius = 3;
+        $height = 6;
+        $points = [
+            new Point(0, -3, 0),
+            new Point(4, 6, 0),
+            new Point(2, -3, 0),
+            new Point(6, 0, 1),
+        ];
+        foreach ($points as $point) {
+            $this->assertFalse(Collision::pointWithCylinder($point, $cylinderBottom, $radius, $height), "Point: {$point}");
+        }
+    }
+
     public function testCylinderWithCylinderTrue(): void
     {
         $centerA = new Point(4, 0, 0);
@@ -148,5 +182,46 @@ class CollisionTest extends BaseTest
             $this->assertFalse(Collision::cylinderWithCylinder($centerA, $radiusA, $heightA, $centerB, $radiusB, $heightB), "CenterB: {$centerB}");
         }
     }
+
+    public function testPointWithSphereTrue(): void
+    {
+        $sphereCenter = new Point();
+        $sphereRadius = 2;
+        $points = [
+            new Point(),
+            new Point(0, 0, 1),
+            new Point(0, 0, 2),
+            new Point(1, 0, 1),
+            new Point(1, 1, 1),
+            new Point(1, 2, 1),
+            new Point(2, 0, 0),
+        ];
+        foreach ($points as $point) {
+            $this->assertTrue(Collision::pointWithSphere($point, $sphereCenter, $sphereRadius), "Point: {$point}");
+        }
+    }
+
+    public function testPointWithSphereFalse(): void
+    {
+        $sphereCenter = new Point();
+        $sphereRadius = 2;
+        $points = [
+            new Point(-2, 1, 1),
+            new Point(-2, 2, 1),
+            new Point(-4, 0, 1),
+            new Point(-4, 2, 3),
+            new Point(0, 2, 5),
+            new Point(1, 2, 5),
+            new Point(1, 3, 5),
+            new Point(1, 0, 2),
+            new Point(2, -2, 1),
+            new Point(2, 1, 1),
+            new Point(2, 2, 1),
+        ];
+        foreach ($points as $point) {
+            $this->assertFalse(Collision::pointWithSphere($point, $sphereCenter, $sphereRadius), "Point: {$point}");
+        }
+    }
+
 
 }

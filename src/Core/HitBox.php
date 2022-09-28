@@ -79,7 +79,7 @@ class HitBox implements Hittable
 
     public function intersect(Bullet $bullet): bool
     {
-        return $this->geometry->intersect($this->player, $bullet);
+        return $this->geometry->intersect($this->player, $bullet->getPosition());
     }
 
     public function getPlayer(): Player
@@ -105,6 +105,11 @@ class HitBox implements Hittable
     public function wasHeadShot(): bool
     {
         return $this->wasHeadShot;
+    }
+
+    public function getGeometry(): HitIntersect
+    {
+        return $this->geometry;
     }
 
 }

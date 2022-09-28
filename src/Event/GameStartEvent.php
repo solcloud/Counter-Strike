@@ -26,12 +26,6 @@ final class GameStartEvent extends TickEvent
             'playersCount' => $this->setting->playersMax,
             'setting'      => $this->gameSetting->toArray(),
             'player'       => $this->player->serialize(),
-            'playerModel'  => [
-                'headRadius'  => $this->player::headRadius,
-                'bodyRadius'  => $this->player::bodyRadius,
-                'bodyHeight'  => $this->player->getBodyHeight(),
-                'sightHeight' => $this->player->getSightHeight(),
-            ],
         ];
     }
 

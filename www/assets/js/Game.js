@@ -83,7 +83,6 @@ export class Game {
 
     setOptions(options) {
         this.#options = options
-        this.#world.setPlayerModelAttributes(options.playerModel)
         this.#hud.startWarmup(options.warmupSec * 1000)
 
         const playerId = options.playerId
@@ -92,12 +91,7 @@ export class Game {
         }
 
         this.playerMe = options.player
-        const me = this.spawnPlayer(playerId, options.player.color, options.player.isAttacker)
-        this.players[playerId] = me
-        const head = me.object.getObjectByName('head')
-        head.rotation.y = 0
-        head.add(this.#world.getCamera())
-        me.object.visible = false
+        this.players[playerId] = this.#spawnPlayerMe(playerId, options.player.color, options.player.isAttacker)
 
         if (this.#readyCallback) {
             this.#readyCallback(this.#options)
@@ -113,6 +107,18 @@ export class Game {
             this.playerMe,
             killItemId
         )
+    }
+
+    #spawnPlayerMe(id, colorIndex, isAttacker) {
+        const me = this.#world.createPlayerMe()
+        return {
+            object: me,
+            data: {
+                id: id,
+                color: colorIndex,
+                isAttacker: isAttacker
+            }
+        }
     }
 
     spawnPlayer(id, colorIndex, isAttacker) {
@@ -160,6 +166,7 @@ export class Game {
 
             player.getObjectByName('head').position.y = playerState.heightSight
             player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
+
             if (game.playerMe.id && playerState.id !== game.playerMe.id) {
                 game.updatePlayerObject(player, playerState)
             }
