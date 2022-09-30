@@ -306,7 +306,12 @@ final class Util
 
     public static function distanceFromOrigin(Point2D $point): int
     {
-        return (int)round(sqrt(pow($point->x, 2) + pow($point->y, 2)));
+        return (int)round(hypot($point->x, $point->y));
+    }
+
+    public static function distance(Point $a, Point $b): int
+    {
+        return pow($a->x - $b->x, 2) + pow($a->y - $b->y, 2) + pow($a->z - $b->z, 2);
     }
 
     /**

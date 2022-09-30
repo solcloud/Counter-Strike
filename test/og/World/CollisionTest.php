@@ -183,6 +183,36 @@ class CollisionTest extends BaseTest
         }
     }
 
+    public function testPointWithSphere(): void
+    {
+        $sphereCenter = new Point();
+        $sphereRadius = 10;
+
+        $points = [
+            new Point(-4, 6, 6),
+            new Point(-5, 6, 6),
+            new Point(-1, 7, 6),
+            new Point(-1, 7, 7),
+            new Point(-5, 5, 6),
+            new Point(-1, 6, 7),
+            new Point(-6, 6, 5),
+        ];
+        foreach ($points as $point) {
+            $this->assertTrue(Collision::pointWithSphere($point, $sphereCenter, $sphereRadius), "Point: {$point}");
+        }
+        $points = [
+            new Point(-6, 6, 6),
+            new Point(-5, 7, 6),
+            new Point(-5, 8, 6),
+            new Point(4, -7, 6),
+            new Point(7, 2, 7),
+            new Point(8, 2, 7),
+        ];
+        foreach ($points as $point) {
+            $this->assertFalse(Collision::pointWithSphere($point, $sphereCenter, $sphereRadius), "Point: {$point}");
+        }
+    }
+
     public function testPointWithSphereTrue(): void
     {
         $sphereCenter = new Point();
@@ -193,7 +223,6 @@ class CollisionTest extends BaseTest
             new Point(0, 0, 2),
             new Point(1, 0, 1),
             new Point(1, 1, 1),
-            new Point(1, 2, 1),
             new Point(2, 0, 0),
         ];
         foreach ($points as $point) {
@@ -211,6 +240,7 @@ class CollisionTest extends BaseTest
             new Point(-4, 0, 1),
             new Point(-4, 2, 3),
             new Point(0, 2, 5),
+            new Point(1, 2, 1),
             new Point(1, 2, 5),
             new Point(1, 3, 5),
             new Point(1, 0, 2),

@@ -5,6 +5,7 @@ namespace Test\Util;
 use cs\Core\GameProperty;
 use cs\Core\Player;
 use cs\Core\PlayerCamera;
+use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
@@ -89,6 +90,12 @@ class UtilTest extends BaseTestCase
         foreach ($data as $angle => $xz) {
             $this->assertSame($xz, Util::rotatePointY($angle, -45, 32, 15, 8));
         }
+    }
+
+    public function testPointToPointDistance(): void
+    {
+        $this->assertSame(105, Util::distance(new Point(4, 1, -8), new Point(2,2,2)));
+        $this->assertSame(578, Util::distance(new Point(11, -1, -8), new Point(-2,-4,12)));
     }
 
     public function testPointToOriginDistance(): void
