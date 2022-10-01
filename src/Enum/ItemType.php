@@ -10,5 +10,6 @@ enum ItemType: int
     case TYPE_BOMB = 5;
     case TYPE_DEFUSE_KIT = 6;
     case TYPE_GRENADE = 7;
+    case TYPE_KEVLAR = 8;
 
 }

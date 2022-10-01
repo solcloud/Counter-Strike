@@ -35,10 +35,11 @@ trait GravityTrait
             $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
             if ($floorCandidate) {
                 $this->setActiveFloor($floorCandidate);
-                $targetYPosition = $floorCandidate->getY();
+                $targetYPosition = $y;
                 break;
             }
             if ($this->collisionWithPlayer($candidate, $this->getBoundingRadius())) {
+                $targetYPosition = $y;
                 break;
             }
         }

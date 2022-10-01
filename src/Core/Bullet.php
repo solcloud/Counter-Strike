@@ -13,6 +13,8 @@ class Bullet
     private int $distanceTraveled = 0;
     private int $damage = 1;
     private int $damageArmor = 1;
+    /** @var array<int,bool> [playerId => true] */
+    private array $playerHitIds = [];
 
     public function __construct(private AttackEnable $item, private int $distanceMax = 1)
     {
@@ -88,6 +90,19 @@ class Bullet
     public function getShootItem(): AttackEnable
     {
         return $this->item;
+    }
+
+    /**
+     * @return array<int,bool> [playerId => true]
+     */
+    public function getPlayerHitIds(): array
+    {
+        return $this->playerHitIds;
+    }
+
+    public function addPlayerIdHit(int $playerId): void
+    {
+        $this->playerHitIds[$playerId] = true;
     }
 
 }

@@ -6,6 +6,7 @@ use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Flashbang;
+use cs\Equipment\Kevlar;
 use cs\Event\EquipEvent;
 use cs\Weapon\Knife;
 use cs\Weapon\PistolGlock;
@@ -104,6 +105,10 @@ class Inventory
         }
 
         $this->store->buy($item);
+        if ($item instanceof Kevlar) {
+            $this->armorType = $item->getArmorType();
+            return null;
+        }
         $this->items[$item->getSlot()->value] = $item;
         return $this->equip($item->getSlot());
     }

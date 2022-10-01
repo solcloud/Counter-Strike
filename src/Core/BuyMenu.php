@@ -36,6 +36,7 @@ class BuyMenu
             BuyMenuItem::GRENADE_DECOY => new Equipment\Decoy(),
             BuyMenuItem::GRENADE_HE => new Equipment\HighExplosive(),
             BuyMenuItem::GRENADE_MOLOTOV => $this->forAttackerStore ? new Equipment\Molotov() : new Equipment\Incendiary(),
+            BuyMenuItem::KEVLAR_BODY_AND_HEAD => new Equipment\Kevlar(true),
             default => null,
         };
 

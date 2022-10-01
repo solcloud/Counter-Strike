@@ -291,14 +291,15 @@ final class Util
             throw new GameException("Invalid angleVertical '{$angleVertical}' given");
         }
 
-        [$x, $z] = self::horizontalMovementXZ($angleHorizontal, $distance);
         if ($angleVertical === 0) {
+            [$x, $z] = self::horizontalMovementXZ($angleHorizontal, $distance);
             return [$x, 0, $z];
         } elseif ($angleVertical === 90) {
-            return [$x, $distance, $z];
+            return [0, $distance, 0];
         } elseif ($angleVertical === -90) {
-            return [$x, -$distance, $z];
+            return [0, -$distance, 0];
         } else {
+            [$x, $z] = self::horizontalMovementXZ($angleHorizontal, $distance);
             $y = (int)round($distance * Util::sine($angleVertical));
             return [$x, $y, $z];
         }
@@ -309,7 +310,7 @@ final class Util
         return (int)round(hypot($point->x, $point->y));
     }
 
-    public static function distance(Point $a, Point $b): int
+    public static function distanceSquared(Point $a, Point $b): int
     {
         return pow($a->x - $b->x, 2) + pow($a->y - $b->y, 2) + pow($a->z - $b->z, 2);
     }

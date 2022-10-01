@@ -13,6 +13,7 @@ enum BuyMenuItem: int
     case RIFLE_M4A4 = 7;
     case PISTOL_USP = 8;
     case PISTOL_P250 = 9;
+    case KEVLAR_BODY_AND_HEAD = 10;
 
 
 }

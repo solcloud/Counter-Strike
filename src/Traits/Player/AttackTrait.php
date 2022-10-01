@@ -42,7 +42,7 @@ trait AttackTrait
     {
         $this->isAttacking = true;
         $origin = $this->getPositionImmutable();
-        $origin->setY($this->getSightHeight());
+        $origin->addY($this->getSightHeight());
         return new AttackEvent(
             $this->world,
             $origin,

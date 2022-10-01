@@ -2,10 +2,12 @@
 
 namespace Test\Shooting;
 
+use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\HitBox;
 use cs\Core\Player;
 use cs\Core\Wall;
+use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
@@ -52,6 +54,36 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame($startMoney - $gun->getPrice() + $gun->getKillAward(), $player2->getMoney());
     }
 
+    public function testBulletHitOnePlayerOnlyOneHitBox(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $game = $this->createTestGame();
+        $game->addPlayer($player2);
+        $player1 = $game->getPlayer(1);
+        $player1->getInventory()->earnMoney(1000);
+        $player1->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
+        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->getSight()->lookAt(0, -90);
+
+        $result = $player2->attack();
+        $this->assertNotNull($result);
+        $gun = $player2->getEquippedItem();
+        $this->assertInstanceOf(PistolUsp::class, $gun);
+
+        $hits = $result->getHits();
+        $this->assertCount(2, $hits);
+
+        $headShot = $hits[0];
+        $this->assertInstanceOf(HitBox::class, $headShot);
+        $this->assertSame(HitBoxType::HEAD, $headShot->getType());
+        $this->assertInstanceOf(Floor::class, $hits[1]);
+
+        $this->assertSame(0, $result->getMoneyAward());
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertTrue($player1->isAlive());
+    }
+
     public function testUspKillPlayerInThreeBulletsInChestWithNoKevlar(): void
     {
         $player2Commands = [
@@ -73,6 +105,7 @@ class PlayerKillTest extends BaseTestCase
         $gun = $player2->getEquippedItem();
         $this->assertInstanceOf(PistolUsp::class, $gun);
         $this->assertSame(0, $result->getMoneyAward());
+        $this->assertSame(1, $game->getRoundNumber());
 
         $hits = $result->getHits();
         $this->assertCount(2, $hits);
@@ -90,17 +123,20 @@ class PlayerKillTest extends BaseTestCase
         $this->assertNotNull($player2->attack());
         $this->assertTrue($player1->isAlive());
         $this->assertTrue($player2->isAlive());
+        $this->assertSame(1, $game->getRoundNumber());
 
         $game->tick(++$tickId);
         $this->assertNotNull($player2->attack());
         $this->assertFalse($player1->isAlive());
         $this->assertTrue($player2->isAlive());
+        $this->assertSame(1, $game->getRoundNumber());
 
         $game->tick(++$tickId);
         $this->assertFalse($game->getScore()->attackersIsWinning());
         $this->assertSame(0, $game->getScore()->getScoreAttackers());
         $this->assertSame(1, $game->getScore()->getScoreDefenders());
         $this->assertFalse($game->getScore()->isTie());
+        $this->assertSame(2, $game->getRoundNumber());
     }
 
     public function testPlayerCanDodgeBulletByCrouch(): void

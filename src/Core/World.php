@@ -182,14 +182,19 @@ class World
     {
         $hits = [];
 
+        $alreadyHitPlayerIds = $bullet->getPlayerHitIds();
+        $alreadyHitPlayerIds[$bullet->getOriginPlayerId()] = true; // cannot shoot self
         foreach ($this->playersColliders as $playerCollider) {
-            if ($playerCollider->getPlayerId() === $bullet->getOriginPlayerId()) {
-                continue; // cannot shoot self
+            if (isset($alreadyHitPlayerIds[$playerCollider->getPlayerId()])) {
+                continue; // player already hit
             }
 
             $hitBox = $playerCollider->tryHitPlayer($bullet);
             if ($hitBox) {
                 $player = $hitBox->getPlayer();
+                if ($player) {
+                    $bullet->addPlayerIdHit($player->getId());
+                }
                 if ($hitBox->playerWasKilled() && $player) {
                     $this->game->playerAttackKilledEvent($player, $bullet, $hitBox->wasHeadShot());
                 }

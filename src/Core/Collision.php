@@ -34,7 +34,7 @@ class Collision
 
     public static function pointWithSphere(Point $point, Point $sphereCenter, int $sphereRadius): bool
     {
-        return Util::distance($point, $sphereCenter) <= pow($sphereRadius, 2);
+        return Util::distanceSquared($point, $sphereCenter) <= pow($sphereRadius, 2);
     }
 
     public static function cylinderWithCylinder(

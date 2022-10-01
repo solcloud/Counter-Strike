@@ -17,4 +17,6 @@ enum InventorySlot: int
     case SLOT_GRENADE_HE = 8;
     case SLOT_TASER = 9;
 
+    case SLOT_KEVLAR = 10;
+
 }

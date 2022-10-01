@@ -15,7 +15,7 @@ final class PistolUsp extends AmmoBasedWeapon
     public const reserveAmmo = 24;
     public const killAward = 300;
     public const fireRateMs = 10;
-    public const damage = 61;
+    public const damage = 116;
     public const range = 5123;
 
     protected bool $isWeaponPrimary = false;
