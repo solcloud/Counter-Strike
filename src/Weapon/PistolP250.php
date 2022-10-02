@@ -8,7 +8,6 @@ use cs\Enum\HitBoxType;
 final class PistolP250 extends AmmoBasedWeapon
 {
 
-    public const movementSlowDownFactor = 0.7;
     public const reloadTimeMs = 2200;
     public const equipReadyTimeMs = 400;
     public const magazineCapacity = 13;

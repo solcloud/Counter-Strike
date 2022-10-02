@@ -19,12 +19,11 @@ trait GravityTrait
 
     private function processGravity(Point $point): void
     {
-        if ($this->isJumping()) {
+        if ($this->isJumping() || $this->activeFloor) {
             return;
         }
-        if (null === $this->activeFloor) {
-            $point->setY($this->calculateGravity($point, Action::fallAmountPerTick()));
-        }
+
+        $point->setY($this->calculateGravity($point, Action::fallAmountPerTick()));
     }
 
     private function calculateGravity(Point $start, int $amount): int

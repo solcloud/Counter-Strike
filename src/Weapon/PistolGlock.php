@@ -8,7 +8,6 @@ use cs\Enum\HitBoxType;
 final class PistolGlock extends AmmoBasedWeapon
 {
 
-    public const movementSlowDownFactor = 0.8;
     public const reloadTimeMs = 2300;
     public const equipReadyTimeMs = 400;
     public const magazineCapacity = 12;

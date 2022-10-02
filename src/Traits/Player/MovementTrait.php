@@ -8,6 +8,7 @@ use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Core\Wall;
+use cs\Enum\ItemType;
 use cs\Event\PlayerMovementEvent;
 
 trait MovementTrait
@@ -93,7 +94,12 @@ trait MovementTrait
             throw new GameException("Wat doing?");
         }
 
-        $speed *= $this->getEquippedItem()::movementSlowDownFactor;
+        $equippedItem = $this->getEquippedItem();
+        if ($equippedItem->getType() === ItemType::TYPE_WEAPON_PRIMARY) {
+            $speed *= Action::getWeaponPrimarySpeedMultiplier($equippedItem->getId());
+        } elseif ($equippedItem->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
+            $speed *= Action::getWeaponSecondarySpeedMultiplier($equippedItem->getId());
+        }
         if ($this->isJumping()) {
             $speed *= Action::jumpMovementSpeedMultiplier();
         } elseif ($this->isFlying()) {

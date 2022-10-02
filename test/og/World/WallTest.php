@@ -102,7 +102,6 @@ class WallTest extends BaseTestCase
         $numOfBoxes = 20;
         $game = $this->createTestGame($numOfBoxes);
         $player = $game->getPlayer(1);
-        $player->playerBoundingRadius = Action::playerObstacleOvercomeHeight();
 
         $ramp = new Ramp(
             new Point(0, 0, Action::playerBoundingRadius()),

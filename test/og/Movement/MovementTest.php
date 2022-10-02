@@ -37,28 +37,13 @@ class MovementTest extends BaseTestCase
 
     public function testPlayerStopOnWallBoundingRadius(): void
     {
-        $boundingRadius = rand(1, 999);
-        $wall = new Wall(new Point(0, 0, Action::moveDistancePerTick() + $boundingRadius), true);
-        $game = $this->createOneRoundGame();
-        $game->getPlayer(1)->playerBoundingRadius = $boundingRadius;
+        $game = $this->createTestGame(2);
+        $boundingRadius = $game->getPlayer(1)->getBoundingRadius();
+        $wall = new Wall(new Point(0, 0, 2 * Action::moveDistancePerTick() - $boundingRadius), true);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->getWorld()->addWall($wall);
         $game->start();
-        $this->assertSame($boundingRadius, $game->getPlayer(1)->playerBoundingRadius);
-        $this->assertGreaterThan(0, $wall->getBase());
-        $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - $boundingRadius - 1));
-    }
-
-    public function testPlayerStopOnWallBoundingRadius2(): void
-    {
-        $boundingRadius = rand(1, 999);
-        $wall = new Wall(new Point(0, 0, 2 * Action::moveDistancePerTick() + $boundingRadius), true);
-        $game = $this->createOneRoundGame(5);
-        $game->getPlayer(1)->playerBoundingRadius = $boundingRadius;
-        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
-        $game->getWorld()->addWall($wall);
-        $game->start();
-        $this->assertSame($boundingRadius, $game->getPlayer(1)->playerBoundingRadius);
+        $this->assertSame($boundingRadius, $game->getPlayer(1)->getBoundingRadius());
         $this->assertGreaterThan(0, $wall->getBase());
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - $boundingRadius - 1));
     }

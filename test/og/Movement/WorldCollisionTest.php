@@ -27,9 +27,9 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerCollisionWithBox(): void
     {
-        $game = $this->createOneRoundGame(3);
-        $game->getPlayer(1)->playerBoundingRadius = Action::playerBoundingRadius();
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
+        $game = $this->createTestGame(3);
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(),
+        Action::playerHeadHeightStand(), 1));
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
         $this->assertPlayerPosition($game, new Point());
@@ -37,8 +37,7 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerCollisionWithBoxAngle(): void
     {
-        $game = $this->createOneRoundGame(3);
-        $game->getPlayer(1)->playerBoundingRadius = Action::playerBoundingRadius();
+        $game = $this->createTestGame(3);
         $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->getSight()->lookHorizontal(45);
@@ -51,8 +50,7 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerCollisionWithBoxDoubleMovement(): void
     {
-        $game = $this->createOneRoundGame(3);
-        $game->getPlayer(1)->playerBoundingRadius = Action::playerBoundingRadius();
+        $game = $this->createTestGame(3);
         $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->moveForward();
@@ -82,8 +80,7 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerCollisionWithBoxAngle2(): void
     {
-        $game = $this->createOneRoundGame(3);
-        $game->getPlayer(1)->playerBoundingRadius = Action::playerBoundingRadius();
+        $game = $this->createTestGame(3);
         $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->moveForward();
@@ -168,31 +165,18 @@ class WorldCollisionTest extends BaseTestCase
         $this->assertPlayerPosition($game, new Point(3 * Action::moveDistancePerTick() - 1, 0, 0));
     }
 
-    public function testPlayerCollisionWithOtherPlayer(): void
-    {
-        $player2 = new Player(2, Color::GREEN, false);
-        $player2->playerBoundingRadius = 0;
-        $game = $this->createOneRoundGame(10);
-        $game->addPlayer($player2);
-
-        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
-        $game->start();
-        $this->assertPositionSame($player2->getPositionImmutable(), new Point(0, 0, Action::moveDistancePerTick()));
-        $this->assertSame($player2->getPositionImmutable()->z - 1, $game->getPlayer(1)->getPositionImmutable()->z);
-    }
-
     public function testPlayerCollisionWithOtherPlayerRadius(): void
     {
+        $game = $this->createTestGame(10);
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->playerBoundingRadius = 10;
-        $game = $this->createOneRoundGame(10);
         $game->addPlayer($player2);
-        $game->getPlayer(1)->playerBoundingRadius = 4;
+        $player2Position = new Point(0, 0, 2 * $player2->getBoundingRadius() + 10);
+        $player2->setPosition($player2Position);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPositionSame($player2->getPositionImmutable(), new Point(0, 0, Action::moveDistancePerTick()));
-        $this->assertSame($player2->getPositionImmutable()->z - 10 - 1 - 4, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertPositionSame($player2->getPositionImmutable(), $player2Position);
+        $this->assertSame($player2Position->z - 2 * $player2->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
     }
 
     public function testGravity(): void
@@ -407,7 +391,7 @@ class WorldCollisionTest extends BaseTestCase
             );
             $game->getWorld()->addFloor($floor);
         }
-        $this->playPlayerDebug($game, $playerCommands);
+        $this->playPlayer($game, $playerCommands);
         $this->assertPositionSame(new Point(0, $floor->getY(), $floor->getStart()->z), $game->getPlayer(1)->getPositionImmutable());
     }
 

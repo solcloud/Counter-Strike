@@ -13,16 +13,38 @@ use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Map\TestMap;
 use InvalidArgumentException;
+use ReflectionProperty;
 
 abstract class BaseTestCase extends BaseTest
 {
     private int $testTickRateMs = 10;
+    /** @var int[] */
+    private array $defaultTestAction = [
+        'moveOneMs'                     => 5,
+        'moveWalkOneMs'                 => 4,
+        'moveCrouchOneMs'               => 3,
+        'fallAmountOneMs'               => 6,
+        'crouchDurationMs'              => 100,
+        'jumpDurationMs'                => 50,
+        'jumpMovementSpeedMultiplier'   => 100,
+        'flyingMovementSpeedMultiplier' => 80,
+        // NOTE: Better to use even numbers for player const
+        'playerHeadRadius'              => 30,
+        'playerBoundingRadius'          => 44,
+        'playerJumpHeight'              => 150,
+        'playerHeadHeightStand'         => 190,
+        'playerHeadHeightCrouch'        => 140,
+        'playerObstacleOvercomeHeight'  => 20,
+        'playerFallDamageThreshold'     => 570,
+        'playerBoxHeightCrouchCover'    => 142,
+        'playerGunHeightStand'          => 160,
+    ];
 
     public function __construct()
     {
         parent::__construct(...func_get_args());
         Util::$TICK_RATE = $this->testTickRateMs;
-        Action::loadConstants(Action::testConstant);
+        Action::loadConstants($this->defaultTestAction);
     }
 
     /**
@@ -65,7 +87,9 @@ abstract class BaseTestCase extends BaseTest
         $game->setTickMax($tickMax);
 
         $testPlayer = new Player(1, Color::BLUE, true);
-        $testPlayer->playerBoundingRadius = 0;
+        $boundingRadius = new ReflectionProperty($testPlayer, 'playerBoundingRadius');
+        $boundingRadius->setAccessible(true);
+        $boundingRadius->setValue($testPlayer, 0);
         $testPlayer->equipKnife();
         $game->addPlayer($testPlayer);
 

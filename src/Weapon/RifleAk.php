@@ -8,7 +8,6 @@ use cs\Enum\HitBoxType;
 final class RifleAk extends AmmoBasedWeapon
 {
 
-    public const movementSlowDownFactor = 0.3;
     public const reloadTimeMs = 2400;
     public const equipReadyTimeMs = 800;
     public const magazineCapacity = 30;

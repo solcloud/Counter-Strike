@@ -16,14 +16,12 @@ final class Player
     use PlayerTrait\MovementTrait;
     use PlayerTrait\InventoryTrait;
 
-    /** @deprecated make it private eventually */
-    public int $playerBoundingRadius = 44;
-
     private Point $position;
     private PlayerCamera $sight;
     private Inventory $inventory;
     private World $world;
     private ?Floor $activeFloor = null;
+    private int $playerBoundingRadius;
     /** @var Event[] */
     private array $eventsCache = [];
     /** @var Event[] */
@@ -52,6 +50,7 @@ final class Player
         $this->inventory = new Inventory($this->isPlayingOnAttackerSide);
         $this->sight = new PlayerCamera();
         $this->position = $position;
+        $this->playerBoundingRadius = Action::playerBoundingRadius();
 
         $this->initialize();
     }

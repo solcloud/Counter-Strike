@@ -11,7 +11,6 @@ use cs\Event\EquipEvent;
 abstract class Item
 {
     public const equipReadyTimeMs = 0;
-    public const movementSlowDownFactor = 1.0;
 
     private int $skinId;
     protected bool $equipped = false;
