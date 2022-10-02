@@ -2,10 +2,10 @@
 
 namespace Test\World;
 
+use cs\Core\Action;
 use cs\Core\Box;
 use cs\Core\Game;
 use cs\Core\GameState;
-use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
@@ -102,23 +102,23 @@ class WallTest extends BaseTestCase
         $numOfBoxes = 20;
         $game = $this->createTestGame($numOfBoxes);
         $player = $game->getPlayer(1);
-        $player->playerBoundingRadius = Player::obstacleOvercomeHeight;
+        $player->playerBoundingRadius = Action::playerObstacleOvercomeHeight();
 
         $ramp = new Ramp(
-            new Point(0, 0, $player::bodyRadius),
+            new Point(0, 0, Action::playerBoundingRadius()),
             new Point2D(0, 1),
             $numOfBoxes * 3,
             10,
             true,
-            Player::speedMove,
-            Player::obstacleOvercomeHeight,
+            Action::moveDistancePerTick(),
+            Action::playerObstacleOvercomeHeight(),
         );
         $game->getWorld()->addRamp($ramp);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
         $this->assertPositionSame(
-            new Point(0, $numOfBoxes * Player::obstacleOvercomeHeight, $numOfBoxes * Player::speedMove),
+            new Point(0, $numOfBoxes * Action::playerObstacleOvercomeHeight(), $numOfBoxes * Action::moveDistancePerTick()),
             $player->getPositionImmutable()
         );
     }
@@ -132,24 +132,24 @@ class WallTest extends BaseTestCase
         for ($i = 1; $i <= $numOfBoxes; $i++) {
             $game->getWorld()->addBox(
                 new Box(
-                    $base->clone()->setZ($i * Player::speedMove),
+                    $base->clone()->setZ($i * Action::moveDistancePerTick()),
                     1,
-                    Player::obstacleOvercomeHeight,
-                    Player::speedMove
+                    Action::playerObstacleOvercomeHeight(),
+                    Action::moveDistancePerTick()
                 )
             );
-            $base->addY(Player::obstacleOvercomeHeight);
+            $base->addY(Action::playerObstacleOvercomeHeight());
         }
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPlayerPosition($game, new Point(0, Player::obstacleOvercomeHeight * $numOfBoxes, Player::speedMove * $numOfBoxes));
+        $this->assertPlayerPosition($game, new Point(0, Action::playerObstacleOvercomeHeight() * $numOfBoxes, Action::moveDistancePerTick() * $numOfBoxes));
     }
 
     public function testPlayerRunningStairsToDeath(): void
     {
         $numOfBoxes = 40;
-        $game = $this->createOneRoundGame($numOfBoxes + 20);
+        $game = $this->createOneRoundGame($numOfBoxes + 40);
         $player = $game->getPlayer(1);
         $this->assertTrue($player->isAlive());
 
@@ -157,15 +157,15 @@ class WallTest extends BaseTestCase
         for ($i = 1; $i <= $numOfBoxes; $i++) {
             $game->getWorld()->addBox(
                 new Box(
-                    $base->clone()->setZ($i * Player::speedMove),
+                    $base->clone()->setZ($i * Action::moveDistancePerTick()),
                     20,
-                    Player::obstacleOvercomeHeight,
-                    Player::speedMove
+                    Action::playerObstacleOvercomeHeight(),
+                    Action::moveDistancePerTick()
                 )
             );
-            $base->addY(Player::obstacleOvercomeHeight);
+            $base->addY(Action::playerObstacleOvercomeHeight());
         }
-        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 2)), 10, $base->y, 10);
+        $box = new Box(new Point(-5, 0, Action::moveDistancePerTick() * ($numOfBoxes + 2)), 10, $base->y, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
@@ -177,24 +177,23 @@ class WallTest extends BaseTestCase
     public function testPlayerRunningStairsToDeathBoundingRadius(): void
     {
         $numOfBoxes = 40;
-        $game = $this->createOneRoundGame($numOfBoxes + 20);
+        $game = $this->createTestGame($numOfBoxes + 40);
         $player = $game->getPlayer(1);
-        $player->playerBoundingRadius = Player::bodyRadius;
         $this->assertTrue($player->isAlive());
 
         $base = new Point(-1);
         for ($i = 1; $i <= $numOfBoxes; $i++) {
             $game->getWorld()->addBox(
                 new Box(
-                    $base->clone()->setZ($i * Player::speedMove),
+                    $base->clone()->setZ($i * Action::moveDistancePerTick()),
                     20,
-                    Player::obstacleOvercomeHeight,
-                    Player::speedMove
+                    Action::playerObstacleOvercomeHeight(),
+                    Action::moveDistancePerTick()
                 )
             );
-            $base->addY(Player::obstacleOvercomeHeight);
+            $base->addY(Action::playerObstacleOvercomeHeight());
         }
-        $box = new Box(new Point(-5, 0, Player::speedMove * ($numOfBoxes + 2) + $player->getBoundingRadius()), 10, $base->y, 10);
+        $box = new Box(new Point(-5, 0, Action::moveDistancePerTick() * ($numOfBoxes + 2) + $player->getBoundingRadius()), 10, $base->y, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(function (GameState $state) use ($numOfBoxes) {

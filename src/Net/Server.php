@@ -2,6 +2,7 @@
 
 namespace cs\Net;
 
+use cs\Core\Action;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\Player;
@@ -288,6 +289,8 @@ class Server
             $players[$player->getId()] = $player->toArray();
         }
         file_put_contents($this->saveRequestsPath . '.json', json_encode([
+            'tickMs'     => $this->setting->tickMs,
+            'actionData' => Action::getDataArray(),
             'protocol'   => get_class($this->protocol),
             'properties' => $this->game->getProperties()->toArray(),
             'players'    => $players,

@@ -1,5 +1,6 @@
 <?php
 
+use cs\Core\Action;
 use cs\Core\Game;
 use cs\Core\Player;
 use cs\Core\PlayerCollider;
@@ -23,7 +24,7 @@ $collider = new PlayerCollider($player);
 if (isset($_GET['crouch'])) {
     // TODO crouch, move animation, also migrate from tickCount to timeMs
     $player->crouch();
-    for ($tick = 0; $tick <= Player::tickCountCrouch; $tick++) {
+    for ($tick = 0; $tick <= Action::tickCountCrouch(); $tick++) {
         $player->onTick($tick);
     }
 }
@@ -143,13 +144,6 @@ foreach ($collider->getHitBoxes() as $box) {
     }
 
     function extra() {
-        // Body
-        const bodyRadius = <?= $player::bodyRadius ?>;
-        const bodyMaterial = new THREE.MeshBasicMaterial({color: 0xFF0000, wireframe: true, transparent: true, opacity: 0.1})
-        const body = new THREE.Mesh(new THREE.CylinderGeometry(bodyRadius, bodyRadius, bodyHeight, 16), bodyMaterial);
-        body.translateY(body.geometry.parameters.height / 2)
-        scene.add(body)
-
         // Bounding box
         const bbRadius = <?= $player->getBoundingRadius() ?>;
         const bbMaterial = new THREE.MeshBasicMaterial({color: 0x000aa0, wireframe: true, transparent: true, opacity: 0.1})

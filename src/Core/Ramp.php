@@ -13,8 +13,8 @@ class Ramp
         public  readonly int $stepCount,
         public  readonly int $stepWidth,
         bool    $stairsGrowingUp = true,
-        public  readonly int $stepDepth = Player::obstacleOvercomeHeight,
-        public  readonly int $stepHeight = Player::obstacleOvercomeHeight,
+        public  readonly int $stepDepth = 20,
+        public  readonly int $stepHeight = 20,
     )
     {
         if (

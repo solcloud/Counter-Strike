@@ -16,31 +16,8 @@ final class Player
     use PlayerTrait\MovementTrait;
     use PlayerTrait\InventoryTrait;
 
-    // NOTE: Better to use even numbers for all constants
-    // TODO: migrate to time based values, so we can play on different tick settings, and expand simulation tests, maybe some player setting object
-    public const speedFall = 60;
-    public const speedMove = 50;
-    public const speedJump = 30;
-    public const speedMoveWalk = 40;
-    public const speedMoveCrouch = 30;
-    public const tickCountJump = 5;
-    public const tickCountCrouch = 10;
-
-    public const headRadius = 30;
-    public const bodyRadius = 44;
-    public const jumpHeight = 150;
-    public const headHeightStand = 190;
-    public const headHeightCrouch = 140;
-    public const obstacleOvercomeHeight = 20;
-    public const playerBoundingRadius = self::bodyRadius;
-    public const fallDamageThreshold = 3 * self::headHeightStand;
-    public const boxHeightCrouchCover = self::headHeightCrouch + 2;
-    public const gunHeightStand = self::headHeightStand - self::headRadius;
     /** @deprecated make it private eventually */
-    public int $playerBoundingRadius = self::playerBoundingRadius;
-
-    public const jumpMovementSlowDown = 1;
-    public const flyingMovementSlowDown = 0.8;
+    public int $playerBoundingRadius = 44;
 
     private Point $position;
     private PlayerCamera $sight;
@@ -83,7 +60,7 @@ final class Player
     {
         $this->health = 100;
         $this->isWalking = false;
-        $this->headHeight = self::headHeightStand;
+        $this->headHeight = Action::playerHeadHeightStand();
 
         $this->events = [];
         $this->addEvent($this->createMovementEvent(), $this->eventIdMovement);
@@ -143,12 +120,12 @@ final class Player
 
     public function getBodyHeight(): int
     {
-        return $this->getHeadHeight() - 2 * self::headRadius;
+        return $this->getHeadHeight() - 2 * Action::playerHeadRadius();
     }
 
     public function getSightHeight(): int
     {
-        return $this->getHeadHeight() - self::headRadius;
+        return $this->getHeadHeight() - Action::playerHeadRadius();
     }
 
     public function getSight(): PlayerCamera

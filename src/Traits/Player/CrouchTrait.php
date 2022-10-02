@@ -2,6 +2,7 @@
 
 namespace cs\Traits\Player;
 
+use cs\Core\Action;
 use cs\Event\CrouchEvent;
 
 trait CrouchTrait
@@ -20,21 +21,21 @@ trait CrouchTrait
         $event = new CrouchEvent($directionDown, function (CrouchEvent $event): void {
             if ($event->directionDown) {
                 $this->headHeight -= $event->moveOffset;
-                if ($this->headHeight < self::headHeightCrouch) {
-                    $this->headHeight = self::headHeightCrouch;
+                if ($this->headHeight < Action::playerHeadHeightCrouch()) {
+                    $this->headHeight = Action::playerHeadHeightCrouch();
                 }
             } else {
                 $targetHeadHeight = $this->headHeight + $event->moveOffset;
                 $candidate = $this->position->clone();
-                for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, self::headHeightStand); $h++) {
+                for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, Action::playerHeadHeightStand()); $h++) {
                     $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getBoundingRadius());
                     if ($floorCandidate) {
                         break;
                     }
                     $this->headHeight = $h;
                 }
-                if ($this->headHeight > self::headHeightStand) {
-                    $this->headHeight = self::headHeightStand;
+                if ($this->headHeight > Action::playerHeadHeightStand()) {
+                    $this->headHeight = Action::playerHeadHeightStand();
                 }
             }
         });
@@ -45,7 +46,7 @@ trait CrouchTrait
 
     public function stand(): void
     {
-        if ($this->getHeadHeight() === self::headHeightStand) {
+        if ($this->getHeadHeight() === Action::playerHeadHeightStand()) {
             return;
         }
 
@@ -54,7 +55,7 @@ trait CrouchTrait
 
     public function crouch(): void
     {
-        if ($this->getHeadHeight() === self::headHeightCrouch) {
+        if ($this->getHeadHeight() === Action::playerHeadHeightCrouch()) {
             return;
         }
         if (!$this->canCrouch()) {

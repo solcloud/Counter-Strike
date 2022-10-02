@@ -2,6 +2,7 @@
 
 namespace Test\World;
 
+use cs\Core\Action;
 use cs\Core\Box;
 use cs\Core\Player;
 use Test\BaseTestCase;
@@ -16,10 +17,10 @@ class CrouchTest extends BaseTestCase
 
         $scale = $player->getBoundingRadius();
         $start = $player->getPositionImmutable()->clone()->addZ(3 * $scale);
-        $ceiling = new Box($start->clone()->addY($player::headHeightCrouch + 1)->addX(-2 * $scale), 4 * $scale, $scale, 10);
+        $ceiling = new Box($start->clone()->addY(Action::playerHeadHeightCrouch() + 1)->addX(-2 * $scale), 4 * $scale, $scale, 10);
         $game->getWorld()->addBox($ceiling);
-        $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, $player::headHeightStand, 10));
-        $game->getWorld()->addBox(new Box($start->clone()->addX($scale + 1), $scale, $player::headHeightStand, 10));
+        $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, Action::playerHeadHeightStand(), 10));
+        $game->getWorld()->addBox(new Box($start->clone()->addX($scale + 1), $scale, Action::playerHeadHeightStand(), 10));
 
         $commands = [
             fn(Player $p) => $p->moveForward(),
@@ -30,7 +31,7 @@ class CrouchTest extends BaseTestCase
                 $this->assertSame($start->z - $p->getBoundingRadius() - 1, $p->getPositionImmutable()->z);
             },
             fn(Player $p) => $p->crouch(),
-            $this->waitXTicks(Player::tickCountCrouch),
+            $this->waitXTicks(Action::tickCountCrouch()),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             $this->endGame(),
@@ -42,16 +43,16 @@ class CrouchTest extends BaseTestCase
 
     public function testCanCrouchIntoTunnel(): void
     {
-        $depth = Player::speedMoveCrouch * 4;
+        $depth = Action::moveDistanceCrouchPerTick() * 4;
         $game = $this->createTestGame();
         $player = $game->getPlayer(1);
 
         $scale = $player->getBoundingRadius();
         $start = $player->getPositionImmutable()->clone()->addZ(3 * $scale);
-        $ceiling = new Box($start->clone()->addY($player::headHeightCrouch + 1)->addX(-2 * $scale), 4 * $scale, $scale, $depth);
+        $ceiling = new Box($start->clone()->addY(Action::playerHeadHeightCrouch() + 1)->addX(-2 * $scale), 4 * $scale, $scale, $depth);
         $game->getWorld()->addBox($ceiling);
-        $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, $player::headHeightStand, $depth));
-        $game->getWorld()->addBox(new Box($start->clone()->addX($scale + 1), $scale, $player::headHeightStand, $depth));
+        $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, Action::playerHeadHeightStand(), $depth));
+        $game->getWorld()->addBox(new Box($start->clone()->addX($scale + 1), $scale, Action::playerHeadHeightStand(), $depth));
 
         $commands = [
             fn(Player $p) => $p->moveForward(),
@@ -62,13 +63,13 @@ class CrouchTest extends BaseTestCase
                 $this->assertSame($start->z - $p->getBoundingRadius() - 1, $p->getPositionImmutable()->z);
             },
             fn(Player $p) => $p->crouch(),
-            $this->waitXTicks(Player::tickCountCrouch),
+            $this->waitXTicks(Action::tickCountCrouch()),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->stand(),
             fn(Player $p) => $p->stand(),
             function (Player $p) use ($ceiling) {
-                $this->assertSame(Player::headHeightCrouch, $p->getHeadHeight());
+                $this->assertSame(Action::playerHeadHeightCrouch(), $p->getHeadHeight());
                 $this->assertLessThan($ceiling->getBase()->y, $p->getPositionImmutable()->y + $p->getHeadHeight());
             },
             fn(Player $p) => $p->moveForward(),
@@ -76,7 +77,7 @@ class CrouchTest extends BaseTestCase
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->stand(),
-            $this->waitXTicks(Player::tickCountCrouch),
+            $this->waitXTicks(Action::tickCountCrouch()),
             fn(Player $p) => $p->moveBackward(),
             fn(Player $p) => $p->moveBackward(),
             $this->endGame(),
@@ -84,7 +85,7 @@ class CrouchTest extends BaseTestCase
 
         $this->playPlayer($game, $commands);
         $this->assertSame($ceiling->getBase()->z + $ceiling->depthZ + $player->getBoundingRadius() + 1, $player->getPositionImmutable()->z);
-        $this->assertSame(Player::headHeightStand, $player->getHeadHeight());
+        $this->assertSame(Action::playerHeadHeightStand(), $player->getHeadHeight());
     }
 
 

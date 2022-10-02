@@ -2,6 +2,7 @@
 
 namespace Test\Protocol;
 
+use cs\Core\Action;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\GameFactory;
@@ -66,7 +67,7 @@ class ServerTest extends BaseTestCase
         $this->assertSame(45, $player->getSight()->getRotationHorizontal());
         $this->assertSame(-20, $player->getSight()->getRotationVertical());
         $this->assertInstanceOf(Molotov::class, $player->getInventory()->getItems()[InventorySlot::SLOT_GRENADE_MOLOTOV->value]);
-        $this->assertLessThan(Player::headHeightStand, $player->getHeadHeight());
+        $this->assertLessThan(Action::playerHeadHeightStand(), $player->getHeadHeight());
     }
 
 }

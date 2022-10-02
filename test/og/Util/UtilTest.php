@@ -94,8 +94,8 @@ class UtilTest extends BaseTestCase
 
     public function testPointToPointDistance(): void
     {
-        $this->assertSame(105, Util::distanceSquared(new Point(4, 1, -8), new Point(2,2,2)));
-        $this->assertSame(578, Util::distanceSquared(new Point(11, -1, -8), new Point(-2,-4,12)));
+        $this->assertSame(105, Util::distanceSquared(new Point(4, 1, -8), new Point(2, 2, 2)));
+        $this->assertSame(578, Util::distanceSquared(new Point(11, -1, -8), new Point(-2, -4, 12)));
     }
 
     public function testPointToOriginDistance(): void

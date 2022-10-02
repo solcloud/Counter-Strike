@@ -9,7 +9,7 @@ class Wall extends Plane
         Point        $start,
         private bool $widthOnXAxis = true,
         public       readonly int $width = 1,
-        public       readonly int $height = 20 * Player::headHeightStand
+        public       readonly int $height = 3800
     )
     {
         if ($width <= 0 || $height <= 0) {

@@ -2,7 +2,7 @@
 
 namespace cs\Map;
 
-use cs\Core\Player;
+use cs\Core\Action;
 use cs\Core\Point;
 
 class TestMap extends Map
@@ -11,7 +11,7 @@ class TestMap extends Map
     public function __construct()
     {
         $this->setAttackersSpawnPositions([new Point()]);
-        $this->setDefendersSpawnPositions([(new Point())->setZ(Player::speedMove)]);
+        $this->setDefendersSpawnPositions([(new Point())->setZ(Action::moveDistancePerTick())]);
     }
 
 }

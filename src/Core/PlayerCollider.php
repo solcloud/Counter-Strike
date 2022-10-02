@@ -22,7 +22,7 @@ class PlayerCollider
         $this->hitBoxes[] = new HitBox(
             $this->player,
             HitBoxType::HEAD,
-            new HitGeometry\HitBoxHead(Player::headRadius)
+            new HitGeometry\HitBoxHead(Action::playerHeadRadius())
         );
 
         // BODY
@@ -43,7 +43,7 @@ class PlayerCollider
         $this->hitBoxes[] = new HitBox(
             $this->player,
             HitBoxType::LEG,
-            new HitGeometry\HitBoxLegs(Player::headHeightStand - Player::headHeightCrouch)
+            new HitGeometry\HitBoxLegs(Action::playerHeadHeightStand() - Action::playerHeadHeightCrouch())
         );
     }
 

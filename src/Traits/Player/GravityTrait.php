@@ -2,6 +2,7 @@
 
 namespace cs\Traits\Player;
 
+use cs\Core\Action;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Event\PlayerGravityEvent;
@@ -22,7 +23,7 @@ trait GravityTrait
             return;
         }
         if (null === $this->activeFloor) {
-            $point->setY($this->calculateGravity($point, static::speedFall));
+            $point->setY($this->calculateGravity($point, Action::fallAmountPerTick()));
         }
     }
 
@@ -61,19 +62,20 @@ trait GravityTrait
     private function checkFallDamage(int $floorHeight): void
     {
         $fallHeight = $this->fallHeight - $floorHeight;
-        if ($fallHeight < static::fallDamageThreshold) {
+        $threshold = Action::playerFallDamageThreshold();
+        if ($fallHeight < $threshold) {
             return;
         }
 
-        if ($fallHeight < static::fallDamageThreshold + 15) {
+        if ($fallHeight < $threshold + 15) {
             $this->lowerHealth(10);
-        } elseif ($fallHeight < static::fallDamageThreshold + 30) {
+        } elseif ($fallHeight < $threshold + 30) {
             $this->lowerHealth(20);
-        } elseif ($fallHeight < static::fallDamageThreshold + 60) {
+        } elseif ($fallHeight < $threshold + 60) {
             $this->lowerHealth(40);
-        } elseif ($fallHeight < static::fallDamageThreshold + 90) {
+        } elseif ($fallHeight < $threshold + 90) {
             $this->lowerHealth(60);
-        } elseif ($fallHeight < static::fallDamageThreshold + 120) {
+        } elseif ($fallHeight < $threshold + 120) {
             $this->lowerHealth(90);
         } else {
             $this->lowerHealth(999);

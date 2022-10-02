@@ -2,6 +2,7 @@
 
 namespace cs\Traits\Player;
 
+use cs\Core\Action;
 use cs\Core\Floor;
 use cs\Core\GameException;
 use cs\Core\Point;
@@ -83,20 +84,20 @@ trait MovementTrait
     private function getMoveSpeed(): int
     {
         if ($this->isCrouching()) {
-            $speed = static::speedMoveCrouch;
+            $speed = Action::moveDistanceCrouchPerTick();
         } elseif ($this->isWalking()) {
-            $speed = static::speedMoveWalk;
+            $speed = Action::moveDistanceWalkPerTick();
         } elseif ($this->isRunning()) {
-            $speed = static::speedMove;
+            $speed = Action::moveDistancePerTick();
         } else {
             throw new GameException("Wat doing?");
         }
 
         $speed *= $this->getEquippedItem()::movementSlowDownFactor;
         if ($this->isJumping()) {
-            $speed *= static::jumpMovementSlowDown;
+            $speed *= Action::jumpMovementSpeedMultiplier();
         } elseif ($this->isFlying()) {
-            $speed *= static::flyingMovementSlowDown;
+            $speed *= Action::flyingMovementSpeedMultiplier();
         }
 
         return (int)ceil($speed);
@@ -239,7 +240,7 @@ trait MovementTrait
             return null;
         }
 
-        if ($wall->getCeiling() <= $candidate->y + static::obstacleOvercomeHeight) {
+        if ($wall->getCeiling() <= $candidate->y + Action::playerObstacleOvercomeHeight()) {
             return $this->world->findFloor($candidate->clone()->setY($wall->getCeiling()), $this->getBoundingRadius());
         }
 

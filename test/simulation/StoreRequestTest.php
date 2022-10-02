@@ -2,11 +2,13 @@
 
 namespace Test\Simulation;
 
+use cs\Core\Action;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Map\TestMap;
 use cs\Net\PlayerControl;
@@ -31,15 +33,20 @@ class StoreRequestTest extends BaseTest
     }
 
     /**
-     * @param array{protocol: string, players: array<mixed>, properties: array<string,string|int|bool>, walls: array<mixed>, floors: array<mixed>} $meta
+     * @param array{actionData: array<string,int>, tickMs: int,
+     *     protocol: string, players: array<mixed>, properties: array<string,string|int|bool>,
+     *     walls: array<mixed>, floors: array<mixed>
+     * } $meta
      */
     private function _testRequest(SimulationTester $tester, array $meta, string &$data): void
     {
-        /// TODO load constant from meta - player speed, radius, .... use Reflection or static factory
-        $playerRequests = [];
-        $playerControls = [];
+        Util::$TICK_RATE = $meta['tickMs'];
+        Action::loadConstants($meta['actionData']);
+
         $this->assertSame(TextProtocol::class, $meta['protocol']);
         $protocol = new TextProtocol();
+
+        $playerRequests = [];
         foreach (explode("\n", $data) as $line) {
             [$tickId, $playerId, $request] = explode('~', $line);
             $playerRequests[(int)$tickId][(int)$playerId] = $protocol->parsePlayerControlCommands($request);
@@ -59,6 +66,7 @@ class StoreRequestTest extends BaseTest
             $player->setPosition(Point::fromArray($playerData['position'])); // @phpstan-ignore-line
         }
 
+        $playerControls = [];
         $game->onEvents(function (array $events) use ($tester): void {
             $tester->onEvents($events);
         });

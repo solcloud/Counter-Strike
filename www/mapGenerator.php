@@ -1,5 +1,6 @@
 <?php
 
+use cs\Core\Action;
 use cs\Core\Player;
 use cs\Map;
 
@@ -147,8 +148,8 @@ foreach ($map->getBoxes() as $box) {
         const spawnAttackers = JSON.parse(spawnAttackersJson);
         const spawnDefenders = JSON.parse(spawnDefendersJson);
 
-        const radius = <?= Player::playerBoundingRadius ?>;
-        const height = <?= Player::headHeightStand ?>;
+        const radius = <?= Action::playerBoundingRadius() ?>;
+        const height = <?= Action::playerHeadHeightStand() ?>;
         const geometry = new THREE.CylinderGeometry(radius, radius, height, 16);
 
         spawnAttackers.forEach(function (point) {
