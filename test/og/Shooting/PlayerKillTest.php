@@ -63,13 +63,15 @@ class PlayerKillTest extends BaseTestCase
         $player1->getInventory()->earnMoney(1000);
         $player1->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
         $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2Position = $player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10);
+        $player2->setPosition($player2Position);
         $player2->getSight()->lookAt(0, -90);
 
         $result = $player2->attack();
         $this->assertNotNull($result);
         $gun = $player2->getEquippedItem();
         $this->assertInstanceOf(PistolUsp::class, $gun);
+        $this->assertSame($player2Position->y + $player2->getSightHeight(),  $result->getBullet()->getDistanceTraveled());
 
         $hits = $result->getHits();
         $this->assertCount(2, $hits);

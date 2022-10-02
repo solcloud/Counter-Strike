@@ -7,8 +7,6 @@ use cs\Map\Map;
 
 class World
 {
-    private const ATTACKER = 0;
-    private const DEFENDER = 1;
     private const WALL_X = 0;
     private const WALL_Z = 1;
 
@@ -146,7 +144,7 @@ class World
             throw new GameException("No map is loaded! Cannot spawn players.");
         }
 
-        $key = ($isAttacker ? self::ATTACKER : self::DEFENDER);
+        $key = (int)$isAttacker;
         if (isset($this->spawnCandidates[$key])) {
             $source = $this->spawnCandidates[$key];
         } else {
@@ -181,24 +179,26 @@ class World
     public function calculateHits(Bullet $bullet): array
     {
         $hits = [];
-
         $alreadyHitPlayerIds = $bullet->getPlayerHitIds();
         $alreadyHitPlayerIds[$bullet->getOriginPlayerId()] = true; // cannot shoot self
+
         foreach ($this->playersColliders as $playerCollider) {
             if (isset($alreadyHitPlayerIds[$playerCollider->getPlayerId()])) {
-                continue; // player already hit
+                continue; // player already hit or self
             }
 
             $hitBox = $playerCollider->tryHitPlayer($bullet);
-            if ($hitBox) {
-                $player = $hitBox->getPlayer();
-                if ($player) {
-                    $bullet->addPlayerIdHit($player->getId());
-                }
-                if ($hitBox->playerWasKilled() && $player) {
+            if (!$hitBox) {
+                continue;
+            }
+
+            $hits[] = $hitBox;
+            $player = $hitBox->getPlayer();
+            if ($player) {
+                $bullet->addPlayerIdHit($player->getId());
+                if ($hitBox->playerWasKilled()) {
                     $this->game->playerAttackKilledEvent($player, $bullet, $hitBox->wasHeadShot());
                 }
-                $hits[] = $hitBox;
             }
         }
 
@@ -233,11 +233,12 @@ class World
         }
 
         $candidatePlane = $center->to2D('zy')->addX(-$radius);
+        $width = 2 * $radius;
         foreach (($this->walls[self::WALL_X][$center->x] ?? []) as $wall) {
             if ($wall->getCeiling() === $center->y) {
                 continue;
             }
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, 2 * $radius, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
                 return $wall;
             }
         }
@@ -252,11 +253,12 @@ class World
         }
 
         $candidatePlane = $center->to2D('xy')->addX(-$radius);
+        $width = 2 * $radius;
         foreach (($this->walls[self::WALL_Z][$center->z] ?? []) as $wall) {
             if ($wall->getCeiling() === $center->y) {
                 continue;
             }
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, 2 * $radius, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
                 return $wall;
             }
         }

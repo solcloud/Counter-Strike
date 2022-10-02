@@ -16,24 +16,29 @@ final class Player
     use PlayerTrait\MovementTrait;
     use PlayerTrait\InventoryTrait;
 
-    // Better to use even numbers
+    // NOTE: Better to use even numbers for all constants
+    // TODO: migrate to time based values, so we can play on different tick settings, and expand simulation tests, maybe some player setting object
     public const speedFall = 60;
-    public const speedMove = 50; // TODO: linear movement or ease-in-out?
+    public const speedMove = 50;
+    public const speedJump = 30;
     public const speedMoveWalk = 40;
     public const speedMoveCrouch = 30;
-    public const speedJump = 30;
     public const tickCountJump = 5;
     public const tickCountCrouch = 10;
+
+    public const headRadius = 30;
+    public const bodyRadius = 44;
+    public const jumpHeight = 150;
     public const headHeightStand = 190;
-    public const gunHeightStand = self::headHeightStand - self::headRadius;
     public const headHeightCrouch = 140;
-    public const boxHeightCrouchCover = self::headHeightCrouch + 2;
     public const obstacleOvercomeHeight = 20;
     public const playerBoundingRadius = self::bodyRadius;
     public const fallDamageThreshold = 3 * self::headHeightStand;
-    public const jumpHeight = self::speedJump * self::tickCountJump;
-    public const headRadius = 30;
-    public const bodyRadius = 44;
+    public const boxHeightCrouchCover = self::headHeightCrouch + 2;
+    public const gunHeightStand = self::headHeightStand - self::headRadius;
+    /** @deprecated make it private eventually */
+    public int $playerBoundingRadius = self::playerBoundingRadius;
+
     public const jumpMovementSlowDown = 1;
     public const flyingMovementSlowDown = 0.8;
 
@@ -47,11 +52,10 @@ final class Player
     /** @var Event[] */
     private array $events = [];
 
-    private bool $isAttacking = false;
-    private int $health = 100;
+    private int $health;
     private int $armor = 0;
-    private int $headHeight = self::headHeightStand; // highest player point
-    public int $playerBoundingRadius = self::playerBoundingRadius;
+    private int $headHeight; // highest player point
+    private bool $isAttacking = false;
 
     // Event IDs, sequence, ascending order priority
     private int $eventIdPrimary = 0;
@@ -77,6 +81,11 @@ final class Player
 
     private function initialize(): void
     {
+        $this->health = 100;
+        $this->isWalking = false;
+        $this->headHeight = self::headHeightStand;
+
+        $this->events = [];
         $this->addEvent($this->createMovementEvent(), $this->eventIdMovement);
         $this->addEvent($this->createGravityEvent(), $this->eventIdGravity);
     }
@@ -99,6 +108,11 @@ final class Player
         $this->isAttacking = false;
     }
 
+    private function onPlayerDied(): void
+    {
+        $this->armor = 0;
+    }
+
     private function addEvent(Event $event, int $eventId): void
     {
         $this->events[$eventId] = $event;
@@ -118,7 +132,7 @@ final class Player
 
     public function suicide(): void
     {
-        $this->health = 0;
+        $this->lowerHealth($this->health);
         $this->world->playerDiedToFallDamage($this);
     }
 
@@ -175,6 +189,9 @@ final class Player
     public function lowerHealth(int $healthDamage): void
     {
         $this->health -= abs($healthDamage);
+        if ($this->health <= 0) {
+            $this->onPlayerDied();
+        }
     }
 
     public function getHealth(): int
@@ -192,11 +209,6 @@ final class Player
         $this->resetTickStates();
         $this->getSight()->reset();
         $this->inventory->reset($this->isPlayingOnAttackerSide, !$this->isAlive());
-
-        $this->events = [];
-        $this->health = 100;
-        $this->isWalking = false;
-        $this->headHeight = self::headHeightStand;
         $this->initialize();
     }
 
@@ -239,7 +251,7 @@ final class Player
             "heightSight" => $this->getSightHeight(),
             "heightBody"  => $this->getBodyHeight(),
             "height"      => $this->getHeadHeight(),
-            "armor"       => 0, //TODO
+            "armor"       => $this->armor, //TODO
         ];
     }
 

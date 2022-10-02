@@ -31,7 +31,7 @@ class RoundTest extends BaseTestCase
         $game = $this->createGame();
         $break = false;
         $game->onEvents(function (array $e) use (&$events, &$break): void {
-            if ($e === [] || $break) {
+            if ($break) {
                 return;
             }
             if ($e[0] instanceof GameOverEvent) {

@@ -75,4 +75,14 @@ class HitBoxTest extends BaseTest
         $this->assertPositionSame(new Point(-10, -8, 67), $sphere->calculateWorldCoordinate($player, new Point(15, -20, 8)));
     }
 
+    public function testSphereHitBoxIntersect(): void
+    {
+        $sphere = new SphereHitBox(new Point(-45, 12, 32), 38);
+        $player = new Player(1, Color::GREEN, true);
+
+        $this->assertFalse($sphere->intersect($player, new Point(-10, -8, 67)));
+        $player->getSight()->lookHorizontal(20);
+        $this->assertTrue($sphere->intersect($player, new Point(-10, -8, 67)));
+    }
+
 }

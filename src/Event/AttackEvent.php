@@ -43,7 +43,7 @@ final class AttackEvent
             foreach ($hits as $hit) {
                 $bullet->lowerDamage($hit->getHitAntiForce());
                 $result->addHit($hit);
-                if ($bullet->isActive()) {
+                if (!$bullet->isActive()) {
                     break;
                 }
             }

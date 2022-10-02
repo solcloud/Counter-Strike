@@ -9,9 +9,9 @@ use cs\Weapon\Knife;
 
 class HitBox implements Hittable
 {
-    private int $moneyAward = 0;
-    private bool $playerWasKilled = false;
-    private bool $wasHeadShot = false;
+    private int $moneyAward;
+    private bool $playerWasKilled;
+    private bool $wasHeadShot;
 
     public function __construct(
         private Player       $player,
@@ -19,6 +19,7 @@ class HitBox implements Hittable
         private HitIntersect $geometry
     )
     {
+        $this->reset();
     }
 
     public function reset(): void
@@ -51,7 +52,7 @@ class HitBox implements Hittable
             return false;
         }
 
-        // TODO do back hit box based on player and bullet angle
+        // TODO do back hit box based on player and bullet angle, or add HitBoxBack geometry
         return false;
     }
 

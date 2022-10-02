@@ -278,6 +278,9 @@ class Server
         $this->logger->log($level, $msg);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     private function saveRequestMetaData(): void
     {
         $players = [];
@@ -293,6 +296,9 @@ class Server
         ], JSON_THROW_ON_ERROR));
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function storeRequests(string $path = '/tmp/cs.server.req'): void
     {
         $this->saveRequestsPath = $path;

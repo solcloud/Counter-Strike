@@ -47,6 +47,8 @@ class Game
         $this->world = new World($this);
         $this->score = new Score();
         $this->properties = $properties;
+
+        $this->initialize();
     }
 
     private function initialize(): void
@@ -70,9 +72,6 @@ class Game
         if ($this->gameOver) {
             $this->tickEvents = [$this->gameOver];
             return $this->gameOver;
-        }
-        if ($tickId === 0) {
-            $this->initialize();
         }
 
         $alivePlayers = [0, 0];
