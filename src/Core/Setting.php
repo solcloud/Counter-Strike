@@ -2,7 +2,7 @@
 
 namespace cs\Core;
 
-final class Action
+final class Setting
 {
 
     /** @var array<string,int> */
@@ -82,7 +82,7 @@ final class Action
     public static function jumpDistancePerTick(): int
     {
         if (!isset(self::$cacheInt['jumpDistancePerTick'])) {
-            self::$cacheInt['jumpDistancePerTick'] = (int)ceil(Action::playerJumpHeight() / self::tickCountJump());
+            self::$cacheInt['jumpDistancePerTick'] = (int)ceil(Setting::playerJumpHeight() / self::tickCountJump());
         }
         return self::$cacheInt['jumpDistancePerTick'];
     }
@@ -90,7 +90,7 @@ final class Action
     public static function crouchDistancePerTick(): int
     {
         if (!isset(self::$cacheInt['crouchDistancePerTick'])) {
-            self::$cacheInt['crouchDistancePerTick'] = (int)ceil((Action::playerHeadHeightStand() - Action::playerHeadHeightCrouch()) / self::tickCountCrouch());
+            self::$cacheInt['crouchDistancePerTick'] = (int)ceil((Setting::playerHeadHeightStand() - Setting::playerHeadHeightCrouch()) / self::tickCountCrouch());
         }
         return self::$cacheInt['crouchDistancePerTick'];
     }

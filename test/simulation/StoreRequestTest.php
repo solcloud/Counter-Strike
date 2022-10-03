@@ -2,7 +2,7 @@
 
 namespace Test\Simulation;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
@@ -41,7 +41,7 @@ class StoreRequestTest extends BaseTest
     private function _testRequest(SimulationTester $tester, array $meta, string &$data): void
     {
         Util::$TICK_RATE = $meta['tickMs'];
-        Action::loadConstants($meta['actionData']);
+        Setting::loadConstants($meta['actionData']);
 
         $this->assertSame(TextProtocol::class, $meta['protocol']);
         $protocol = new TextProtocol();

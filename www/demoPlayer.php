@@ -1,6 +1,6 @@
 <?php
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Player;
 
 if (getenv('DEVTOKEN') !== 'dev') {
@@ -154,8 +154,8 @@ $frameIdEnd = null;
         },
         players: [],
         spawnPlayer: function (id, color, isAttacker) {
-            const radiusHead = <?= Action::playerHeadRadius() ?>;
-            const sightHeight = <?= Action::playerHeadHeightStand() - Action::playerHeadRadius() ?>;
+            const radiusHead = <?= Setting::playerHeadRadius() ?>;
+            const sightHeight = <?= Setting::playerHeadHeightStand() - Setting::playerHeadRadius() ?>;
             const head = new THREE.Mesh(
                 new THREE.SphereGeometry(radiusHead),
                 new THREE.MeshBasicMaterial({color: 0xFF6600})
@@ -164,8 +164,8 @@ $frameIdEnd = null;
             head.rotation.y = degreeToRadian(90)
             head.position.y = sightHeight
 
-            const radiusBody = <?= Action::playerBoundingRadius() ?>;
-            const heightBody = <?= Action::playerHeadHeightStand() ?>;
+            const radiusBody = <?= Setting::playerBoundingRadius() ?>;
+            const heightBody = <?= Setting::playerHeadHeightStand() ?>;
             const body = new THREE.Mesh(
                 new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 16),
                 new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2), transparent: true, opacity: .4})
@@ -180,7 +180,7 @@ $frameIdEnd = null;
             body0.translateY(body0.geometry.parameters.height / 2)
 
             const boundingRadius = new THREE.Mesh(
-                new THREE.CircleGeometry(<?= Action::playerBoundingRadius() ?>, 16),
+                new THREE.CircleGeometry(<?= Setting::playerBoundingRadius() ?>, 16),
                 new THREE.MeshBasicMaterial({color: 0xFF6600, side: THREE.DoubleSide})
             );
             boundingRadius.rotateX(degreeToRadian(90))

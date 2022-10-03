@@ -3,7 +3,7 @@
 namespace Test\Movement;
 
 use Closure;
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\Player;
 use cs\Core\Point;
@@ -29,7 +29,7 @@ class MouseAngleTest extends BaseTestCase
         ];
 
         $game = $this->createGame();
-        $game->getWorld()->addFloor(new Floor(new Point(), 2 * Action::moveDistancePerTick(), 2 * Action::moveDistancePerTick()));
+        $game->getWorld()->addFloor(new Floor(new Point(), 2 * Setting::moveDistancePerTick(), 2 * Setting::moveDistancePerTick()));
         $this->playPlayer($game, $playerCommands);
         return $game->getPlayer(1)->getPositionImmutable();
     }
@@ -55,7 +55,7 @@ class MouseAngleTest extends BaseTestCase
 
     protected function checkAngle(int $angleBase, ?bool $moveTowardsPositiveX, ?bool $moveTowardsPositiveZ): void
     {
-        $startPos = new Point(2 * Action::moveDistancePerTick(), 0, 2 * Action::moveDistancePerTick());
+        $startPos = new Point(2 * Setting::moveDistancePerTick(), 0, 2 * Setting::moveDistancePerTick());
         $endPos = $this->runAngle($angleBase, fn(Player $p) => $p->moveForward(), $startPos);
         $this->verifyPosition($endPos, $startPos, $moveTowardsPositiveX, $moveTowardsPositiveZ, $angleBase);
         $angle = $angleBase - 90;

@@ -2,7 +2,7 @@
 
 namespace Test\Shooting;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\HitBox;
@@ -92,7 +92,7 @@ class PlayerKillTest extends BaseTestCase
         $player2Commands = [
             fn(Player $p) => $p->getSight()->lookAt(180, 0),
             fn(Player $p) => $p->crouch(),
-            $this->waitNTicks(max(Action::tickCountCrouch(), PistolUsp::equipReadyTimeMs)),
+            $this->waitNTicks(max(Setting::tickCountCrouch(), PistolUsp::equipReadyTimeMs)),
             $this->endGame(),
         ];
         $player2 = new Player(2, Color::GREEN, false);
@@ -151,11 +151,11 @@ class PlayerKillTest extends BaseTestCase
         $game->addPlayer($player2);
         $game->getPlayer(1)->crouch();
 
-        for ($i = 1; $i <= Action::tickCountCrouch(); $i++) {
+        for ($i = 1; $i <= Setting::tickCountCrouch(); $i++) {
             $game->tick($i);
         }
-        $this->assertSame(Action::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
-        $this->assertSame(Action::playerHeadHeightStand(), $player2->getHeadHeight());
+        $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
+        $this->assertSame(Setting::playerHeadHeightStand(), $player2->getHeadHeight());
         $result = $player2->attack();
         $this->assertNotNull($result);
 
@@ -169,14 +169,14 @@ class PlayerKillTest extends BaseTestCase
         $player2 = new Player(2, Color::GREEN, false);
         $player2->getSight()->lookAt(180, -18);
 
-        $game = $this->createOneRoundGame(Action::tickCountCrouch() + 1);
+        $game = $this->createOneRoundGame(Setting::tickCountCrouch() + 1);
         $game->addPlayer($player2);
         $game->getPlayer(1)->crouch();
 
         $game->start();
-        $this->assertSame(Action::tickCountCrouch(), $game->getTickId());
-        $this->assertSame(Action::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
-        $this->assertSame(Action::playerHeadHeightStand(), $player2->getHeadHeight());
+        $this->assertSame(Setting::tickCountCrouch(), $game->getTickId());
+        $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
+        $this->assertSame(Setting::playerHeadHeightStand(), $player2->getHeadHeight());
         $result = $player2->attack();
         $this->assertNotNull($result);
 

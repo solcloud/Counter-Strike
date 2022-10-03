@@ -2,7 +2,7 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Event\JumpEvent;
 
 trait JumpTrait
@@ -23,7 +23,7 @@ trait JumpTrait
 
         $event = new JumpEvent(function (): void {
             $this->setActiveFloor(null);
-            $targetYPosition = $this->position->y + Action::jumpDistancePerTick();
+            $targetYPosition = $this->position->y + Setting::jumpDistancePerTick();
             $candidate = $this->position->clone();
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
                 $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->getBoundingRadius());
@@ -34,7 +34,7 @@ trait JumpTrait
             }
 
             $this->position->setY($targetYPosition);
-        }, Action::tickCountJump());
+        }, Setting::tickCountJump());
 
         $this->addEvent($event, $this->eventIdJump);
         $this->eventsCache[$this->eventIdJump] = $event;

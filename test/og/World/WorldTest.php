@@ -2,7 +2,7 @@
 
 namespace Test\World;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
@@ -40,7 +40,7 @@ class WorldTest extends BaseTestCase
     public function testStairCase(): void
     {
         $steps = 20;
-        $ramp = new Ramp(new Point(Action::playerBoundingRadius(), 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Action::moveDistancePerTick());
+        $ramp = new Ramp(new Point(Setting::playerBoundingRadius(), 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Setting::moveDistancePerTick());
 
         $game = $this->createTestGame($steps);
         $game->getWorld()->addRamp($ramp);
@@ -52,11 +52,11 @@ class WorldTest extends BaseTestCase
 
     public function testWallPenetration(): void
     {
-        $game = $this->createTestGame(Action::tickCountJump());
+        $game = $this->createTestGame(Setting::tickCountJump());
         $p = $game->getPlayer(1);
-        $box = new Box($p->getPositionImmutable()->clone()->addZ(Action::moveDistancePerTick()), $p->getBoundingRadius(), 50, $p->getBoundingRadius());
+        $box = new Box($p->getPositionImmutable()->clone()->addZ(Setting::moveDistancePerTick()), $p->getBoundingRadius(), 50, $p->getBoundingRadius());
         $game->getWorld()->addBox($box);
-        $wall = new Wall(new Point(-200, -10, $box->getBase()->z + $box->depthZ), true, 400, 3 * Action::playerJumpHeight());
+        $wall = new Wall(new Point(-200, -10, $box->getBase()->z + $box->depthZ), true, 400, 3 * Setting::playerJumpHeight());
         $game->getWorld()->addWall($wall);
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->jump();
@@ -72,7 +72,7 @@ class WorldTest extends BaseTestCase
     {
         $game = $this->createTestGame(50);
         $p = $game->getPlayer(1);
-        $box = new Box($p->getPositionImmutable()->clone()->addZ(2 * Action::moveDistancePerTick()), 700, 50, 3 * $p->getBoundingRadius());
+        $box = new Box($p->getPositionImmutable()->clone()->addZ(2 * Setting::moveDistancePerTick()), 700, 50, 3 * $p->getBoundingRadius());
         $game->getWorld()->addBox($box);
         $depth = $box->getBase()->z + $box->depthZ;
         $wall = new Box(new Point(-100, 0, -$depth), 800, 400, 2 * $depth);

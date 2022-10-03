@@ -3,7 +3,7 @@
 namespace cs\Event;
 
 use Closure;
-use cs\Core\Action;
+use cs\Core\Setting;
 
 final class CrouchEvent extends TickEvent
 {
@@ -11,8 +11,8 @@ final class CrouchEvent extends TickEvent
 
     public function __construct(public bool $directionDown, Closure $callback)
     {
-        parent::__construct($callback, Action::tickCountCrouch());
-        $this->moveOffset = Action::crouchDistancePerTick();
+        parent::__construct($callback, Setting::tickCountCrouch());
+        $this->moveOffset = Setting::crouchDistancePerTick();
     }
 
 }

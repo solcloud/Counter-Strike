@@ -2,7 +2,7 @@
 
 namespace cs\Net;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\Player;
@@ -290,7 +290,7 @@ class Server
         }
         file_put_contents($this->saveRequestsPath . '.json', json_encode([
             'tickMs'     => $this->setting->tickMs,
-            'actionData' => Action::getDataArray(),
+            'actionData' => Setting::getDataArray(),
             'protocol'   => get_class($this->protocol),
             'properties' => $this->game->getProperties()->toArray(),
             'players'    => $players,

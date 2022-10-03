@@ -50,7 +50,7 @@ final class Player
         $this->inventory = new Inventory($this->isPlayingOnAttackerSide);
         $this->sight = new PlayerCamera();
         $this->position = $position;
-        $this->playerBoundingRadius = Action::playerBoundingRadius();
+        $this->playerBoundingRadius = Setting::playerBoundingRadius();
 
         $this->initialize();
     }
@@ -59,7 +59,7 @@ final class Player
     {
         $this->health = 100;
         $this->isWalking = false;
-        $this->headHeight = Action::playerHeadHeightStand();
+        $this->headHeight = Setting::playerHeadHeightStand();
 
         $this->events = [];
         $this->addEvent($this->createMovementEvent(), $this->eventIdMovement);
@@ -119,12 +119,12 @@ final class Player
 
     public function getBodyHeight(): int
     {
-        return $this->getHeadHeight() - 2 * Action::playerHeadRadius();
+        return $this->getHeadHeight() - 2 * Setting::playerHeadRadius();
     }
 
     public function getSightHeight(): int
     {
-        return $this->getHeadHeight() - Action::playerHeadRadius();
+        return $this->getHeadHeight() - Setting::playerHeadRadius();
     }
 
     public function getSight(): PlayerCamera

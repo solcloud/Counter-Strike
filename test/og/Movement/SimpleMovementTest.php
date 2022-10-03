@@ -2,7 +2,7 @@
 
 namespace Test\Movement;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
@@ -17,7 +17,7 @@ class SimpleMovementTest extends BaseTestCase
         $game = $this->createOneRoundGame($ticks);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
         $game->start();
-        $this->assertPlayerPosition($game, new Point($ticks * Action::moveDistancePerTick(), 0, 0));
+        $this->assertPlayerPosition($game, new Point($ticks * Setting::moveDistancePerTick(), 0, 0));
     }
 
     public function testPlayerCanMoveForward(): void
@@ -26,7 +26,7 @@ class SimpleMovementTest extends BaseTestCase
         $game = $this->createOneRoundGame($ticks);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPlayerPosition($game, new Point(0, 0, $ticks * Action::moveDistancePerTick()));
+        $this->assertPlayerPosition($game, new Point(0, 0, $ticks * Setting::moveDistancePerTick()));
     }
 
     public function testPlayerDiagonalMovement(): void
@@ -38,10 +38,10 @@ class SimpleMovementTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertGreaterThan(Action::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertLessThan(Action::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Action::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Action::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
     }
 
     public function testPlayerMovementSpeed(): void
@@ -52,18 +52,18 @@ class SimpleMovementTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertPlayerPosition($game, new Point(0, 0, 2 * Action::moveDistancePerTick()));
+        $this->assertPlayerPosition($game, new Point(0, 0, 2 * Setting::moveDistancePerTick()));
     }
 
     public function testPlayerCrouch(): void
     {
-        $game = $this->createOneRoundGame(Action::tickCountCrouch());
+        $game = $this->createOneRoundGame(Setting::tickCountCrouch());
         $game->onTick(function (GameState $state): void {
             $state->getPlayer(1)->crouch();
         });
 
         $game->start();
-        $this->assertSame(Action::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
+        $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
     }
 
     public function testPlayerMovementWalkSpeed(): void
@@ -75,7 +75,7 @@ class SimpleMovementTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertPlayerPosition($game, new Point(0, 0, Action::moveDistanceWalkPerTick()));
+        $this->assertPlayerPosition($game, new Point(0, 0, Setting::moveDistanceWalkPerTick()));
     }
 
     public function testPlayerCantMoveLeftFromOrigin(): void
@@ -94,7 +94,7 @@ class SimpleMovementTest extends BaseTestCase
             $state->getPlayer(1)->moveRight();
         });
         $game->start();
-        $this->assertPlayerPosition($game, new Point(20 * Action::moveDistancePerTick(), 0, 0));
+        $this->assertPlayerPosition($game, new Point(20 * Setting::moveDistancePerTick(), 0, 0));
     }
 
 

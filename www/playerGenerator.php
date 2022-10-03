@@ -1,6 +1,6 @@
 <?php
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Game;
 use cs\Core\Player;
 use cs\Core\PlayerCollider;
@@ -24,7 +24,7 @@ $collider = new PlayerCollider($player);
 if (isset($_GET['crouch'])) {
     // TODO crouch, move animation, also migrate from tickCount to timeMs
     $player->crouch();
-    for ($tick = 0; $tick <= Action::tickCountCrouch(); $tick++) {
+    for ($tick = 0; $tick <= Setting::tickCountCrouch(); $tick++) {
         $player->onTick($tick);
     }
 }

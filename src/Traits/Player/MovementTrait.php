@@ -2,7 +2,7 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameException;
 use cs\Core\Point;
@@ -85,25 +85,25 @@ trait MovementTrait
     private function getMoveSpeed(): int
     {
         if ($this->isCrouching()) {
-            $speed = Action::moveDistanceCrouchPerTick();
+            $speed = Setting::moveDistanceCrouchPerTick();
         } elseif ($this->isWalking()) {
-            $speed = Action::moveDistanceWalkPerTick();
+            $speed = Setting::moveDistanceWalkPerTick();
         } elseif ($this->isRunning()) {
-            $speed = Action::moveDistancePerTick();
+            $speed = Setting::moveDistancePerTick();
         } else {
             throw new GameException("Wat doing?");
         }
 
         $equippedItem = $this->getEquippedItem();
         if ($equippedItem->getType() === ItemType::TYPE_WEAPON_PRIMARY) {
-            $speed *= Action::getWeaponPrimarySpeedMultiplier($equippedItem->getId());
+            $speed *= Setting::getWeaponPrimarySpeedMultiplier($equippedItem->getId());
         } elseif ($equippedItem->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
-            $speed *= Action::getWeaponSecondarySpeedMultiplier($equippedItem->getId());
+            $speed *= Setting::getWeaponSecondarySpeedMultiplier($equippedItem->getId());
         }
         if ($this->isJumping()) {
-            $speed *= Action::jumpMovementSpeedMultiplier();
+            $speed *= Setting::jumpMovementSpeedMultiplier();
         } elseif ($this->isFlying()) {
-            $speed *= Action::flyingMovementSpeedMultiplier();
+            $speed *= Setting::flyingMovementSpeedMultiplier();
         }
 
         return (int)ceil($speed);
@@ -246,7 +246,7 @@ trait MovementTrait
             return null;
         }
 
-        if ($wall->getCeiling() <= $candidate->y + Action::playerObstacleOvercomeHeight()) {
+        if ($wall->getCeiling() <= $candidate->y + Setting::playerObstacleOvercomeHeight()) {
             return $this->world->findFloor($candidate->clone()->setY($wall->getCeiling()), $this->getBoundingRadius());
         }
 

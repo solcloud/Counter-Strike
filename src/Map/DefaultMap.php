@@ -2,7 +2,7 @@
 
 namespace cs\Map;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Player;
 use cs\Core\Point;
@@ -15,12 +15,12 @@ class DefaultMap extends BoxMap
     {
         $attackers = [];
         $defenders = [];
-        $scale = (int)ceil(Action::playerBoundingRadius() * 1.8);
-        $scaleHalf = (int)ceil(Action::playerBoundingRadius() * 1.8 / 2);
-        $radiusHalf = Action::playerBoundingRadius() / 2;
-        $boxHeight = Action::playerBoxHeightCrouchCover();
+        $scale = (int)ceil(Setting::playerBoundingRadius() * 1.8);
+        $scaleHalf = (int)ceil(Setting::playerBoundingRadius() * 1.8 / 2);
+        $radiusHalf = Setting::playerBoundingRadius() / 2;
+        $boxHeight = Setting::playerBoxHeightCrouchCover();
 
-        $this->addBox(new Box(new Point(), 43 * $scale, 5 * Action::playerHeadHeightStand(), 32 * $scale));
+        $this->addBox(new Box(new Point(), 43 * $scale, 5 * Setting::playerHeadHeightStand(), 32 * $scale));
         foreach ([5, 13, 21, 29, 37] as $x) {
             $attackers[] = new Point($x * $scale + $scaleHalf, 0, 4 * $scale - $radiusHalf);
             $this->addBox(new Box(new Point(($x - 1) * $scale, 0, 5 * $scale), 3 * $scale, $boxHeight, $scale));
@@ -32,13 +32,13 @@ class DefaultMap extends BoxMap
         }
 
         $stepHeight = 10;
-        $stepCount = Action::playerHeadHeightCrouch() / $stepHeight;
+        $stepCount = Setting::playerHeadHeightCrouch() / $stepHeight;
         foreach ([0, 31] as $z) {
             $ramp1 = new Ramp(new Point(19 * $scale, 0, $z * $scale), new Point2D(1, 0), $stepCount, $scale, true, 12, $stepHeight);
             foreach ($ramp1->getBoxes() as $box) {
                 $this->addBox($box);
             }
-            $this->addBox(new Box(new Point(21 * $scale, 0, $z * $scale), $scale, Action::playerHeadHeightCrouch(), $scale));
+            $this->addBox(new Box(new Point(21 * $scale, 0, $z * $scale), $scale, Setting::playerHeadHeightCrouch(), $scale));
             $ramp2 = new Ramp(new Point(24 * $scale - 20, 0, $z * $scale), new Point2D(-1, 0), $stepCount, $scale, true, 12, $stepHeight);
             foreach ($ramp2->getBoxes() as $box) {
                 $this->addBox($box);

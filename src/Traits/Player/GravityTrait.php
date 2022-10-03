@@ -2,7 +2,7 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Event\PlayerGravityEvent;
@@ -23,7 +23,7 @@ trait GravityTrait
             return;
         }
 
-        $point->setY($this->calculateGravity($point, Action::fallAmountPerTick()));
+        $point->setY($this->calculateGravity($point, Setting::fallAmountPerTick()));
     }
 
     private function calculateGravity(Point $start, int $amount): int
@@ -61,7 +61,7 @@ trait GravityTrait
     private function checkFallDamage(int $floorHeight): void
     {
         $fallHeight = $this->fallHeight - $floorHeight;
-        $threshold = Action::playerFallDamageThreshold();
+        $threshold = Setting::playerFallDamageThreshold();
         if ($fallHeight < $threshold) {
             return;
         }

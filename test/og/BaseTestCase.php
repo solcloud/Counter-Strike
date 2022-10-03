@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Test;
 
 use Closure;
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
@@ -44,7 +44,7 @@ abstract class BaseTestCase extends BaseTest
     {
         parent::__construct(...func_get_args());
         Util::$TICK_RATE = $this->testTickRateMs;
-        Action::loadConstants($this->defaultTestAction);
+        Setting::loadConstants($this->defaultTestAction);
     }
 
     /**

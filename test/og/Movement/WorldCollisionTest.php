@@ -2,7 +2,7 @@
 
 namespace Test\Movement;
 
-use cs\Core\Action;
+use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
@@ -18,7 +18,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerCollisionWithWall(): void
     {
         $game = $this->createOneRoundGame(3);
-        $wall = new Wall(new Point(0, 0, 2 * Action::moveDistancePerTick()));
+        $wall = new Wall(new Point(0, 0, 2 * Setting::moveDistancePerTick()));
         $game->getWorld()->addWall($wall);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
@@ -28,8 +28,8 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerCollisionWithBox(): void
     {
         $game = $this->createTestGame(3);
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(),
-        Action::playerHeadHeightStand(), 1));
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(),
+        Setting::playerHeadHeightStand(), 1));
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
         $this->assertPlayerPosition($game, new Point());
@@ -38,7 +38,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerCollisionWithBoxAngle(): void
     {
         $game = $this->createTestGame(3);
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(), Setting::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->getSight()->lookHorizontal(45);
             $state->getPlayer(1)->moveForward();
@@ -51,7 +51,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerCollisionWithBoxDoubleMovement(): void
     {
         $game = $this->createTestGame(3);
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(), Setting::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->moveForward();
             $state->getPlayer(1)->moveLeft();
@@ -65,7 +65,7 @@ class WorldCollisionTest extends BaseTestCase
     {
         $ticks = 3;
         $game = $this->createTestGame($ticks);
-        $box = new Box((new Point())->setZ(Action::playerBoundingRadius() + 10), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1);
+        $box = new Box((new Point())->setZ(Setting::playerBoundingRadius() + 10), 10 * Setting::moveDistancePerTick(), Setting::playerHeadHeightStand(), 1);
         $game->getWorld()->addBox($box);
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->getSight()->lookHorizontal(1);
@@ -74,14 +74,14 @@ class WorldCollisionTest extends BaseTestCase
         });
         $game->start();
         $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertSame($box->getBase()->z - Action::playerBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertSame($box->getBase()->z - Setting::playerBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
         $this->assertGreaterThan($ticks, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testPlayerCollisionWithBoxAngle2(): void
     {
         $game = $this->createTestGame(3);
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Action::playerBoundingRadius() + 1), 10 * Action::moveDistancePerTick(), Action::playerHeadHeightStand(), 1));
+        $game->getWorld()->addBox(new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(), Setting::playerHeadHeightStand(), 1));
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->moveForward();
             $state->getPlayer(1)->moveRight();
@@ -93,10 +93,10 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerDieOnFallDamage(): void
     {
-        $yStart = Action::playerHeadHeightStand() * 6;
+        $yStart = Setting::playerHeadHeightStand() * 6;
         $playerCommands = [
             fn(Player $p) => $p->setPosition(new Point(0, $yStart, 0)),
-            $this->waitXTicks((int)ceil($yStart / Action::fallAmountPerTick())),
+            $this->waitXTicks((int)ceil($yStart / Setting::fallAmountPerTick())),
             $this->endGame(),
         ];
 
@@ -115,7 +115,7 @@ class WorldCollisionTest extends BaseTestCase
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertSame(1 + Action::moveDistancePerTick(), $p->getPositionImmutable()->getZ());
+                $this->assertSame(1 + Setting::moveDistancePerTick(), $p->getPositionImmutable()->getZ());
             },
             fn(Player $p) => $p->moveLeft(),
             fn(Player $p) => $p->moveLeft(),
@@ -125,31 +125,31 @@ class WorldCollisionTest extends BaseTestCase
         $game = $this->createGame();
         $game->getWorld()->addWall($wall);
         $this->playPlayer($game, $playerCommands);
-        $this->assertPlayerPosition($game, new Point(0, 0, Action::moveDistancePerTick() + 1));
+        $this->assertPlayerPosition($game, new Point(0, 0, Setting::moveDistancePerTick() + 1));
     }
 
     public function testPlayerCollisionWithWallWalkBypassRound(): void
     {
         $walls = [
-            new Wall(new Point(1 * Action::moveDistancePerTick(), 0, 1 * Action::moveDistancePerTick() - 1), false, Action::moveDistancePerTick()),
-            new Wall(new Point(1 * Action::moveDistancePerTick(), 0, 1 * Action::moveDistancePerTick()), true, Action::moveDistancePerTick()),
+            new Wall(new Point(1 * Setting::moveDistancePerTick(), 0, 1 * Setting::moveDistancePerTick() - 1), false, Setting::moveDistancePerTick()),
+            new Wall(new Point(1 * Setting::moveDistancePerTick(), 0, 1 * Setting::moveDistancePerTick()), true, Setting::moveDistancePerTick()),
         ];
         $playerCommands = [
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertPositionSame(new Point(0, 0, Action::moveDistancePerTick()), $p->getPositionImmutable());
+                $this->assertPositionSame(new Point(0, 0, Setting::moveDistancePerTick()), $p->getPositionImmutable());
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveRight(),
             function (Player $p) {
-                $this->assertPositionSame(new Point(1 * Action::moveDistancePerTick() - 1, 0, 1 * Action::moveDistancePerTick()), $p->getPositionImmutable());
+                $this->assertPositionSame(new Point(1 * Setting::moveDistancePerTick() - 1, 0, 1 * Setting::moveDistancePerTick()), $p->getPositionImmutable());
             },
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveBackward(),
             fn(Player $p) => $p->moveBackward(),
             function (Player $p) {
-                $this->assertSame(Action::moveDistancePerTick() + 1, $p->getPositionImmutable()->z);
+                $this->assertSame(Setting::moveDistancePerTick() + 1, $p->getPositionImmutable()->z);
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveBackward(),
@@ -162,7 +162,7 @@ class WorldCollisionTest extends BaseTestCase
             $game->getWorld()->addWall($wall);
         }
         $this->playPlayer($game, $playerCommands);
-        $this->assertPlayerPosition($game, new Point(3 * Action::moveDistancePerTick() - 1, 0, 0));
+        $this->assertPlayerPosition($game, new Point(3 * Setting::moveDistancePerTick() - 1, 0, 0));
     }
 
     public function testPlayerCollisionWithOtherPlayerRadius(): void
@@ -230,7 +230,7 @@ class WorldCollisionTest extends BaseTestCase
                 $this->assertFalse($p->canJump());
                 $this->assertGreaterThan(0, $p->getPositionImmutable()->y);
             },
-            $this->waitXTicks(Action::tickCountJump() * 2),
+            $this->waitXTicks(Setting::tickCountJump() * 2),
             function (Player $p): void {
                 $this->assertTrue($p->canJump());
             },
@@ -241,8 +241,8 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerJumpCeiling(): void
     {
-        $ceiling = new Floor(new Point(0, Action::playerJumpHeight() / 2, 0));
-        $game = $this->createOneRoundGame(Action::tickCountJump());
+        $ceiling = new Floor(new Point(0, Setting::playerJumpHeight() / 2, 0));
+        $game = $this->createOneRoundGame(Setting::tickCountJump());
         $game->getWorld()->addFloor($ceiling);
         $game->getPlayer(1)->jump();
         $game->onTick(function (GameState $state) use ($ceiling): void {
@@ -265,12 +265,12 @@ class WorldCollisionTest extends BaseTestCase
         });
         $game->start();
         $this->assertSame(1, $game->getTickId());
-        $this->assertPlayerPosition($game, new Point(2 * Action::moveDistancePerTick(), 2 * Action::jumpDistancePerTick(), 0));
+        $this->assertPlayerPosition($game, new Point(2 * Setting::moveDistancePerTick(), 2 * Setting::jumpDistancePerTick(), 0));
     }
 
     public function testCanJumpOnBox(): void
     {
-        $tickCount = Action::tickCountJump() * 2 + 4;
+        $tickCount = Setting::tickCountJump() * 2 + 4;
         $game = $this->createOneRoundGame($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 0) {
@@ -278,19 +278,19 @@ class WorldCollisionTest extends BaseTestCase
             }
             $state->getPlayer(1)->moveRight();
         });
-        $box = new Box(new Point(Action::moveDistancePerTick() / 2, 0, 0), $tickCount * Action::moveDistancePerTick(), Action::playerHeadHeightCrouch(), 1);
+        $box = new Box(new Point(Setting::moveDistancePerTick() / 2, 0, 0), $tickCount * Setting::moveDistancePerTick(), Setting::playerHeadHeightCrouch(), 1);
         $game->getWorld()->addBox($box);
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
         $this->assertFalse($game->getPlayer(1)->isFlying());
         $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertLessThan(Action::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Action::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testCanJumpOnBoxBoundingRadius(): void
     {
-        $tickCount = Action::tickCountJump() * 2 + 4;
+        $tickCount = Setting::tickCountJump() * 2 + 4;
         $game = $this->createTestGame($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
@@ -298,30 +298,30 @@ class WorldCollisionTest extends BaseTestCase
             }
             $state->getPlayer(1)->moveRight();
         });
-        $box = new Box(new Point((int)floor(Action::playerBoundingRadius() * 2.5), 0, 0), $tickCount * Action::moveDistancePerTick(), Action::playerHeadHeightCrouch(), 1);
+        $box = new Box(new Point((int)floor(Setting::playerBoundingRadius() * 2.5), 0, 0), $tickCount * Setting::moveDistancePerTick(), Setting::playerHeadHeightCrouch(), 1);
         $game->getWorld()->addBox($box);
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
         $this->assertFalse($game->getPlayer(1)->isFlying());
         $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertLessThan(Action::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Action::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
     }
 
     public function testCanJumpOverWall(): void
     {
-        $tickCount = Action::tickCountJump() * 2;
+        $tickCount = Setting::tickCountJump() * 2;
         $game = $this->createOneRoundGame($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();
             }
-            if ($state->getTickId() === 1 + Action::tickCountJump()) {
-                $this->assertSame(Action::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+            if ($state->getTickId() === 1 + Setting::tickCountJump()) {
+                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
-        $box = new Box(new Point(Action::moveDistancePerTick(), 0, 0), Action::moveDistancePerTick(), Action::playerJumpHeight() - 1, 1);
+        $box = new Box(new Point(Setting::moveDistancePerTick(), 0, 0), Setting::moveDistancePerTick(), Setting::playerJumpHeight() - 1, 1);
         $game->getWorld()->addBox($box);
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
@@ -332,18 +332,18 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testCanJumpOverWallBoundingRadius(): void
     {
-        $tickCount = Action::tickCountJump() * 2 + 2;
+        $tickCount = Setting::tickCountJump() * 2 + 2;
         $game = $this->createTestGame($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();
             }
-            if ($state->getTickId() === 1 + Action::tickCountJump()) {
-                $this->assertSame(Action::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+            if ($state->getTickId() === 1 + Setting::tickCountJump()) {
+                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
-        $box = new Box(new Point(Action::moveDistancePerTick(), 0, 0), Action::moveDistancePerTick(), Action::playerJumpHeight() - 1, 1);
+        $box = new Box(new Point(Setting::moveDistancePerTick(), 0, 0), Setting::moveDistancePerTick(), Setting::playerJumpHeight() - 1, 1);
         $game->getWorld()->addBox($box);
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
@@ -359,22 +359,22 @@ class WorldCollisionTest extends BaseTestCase
                 $p->moveForward();
                 $p->jump();
             },
-            $this->waitXTicks(Action::tickCountJump() * 2),
+            $this->waitXTicks(Setting::tickCountJump() * 2),
             function (Player $p): void {
                 $p->jump();
                 $p->moveForward();
             },
-            $this->waitXTicks(Action::tickCountJump() * 2),
+            $this->waitXTicks(Setting::tickCountJump() * 2),
             function (Player $p): void {
                 $p->moveForward();
                 $p->jump();
             },
-            $this->waitXTicks(Action::tickCountJump() * 2),
+            $this->waitXTicks(Setting::tickCountJump() * 2),
             function (Player $p): void {
                 $p->jump();
                 $p->moveForward();
             },
-            $this->waitXTicks(Action::tickCountJump() * 2),
+            $this->waitXTicks(Setting::tickCountJump() * 2),
             $this->endGame(),
         ];
 
@@ -384,10 +384,10 @@ class WorldCollisionTest extends BaseTestCase
             $floor = new Floor(
                 new Point(
                     0,
-                    $i * Action::jumpDistancePerTick(),
-                    (int)ceil($i * Action::moveDistancePerTick() * Action::jumpMovementSpeedMultiplier())
+                    $i * Setting::jumpDistancePerTick(),
+                    (int)ceil($i * Setting::moveDistancePerTick() * Setting::jumpMovementSpeedMultiplier())
                 ),
-                1, Action::moveDistancePerTick()
+                1, Setting::moveDistancePerTick()
             );
             $game->getWorld()->addFloor($floor);
         }
