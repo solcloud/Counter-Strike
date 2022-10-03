@@ -23,8 +23,6 @@ final class Setting
         'playerHeadHeightCrouch'       => 140,
         'playerObstacleOvercomeHeight' => 20,
         'playerFallDamageThreshold'    => 570,
-        'playerBoxHeightCrouchCover'   => 142,
-        'playerGunHeightStand'         => 160,
     ];
 
     /** @var array<string,int> */
@@ -71,14 +69,6 @@ final class Setting
         return self::$cacheInt['fallAmountPerTick'];
     }
 
-    public static function moveDistancePerTick(): int
-    {
-        if (!isset(self::$cacheInt['moveDistancePerTick'])) {
-            self::$cacheInt['moveDistancePerTick'] = (int)ceil(self::$data['moveOneMs'] * Util::$TICK_RATE);
-        }
-        return self::$cacheInt['moveDistancePerTick'];
-    }
-
     public static function jumpDistancePerTick(): int
     {
         if (!isset(self::$cacheInt['jumpDistancePerTick'])) {
@@ -101,6 +91,14 @@ final class Setting
             self::$cacheInt['tickCountJump'] = (int)ceil(self::$data['jumpDurationMs'] / Util::$TICK_RATE);
         }
         return self::$cacheInt['tickCountJump'];
+    }
+
+    public static function moveDistancePerTick(): int
+    {
+        if (!isset(self::$cacheInt['moveDistancePerTick'])) {
+            self::$cacheInt['moveDistancePerTick'] = (int)ceil(self::$data['moveOneMs'] * Util::$TICK_RATE);
+        }
+        return self::$cacheInt['moveDistancePerTick'];
     }
 
     public static function moveDistanceWalkPerTick(): int
@@ -184,16 +182,6 @@ final class Setting
     public static function playerFallDamageThreshold(): int
     {
         return self::$data['playerFallDamageThreshold'];
-    }
-
-    public static function playerBoxHeightCrouchCover(): int
-    {
-        return self::$data['playerBoxHeightCrouchCover'];
-    }
-
-    public static function playerGunHeightStand(): int
-    {
-        return self::$data['playerGunHeightStand'];
     }
 
     /**

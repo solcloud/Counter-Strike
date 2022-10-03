@@ -18,7 +18,7 @@ class DefaultMap extends BoxMap
         $scale = (int)ceil(Setting::playerBoundingRadius() * 1.8);
         $scaleHalf = (int)ceil(Setting::playerBoundingRadius() * 1.8 / 2);
         $radiusHalf = Setting::playerBoundingRadius() / 2;
-        $boxHeight = Setting::playerBoxHeightCrouchCover();
+        $boxHeight = Setting::playerHeadHeightCrouch() + 2;
 
         $this->addBox(new Box(new Point(), 43 * $scale, 5 * Setting::playerHeadHeightStand(), 32 * $scale));
         foreach ([5, 13, 21, 29, 37] as $x) {

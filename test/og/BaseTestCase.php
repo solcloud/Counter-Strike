@@ -36,8 +36,6 @@ abstract class BaseTestCase extends BaseTest
         'playerHeadHeightCrouch'        => 140,
         'playerObstacleOvercomeHeight'  => 20,
         'playerFallDamageThreshold'     => 570,
-        'playerBoxHeightCrouchCover'    => 142,
-        'playerGunHeightStand'          => 160,
     ];
 
     public function __construct()

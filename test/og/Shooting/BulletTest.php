@@ -18,7 +18,8 @@ class BulletTest extends BaseTestCase
 
     public function _testBulletHitFloor(int $angleHorizontal, int $angleVertical): AttackResult
     {
-        $spawn = new Point(Setting::playerGunHeightStand(), 0, Setting::playerGunHeightStand());
+        $gunHeight = Setting::playerHeadHeightStand() - Setting::playerHeadRadius();
+        $spawn = new Point($gunHeight, 0, $gunHeight);
         $playerCommands = [
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             fn(Player $p) => $p->setPosition($spawn),
@@ -28,9 +29,9 @@ class BulletTest extends BaseTestCase
         ];
 
         $game = $this->createGame([GameProperty::START_MONEY => 16000]);
-        $game->getWorld()->addWall(new Wall(new Point(0, $spawn->y, $spawn->z + Setting::playerGunHeightStand() + 1), true, 2 * $spawn->x));
-        $game->getWorld()->addWall(new Wall(new Point($spawn->x + Setting::playerGunHeightStand() + 1, $spawn->y, 0), false, 2 * $spawn->z));
-        $game->getWorld()->addFloor(new Floor(new Point(0, Setting::playerGunHeightStand() * 2, 0), PHP_INT_MAX, PHP_INT_MAX));
+        $game->getWorld()->addWall(new Wall(new Point(0, $spawn->y, $spawn->z + $gunHeight + 1), true, 2 * $spawn->x));
+        $game->getWorld()->addWall(new Wall(new Point($spawn->x + $gunHeight + 1, $spawn->y, 0), false, 2 * $spawn->z));
+        $game->getWorld()->addFloor(new Floor(new Point(0, $gunHeight * 2, 0), PHP_INT_MAX, PHP_INT_MAX));
         $this->playPlayer($game, $playerCommands);
 
         $player = $game->getPlayer(1);
@@ -39,14 +40,14 @@ class BulletTest extends BaseTestCase
         $this->assertCount(1, $result->getHits(), "Angles [{$angleHorizontal},{$angleVertical}]");
         $hitTarget = $result->getHits()[0];
         $this->assertTrue(($hitTarget instanceof Wall || $hitTarget instanceof Floor), "Angles [{$angleHorizontal},{$angleVertical}]");
-        $this->assertGreaterThanOrEqual(Setting::playerGunHeightStand(), $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
-        $this->assertLessThan(sqrt(pow(Setting::playerGunHeightStand(), 2) + pow(Setting::playerGunHeightStand(), 2)), $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
+        $this->assertGreaterThanOrEqual($gunHeight, $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
+        $this->assertLessThan(sqrt(pow($gunHeight, 2) + pow($gunHeight, 2)), $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
         if ($angleVertical < 0) {
-            $this->assertLessThan($spawn->y + Setting::playerGunHeightStand(), $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
+            $this->assertLessThan($spawn->y + $gunHeight, $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
         } elseif ($angleVertical === 0) {
-            $this->assertSame($spawn->y + Setting::playerGunHeightStand(), $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
+            $this->assertSame($spawn->y + $gunHeight, $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
         } else {
-            $this->assertGreaterThan($spawn->y + Setting::playerGunHeightStand(), $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
+            $this->assertGreaterThan($spawn->y + $gunHeight, $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
         }
         if ($angleVertical % 90 === 0) {
             return $result;
@@ -64,9 +65,10 @@ class BulletTest extends BaseTestCase
 
     public function testBulletHitFloor(): void
     {
+        $gunHeight = Setting::playerHeadHeightStand() - Setting::playerHeadRadius();
         $this->_testBulletHitFloor(0, -89);
 
-        $maxDistance = (int)floor(sqrt(pow(Setting::playerGunHeightStand(), 2) + pow(Setting::playerGunHeightStand(), 2)));
+        $maxDistance = (int)floor(sqrt(pow($gunHeight, 2) + pow($gunHeight, 2)));
         $result = $this->_testBulletHitFloor(45, -45);
         $this->assertSame($maxDistance, $result->getBullet()->getDistanceTraveled());
         $result = $this->_testBulletHitFloor(45, 45);
@@ -75,9 +77,9 @@ class BulletTest extends BaseTestCase
         $this->assertInstanceOf(Floor::class, $floor);
 
         $result = $this->_testBulletHitFloor(0, -90);
-        $this->assertSame(Setting::playerGunHeightStand(), $result->getBullet()->getDistanceTraveled());
+        $this->assertSame($gunHeight, $result->getBullet()->getDistanceTraveled());
         $result = $this->_testBulletHitFloor(1, -90);
-        $this->assertSame(Setting::playerGunHeightStand(), $result->getBullet()->getDistanceTraveled());
+        $this->assertSame($gunHeight, $result->getBullet()->getDistanceTraveled());
 
         $result1 = $this->_testBulletHitFloor(1, -89);
         $result2 = $this->_testBulletHitFloor(1, -79);
