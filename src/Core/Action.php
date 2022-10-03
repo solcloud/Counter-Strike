@@ -138,7 +138,7 @@ final class Action
     public static function getWeaponPrimarySpeedMultiplier(string $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"])) {
-            self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"] = self::$data["weaponPrimarySpeedMultiplier-{$itemId}"] ?? 0.6;
+            self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"] = (self::$data["weaponPrimarySpeedMultiplier-{$itemId}"] ?? 60) / 100;
         }
         return self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"];
     }
@@ -146,7 +146,7 @@ final class Action
     public static function getWeaponSecondarySpeedMultiplier(string $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"])) {
-            self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 0.8;
+            self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = (self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 80) / 100;
         }
         return self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"];
     }

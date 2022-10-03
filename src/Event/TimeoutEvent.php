@@ -3,7 +3,6 @@
 namespace cs\Event;
 
 use Closure;
-use cs\Core\Util;
 
 class TimeoutEvent extends Event
 {
@@ -13,7 +12,7 @@ class TimeoutEvent extends Event
     public function __construct(Closure $callback, protected int $timeoutMs)
     {
         $this->callback = $callback;
-        $this->tickCountTimeout = Util::millisecondsToFrames($this->timeoutMs);
+        $this->tickCountTimeout = $this->timeMsToTick($this->timeoutMs);
     }
 
     final public function process(int $tick): void

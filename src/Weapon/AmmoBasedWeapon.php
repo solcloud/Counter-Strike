@@ -19,7 +19,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
     protected bool $reloading = false;
     protected bool $isWeaponPrimary;
     private ?ReloadEvent $eventReload = null;
-    private int $lastAttackTick = -9999;
+    private int $lastAttackTick = 0;
     private int $fireRateTicks;
 
     public function __construct(bool $instantlyEquip = false)
@@ -41,7 +41,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
             return false;
         }
 
-        return ($this->lastAttackTick + $this->fireRateTicks <= $tickId);
+        return ($this->lastAttackTick === 0 || $this->lastAttackTick + $this->fireRateTicks <= $tickId);
     }
 
     public final function attack(AttackEvent $event): ?AttackResult
