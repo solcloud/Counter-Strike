@@ -8,7 +8,7 @@ class ServerSetting
 
     public function __construct(
         public readonly int $playersMax,
-        public readonly int $tickMs = 100,
+        public readonly int $tickMs = 20,
         public readonly string $attackerCode = 'acode',
         public readonly string $defenderCode = 'dcode',
         public readonly bool $warmupInstantStart = true,
