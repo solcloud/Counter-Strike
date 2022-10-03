@@ -19,13 +19,13 @@ let launchGame
 ////////////
 
 
-    launchGame = async function (canvasParent, elementHud, map, address, code) {
+    launchGame = async function (canvasParent, elementHud, setting) {
         if (initialized) {
             throw new Error("Game already launched")
         }
 
         initialized = true
-        const canvas = await world.init(map)
+        const canvas = await world.init(setting.map, setting.world)
         hud.createHud(elementHud)
         control.init(world.getCamera())
         document.addEventListener("click", () => control.requestLock())
@@ -39,7 +39,7 @@ let launchGame
         game.onReady(function (options) {
             connector.startLoop(control, options.tickMs)
         })
-        connector.connect(address, code)
+        connector.connect(setting.url, setting.code)
     }
 
 })()

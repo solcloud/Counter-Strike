@@ -15,10 +15,13 @@
     </header>
     <div id="menu">
         <button onclick="showModal('modal-join')">Play</button>
-        <button>Settings</button>
+        <button onclick="loadUserSetting();showModal('modal-setting')">Settings</button>
         <button>Quit</button>
     </div>
-    <footer>Created by <a target="_blank" href="https://github.com/solcloud">solcloud</a> using awesome <a target="_blank" href="https://threejs.org/">three.js</a> 3D library</footer>
+    <footer>
+        Created by <a target="_blank" href="https://github.com/solcloud">solcloud</a>
+        using awesome <a target="_blank" href="https://threejs.org/">three.js</a> 3D library
+    </footer>
 </div>
 <div id="modal" class="hidden">
     <div data-name="modal-join" class="hidden">
@@ -26,8 +29,30 @@
         <textarea id="join-url">ws://localhost:8081?map=default&code=acode</textarea>
         <p class="flex">
             <button onclick="closeModal()" class="btn">× Close</button>
-            <span></span>
+            <span>&nbsp;</span>
             <button onclick="joinGameUrl(document.getElementById('join-url').value)" class="btn">↳ Join</button>
+        </p>
+    </div>
+    <div data-name="modal-setting" class="hidden">
+        <div class="text-warning">
+            <form id="setting-form">
+                <p>
+                    <label>
+                        <input name="prefer_performance" type="checkbox"> Prefer performance over quality
+                    </label>
+                </p>
+                <p>
+                    <label>
+                        Field of view
+                        <input min="10" name="fov" type="number">
+                    </label>
+                </p>
+            </form>
+        </div>
+        <p class="flex">
+            <button onclick="closeModal()" class="btn">× Close</button>
+            <span>&nbsp;</span>
+            <button onclick="saveSetting(new URLSearchParams(new FormData(document.getElementById('setting-form'))));closeModal()" class="btn">✓ Save</button>
         </p>
     </div>
 </div>
@@ -39,6 +64,11 @@
     const modal = document.getElementById('modal')
     const ui = document.getElementById('ui')
     const hud = document.getElementById('hud')
+    const validMaps = ['default']
+    const defaultSetting = {
+        prefer_performance: false,
+        fov: 70
+    }
 
     function router() {
         const hash = window.location.hash.substring(1)
@@ -57,13 +87,48 @@
         }
     }
 
+    function loadUserSetting() {
+        const data = loadSetting()
+        const base = document.querySelector('#setting-form')
+
+        Object.entries(data).forEach(function ([key, value]) {
+            const element = base.querySelector(`[name="${key}"]`)
+            if (element === null) {
+                console.log("Undefined key: " + key)
+                return
+            }
+            if (typeof value === 'boolean') {
+                element.checked = value
+            } else {
+                element.value = value
+            }
+        })
+    }
+
+    function saveSetting(data) {
+        if (data.has('prefer_performance')) {
+            defaultSetting.prefer_performance = true
+        }
+        defaultSetting.fov = data.get('fov')
+
+        localStorage.setItem('setting', JSON.stringify(defaultSetting))
+    }
+
+    function loadSetting() {
+        const userSetting = localStorage.getItem('setting')
+        if (userSetting === null) {
+            return defaultSetting
+        }
+
+        return JSON.parse(userSetting)
+    }
+
     function joinGameUrl(url) {
         const query = url.substring(url.indexOf('?') + 1)
         const params = new URLSearchParams(query)
         joinGame(params.get('map'), url.substring(0, url.indexOf('?')), params.get('code'))
     }
 
-    const validMaps = ['default']
     function joinGame(map, url, code) {
         if (!map || !url || !code) {
             alert("Invalid parameters")
@@ -75,9 +140,15 @@
 
         modal.remove()
         ui.remove()
-        console.log("Launching game")
+        const setting = {
+            world: loadSetting(),
+            code: code,
+            url: url,
+            map: map
+        }
+        console.log("Launching game", setting)
         import("/assets/js/start.js").then(async (ns) => {
-            await ns.launchGame(document.body, hud, map, url, code)
+            await ns.launchGame(document.body, hud, setting)
         })
     }
 

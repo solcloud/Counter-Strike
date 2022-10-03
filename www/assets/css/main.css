@@ -147,7 +147,7 @@ textarea {
     border-radius: 10px;
 }
 
-#modal > div * {
+#modal > div > * {
     display: block;
     width: 100%;
 }

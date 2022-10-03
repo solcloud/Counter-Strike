@@ -35,23 +35,27 @@ export class World {
         });
     }
 
-    async init(map, fov = 70) {
+    async init(map, setting) {
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0xdadada);
 
         this.#playerModel = await this.#loadJSON('/resources/model/player.json')
         await this.#loadMap(scene, map)
 
-        const camera = new THREE.PerspectiveCamera(fov, window.innerWidth / window.innerHeight, 0.1, 4999);
+        const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999);
         camera.rotation.reorder("YXZ")
 
-        const renderer = new THREE.WebGLRenderer({
-            antialias: true
-        });
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setPixelRatio(window.devicePixelRatio);
+        const glParameters = {}
+        if (!setting.prefer_performance) {
+            glParameters.antialias = true
+        }
+        const renderer = new THREE.WebGLRenderer(glParameters);
         renderer.setSize(window.innerWidth, window.innerHeight);
+        if (!setting.prefer_performance) {
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setPixelRatio(window.devicePixelRatio);
+        }
 
         window.addEventListener('resize', function () {
             camera.aspect = window.innerWidth / window.innerHeight;
