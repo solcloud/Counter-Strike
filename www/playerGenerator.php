@@ -22,7 +22,7 @@ $collider = new PlayerCollider($player);
 ////////
 
 if (isset($_GET['crouch'])) {
-    // TODO crouch, move animation, also migrate from tickCount to timeMs
+    // TODO crouch, move animation
     $player->crouch();
     for ($tick = 0; $tick <= Setting::tickCountCrouch(); $tick++) {
         $player->onTick($tick);

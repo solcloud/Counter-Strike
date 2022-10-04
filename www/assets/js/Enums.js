@@ -17,6 +17,7 @@ const EventList = {
     GameStartEvent: 6,
     RoundEndCoolDownEvent: 7,
     KillEvent: 8,
+    SoundEvent: 9,
 }
 
 // server/src/Enum/GameOverReason.php

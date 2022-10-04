@@ -29,7 +29,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->fireRateTicks = Util::millisecondsToFrames(static::fireRateMs);
     }
 
-    private function canAttack(int $tickId): bool
+    public function canAttack(int $tickId): bool
     {
         if (!$this->equipped) {
             return false;

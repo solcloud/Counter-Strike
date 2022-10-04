@@ -17,6 +17,7 @@ export class HUD {
         money: null,
         health: null,
         armor: null,
+        ammo: null,
         messageTop: null,
         messageBottom: null,
         scoreMyTeam: null,
@@ -158,6 +159,11 @@ export class HUD {
         this.#elements.money.innerText = player.money
         this.#elements.health.innerText = player.health
         this.#elements.armor.innerText = player.armor
+        if (player.ammo === null) {
+            this.#elements.ammo.innerText = `${player.item.name}`
+        } else {
+            this.#elements.ammo.innerText = `${player.item.name} - ${player.ammo} / ${player.ammoReserve}`
+        }
         this.#elements.messageTop.innerText = this.#messages.top
         this.#elements.messageBottom.innerHTML = this.#messages.bottom
 
@@ -224,11 +230,11 @@ export class HUD {
                 </div>
                 <div class="inventory">
                     <p data-slot="0">Knife  [q]</p>
-                    <p data-slot="1">Rifle  [1]</p>
-                    <p class="highlight" data-slot="2">Pistol [2]</p>
+                    <p data-slot="1">Primary  [1]</p>
+                    <p class="highlight" data-slot="2">Secondary [2]</p>
                 </div>
                 <div>
-                    <span class="ammo bg">
+                    <span data-ammo class="ammo bg">
                     12 / 24
                     </span>
                 </div>
@@ -243,6 +249,7 @@ export class HUD {
         this.#elements.money = elementHud.querySelector('[data-money]')
         this.#elements.health = elementHud.querySelector('[data-health]')
         this.#elements.armor = elementHud.querySelector('[data-armor]')
+        this.#elements.ammo = elementHud.querySelector('[data-ammo]')
         this.#elements.messageTop = elementHud.querySelector('#message-top')
         this.#elements.messageBottom = elementHud.querySelector('#message-bottom')
         this.#elements.scoreMyTeam = elementHud.querySelector('.team-me-score')

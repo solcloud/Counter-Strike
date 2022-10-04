@@ -4,6 +4,7 @@ namespace cs\Core;
 
 use cs\Enum\GameOverReason;
 use cs\Enum\PauseReason;
+use cs\Enum\RoundEndReason;
 use cs\Event\Event;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
@@ -12,6 +13,7 @@ use cs\Event\PauseStartEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
+use cs\Event\SoundEvent;
 use cs\Map\Map;
 
 class Game
@@ -30,6 +32,8 @@ class Game
     private array $events = [];
     /** @var Event[] */
     private array $tickEvents = [];
+    /** @var int[] */
+    private array $lossBonuses = [1400, 1900, 2400, 2900, 3400];
 
     private int $tick = 0;
     private int $eventId = 0;
@@ -40,6 +44,7 @@ class Game
     private int $playersCountDefenders = 0;
     private bool $paused = true;
     private bool $roundEndCoolDown = false;
+    private bool $bombPlanted = false; // TODO
 
     public function __construct(GameProperty $properties = new GameProperty())
     {
@@ -56,6 +61,7 @@ class Game
         $this->roundTickCount = Util::millisecondsToFrames($this->properties->round_time_ms);
         $this->startRoundFreezeTime = new PauseStartEvent(PauseReason::FREEZE_TIME, function (): void {
             $this->paused = false;
+            $this->bombPlanted = false;
             $this->addEvent(new PauseEndEvent());
             $this->addEvent(new RoundStartEvent($this->playersCountAttackers, $this->playersCountDefenders, function (): void {
                 $this->roundEndCoolDown = false;
@@ -99,18 +105,18 @@ class Game
 
         if ($this->playersCountAttackers > 0 && $attackersAlive === 0) {
             $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, false));
+            $this->addEvent(new RoundEndEvent($this, false, RoundEndReason::ALL_ENEMIES_ELIMINATED));
             return;
         }
         if ($this->playersCountDefenders > 0 && $defendersAlive === 0) {
             $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, true));
+            $this->addEvent(new RoundEndEvent($this, true, RoundEndReason::ALL_ENEMIES_ELIMINATED));
             return;
         }
 
         if ($this->roundStartTickId + $this->roundTickCount === $this->tick) {
             $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, false));
+            $this->addEvent(new RoundEndEvent($this, false, RoundEndReason::TIME_RUNS_OUT));
             return;
         }
     }
@@ -208,6 +214,11 @@ class Game
         return $this->roundNumber;
     }
 
+    public function addSoundEvent(SoundEvent $event): void
+    {
+        $this->addEvent($event);
+    }
+
     public function playerAttackKilledEvent(Player $playerDead, Bullet $bullet, bool $headShot): void
     {
         $this->addEvent(new KillEvent($playerDead, $this->players[$bullet->getOriginPlayerId()], $bullet->getShootItem()->getId(), $headShot));
@@ -218,15 +229,10 @@ class Game
         $this->addEvent(new KillEvent($playerDead, $playerDead, Floor::class, false));
     }
 
-    public function endRound(bool $attackersWins): void
+    public function endRound(RoundEndEvent $roundEndEvent): void
     {
         $this->roundNumber++;
-
-        if ($attackersWins) {
-            $this->score->attackersWinsRound();
-        } else {
-            $this->score->defendersWinsRound();
-        }
+        $this->score->roundEnd($roundEndEvent);
 
         if ($this->roundNumber > $this->properties->max_rounds) {
             if ($this->score->isTie()) {
@@ -237,36 +243,85 @@ class Game
             return;
         }
 
-        $roundResetCallback = function () {
-            $this->world->roundReset();
-            foreach ($this->players as $player) {
-                $player->roundReset();
-                $player->getInventory()->earnMoney(1000); // TODO
-                $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
-                $player->setPosition($spawnPosition);
-            }
-        };
-
         $startRoundFreezeTime = $this->startRoundFreezeTime;
         $startRoundFreezeTime->reset();
 
-        $isHalftime = $this->properties->max_rounds > 2 && (((int)floor($this->properties->max_rounds / 2)) === $this->roundNumber);
+        $isHalftime = $this->properties->max_rounds > 1 && (((int)floor($this->properties->max_rounds / 2)) + 1 === $this->roundNumber);
         if ($isHalftime) {
-            $callback = function () use ($startRoundFreezeTime): void {
+            $this->halfTimeSwapTeams();
+            $callback = function () use ($startRoundFreezeTime, $roundEndEvent): void {
                 $this->paused = true;
-                // $roundResetCallback(); todo switch sides and reset world
+                $this->roundReset(true, $roundEndEvent);
                 $this->addEvent($startRoundFreezeTime);
             };
             $event = new PauseStartEvent(PauseReason::HALF_TIME, $callback, $this->properties->half_time_freeze_sec * 1000);
         } else {
-            $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime, $roundResetCallback): void {
+            $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime, $roundEndEvent): void {
                 $this->paused = true;
-                $roundResetCallback();
+                $this->roundReset(false, $roundEndEvent);
                 $this->addEvent($startRoundFreezeTime);
             }, $this->properties->round_end_cool_down_sec * 1000);
         }
 
         $this->addEvent($event);
+    }
+
+    private function halfTimeSwapTeams(): void
+    {
+        $this->score->swapTeams();
+        foreach ($this->players as $player) {
+            $player->getInventory()->earnMoney(-$player->getInventory()->getDollars());
+            $player->getInventory()->earnMoney($this->properties->start_money);
+            $player->swapTeam();
+        }
+    }
+
+    private function roundReset(bool $firstRound, RoundEndEvent $roundEndEvent): void
+    {
+        $this->world->roundReset();
+        foreach ($this->players as $player) {
+            $player->roundReset();
+            if (!$firstRound) {
+                $player->getInventory()->earnMoney($this->calculateRoundMoneyAward($roundEndEvent, $player));
+            }
+            $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
+            $player->setPosition($spawnPosition);
+        }
+    }
+
+    private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int
+    {
+        $amount = 0;
+        $attackersWins = $roundEndEvent->attackersWins;
+
+        // Attacker side checks
+        if ($player->isPlayingOnAttackerSide()) {
+            $amount += $this->bombPlanted ? 800 : 0;
+            if ($attackersWins) {
+                $amount += match ($roundEndEvent->reason) {
+                    RoundEndReason::ALL_ENEMIES_ELIMINATED => 3250,
+                    RoundEndReason::BOMB_EXPLODED => 3500,
+                    default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
+                };
+            } elseif (!$player->isAlive()) {
+                $amount += $this->lossBonuses[min(4, $this->score->getNumberOfLossRoundsInRow(true))];
+            }
+
+            return $amount;
+        }
+
+        // Defender side checks
+        if (!$attackersWins) {
+            $amount += match ($roundEndEvent->reason) {
+                RoundEndReason::ALL_ENEMIES_ELIMINATED, RoundEndReason::TIME_RUNS_OUT => 3250,
+                RoundEndReason::BOMB_DEFUSED => 3500,
+                default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
+            };
+        } else {
+            $amount += $this->lossBonuses[min(4, $this->score->getNumberOfLossRoundsInRow(false))];
+        }
+
+        return $amount;
     }
 
     public function getState(): GameState

@@ -28,7 +28,9 @@ class RoundTest extends BaseTestCase
         ];
 
         $events = [];
-        $game = $this->createGame();
+        $gameProperty = new GameProperty();
+        $gameProperty->max_rounds = 1;
+        $game = $this->createTestGame(null, $gameProperty);
         $break = false;
         $game->onEvents(function (array $e) use (&$events, &$break): void {
             if ($break) {
@@ -105,7 +107,7 @@ class RoundTest extends BaseTestCase
 
         $roundEndEventsCount = 0;
         $roundCoolDownEventsCount = 0;
-        $game->setTickMax($maxRounds * 20);
+        $game->setTickMax($maxRounds * 2);
         $game->onTick(function (GameState $state) {
             $state->getPlayer(1)->moveForward();
         });
@@ -121,8 +123,30 @@ class RoundTest extends BaseTestCase
         });
         $game->start();
         $this->assertSame($maxRounds, $roundEndEventsCount);
-        $this->assertSame($maxRounds - 2, $roundCoolDownEventsCount); // firstRound and halfTime without cool down
+        $this->assertSame($maxRounds - 2, $roundCoolDownEventsCount); // (firstRound + halfTime)
         $this->assertSame($maxRounds + 1, $game->getRoundNumber());
+    }
+
+    public function testHalfTimeSwitch(): void
+    {
+        $maxRounds = 5;
+        $game = $this->createGame([
+            GameProperty::MAX_ROUNDS    => $maxRounds,
+            GameProperty::ROUND_TIME_MS => 1,
+        ]);
+        $game->setTickMax($maxRounds * 2);
+
+        $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
+        $this->assertTrue($game->getScore()->isTie());
+
+        $game->start();
+        $this->assertSame($maxRounds + 1, $game->getRoundNumber());
+        $this->assertFalse($game->getPlayer(1)->isPlayingOnAttackerSide());
+        $this->assertFalse($game->getScore()->isTie());
+        $this->assertTrue($game->getScore()->defendersIsWinning());
+        $this->assertFalse($game->getScore()->attackersIsWinning());
+        $this->assertSame(3, $game->getScore()->getScoreDefenders());
+        $this->assertSame(2, $game->getScore()->getScoreAttackers());
     }
 
     public function testSighReset(): void

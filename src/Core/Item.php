@@ -22,6 +22,11 @@ abstract class Item
         $this->equipped = $instantlyEquip;
     }
 
+    public function canAttack(int $tickId): bool
+    {
+        return false;
+    }
+
     public function isUserDroppable(): bool
     {
         if ($this->getType() === ItemType::TYPE_KNIFE) {

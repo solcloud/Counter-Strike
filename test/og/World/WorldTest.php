@@ -2,14 +2,13 @@
 
 namespace Test\World;
 
-use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
-use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
+use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
 use Test\BaseTestCase;
@@ -37,7 +36,7 @@ class WorldTest extends BaseTestCase
         $this->assertNull($world->findFloor(new Point(15, 1, 0), 3));
     }
 
-    public function testStairCase(): void
+    public function testStairCaseUp(): void
     {
         $steps = 20;
         $ramp = new Ramp(new Point(Setting::playerBoundingRadius(), 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Setting::moveDistancePerTick());
@@ -48,6 +47,31 @@ class WorldTest extends BaseTestCase
 
         $game->start();
         $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionImmutable()->y);
+    }
+
+    public function testStairCaseDown(): void
+    {
+        $steps = 20;
+        $startY = $steps * Setting::playerObstacleOvercomeHeight();
+        $ramp = new Ramp(
+            new Point(Setting::moveDistancePerTick() / -2, $startY, -2 * Setting::playerBoundingRadius()),
+            new Point2D(1, 0),
+            $steps,
+            250,
+            false,
+            Setting::moveDistancePerTick(),
+            Setting::playerObstacleOvercomeHeight()
+        );
+
+        $game = $this->createTestGame($steps);
+        $game->getWorld()->addRamp($ramp);
+        $player = $game->getPlayer(1);
+        $player->setPosition($player->getPositionImmutable()->addY($startY));
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
+
+        $game->start();
+        $this->assertNotSame(0, $player->getPositionImmutable()->y);
+        $this->assertPositionSame(new Point($steps * Setting::moveDistancePerTick(), Setting::playerObstacleOvercomeHeight(), 0), $player->getPositionImmutable());
     }
 
     public function testWallPenetration(): void

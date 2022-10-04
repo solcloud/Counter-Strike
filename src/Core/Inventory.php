@@ -134,6 +134,12 @@ class Inventory
     public function earnMoney(int $amount): void
     {
         $this->dollars += $amount;
+        if ($this->dollars < 0) {
+            $this->dollars = 0;
+        }
+        if ($this->dollars > 16000) {
+            $this->dollars = 16000;
+        }
     }
 
     /**

@@ -5,7 +5,9 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\Color;
 use cs\Event\Event;
+use cs\Interface\PlayerSerializableEvent;
 use cs\Traits\Player as PlayerTrait;
+use cs\Weapon\AmmoBasedWeapon;
 
 final class Player
 {
@@ -26,6 +28,8 @@ final class Player
     private array $eventsCache = [];
     /** @var Event[] */
     private array $events = [];
+    /** @var PlayerSerializableEvent[] */
+    private array $tickEvents = [];
 
     private int $health;
     private int $armor = 0;
@@ -94,11 +98,29 @@ final class Player
         $this->events[$eventId] = $event;
         $event->customId = $eventId;
         $event->onComplete[] = fn(Event $e) => $this->removeEvent($e->customId);
+        if ($event instanceof PlayerSerializableEvent) {
+            $event->onComplete[] = fn(Event $e) => $this->addTickEvent($event);
+        }
     }
 
     private function removeEvent(int $eventId): void
     {
         unset($this->events[$eventId]);
+    }
+
+    private function addTickEvent(PlayerSerializableEvent $event): void
+    {
+        $this->tickEvents[] = $event;
+    }
+
+    /**
+     * @return PlayerSerializableEvent[]
+     */
+    public function consumeTickEvents(): array
+    {
+        $events = $this->tickEvents;
+        $this->tickEvents = [];
+        return $events;
     }
 
     public function isAlive(): bool
@@ -180,6 +202,11 @@ final class Player
         return $this->inventory->getArmor();
     }
 
+    public function swapTeam(): void
+    {
+        $this->isPlayingOnAttackerSide = !$this->isPlayingOnAttackerSide;
+    }
+
     public function roundReset(): void
     {
         $this->resetTickStates();
@@ -214,11 +241,20 @@ final class Player
      */
     public function serialize(): array
     {
+        $ammo = null;
+        $ammoReserve = null;
+        $equippedItem = $this->getInventory()->getEquipped();
+        if ($equippedItem instanceof AmmoBasedWeapon) {
+            $ammo = $equippedItem->getAmmo();
+            $ammoReserve = $equippedItem->getAmmoReserve();
+        }
+
         return [
             "id"          => $this->getId(),
             "color"       => $this->getColor()->value,
             "money"       => $this->getInventory()->getDollars(),
-            "item"        => $this->getEquippedItem()->toArray(),
+            "item"        => $equippedItem->toArray(),
+            "canAttack"   => $equippedItem->canAttack($this->world->getTickId()),
             "slots"       => $this->getInventory()->getFilledSlots(),
             "health"      => $this->health,
             "position"    => $this->position->toArray(),
@@ -228,6 +264,9 @@ final class Player
             "heightBody"  => $this->getBodyHeight(),
             "height"      => $this->getHeadHeight(),
             "armor"       => $this->armor, //TODO
+            "ammo"        => $ammo,
+            "ammoReserve" => $ammoReserve,
+            "events"      => $this->consumeTickEvents(),
         ];
     }
 

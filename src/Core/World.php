@@ -2,6 +2,8 @@
 
 namespace cs\Core;
 
+use cs\Enum\SoundType;
+use cs\Event\SoundEvent;
 use cs\Interface\Hittable;
 use cs\Map\Map;
 
@@ -264,6 +266,17 @@ class World
         }
 
         return null;
+    }
+
+    public function bulletHit(Hittable $hit, Point $position): void
+    {
+        $soundEvent = new SoundEvent($position, SoundType::BULLET_HIT);
+        $soundEvent->setPlayer($hit->getPlayer());
+        if ($hit instanceof SolidSurface) {
+            $soundEvent->setSurface($hit);
+        }
+
+        $this->game->addSoundEvent($soundEvent);
     }
 
     public function isCollisionWithOtherPlayers(int $playerId, Point $point, int $radius, int $height): bool

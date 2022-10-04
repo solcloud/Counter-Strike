@@ -15,6 +15,7 @@ final class EventList
         GameStartEvent::class        => 6,
         RoundEndCoolDownEvent::class => 7,
         KillEvent::class             => 8,
+        SoundEvent::class            => 9,
     ];
 
 }

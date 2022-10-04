@@ -5,7 +5,7 @@ namespace cs\Core;
 class GameFactory
 {
 
-    public static function createDefault5v5Competitive(): Game
+    public static function createDefaultCompetitive(): Game
     {
         $properties = new GameProperty();
 

@@ -58,13 +58,14 @@ abstract class BaseTestCase extends BaseTest
             }
             $tickMax += $command;
         }
-        $game = $this->createOneRoundGame($tickMax, $gameProperties);
+        $game = $this->createTestGame($tickMax, GameProperty::fromArray($gameProperties));
         $this->playPlayer($game, $commands);
         return $game;
     }
 
     /**
      * @param array<string,int|string> $gameProperties
+     * @deprecated use createTestGame() instead, this only set playerBoundingRadius() to 0
      */
     protected function createOneRoundGame(int $tickMax = 1, array $gameProperties = []): TestGame
     {
@@ -109,6 +110,7 @@ abstract class BaseTestCase extends BaseTest
 
     /**
      * @param array<string,int|string> $gameProperties
+     * @deprecated rather use createTestGame() maybe
      */
     protected function createGame(array $gameProperties = []): TestGame
     {

@@ -22,7 +22,7 @@ $settings = new ServerSetting($playersMax);
 $logger->info("Starting server on '{$bindAddress}', waiting maximum of '{$settings->warmupWaitSec}' sec for '{$playersMax}' player" . ($playersMax > 1 ? 's' : '') . " to connect.");
 $net = new ClueSocket($bindAddress);
 
-$game = ($debug ? GameFactory::createDebug() : GameFactory::createDefault5v5Competitive());
+$game = ($debug ? GameFactory::createDebug() : GameFactory::createDefaultCompetitive());
 $game->loadMap(new DefaultMap());
 
 $server = new Server($game, $settings, $net);

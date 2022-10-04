@@ -25,7 +25,7 @@ class Ramp
             throw new GameException("Invalid direction given");
         }
 
-        $heightSum = $stepHeight;
+        $heightSum = $stairsGrowingUp ? $stepHeight : $stepHeight * $stepCount;
         if ($direction->x <> 0) {
             $depth = $stepWidth;
             $width = $stepDepth;
@@ -34,12 +34,12 @@ class Ramp
             $width = $stepWidth;
         }
 
-        $point = $lowerLeftPoint->clone();
+        $point = $stairsGrowingUp ? $lowerLeftPoint->clone() : $lowerLeftPoint->clone()->addY(-$heightSum);
         for ($step = 0; $step < $stepCount; $step++) {
             // todo use only walls and floors for fewer walls and floors or use box $sides param
             $this->boxes[] = new Box($point->clone(), $width, $heightSum, $depth);
 
-            $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight; // TODO fix going down
+            $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight;
             if ($direction->x <> 0) {
                 $point->addX(($direction->x > 0 ? 1 : -1) * $stepDepth);
             } else {

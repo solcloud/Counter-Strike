@@ -7,14 +7,13 @@ use cs\Interface\Hittable;
 
 final class AttackResult
 {
+    /** @var Hittable[] */
+    private array $hits = [];
     private int $moneyAward = 0;
 
     public function __construct(private Bullet $bullet)
     {
     }
-
-    /** @var Hittable[] */
-    private array $hits = [];
 
     public function addHit(Hittable $hit): void
     {

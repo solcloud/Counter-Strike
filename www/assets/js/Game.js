@@ -175,6 +175,8 @@ export class Game {
                 game.playerMe.health = playerState.health
                 game.playerMe.item = playerState.item
                 game.playerMe.slots = playerState.slots
+                game.playerMe.ammo = playerState.ammo
+                game.playerMe.ammoReserve = playerState.ammoReserve
             }
         })
 

@@ -96,6 +96,10 @@ export class EventProcessor {
             game.playerKilled(data.playerDead, data.playerCulprit, data.headshot, data.itemId)
         }
 
+        eventsCallback[EventList.SoundEvent] = function (data) {
+            // TODO HRTF https://threejs.org/docs/#api/en/audio/Audio https://threejs.org/examples/?q=audio#webaudio_orientation
+        }
+
         this.#callbacks = eventsCallback
     }
 }
