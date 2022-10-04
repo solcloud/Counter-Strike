@@ -38,9 +38,9 @@ class SoundEvent extends TickEvent
     {
         return [
             'position' => $this->position->toArray(),
-            'item'     => $this->item,
-            'player'   => $this->player,
-            'surface'  => $this->surface,
+            'item'     => $this->item?->getId(),
+            'player'   => $this->player?->getId(),
+            'surface'  => $this->surface?->getHitAntiForce(),
             'type'     => $this->type->value,
         ];
     }
