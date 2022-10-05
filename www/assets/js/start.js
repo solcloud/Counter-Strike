@@ -27,6 +27,7 @@ let launchGame
         }
 
         initialized = true
+        game.setLaunchSetting(setting)
         const canvas = await world.init(setting.map, setting.world)
         hud.createHud(elementHud)
         control.init(world.getCamera())

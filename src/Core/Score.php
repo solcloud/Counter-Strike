@@ -12,9 +12,17 @@ class Score
     private int $scoreDefenders = 0;
     private int $lossBonusAttackers = 0;
     private int $lossBonusDefenders = 0;
+    private ?int $halfTimeRoundNumber = null;
     private ?bool $lastRoundAttackerWins = null;
-    /** @var array<int,RoundEndEvent> */
-    private array $roundEndEvents = [];
+    /** @var array<int,mixed> */
+    private array $roundsHistory = [];
+
+    /**
+     * @param int[] $lossBonuses
+     */
+    public function __construct(private array $lossBonuses)
+    {
+    }
 
     public function swapTeams(): void
     {
@@ -25,14 +33,14 @@ class Score
         $this->lossBonusAttackers = 1;
         $this->lossBonusDefenders = 1;
         $this->lastRoundAttackerWins = null;
+        $this->halfTimeRoundNumber = $this->roundNumber;
     }
 
     public function roundEnd(RoundEndEvent $event): void
     {
-        $this->roundEndEvents[$this->roundNumber] = $event;
+        $this->roundNumber = $event->roundNumberEnded;
 
         $attackersWins = $event->attackersWins;
-        $this->roundNumber++;
         if ($attackersWins) {
             $this->scoreAttackers++;
         } else {
@@ -62,6 +70,12 @@ class Score
         }
 
         $this->lastRoundAttackerWins = $attackersWins;
+        $this->roundsHistory[$this->roundNumber] = [
+            'attackersWins'  => $attackersWins,
+            'reason'         => $event->reason->value,
+            'scoreAttackers' => $this->scoreAttackers,
+            'scoreDefenders' => $this->scoreDefenders,
+        ];
     }
 
     public function attackersIsWinning(): bool
@@ -95,6 +109,11 @@ class Score
         return $this->scoreDefenders;
     }
 
+    public function getMoneyLossBonus(bool $isAttacker): int
+    {
+        return $this->lossBonuses[min(count($this->lossBonuses) - 1, $this->getNumberOfLossRoundsInRow($isAttacker))];
+    }
+
     public function getNumberOfLossRoundsInRow(bool $isAttacker): int
     {
         if ($isAttacker) {
@@ -105,11 +124,18 @@ class Score
     }
 
     /**
-     * @return RoundEndEvent[]
+     * @return array<mixed>
      */
-    public function getRoundEndEvents(): array
+    public function toArray(): array
     {
-        return $this->roundEndEvents;
+        return [
+            'scoreAttackers'      => $this->scoreAttackers,
+            'scoreDefenders'      => $this->scoreDefenders,
+            'lossBonusAttackers'  => $this->getMoneyLossBonus(true),
+            'lossBonusDefenders'  => $this->getMoneyLossBonus(false),
+            'history'             => $this->roundsHistory,
+            'halfTimeRoundNumber' => $this->halfTimeRoundNumber,
+        ];
     }
 
 }

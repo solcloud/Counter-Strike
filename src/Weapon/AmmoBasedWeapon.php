@@ -135,4 +135,9 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         return InventorySlot::SLOT_SECONDARY;
     }
 
+    public function isReloading(): bool
+    {
+        return $this->reloading;
+    }
+
 }

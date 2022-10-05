@@ -19,6 +19,8 @@ class GameProperty
     public int $freeze_time_sec = 15;
     const ROUND_END_COOL_DOWN_SEC = 'round_end_cool_down_sec';
     public int $round_end_cool_down_sec = 4;
+    /** @var int[] */
+    public array $loss_bonuses = [1400, 1900, 2400, 2900, 3400];
 
 
     public function __set(string $name, mixed $value): void
@@ -45,7 +47,7 @@ class GameProperty
     }
 
     /**
-     * @return array<string,string|int|bool>
+     * @return array<string,string|int|bool|int[]>
      */
     public function toArray()
     {

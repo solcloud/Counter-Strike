@@ -32,8 +32,6 @@ class Game
     private array $events = [];
     /** @var Event[] */
     private array $tickEvents = [];
-    /** @var int[] */
-    private array $lossBonuses = [1400, 1900, 2400, 2900, 3400];
 
     private int $tick = 0;
     private int $eventId = 0;
@@ -50,7 +48,7 @@ class Game
     {
         $this->state = new GameState($this);
         $this->world = new World($this);
-        $this->score = new Score();
+        $this->score = new Score($properties->loss_bonuses);
         $this->properties = $properties;
 
         $this->initialize();
@@ -61,7 +59,6 @@ class Game
         $this->roundTickCount = Util::millisecondsToFrames($this->properties->round_time_ms);
         $this->startRoundFreezeTime = new PauseStartEvent(PauseReason::FREEZE_TIME, function (): void {
             $this->paused = false;
-            $this->bombPlanted = false;
             $this->addEvent(new PauseEndEvent());
             $this->addEvent(new RoundStartEvent($this->playersCountAttackers, $this->playersCountDefenders, function (): void {
                 $this->roundEndCoolDown = false;
@@ -287,6 +284,7 @@ class Game
             $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
             $player->setPosition($spawnPosition);
         }
+        $this->bombPlanted = false;
     }
 
     private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int
@@ -304,7 +302,7 @@ class Game
                     default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
                 };
             } elseif (!$player->isAlive()) {
-                $amount += $this->lossBonuses[min(4, $this->score->getNumberOfLossRoundsInRow(true))];
+                $amount += $this->score->getMoneyLossBonus(true);
             }
 
             return $amount;
@@ -318,7 +316,7 @@ class Game
                 default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
             };
         } else {
-            $amount += $this->lossBonuses[min(4, $this->score->getNumberOfLossRoundsInRow(false))];
+            $amount += $this->score->getMoneyLossBonus(false);
         }
 
         return $amount;

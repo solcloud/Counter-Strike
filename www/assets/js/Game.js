@@ -10,8 +10,10 @@ export class Game {
     #hud
     #stats
     #world
+    launchSetting
     eventProcessor
     score = {
+        history: [],
         attackers: 0,
         defenders: 0
     }
@@ -64,11 +66,12 @@ export class Game {
         this.#hud.roundStart(this.#options.setting.round_time_ms)
     }
 
-    roundEnd(attackersWins, round) {
+    roundEnd(attackersWins, newRoundNumber) {
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
-        this.#round = round
+        this.#round = newRoundNumber
         this.#hud.displayTopMessage(winner + ' wins')
+        this.#hud.updateRoundsHistory(this.score)
     }
 
     isPlaying() {
@@ -81,6 +84,10 @@ export class Game {
 
     onEnd(callback) {
         this.#endCallback = callback
+    }
+
+    setLaunchSetting(setting) {
+        this.launchSetting = setting
     }
 
     setOptions(options) {
@@ -136,12 +143,17 @@ export class Game {
         return this.players[id]
     }
 
+    attack() {
+        // TODO attack feedback (audiovisual)
+    }
+
     equip(slotId) {
         if (!this.playerMe.slots[slotId]) {
             return false
         }
 
-        this.#hud.equip(slotId)
+        this.#hud.equip(slotId, this.playerMe.slots)
+        this.playerMe.equippedSlot = slotId
         return true
     }
 
@@ -179,6 +191,10 @@ export class Game {
                 game.playerMe.slots = playerState.slots
                 game.playerMe.ammo = playerState.ammo
                 game.playerMe.ammoReserve = playerState.ammoReserve
+                game.playerMe.canAttack = playerState.canAttack
+                if (game.playerMe.item.slot !== game.playerMe.equippedSlot) {
+                    game.equip(game.playerMe.item.slot)
+                }
             }
         })
 

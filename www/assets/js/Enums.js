@@ -4,6 +4,7 @@ export {
     PauseReason,
     Color,
     ColorNames,
+    RoundEndReasonIcon,
 }
 
 // server/src/Event/EventList.php
@@ -55,4 +56,12 @@ const ColorNames = {
     3: 'Yellow',
     4: 'Purple',
     5: 'Orange',
+}
+
+// server/src/Enum/RoundEndReason.php
+const RoundEndReasonIcon = {
+    0: '☠',
+    1: '⏱',
+    2: '✂',
+    3: '💥',
 }

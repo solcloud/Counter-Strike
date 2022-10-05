@@ -7,8 +7,11 @@ use cs\Enum\RoundEndReason;
 
 final class RoundEndEvent extends TickEvent
 {
+    public readonly int $roundNumberEnded;
+
     public function __construct(private Game $game, public readonly bool $attackersWins, public readonly RoundEndReason $reason)
     {
+        $this->roundNumberEnded = $this->game->getRoundNumber();
         parent::__construct(function (): void {
             $this->game->endRound($this);
         });
@@ -17,10 +20,10 @@ final class RoundEndEvent extends TickEvent
     public function serialize(): array
     {
         return [
+            'roundNumber'    => $this->roundNumberEnded,
+            'newRoundNumber' => $this->game->getRoundNumber(),
             'attackersWins'  => $this->attackersWins,
-            'round'          => $this->game->getRoundNumber(),
-            'scoreAttackers' => $this->game->getScore()->getScoreAttackers(),
-            'scoreDefenders' => $this->game->getScore()->getScoreDefenders(),
+            'score'          => $this->game->getScore()->toArray(),
         ];
     }
 

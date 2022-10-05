@@ -79,9 +79,10 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.RoundEndEvent] = function (data) {
-            game.roundEnd(data.attackersWins, data.round)
-            game.score.attackers = data.scoreAttackers
-            game.score.defenders = data.scoreDefenders
+            game.score.attackers = data.score.scoreAttackers
+            game.score.defenders = data.score.scoreDefenders
+            game.score.history = data.score.history
+            game.roundEnd(data.attackersWins, data.newRoundNumber)
         }
 
         eventsCallback[EventList.GameStartEvent] = function (options) {

@@ -19,11 +19,12 @@ export class Control {
         let jumping = false
         let crouching = false
         let standing = false
-        let shoot = false
+        let attack = false
         let shifting = false
         let running = false
         let reload = false
         let equip = false
+        let drop = false
 
         const game = this.#game
         const hud = this.#hud
@@ -32,18 +33,19 @@ export class Control {
 
         document.addEventListener("click", function (event) {
             event.preventDefault()
-            if (!game.playerIsAlive()) {
+            if (!(game.isPlaying() && game.playerIsAlive())) {
                 return
             }
 
-            if (pointer.isLocked) {
-                shoot = true
+            if (pointer.isLocked && game.playerMe.canAttack) {
+                attack = true
                 let lookAt = threeHorizontalRotationToServer(pointer.getObject().rotation)
                 shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
+                game.attack()
             }
         })
         document.addEventListener('wheel', (event) => {
-            if (!game.playerIsAlive()) {
+            if (!(game.isPlaying() && game.playerIsAlive())) {
                 return
             }
 
@@ -62,7 +64,7 @@ export class Control {
                     break;
             }
 
-            if (!game.playerIsAlive()) {
+            if (!(game.isPlaying() && game.playerIsAlive())) {
                 return
             }
 
@@ -78,6 +80,9 @@ export class Control {
                     break;
                 case 'KeyD':
                     moveRight = true;
+                    break;
+                case 'KeyG':
+                    drop = true;
                     break;
                 case 'Space':
                     jumping = true;
@@ -103,7 +108,7 @@ export class Control {
                     break;
             }
 
-            if (!game.playerIsAlive()) {
+            if (!(game.isPlaying() && game.playerIsAlive())) {
                 return
             }
 
@@ -184,20 +189,22 @@ export class Control {
                 serverAction.push('reload')
                 reload = false
             }
+            if (drop) {
+                serverAction.push('drop')
+                drop = false
+            }
             if (equip !== false) {
-                if (game.equip(equip)) {
-                    serverAction.push('equip ' + equip)
-                }
+                serverAction.push('equip ' + equip)
                 equip = false
             }
 
-            let horizontal, vertical
-            [horizontal, vertical] = threeHorizontalRotationToServer(pointer.getObject().rotation)
-            if (shoot) {
+            if (attack) {
                 serverAction.push(shootLookAt)
                 serverAction.push('attack')
-                shoot = false
+                attack = false
             } else {
+                let horizontal, vertical
+                [horizontal, vertical] = threeHorizontalRotationToServer(pointer.getObject().rotation)
                 let action = `lookAt ${horizontal} ${vertical}`
                 if (lastLookAt !== action) {
                     serverAction.push(action)

@@ -67,6 +67,11 @@
     color: white;
 }
 
+#hud #scoreboard table {
+    width: 100%;
+    border: 0;
+}
+
 #hud .radar {
     margin-bottom: 2rem;
 }

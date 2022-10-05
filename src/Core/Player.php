@@ -222,10 +222,12 @@ final class Player
     {
         $ammo = null;
         $ammoReserve = null;
+        $reloading = false;
         $equippedItem = $this->getInventory()->getEquipped();
         if ($equippedItem instanceof AmmoBasedWeapon) {
             $ammo = $equippedItem->getAmmo();
             $ammoReserve = $equippedItem->getAmmoReserve();
+            $reloading = $equippedItem->isReloading();
         }
 
         return [
@@ -245,6 +247,7 @@ final class Player
             "armor"       => $this->armor, //TODO
             "ammo"        => $ammo,
             "ammoReserve" => $ammoReserve,
+            "isReloading" => $reloading,
         ];
     }
 

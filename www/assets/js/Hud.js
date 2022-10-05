@@ -11,6 +11,7 @@ export class HUD {
     }
     #elements = {
         score: null,
+        scoreDetail: null,
         equippedItem: null,
         slotModel: null,
         inventory: null,
@@ -48,6 +49,66 @@ export class HUD {
 
     toggleScore() {
         this.#setting.showScore = !this.#setting.showScore
+    }
+
+    updateRoundsHistory(score) {
+        const game = this.#game;
+        //game.players.forEach(function (player) {})
+        const template = `
+            <div>
+                <table>
+                    <tr>
+                        <td>15</td>
+                        <td>
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th>Bomb/Kit</th>
+                                    <th>Player name</th>
+                                    <th>Money</th>
+                                    <th>Kills</th>
+                                    <th>Deaths</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr>
+                        <td>
+                            <table>
+                                <td>
+                                    10<br>
+                                    1st half<br>
+                                    5
+                                </td>
+                                <td>
+                                    5<br>
+                                    2nd half<br>
+                                    2
+                                </td>
+                            </table>
+                        </td>
+                        <td>
+                            🏆
+                        </td>
+                        <td>
+                            $ 3400 <br>
+                            Loss Bonus<br>
+                            $ 1200
+                        </td>
+                    </tr>
+                </table>
+            </div>`;
+        this.#elements.scoreDetail.innerHTML = template
     }
 
     bombPlanted() {
@@ -140,10 +201,13 @@ export class HUD {
         this.#messages.bottom = ''
     }
 
-    equip(slotId) {
+    equip(slotId, availableSlots) {
         this.#elements.slotModel.src = `/resources/slot_${slotId}.png`
         this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
-            node.classList.remove('highlight')
+            node.classList.remove('highlight', 'hidden')
+            if (!availableSlots[node.dataset.slot]) {
+                node.classList.add('hidden')
+            }
         })
         this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
     }
@@ -180,11 +244,14 @@ export class HUD {
             throw new Error("HUD already created")
         }
 
+        const game = this.#game
         elementHud.innerHTML = `
         <div id="cross">✛</div>
         <div id="equipped-item"><img src="/resources/slot_2.png"></div>
         <div id="scoreboard" class="hidden">
-            scoreboard: (kill, assist, death, hs %, money, name, MVP, score, K/D, ADDR, UD, EF)
+            <p>Competitive | Map: ${game.launchSetting.map}</p>
+            <hr>
+            <div id="scoreboard-detail"></div>
         </div>
         <div id="buy-menu" class="hidden">
              BuyMenu weapon stats (ammo, kill award ($), damage, fire rate, recoil control, accurate range, armor penetration) and each hit box damage
@@ -230,12 +297,12 @@ export class HUD {
                 </div>
                 <div class="inventory">
                     <p data-slot="0">Knife  [q]</p>
-                    <p data-slot="1">Primary  [1]</p>
+                    <p class="hidden" data-slot="1">Primary [1]</p>
                     <p class="highlight" data-slot="2">Secondary [2]</p>
+                    <p class="hidden" data-slot="3">Bomb [5]</p>
                 </div>
                 <div>
                     <span data-ammo class="ammo bg">
-                    12 / 24
                     </span>
                 </div>
             </div>
@@ -243,6 +310,7 @@ export class HUD {
     `;
 
         this.#elements.score = elementHud.querySelector('#scoreboard')
+        this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img')
         this.#elements.inventory = elementHud.querySelector('.inventory')
