@@ -2,10 +2,9 @@
 
 namespace Test\Movement;
 
-use cs\Core\Setting;
 use cs\Core\GameState;
-use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use Test\BaseTestCase;
 
 class SimpleMovementTest extends BaseTestCase

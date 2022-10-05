@@ -2,11 +2,11 @@
 
 namespace Test\Shooting;
 
-use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\HitBox;
 use cs\Core\Player;
+use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;

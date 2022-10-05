@@ -2,8 +2,8 @@
 
 namespace cs\Map;
 
-use cs\Core\Setting;
 use cs\Core\Point;
+use cs\Core\Setting;
 
 class TestMap extends Map
 {

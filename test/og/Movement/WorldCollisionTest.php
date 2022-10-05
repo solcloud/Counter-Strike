@@ -2,12 +2,12 @@
 
 namespace Test\Movement;
 
-use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\Color;
 use Test\BaseTestCase;
@@ -28,8 +28,8 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerCollisionWithBox(): void
     {
         $game = $this->createTestGame(3);
-        $game->getWorld()->addBox(new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(),
-        Setting::playerHeadHeightStand(), 1));
+        $box = new Box((new Point())->setZ(Setting::playerBoundingRadius() + 1), 10 * Setting::moveDistancePerTick(), Setting::playerHeadHeightStand(), 1);
+        $game->getWorld()->addBox($box);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
         $this->assertPlayerPosition($game, new Point());

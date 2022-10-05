@@ -2,11 +2,11 @@
 
 namespace Test\Shooting;
 
-use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Event\AttackResult;

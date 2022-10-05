@@ -13,6 +13,7 @@ class TestConnector implements NetConnector
     private array $requests;
     /** @var string[] */
     private array $responses = [];
+    private bool $expectReceive = true;
 
     /**
      * @param string[] $requests
@@ -24,16 +25,23 @@ class TestConnector implements NetConnector
 
     public function receive(string &$peerAddress, int $blockTimeoutMicroSeconds, int $readMaxBytes = 100): ?string
     {
+        if (!$this->expectReceive) {
+            return null;
+        }
+
         $peerAddress = 'test:1234';
         $request = ($this->requests[$this->iterator++] ?? null);
         if ($request === null) {
             $this->close();
         }
+
+        $this->expectReceive = false;
         return $request;
     }
 
     public function sendTo(Client $client, string $msg): bool
     {
+        $this->expectReceive = true;
         $this->responses[] = $msg;
         return true;
     }

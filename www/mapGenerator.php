@@ -1,7 +1,6 @@
 <?php
 
 use cs\Core\Setting;
-use cs\Core\Player;
 use cs\Map;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -45,12 +44,12 @@ foreach ($map->getBoxes() as $box) {
 </div>
 <script>
     let camera, scene, renderer, controls;
-    const worldMaterial = new THREE.MeshPhongMaterial({color: 0x9f998e})
-    const material = new THREE.MeshPhongMaterial({color: 0x664b17})
+    const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
+    const material = new THREE.MeshLambertMaterial({color: 0x664b17})
 
     function init() {
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 9999);
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
         camera.position.y = 4000
 
         renderer = new THREE.WebGLRenderer({antialias: true});
@@ -99,6 +98,7 @@ foreach ($map->getBoxes() as $box) {
                 center = new THREE.Group()
                 center.name = "center"
                 center.position.set(box.width / 2, box.height / 2, box.depth / -2)
+                center.visible = false
                 map.add(center)
                 camera.position.x = center.position.x;
                 camera.position.z = center.position.z;

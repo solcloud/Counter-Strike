@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Test;
 
 use Closure;
-use cs\Core\Setting;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
+use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Map\TestMap;
@@ -18,29 +18,26 @@ use ReflectionProperty;
 abstract class BaseTestCase extends BaseTest
 {
     private int $testTickRateMs = 10;
-    /** @var int[] */
+    /** @var array<string,int|float> */
     private array $defaultTestAction = [
-        'moveOneMs'                     => 5,
-        'moveWalkOneMs'                 => 4,
-        'moveCrouchOneMs'               => 3,
-        'fallAmountOneMs'               => 6,
-        'crouchDurationMs'              => 100,
-        'jumpDurationMs'                => 50,
-        'jumpMovementSpeedMultiplier'   => 100,
-        'flyingMovementSpeedMultiplier' => 80,
+        'moveOneMs'                    => 5,
+        'moveWalkOneMs'                => 4,
+        'moveCrouchOneMs'              => 3,
+        'fallAmountOneMs'              => 6,
+        'crouchDurationMs'             => 40,
+        'jumpDurationMs'               => 50,
         // NOTE: Better to use even numbers for player const
-        'playerHeadRadius'              => 30,
-        'playerBoundingRadius'          => 44,
-        'playerJumpHeight'              => 150,
-        'playerHeadHeightStand'         => 190,
-        'playerHeadHeightCrouch'        => 140,
-        'playerObstacleOvercomeHeight'  => 20,
-        'playerFallDamageThreshold'     => 570,
+        'playerHeadRadius'             => 30,
+        'playerBoundingRadius'         => 44,
+        'playerJumpHeight'             => 150,
+        'playerHeadHeightStand'        => 190,
+        'playerHeadHeightCrouch'       => 140,
+        'playerObstacleOvercomeHeight' => 20,
+        'playerFallDamageThreshold'    => 570,
     ];
 
-    public function __construct()
+    protected function setUp(): void
     {
-        parent::__construct(...func_get_args());
         Util::$TICK_RATE = $this->testTickRateMs;
         Setting::loadConstants($this->defaultTestAction);
     }

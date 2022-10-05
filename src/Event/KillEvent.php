@@ -8,10 +8,10 @@ final class KillEvent extends TickEvent
 {
 
     public function __construct(
-        private Player  $playerDead,
+        private Player $playerDead,
         private Player $playerCulprit,
-        private string  $attackItemId,
-        private bool    $headShot,
+        private string $attackItemId,
+        private bool   $headShot,
     )
     {
     }

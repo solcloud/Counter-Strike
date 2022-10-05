@@ -2,12 +2,12 @@
 
 namespace Test\Simulation;
 
-use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Map\TestMap;

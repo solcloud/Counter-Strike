@@ -5,16 +5,16 @@ namespace cs\Core;
 final class Setting
 {
 
-    /** @var array<string,int> */
+    /** @var array<string,int|float> */
     public const defaultConstant = [
-        'moveOneMs'                     => 3,
-        'moveWalkOneMs'                 => 2,
-        'moveCrouchOneMs'               => 1,
-        'fallAmountOneMs'               => 4,
-        'crouchDurationMs'              => 300,
-        'jumpDurationMs'                => 500,
-        'jumpMovementSpeedMultiplier'   => 100,
-        'flyingMovementSpeedMultiplier' => 80,
+        'moveOneMs'                     => 0.9,
+        'moveWalkOneMs'                 => 0.7,
+        'moveCrouchOneMs'               => 0.5,
+        'fallAmountOneMs'               => 2,
+        'crouchDurationMs'              => 250,
+        'jumpDurationMs'                => 380,
+        'jumpMovementSpeedMultiplier'   => 1.0,
+        'flyingMovementSpeedMultiplier' => 0.8,
 
         'playerHeadRadius'             => 30,
         'playerBoundingRadius'         => 44,
@@ -25,7 +25,7 @@ final class Setting
         'playerFallDamageThreshold'    => 570,
     ];
 
-    /** @var array<string,int> */
+    /** @var array<string,int|float> */
     private static array $data = self::defaultConstant;
 
     /** @var array<string,int> */
@@ -34,7 +34,7 @@ final class Setting
     private static array $cacheFloat = [];
 
     /**
-     * @param array<string,int> $constants
+     * @param array<string,int|float> $constants
      */
     public static function loadConstants(array $constants): void
     {
@@ -51,6 +51,13 @@ final class Setting
     private static function fixBackwardCompatible(array &$constants): void
     {
         // BC code
+        foreach (self::defaultConstant as $key => $defaultValue) {
+            if (isset($constants[$key])) {
+                continue;
+            }
+
+            $constants[$key] = $defaultValue;
+        }
     }
 
     public static function tickCountCrouch(): int
@@ -120,7 +127,7 @@ final class Setting
     public static function jumpMovementSpeedMultiplier(): float
     {
         if (!isset(self::$cacheFloat['jumpMovementSpeedMultiplier'])) {
-            self::$cacheFloat['jumpMovementSpeedMultiplier'] = self::$data['jumpMovementSpeedMultiplier'] / 100;
+            self::$cacheFloat['jumpMovementSpeedMultiplier'] = self::$data['jumpMovementSpeedMultiplier'];
         }
         return self::$cacheFloat['jumpMovementSpeedMultiplier'];
     }
@@ -128,7 +135,7 @@ final class Setting
     public static function flyingMovementSpeedMultiplier(): float
     {
         if (!isset(self::$cacheFloat['flyingMovementSpeedMultiplier'])) {
-            self::$cacheFloat['flyingMovementSpeedMultiplier'] = self::$data['flyingMovementSpeedMultiplier'] / 100;
+            self::$cacheFloat['flyingMovementSpeedMultiplier'] = self::$data['flyingMovementSpeedMultiplier'];
         }
         return self::$cacheFloat['flyingMovementSpeedMultiplier'];
     }
@@ -136,7 +143,7 @@ final class Setting
     public static function getWeaponPrimarySpeedMultiplier(string $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"])) {
-            self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"] = (self::$data["weaponPrimarySpeedMultiplier-{$itemId}"] ?? 60) / 100;
+            self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"] = (self::$data["weaponPrimarySpeedMultiplier-{$itemId}"] ?? 0.6);
         }
         return self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"];
     }
@@ -144,48 +151,48 @@ final class Setting
     public static function getWeaponSecondarySpeedMultiplier(string $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"])) {
-            self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = (self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 80) / 100;
+            self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = (self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 0.8);
         }
         return self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"];
     }
 
     public static function playerHeadRadius(): int
     {
-        return self::$data['playerHeadRadius'];
+        return self::$data['playerHeadRadius']; // @phpstan-ignore-line
     }
 
     public static function playerBoundingRadius(): int
     {
-        return self::$data['playerBoundingRadius'];
+        return self::$data['playerBoundingRadius']; // @phpstan-ignore-line
     }
 
     public static function playerJumpHeight(): int
     {
-        return self::$data['playerJumpHeight'];
+        return self::$data['playerJumpHeight']; // @phpstan-ignore-line
     }
 
     public static function playerHeadHeightStand(): int
     {
-        return self::$data['playerHeadHeightStand'];
+        return self::$data['playerHeadHeightStand']; // @phpstan-ignore-line
     }
 
     public static function playerHeadHeightCrouch(): int
     {
-        return self::$data['playerHeadHeightCrouch'];
+        return self::$data['playerHeadHeightCrouch']; // @phpstan-ignore-line
     }
 
     public static function playerObstacleOvercomeHeight(): int
     {
-        return self::$data['playerObstacleOvercomeHeight'];
+        return self::$data['playerObstacleOvercomeHeight']; // @phpstan-ignore-line
     }
 
     public static function playerFallDamageThreshold(): int
     {
-        return self::$data['playerFallDamageThreshold'];
+        return self::$data['playerFallDamageThreshold']; // @phpstan-ignore-line
     }
 
     /**
-     * @return int[]
+     * @return array<string,int|float>
      */
     public static function getDataArray(): array
     {

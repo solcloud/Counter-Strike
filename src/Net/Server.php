@@ -2,10 +2,10 @@
 
 namespace cs\Net;
 
-use cs\Core\Setting;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\Player;
+use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Enum\GameOverReason;
@@ -119,6 +119,9 @@ class Server
                 $sleepTimeUs = $this->tickMicrosecond - $delta - 100;
                 usleep($sleepTimeUs);
             } else {
+                if ($this->serverLag === 0) {
+                    $this->log("First Server tick lag detected on tick '{$tickId}'", LogLevel::WARNING);
+                }
                 $this->serverLag++;
             }
             $usLast = $usCurrent + $sleepTimeUs;
@@ -153,14 +156,13 @@ class Server
 
             if (isset($this->loggedPlayers["{$address}-{$port}"])) {
                 $playerId = $this->loggedPlayers["{$address}-{$port}"];
-                if (!isset($playersRequest[$playerId])) {
+                if (isset($playersRequest[$playerId])) {
+                    $this->log("Player '{$playerId}' sending requests too fast (or server slow), dropping", LogLevel::WARNING);
+                } else {
                     $playersRequest[$playerId] = 1;
                     if ($this->game->getPlayer($playerId)->isAlive()) {
                         $this->parseClientRequest($playerId, $msg);
                     }
-                }
-                if (count($playersRequest) === $this->setting->playersMax) {
-                    break;
                 }
             } else {
                 $this->playerBlock($address);

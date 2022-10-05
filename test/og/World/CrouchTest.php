@@ -2,9 +2,9 @@
 
 namespace Test\World;
 
-use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Player;
+use cs\Core\Setting;
 use Test\BaseTestCase;
 
 class CrouchTest extends BaseTestCase

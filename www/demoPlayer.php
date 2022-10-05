@@ -1,7 +1,6 @@
 <?php
 
 use cs\Core\Setting;
-use cs\Core\Player;
 
 if (getenv('DEVTOKEN') !== 'dev') {
     exit;
@@ -81,9 +80,9 @@ $frameIdEnd = null;
         <button onclick="driver.goToFrame(<?= $frameIdEnd ?>)">Go to End</button>
         &nbsp;
         Speed: <span id="speedLimit"></span>ms</span>
-        <button onclick="driver.changeSpeed(50)">Slower</button>
+        <button onclick="driver.changeSpeed(10)">Slower</button>
         <button onclick="driver.changeSpeed()">Default</button>
-        <button onclick="driver.changeSpeed(-50)">Faster</button>
+        <button onclick="driver.changeSpeed(-10)">Faster</button>
     </div>
     <div class="progress">
         <input type="range" id="progress" min="0" value="0" max="<?= $frameIdEnd ?>">
@@ -200,7 +199,7 @@ $frameIdEnd = null;
                     self.players[playerState.id] = player
                 }
 
-                console.debug(frameId, playerState.position)
+                console.debug(frameId, playerState.id, playerState.position)
                 player.getObjectByName('head').position.y = playerState.heightSight
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
             })
@@ -211,7 +210,7 @@ $frameIdEnd = null;
 
         const driver = {
             frameId: <?= $frameIdStart ?>,
-            defaultAnimationSpeedMs: 250,
+            defaultAnimationSpeedMs: 100,
             getFrameId: function () {
                 return this.frameId;
             }
@@ -269,7 +268,7 @@ $frameIdEnd = null;
 
         driver.pause = function () {
             clearInterval(animationId);
-            animationId = undefined;
+            animationId = null;
         }
 
         driver.changeSpeed = function (speedDelta) {
@@ -278,6 +277,7 @@ $frameIdEnd = null;
             } else {
                 animationSpeed += speedDelta;
             }
+            animationSpeed = Math.max(1, animationSpeed);
 
             speedLimitCaption.innerText = animationSpeed;
             driver.pause();
@@ -290,10 +290,11 @@ $frameIdEnd = null;
     renderer.initialize(JSON.parse('<?= json_encode($data['floors']) ?>'), JSON.parse('<?= json_encode($data['walls']) ?>'))
     window.driver = createDriver(renderer)
     document.getElementById('progress').addEventListener('input', function () {
-        if (driver.getFrameId() === this.value) {
+        const value = parseInt(this.value)
+        if (driver.getFrameId() === value) {
             return
         }
-        driver.goToFrame(this.value)
+        driver.goToFrame(value)
     })
     driver.goToFrame(0)
 

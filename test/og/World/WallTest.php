@@ -2,13 +2,13 @@
 
 namespace Test\World;
 
-use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Game;
 use cs\Core\GameState;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
+use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
 use Test\BaseTestCase;

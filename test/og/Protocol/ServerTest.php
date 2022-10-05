@@ -2,11 +2,10 @@
 
 namespace Test\Protocol;
 
-use cs\Core\Setting;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\GameFactory;
-use cs\Core\Player;
+use cs\Core\Setting;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Molotov;

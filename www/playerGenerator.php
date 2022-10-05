@@ -1,10 +1,10 @@
 <?php
 
-use cs\Core\Setting;
 use cs\Core\Game;
 use cs\Core\Player;
 use cs\Core\PlayerCollider;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
 use cs\HitGeometry\SphereGroupHitBox;

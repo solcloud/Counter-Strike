@@ -17,7 +17,7 @@ final class PauseStartEvent extends TimeoutEvent
     {
         return [
             'reason' => $this->reason->value,
-            'ms'   => $this->timeoutMs,
+            'ms'     => $this->timeoutMs,
         ];
     }
 

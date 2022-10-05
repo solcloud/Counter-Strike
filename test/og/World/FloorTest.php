@@ -2,11 +2,11 @@
 
 namespace Test\World;
 
-use cs\Core\Setting;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
 use cs\Core\Point;
+use cs\Core\Setting;
 use Test\BaseTestCase;
 
 class FloorTest extends BaseTestCase

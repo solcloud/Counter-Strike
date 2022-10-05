@@ -2,12 +2,11 @@
 
 namespace cs\Map;
 
-use cs\Core\Setting;
 use cs\Core\Box;
-use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
+use cs\Core\Setting;
 
 class DefaultMap extends BoxMap
 {

@@ -3,10 +3,10 @@
 namespace Test\Movement;
 
 use Closure;
-use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use Test\BaseTestCase;
 
 class MouseAngleTest extends BaseTestCase

@@ -3,6 +3,7 @@ import {HUD} from "./Hud.js";
 import {Control} from "./Control.js";
 import {World} from "./World.js";
 import {WebSocketConnector} from "./WebSocketConnector.js";
+import Stats from "./Stats.js";
 
 let launchGame
 (function () {
@@ -12,7 +13,8 @@ let launchGame
     let initialized = false
     const world = new World()
     const hud = new HUD()
-    const game = new Game(world, hud);
+    const stats = new Stats();
+    const game = new Game(world, hud, stats);
     const control = new Control(game, hud)
     hud.setGame(game)
 
@@ -30,6 +32,7 @@ let launchGame
         control.init(world.getCamera())
         document.addEventListener("click", () => control.requestLock())
         canvasParent.appendChild(canvas)
+        canvasParent.appendChild(stats.dom);
 
         let connector = new WebSocketConnector(game)
         game.onEnd(function (msg) {

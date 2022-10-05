@@ -31,7 +31,7 @@ while (true) {
         break;
     }
     $request = trim($request);
-    while ($socket->selectRead()) {// drain socket
+    while ($socket->selectRead()) { // drain socket
         $socket->read(10241024);
     }
     if ($request !== '') {

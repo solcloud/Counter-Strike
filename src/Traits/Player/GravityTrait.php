@@ -2,9 +2,9 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Setting;
 use cs\Core\Floor;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Event\PlayerGravityEvent;
 
 trait GravityTrait

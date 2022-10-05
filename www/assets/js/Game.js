@@ -8,6 +8,7 @@ export class Game {
     #readyCallback
     #endCallback
     #hud
+    #stats
     #world
     eventProcessor
     score = {
@@ -21,9 +22,10 @@ export class Game {
     players = []
     playerMe = {}
 
-    constructor(world, hud) {
+    constructor(world, hud, stats) {
         this.#world = world
         this.#hud = hud
+        this.#stats = stats
         this.eventProcessor = new EventProcessor(this)
     }
 
@@ -193,7 +195,9 @@ export class Game {
     }
 
     render() {
+        this.#stats.begin()
         this.#hud.updateHud(this.playerMe)
         this.#world.render()
+        this.#stats.end()
     }
 }

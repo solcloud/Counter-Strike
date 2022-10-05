@@ -50,8 +50,8 @@ abstract class Plane extends SolidSurface
     {
         return [
             's' => $this->start->toArray(),
-            'e'   => $this->end->toArray(),
-            'p'  => $this->axis2d,
+            'e' => $this->end->toArray(),
+            'p' => $this->axis2d,
         ];
     }
 
