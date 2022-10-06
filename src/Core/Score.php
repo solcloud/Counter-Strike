@@ -16,6 +16,12 @@ class Score
     private ?bool $lastRoundAttackerWins = null;
     /** @var array<int,mixed> */
     private array $roundsHistory = [];
+    /** @var array<int,PlayerStat> */
+    private array $playerStats = [];
+    /** @var int[] */
+    private array $firstHalfScore = [];
+    /** @var int[] */
+    private array $secondHalfScore = [];
 
     /**
      * @param int[] $lossBonuses
@@ -24,8 +30,17 @@ class Score
     {
     }
 
+    public function addPlayer(Player $player): void
+    {
+        $this->playerStats[$player->getId()] = new PlayerStat($player);
+    }
+
     public function swapTeams(): void
     {
+        $this->firstHalfScore = [$this->scoreDefenders, $this->scoreAttackers];
+        $this->halfTimeRoundNumber = $this->roundNumber;
+        $this->secondHalfScore = [0, 0];
+
         $attackerScore = $this->scoreAttackers;
         $this->scoreAttackers = $this->scoreDefenders;
         $this->scoreDefenders = $attackerScore;
@@ -33,7 +48,6 @@ class Score
         $this->lossBonusAttackers = 1;
         $this->lossBonusDefenders = 1;
         $this->lastRoundAttackerWins = null;
-        $this->halfTimeRoundNumber = $this->roundNumber;
     }
 
     public function roundEnd(RoundEndEvent $event): void
@@ -69,6 +83,9 @@ class Score
             }
         }
 
+        if ($this->secondHalfScore !== []) {
+            $this->secondHalfScore[(int)$attackersWins]++;
+        }
         $this->lastRoundAttackerWins = $attackersWins;
         $this->roundsHistory[$this->roundNumber] = [
             'attackersWins'  => $attackersWins,
@@ -123,18 +140,34 @@ class Score
         return $this->lossBonusDefenders;
     }
 
+    public function getPlayerStat(int $playerId): PlayerStat
+    {
+        return $this->playerStats[$playerId];
+    }
+
     /**
      * @return array<mixed>
      */
     public function toArray(): array
     {
+        $scoreboard = [[],[]];
+        foreach ($this->playerStats as $playerId => $playerStat) {
+            $key = sprintf('%d-%d', $playerStat->getKills(), $playerId);
+            $scoreboard[(int)$playerStat->isAttacker()][$key] = $playerStat->toArray();
+        }
+        $teamDefenders = $scoreboard[0];
+        $teamAttackers = $scoreboard[1];
+        krsort($teamDefenders, SORT_NATURAL);
+        krsort($teamAttackers, SORT_NATURAL);
+
         return [
-            'scoreAttackers'      => $this->scoreAttackers,
-            'scoreDefenders'      => $this->scoreDefenders,
-            'lossBonusAttackers'  => $this->getMoneyLossBonus(true),
-            'lossBonusDefenders'  => $this->getMoneyLossBonus(false),
+            'score'               => [$this->scoreDefenders, $this->scoreAttackers],
+            'lossBonus'           => [$this->getMoneyLossBonus(false), $this->getMoneyLossBonus(true)],
             'history'             => $this->roundsHistory,
+            'firstHalfScore'      => ($this->firstHalfScore === []) ? [$this->scoreDefenders, $this->scoreAttackers] : $this->firstHalfScore,
+            'secondHalfScore'     => $this->secondHalfScore,
             'halfTimeRoundNumber' => $this->halfTimeRoundNumber,
+            'scoreboard'          => [array_values($teamDefenders), array_values($teamAttackers)],
         ];
     }
 

@@ -54,7 +54,7 @@ export class WebSocketConnector {
         const socket = this.#socket
 
         this.sendIntervalId = setInterval(function () {
-            if (game.isPlaying() && game.playerIsAlive()) {
+            if (game.isPlaying() && game.meIsAlive()) {
                 socket.send(control.getTickAction())
                 return
             }

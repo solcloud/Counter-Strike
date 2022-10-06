@@ -51,91 +51,148 @@ export class HUD {
         this.#setting.showScore = !this.#setting.showScore
     }
 
-    updateRoundsHistory(score) {
-        const game = this.#game;
-        //game.players.forEach(function (player) {})
-        const template = `
-            <div>
-                <table>
-                    <tr>
-                        <td>15</td>
-                        <td>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Bomb/Kit</th>
-                                    <th>Player name</th>
-                                    <th>Money</th>
-                                    <th>Kills</th>
-                                    <th>Deaths</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div>
-                <table>
-                    <tr>
-                        <td>
-                            <table>
-                                <td>
-                                    10<br>
-                                    1st half<br>
-                                    5
-                                </td>
-                                <td>
-                                    5<br>
-                                    2nd half<br>
-                                    2
-                                </td>
-                            </table>
-                        </td>
-                        <td>
-                            🏆
-                        </td>
-                        <td>
-                            $ 3400 <br>
-                            Loss Bonus<br>
-                            $ 1200
-                        </td>
-                    </tr>
-                </table>
-            </div>`;
-        this.#elements.scoreDetail.innerHTML = template
+    #renderRoundsHistory(history, halfTimeRoundNumber, meIsAttacker) {
+        let template = ''
+        if (halfTimeRoundNumber === null) {
+            halfTimeRoundNumber = -1
+        }
+
+        for (let [roundNumber, data] of Object.entries(history)) {
+            roundNumber = parseInt(roundNumber)
+            let iWasAttacker = meIsAttacker
+            if (roundNumber < halfTimeRoundNumber) {
+                iWasAttacker = !meIsAttacker
+            }
+
+            if (roundNumber === halfTimeRoundNumber) {
+                template += '<div class="round-number">|</div>'
+            }
+            const myTeamWonThatRound = (iWasAttacker === data.attackersWins)
+            const direction = (myTeamWonThatRound ? 'round-win-my-team' : 'round-win-other-team')
+            template += `<div class="round-number">
+                <span class="${direction} round-win-${data.attackersWins ? '1' : '0'}">
+                ${Enum.RoundEndReasonIcon[data.reason]}
+                </span>
+                <div>${roundNumber % 5 === 0 ? roundNumber : ''}</div>
+            </div>`
+        }
+        return template
+    }
+
+    #renderPlayerStats(scoreBoardData, players, statsForOtherTeam) {
+        const hud = this
+        let playerTable = '';
+        scoreBoardData.forEach(function (row) {
+            const player = players[row['id']].data
+            playerTable += `
+            <tr ${player.health > 0 ? '' : 'class="player-dead"'}>
+                <td>${hud.#getPlayerName(player, hud.#game.playerMe.data)}</td>
+                <td>${statsForOtherTeam ? '' : `${player.money}`}</td>
+                <td>${row.kills}</td>
+                <td>${row.deaths}</td>
+            </tr>
+            `;
+        })
+        return `
+        <table class="player-stats ${statsForOtherTeam ? 'team-other' : 'team-my'}">
+            <thead>
+            <tr>
+                <th style="width:60%">Player name</th>
+                <th style="width:20%">Money</th>
+                <th style="width:10%">Kills</th>
+                <th style="width:10%">Deaths</th>
+            </tr>
+            </thead>
+            <tbody>
+            ${playerTable}
+            </tbody>
+        </table>
+        `;
+    }
+
+    updateRoundsHistory(scoreObject) {
+        const game = this.#game
+        const meIsAttacker = game.playerMe.isAttacker()
+        const myTeam = (meIsAttacker ? 'Attackers' : 'Defenders')
+        const opponentTeam = (meIsAttacker ? 'Defenders' : 'Attackers')
+        const myTeamIndex = game.playerMe.getTeamIndex()
+        const otherTeamIndex = game.playerMe.getOtherTeamIndex()
+
+        this.#elements.scoreDetail.innerHTML = `
+        <div>
+            <table>
+                <tr>
+                    <td class="score-my color-me">${scoreObject.score[myTeamIndex]}<p>Score ${myTeam}</p></td>
+                    <td class="score-players players-my">
+                        ${this.#renderPlayerStats(scoreObject.scoreboard[myTeamIndex], game.players, false)}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <td style="width:76px;text-align:center">
+                        <small>Half Score</small>
+                        <table class="half-score">
+                            <td>
+                                <span class="color-me">${scoreObject.firstHalfScore[scoreObject.halfTimeRoundNumber === null ? myTeamIndex : otherTeamIndex]}</span><br>
+                                <small>1st</small><br>
+                                <span class="color-opponent">${scoreObject.firstHalfScore[scoreObject.halfTimeRoundNumber === null ? otherTeamIndex : myTeamIndex]}</span>
+                            </td>
+                            ${scoreObject.halfTimeRoundNumber === null ? '' : `
+                            <td>
+                                <span class="color-me">${scoreObject.secondHalfScore[myTeamIndex]}</span><br>
+                                <small>2nd</small><br>
+                                <span class="color-opponent">${scoreObject.secondHalfScore[otherTeamIndex]}</span>
+                            </td>`}
+                        </table>
+                    </td>
+                    <td>
+                        <div class="rounds-history">${this.#renderRoundsHistory(scoreObject.history, scoreObject.halfTimeRoundNumber, meIsAttacker)}</div>
+                    </td>
+                    <td style="width:135px">
+                        <span class="color-me">$ ${scoreObject.lossBonus[myTeamIndex]}</span><br>
+                        <small>Round loss Bonus</small><br>
+                        <span class="color-opponent">$ ${scoreObject.lossBonus[otherTeamIndex]}</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tr>
+                    <td class="score-opponent color-opponent">${scoreObject.score[otherTeamIndex]}<p>Score ${opponentTeam}</p></td>
+                    <td class="score-players players-opponent">
+                        ${this.#renderPlayerStats(scoreObject.scoreboard[otherTeamIndex], game.players, true)}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    `;
     }
 
     bombPlanted() {
         this.#messages.bottom = '<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>40 seconds to detonation.'
     }
 
-    showKill(playerCulprit, playerDead, wasHeadshot, playerDataMe, killedItemId) {
-        let shouldHighlight = false
-        const culprit = document.createElement('span')
-        const culpritOnMyTeam = (playerCulprit.isAttacker === playerDataMe.isAttacker)
-        culprit.classList.add(culpritOnMyTeam ? 'team-me' : 'team-opponent')
-        if (playerCulprit.id === playerDataMe.id) {
-            shouldHighlight = true
-            culprit.innerText = `Me (${Enum.ColorNames[playerCulprit.color]})`
-        } else {
-            culprit.innerText = (culpritOnMyTeam ? '' : 'Enemy ') + Enum.ColorNames[playerCulprit.color]
+    #getPlayerName(player, playerMe) {
+        if (player.id === playerMe.id) {
+            return `Me (${Enum.ColorNames[player.color]})`
         }
+        return (player.isAttacker === playerMe.isAttacker ? '' : 'Enemy ') + Enum.ColorNames[player.color]
+    }
+
+    showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
+        const culprit = document.createElement('span')
+        const culpritOnMyTeam = (playerCulprit.isAttacker === playerMe.isAttacker)
+        culprit.classList.add(culpritOnMyTeam ? 'team-me' : 'team-opponent')
+        culprit.innerText = this.#getPlayerName(playerCulprit, playerMe)
 
         const dead = document.createElement('span')
-        const deadOnyMyTeam = (playerDead.isAttacker === playerDataMe.isAttacker)
+        const deadOnyMyTeam = (playerDead.isAttacker === playerMe.isAttacker)
         dead.classList.add(deadOnyMyTeam ? 'team-me' : 'team-opponent')
-        if (playerDead.id === playerDataMe.id) {
-            shouldHighlight = true
-            dead.innerText = `Me (${Enum.ColorNames[playerDead.color]})`
-        } else {
-            dead.innerText = (deadOnyMyTeam ? '' : 'Enemy ') + Enum.ColorNames[playerDead.color]
-        }
+        dead.innerText = this.#getPlayerName(playerDead, playerMe)
 
         const parentElement = this.#elements.killFeed
         if (parentElement.children.length > 4) {
@@ -143,6 +200,7 @@ export class HUD {
         }
 
         const row = document.createElement('p')
+        let shouldHighlight = (playerCulprit.id === playerMe.id || playerDead.id === playerMe.id)
         if (shouldHighlight) {
             row.classList.add('highlight')
         }
@@ -231,12 +289,12 @@ export class HUD {
         this.#elements.messageTop.innerText = this.#messages.top
         this.#elements.messageBottom.innerHTML = this.#messages.bottom
 
-        let myTeam = player.isAttacker ? 'attackers' : 'defenders'
-        let otherTeam = player.isAttacker ? 'defenders' : 'attackers'
-        this.#elements.scoreMyTeam.innerHTML = this.#game.score[myTeam]
-        this.#elements.scoreOpponentTeam.innerHTML = this.#game.score[otherTeam]
-        this.#elements.aliveMyTeam.innerHTML = this.#game.alivePlayers[myTeam]
-        this.#elements.aliveOpponentTeam.innerHTML = this.#game.alivePlayers[otherTeam]
+        let myTeamIndex = +player.isAttacker
+        let otherTeamIndex = +!player.isAttacker
+        this.#elements.scoreMyTeam.innerHTML = this.#game.score.score[myTeamIndex]
+        this.#elements.scoreOpponentTeam.innerHTML = this.#game.score.score[otherTeamIndex]
+        this.#elements.aliveMyTeam.innerHTML = this.#game.alivePlayers[myTeamIndex]
+        this.#elements.aliveOpponentTeam.innerHTML = this.#game.alivePlayers[otherTeamIndex]
     }
 
     createHud(elementHud) {
@@ -244,13 +302,10 @@ export class HUD {
             throw new Error("HUD already created")
         }
 
-        const game = this.#game
         elementHud.innerHTML = `
         <div id="cross">✛</div>
         <div id="equipped-item"><img src="/resources/slot_2.png"></div>
         <div id="scoreboard" class="hidden">
-            <p>Competitive | Map: ${game.launchSetting.map}</p>
-            <hr>
             <div id="scoreboard-detail"></div>
         </div>
         <div id="buy-menu" class="hidden">

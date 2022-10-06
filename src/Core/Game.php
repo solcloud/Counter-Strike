@@ -57,7 +57,7 @@ class Game
     private function initialize(): void
     {
         $this->roundTickCount = Util::millisecondsToFrames($this->properties->round_time_ms);
-        $this->startRoundFreezeTime = new PauseStartEvent(PauseReason::FREEZE_TIME, function (): void {
+        $this->startRoundFreezeTime = new PauseStartEvent($this, PauseReason::FREEZE_TIME, function (): void {
             $this->paused = false;
             $this->addEvent(new PauseEndEvent());
             $this->addEvent(new RoundStartEvent($this->playersCountAttackers, $this->playersCountDefenders, function (): void {
@@ -168,6 +168,7 @@ class Game
         } else {
             $this->playersCountDefenders++;
         }
+        $this->score->addPlayer($player);
     }
 
     public function quit(GameOverReason $reason): void
@@ -218,11 +219,22 @@ class Game
 
     public function playerAttackKilledEvent(Player $playerDead, Bullet $bullet, bool $headShot): void
     {
-        $this->addEvent(new KillEvent($playerDead, $this->players[$bullet->getOriginPlayerId()], $bullet->getShootItem()->getId(), $headShot));
+        $playerCulprit = $this->players[$bullet->getOriginPlayerId()];
+        if ($playerDead->isPlayingOnAttackerSide() === $playerCulprit->isPlayingOnAttackerSide()) { // team kill
+            $this->score->getPlayerStat($playerCulprit->getId())->removeKill();
+        } else {
+            $this->score->getPlayerStat($playerCulprit->getId())->addKill($headShot);
+        }
+        $this->score->getPlayerStat($playerDead->getId())->addDeath();
+
+        $this->addEvent(new KillEvent($playerDead, $playerCulprit, $bullet->getShootItem()->getId(), $headShot));
     }
 
     public function playerFallDamageKilledEvent(Player $playerDead): void
     {
+        $this->score->getPlayerStat($playerDead->getId())->removeKill();
+        $this->score->getPlayerStat($playerDead->getId())->addDeath();
+
         $this->addEvent(new KillEvent($playerDead, $playerDead, Floor::class, false));
     }
 
@@ -251,7 +263,7 @@ class Game
                 $this->roundReset(true, $roundEndEvent);
                 $this->addEvent($startRoundFreezeTime);
             };
-            $event = new PauseStartEvent(PauseReason::HALF_TIME, $callback, $this->properties->half_time_freeze_sec * 1000);
+            $event = new PauseStartEvent($this, PauseReason::HALF_TIME, $callback, $this->properties->half_time_freeze_sec * 1000);
         } else {
             $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime, $roundEndEvent): void {
                 $this->paused = true;

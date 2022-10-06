@@ -16,7 +16,7 @@ $socket = $factory->createClient($address, 4);
 
 $socket->write('login ' . $loginCode);
 while (true) {
-    $response = $socket->read(1024);
+    $response = $socket->read(10241024);
     if ($command) {
         $socket->write($command);
         continue;

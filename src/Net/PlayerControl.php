@@ -72,7 +72,11 @@ class PlayerControl
 
     public function buy(int $buyMenuItemId): void
     {
-        $this->player->buyItem(BuyMenuItem::from($buyMenuItemId));
+        $item = BuyMenuItem::tryFrom($buyMenuItemId);
+        if ($item === null) {
+            return;
+        }
+        $this->player->buyItem($item);
     }
 
     public function lookAt(int $angleHorizontal, int $angleVertical): void
@@ -105,7 +109,11 @@ class PlayerControl
 
     public function equip(int $slotId): void
     {
-        $this->player->equip(InventorySlot::from($slotId));
+        $slot = InventorySlot::tryFrom($slotId);
+        if ($slot === null) {
+            return;
+        }
+        $this->player->equip($slot);
     }
 
     public function forward(): void

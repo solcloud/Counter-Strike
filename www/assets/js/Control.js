@@ -33,7 +33,7 @@ export class Control {
 
         document.addEventListener("click", function (event) {
             event.preventDefault()
-            if (!(game.isPlaying() && game.playerIsAlive())) {
+            if (!(game.isPlaying() && game.meIsAlive())) {
                 return
             }
 
@@ -45,7 +45,7 @@ export class Control {
             }
         })
         document.addEventListener('wheel', (event) => {
-            if (!(game.isPlaying() && game.playerIsAlive())) {
+            if (!(game.isPlaying() && game.meIsAlive())) {
                 return
             }
 
@@ -64,7 +64,7 @@ export class Control {
                     break;
             }
 
-            if (!(game.isPlaying() && game.playerIsAlive())) {
+            if (!(game.isPlaying() && game.meIsAlive())) {
                 return
             }
 
@@ -108,7 +108,7 @@ export class Control {
                     break;
             }
 
-            if (!(game.isPlaying() && game.playerIsAlive())) {
+            if (!(game.isPlaying() && game.meIsAlive())) {
                 return
             }
 

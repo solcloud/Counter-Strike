@@ -67,7 +67,7 @@ export class EventProcessor {
                     msg = "Half time"
                     break
             }
-            game.pause(msg, data.ms)
+            game.pause(msg, data.score, data.ms)
         }
 
         eventsCallback[EventList.PauseEndEvent] = function () {
@@ -79,10 +79,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.RoundEndEvent] = function (data) {
-            game.score.attackers = data.score.scoreAttackers
-            game.score.defenders = data.score.scoreDefenders
-            game.score.history = data.score.history
-            game.roundEnd(data.attackersWins, data.newRoundNumber)
+            game.roundEnd(data.attackersWins, data.newRoundNumber, data.score)
         }
 
         eventsCallback[EventList.GameStartEvent] = function (options) {

@@ -96,6 +96,8 @@ abstract class Protocol
 
     public abstract function serializeGameState(Game $game): string;
 
+    public abstract function getRequestMaxSizeBytes(): int;
+
     /**
      * @return array<int,array<string|int>>
      */

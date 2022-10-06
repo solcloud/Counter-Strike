@@ -44,7 +44,7 @@ while (true) {
             $udp->write($clientMsg);
         }
 
-        $serverMsg = $udp->read(1024);
+        $serverMsg = $udp->read(10241024);
         if ($loginResponse === '' && $logged) {
             $loginResponse = $serverMsg;
         }

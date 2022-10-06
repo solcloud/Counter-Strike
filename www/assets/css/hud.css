@@ -2,6 +2,20 @@
     font-family: Arial;
     pointer-events: none;
     user-select: none;
+    --color-attackers: #ff9145;
+    --color-defenders: #43b4fd;
+    --color-me: #afde68;
+    --color-me-hsl: 84, 64%, 64%;
+    --color-opponent: #de6868;
+    --color-opponent-hsl: 0, 64%, 64%;
+}
+
+#hud .color-me {
+    color: var(--color-me);
+}
+
+#hud .color-opponent {
+    color: var(--color-opponent);
 }
 
 #hud #equipped-item {
@@ -54,22 +68,117 @@
 }
 
 #hud #scoreboard {
+    font-size: 16px;
     padding: 1rem;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.86);
-    height: 40%;
-    max-height: 600px;
-    width: 60%;
-    max-width: 700px;
+    height: 70%;
+    max-height: 1200px;
+    width: 65%;
+    max-width: 1200px;
     color: white;
+    overflow-y: auto;
+}
+
+#hud #scoreboard small {
+    color: #efefef;
 }
 
 #hud #scoreboard table {
     width: 100%;
     border: 0;
+}
+
+#hud #scoreboard .score-my,
+#hud #scoreboard .score-opponent {
+    font-size: 50px;
+    padding-right: 8px;
+    text-align: center;
+    width: 70px;
+    padding-top: 22px;
+}
+#hud #scoreboard .score-my p,
+#hud #scoreboard .score-opponent p {
+    font-size: 14px;
+    text-align: center;
+    margin-top: 0;
+}
+
+#hud #scoreboard table thead {
+    text-align: center;
+}
+
+#hud #scoreboard table.player-stats.team-my tbody tr {
+    background-color: hsla(var(--color-me-hsl), .4);
+}
+
+#hud #scoreboard table.player-stats.team-other tbody tr {
+    background-color: hsla(var(--color-opponent-hsl), .4);
+}
+
+#hud #scoreboard table.player-stats tr:hover {
+    filter: brightness(150%);
+}
+
+#hud #scoreboard table.player-stats tbody tr.player-dead {
+    background-color: rgba(232, 11, 11, 0.45);
+}
+
+#hud #scoreboard .rounds-history {
+    height: 40px;
+    clear: both;
+    padding: 4px;
+    margin: 12px 10px;
+}
+
+#hud #scoreboard .rounds-history .round-number {
+    width: 20px;
+    height: 20px;
+    float: left;
+    position: relative;
+    margin: 0 2px;
+    text-align: center;
+}
+
+#hud #scoreboard .rounds-history .round-number div {
+    font-size: 12px;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+}
+
+#hud #scoreboard .rounds-history .round-number span {
+    border: 0px solid transparent;
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(222, 209, 209, 0.2);
+}
+
+#hud #scoreboard .rounds-history .round-number span.round-win-0 {
+    color: var(--color-defenders);
+    border-color: var(--color-defenders);
+}
+
+#hud #scoreboard .rounds-history .round-number span.round-win-1 {
+    color: var(--color-attackers);
+    border-color: var(--color-attackers);
+}
+
+#hud #scoreboard .rounds-history .round-number span.round-win-my-team {
+    top: -10px;
+    border-bottom-width: 2px;
+}
+
+#hud #scoreboard .rounds-history .round-number span.round-win-other-team {
+    top: 10px;
+    border-top-width: 2px;
 }
 
 #hud .radar {
@@ -122,20 +231,20 @@
 }
 
 #hud .team-me-alive {
-    background-color: #afde68;
+    background-color: var(--color-me);
 }
 
 #hud .team-me-score {
-    color: #afde68;
+    color: var(--color-me);
     border-right: 1px solid #dadada;
 }
 
 #hud .team-opponent-alive {
-    background-color: #de6868;
+    background-color: var(--color-opponent);
 }
 
 #hud .team-opponent-score {
-    color: #de6868;
+    color: var(--color-opponent);
 }
 
 #hud #time {
@@ -198,10 +307,10 @@
 }
 
 #hud .kill-feed .team-me {
-    color: #afde68;
+    color: var(--color-me);
 }
 
 #hud .kill-feed .team-opponent {
-    color: #de6868;
+    color: var(--color-opponent);
 }
 

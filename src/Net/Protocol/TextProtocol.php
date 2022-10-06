@@ -14,6 +14,11 @@ class TextProtocol extends Protocol
 
     public const separator = '|';
 
+    public function getRequestMaxSizeBytes(): int
+    {
+        return 960;
+    }
+
     public function serializeGameSetting(Player $player, ServerSetting $setting, Game $game): string
     {
         $gameStartEvent = new GameStartEvent($player, $setting, $game->getProperties());

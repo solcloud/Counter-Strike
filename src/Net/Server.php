@@ -193,7 +193,7 @@ class Server
     private function pollClient(mixed &$clientIp, mixed &$clientPort, mixed &$clientRequest, int $readTimeoutMicroSeconds = 100): bool
     {
         $peer = '';
-        $clientRequest = $this->net->receive($peer, $readTimeoutMicroSeconds);
+        $clientRequest = $this->net->receive($peer, $readTimeoutMicroSeconds, $this->protocol->getRequestMaxSizeBytes());
         if ($clientRequest === null) {
             return false;
         }

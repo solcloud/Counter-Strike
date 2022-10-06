@@ -1,8 +1,9 @@
 import {EventProcessor} from "./EventProcessor.js";
+import {Player} from "./Player.js";
 
 export class Game {
-    #paused = false
     #round = 1
+    #paused = false
     #started = false
     #options = false
     #readyCallback
@@ -10,19 +11,11 @@ export class Game {
     #hud
     #stats
     #world
-    launchSetting
     eventProcessor
-    score = {
-        history: [],
-        attackers: 0,
-        defenders: 0
-    }
-    alivePlayers = {
-        attackers: 0,
-        defenders: 0
-    }
+    score = null
+    alivePlayers = [0, 0]
     players = []
-    playerMe = {}
+    playerMe = null
 
     constructor(world, hud, stats) {
         this.#world = world
@@ -31,18 +24,19 @@ export class Game {
         this.eventProcessor = new EventProcessor(this)
     }
 
-    pause(msg, timeMs) {
+    pause(msg, score, timeMs) {
+        console.log("Pause: " + msg + " for " + timeMs + "ms")
         const game = this
         this.players.forEach(function (player) {
-            if (player.data.id === game.playerMe.id) {
-                return
+            if (player.getId() !== game.playerMe.getId()) {
+                player.get3DObject().visible = true // respawn (show) all beside me
             }
-            player.object.visible = true
         })
         this.#started = true
         this.#paused = true
-        console.log("Pause: " + msg + " for " + timeMs + "ms")
+        this.score = score
         this.#hud.pause(msg, timeMs)
+        this.#hud.updateRoundsHistory(this.score)
     }
 
     unpause() {
@@ -60,15 +54,16 @@ export class Game {
 
     roundStart(aliveAttackers, aliveDefenders) {
         console.log("Starting round " + this.#round)
-        this.alivePlayers.attackers = aliveAttackers
-        this.alivePlayers.defenders = aliveDefenders
+        this.alivePlayers[0] = aliveDefenders
+        this.alivePlayers[1] = aliveAttackers
         this.#hud.clearAlerts()
         this.#hud.roundStart(this.#options.setting.round_time_ms)
     }
 
-    roundEnd(attackersWins, newRoundNumber) {
+    roundEnd(attackersWins, newRoundNumber, score) {
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
+        this.score = score;
         this.#round = newRoundNumber
         this.#hud.displayTopMessage(winner + ' wins')
         this.#hud.updateRoundsHistory(this.score)
@@ -86,10 +81,6 @@ export class Game {
         this.#endCallback = callback
     }
 
-    setLaunchSetting(setting) {
-        this.launchSetting = setting
-    }
-
     setOptions(options) {
         this.#options = options
         this.#hud.startWarmup(options.warmupSec * 1000)
@@ -99,8 +90,8 @@ export class Game {
             throw new Error("My Player is already set!")
         }
 
-        this.playerMe = options.player
-        this.players[playerId] = this.#spawnPlayerMe(playerId, options.player.color, options.player.isAttacker)
+        this.playerMe = new Player(options.player, this.#world.createPlayerMe())
+        this.players[playerId] = this.playerMe;
 
         if (this.#readyCallback) {
             this.#readyCallback(this.#options)
@@ -108,39 +99,27 @@ export class Game {
     }
 
     playerKilled(playerIdDead, playerIdCulprit, wasHeadshot, killItemId) {
-        this.players[playerIdDead].object.visible = false
+        const deadPlayer = this.players[playerIdDead];
+        deadPlayer.get3DObject().visible = false
+        this.alivePlayers[deadPlayer.getTeamIndex()]--
+        // TODO update scoreboard player row
+
         this.#hud.showKill(
             this.players[playerIdCulprit].data,
-            this.players[playerIdDead].data,
+            deadPlayer.data,
             wasHeadshot,
-            this.playerMe,
+            this.playerMe.data,
             killItemId
         )
     }
 
-    #spawnPlayerMe(id, colorIndex, isAttacker) {
-        const me = this.#world.createPlayerMe()
-        return {
-            object: me,
-            data: {
-                id: id,
-                color: colorIndex,
-                isAttacker: isAttacker
-            }
+    createPlayer(data) {
+        const player = new Player(data, this.#world.spawnPlayer(data.id, data.color, this.playerMe.isAttacker !== data.isAttacker))
+        if (this.players[data.id]) {
+            throw new Error('Player already exist with id ' + data.id)
         }
-    }
-
-    spawnPlayer(id, colorIndex, isAttacker) {
-        const player = this.#world.spawnPlayer(id, colorIndex, this.playerMe.isAttacker !== isAttacker)
-        this.players[id] = {
-            object: player,
-            data: {
-                id: id,
-                color: colorIndex,
-                isAttacker: isAttacker
-            }
-        }
-        return this.players[id]
+        this.players[data.id] = player
+        return player
     }
 
     attack() {
@@ -148,12 +127,12 @@ export class Game {
     }
 
     equip(slotId) {
-        if (!this.playerMe.slots[slotId]) {
+        if (!this.playerMe.data.slots[slotId]) {
             return false
         }
 
-        this.#hud.equip(slotId, this.playerMe.slots)
-        this.playerMe.equippedSlot = slotId
+        this.playerMe.equip(slotId)
+        this.#hud.equip(slotId, this.playerMe.data.slots)
         return true
     }
 
@@ -173,46 +152,42 @@ export class Game {
         state.players.forEach(function (playerState) {
             let player = game.players[playerState.id]
             if (player === undefined) {
-                player = game.spawnPlayer(playerState.id, playerState.color, playerState.isAttacker)
+                player = game.createPlayer(playerState)
             }
-            player.data.isAttacker = playerState.isAttacker
-            player = player.object
 
-            player.getObjectByName('head').position.y = playerState.heightSight
-            player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
+            const player3DObject = player.get3DObject()
+            player3DObject.getObjectByName('head').position.y = playerState.heightSight
+            player3DObject.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
 
-            if (game.playerMe.id && playerState.id !== game.playerMe.id) {
-                game.updatePlayerObject(player, playerState)
-            }
-            if (playerState.id === game.playerMe.id) {
-                game.playerMe.money = playerState.money
-                game.playerMe.health = playerState.health
-                game.playerMe.item = playerState.item
-                game.playerMe.slots = playerState.slots
-                game.playerMe.ammo = playerState.ammo
-                game.playerMe.ammoReserve = playerState.ammoReserve
-                game.playerMe.canAttack = playerState.canAttack
-                if (game.playerMe.item.slot !== game.playerMe.equippedSlot) {
-                    game.equip(game.playerMe.item.slot)
+            if (game.playerMe.getId() === playerState.id) {
+                player.updateData(playerState)
+                if (game.playerMe.getEquippedSlotId() !== playerState.item.slot) {
+                    game.equip(playerState.item.slot)
                 }
+            } else {
+                player.data.item = playerState.item
+                player.data.isAttacker = playerState.isAttacker
+                game.updateOtherPlayersModels(player3DObject, playerState)
             }
         })
 
         this.render()
     }
 
-    playerIsAlive() {
-        return this.playerMe.health > 0
+    meIsAlive() {
+        return this.playerMe.isAlive()
     }
 
-    updatePlayerObject(playerObject, data) {
+    updateOtherPlayersModels(playerObject, data) {
         playerObject.rotation.y = serverRotationToThreeRadian(data.look.horizontal)
         this.#world.updatePlayerModel(playerObject, data)
     }
 
     render() {
         this.#stats.begin()
-        this.#hud.updateHud(this.playerMe)
+        if (this.#started) {
+            this.#hud.updateHud(this.playerMe.data) // TODO check performance and if heavy debounce to every x tick
+        }
         this.#world.render()
         this.#stats.end()
     }
