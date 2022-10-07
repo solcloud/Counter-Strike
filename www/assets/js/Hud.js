@@ -3,7 +3,8 @@ import * as Enum from "./Enums.js";
 export class HUD {
     #game
     #setting = {
-        showScore: false
+        showScore: false,
+        showBuyMenu: false
     }
     #messages = {
         top: '',
@@ -12,6 +13,7 @@ export class HUD {
     #elements = {
         score: null,
         scoreDetail: null,
+        buyMenu: null,
         equippedItem: null,
         slotModel: null,
         inventory: null,
@@ -29,6 +31,7 @@ export class HUD {
         killFeed: null,
     }
     #countDownIntervalId = null;
+    #scoreObject = null;
 
     setGame(game) {
         this.#game = game
@@ -45,6 +48,14 @@ export class HUD {
 
     hideScore() {
         this.#setting.showScore = false
+    }
+
+    toggleBuyMenu() {
+        this.#setting.showBuyMenu = !this.#setting.showBuyMenu
+    }
+
+    hideBuyMenu() {
+        this.#setting.showBuyMenu = false
     }
 
     toggleScore() {
@@ -83,13 +94,14 @@ export class HUD {
         const hud = this
         let playerTable = '';
         scoreBoardData.forEach(function (row) {
-            const player = players[row['id']].data
+            const playerId = row.id
+            const player = players[playerId].data
             playerTable += `
-            <tr ${player.health > 0 ? '' : 'class="player-dead"'}>
+            <tr ${player.health > 0 ? '' : 'class="player-dead"'} data-player-id="${playerId}">
                 <td>${hud.#getPlayerName(player, hud.#game.playerMe.data)}</td>
-                <td>${statsForOtherTeam ? '' : `${player.money}`}</td>
-                <td>${row.kills}</td>
-                <td>${row.deaths}</td>
+                <td data-money>${statsForOtherTeam ? '' : `${player.money}`}</td>
+                <td data-kills>${row.kills}</td>
+                <td data-deaths>${row.deaths}</td>
             </tr>
             `;
         })
@@ -103,15 +115,24 @@ export class HUD {
                 <th style="width:10%">Deaths</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody data-player-stats>
             ${playerTable}
             </tbody>
         </table>
         `;
     }
 
-    updateRoundsHistory(scoreObject) {
+    requestFullScoreBoardUpdate(scoreObject) {
+        this.#scoreObject = scoreObject
+    }
+
+    #updateScoreBoard() {
+        if (this.#scoreObject === null) {
+            return;
+        }
+
         const game = this.#game
+        const scoreObject = this.#scoreObject;
         const meIsAttacker = game.playerMe.isAttacker()
         const myTeam = (meIsAttacker ? 'Attackers' : 'Defenders')
         const opponentTeam = (meIsAttacker ? 'Defenders' : 'Attackers')
@@ -169,7 +190,8 @@ export class HUD {
                 </tr>
             </table>
         </div>
-    `;
+        `;
+        this.#scoreObject = null
     }
 
     bombPlanted() {
@@ -183,7 +205,39 @@ export class HUD {
         return (player.isAttacker === playerMe.isAttacker ? '' : 'Enemy ') + Enum.ColorNames[player.color]
     }
 
+    #getPlayerStatRowElement(playerData) {
+        return this.#elements.scoreDetail.querySelector(`[data-player-stats] [data-player-id="${playerData.id}"]`)
+    }
+
+    #updatePlayerKills(playerData, amount) {
+        const killsElement = this.#getPlayerStatRowElement(playerData).querySelector('[data-kills]')
+        let kills = parseInt(killsElement.innerText)
+        killsElement.innerText = `${kills + amount}`
+    }
+
+    #updatePlayerAlive(playerData) {
+        const statRowElement = this.#getPlayerStatRowElement(playerData)
+        statRowElement.classList.add('player-dead')
+        const deathsElement = statRowElement.querySelector('[data-deaths]')
+        let deaths = parseInt(deathsElement.innerText)
+        deathsElement.innerText = `${deaths - 1}`
+    }
+
+    updateMyTeamPlayerMoney(playerData, money) {
+        const moneyElement = this.#getPlayerStatRowElement(playerData).querySelector('[data-money]')
+        moneyElement.innerText = `${money}`
+    }
+
     showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
+        this.#updatePlayerAlive(playerDead)
+        if (playerCulprit.id === playerDead.id) { // suicide
+            this.#updatePlayerKills(playerDead, -1)
+        } else if (playerCulprit.isAttacker === playerDead.isAttacker) { // team kill
+            this.#updatePlayerKills(playerCulprit, -1)
+        } else {
+            this.#updatePlayerKills(playerCulprit, 1)
+        }
+
         const culprit = document.createElement('span')
         const culpritOnMyTeam = (playerCulprit.isAttacker === playerMe.isAttacker)
         culprit.classList.add(culpritOnMyTeam ? 'team-me' : 'team-opponent')
@@ -271,11 +325,17 @@ export class HUD {
     }
 
     updateHud(player) {
+        this.#updateScoreBoard()
         const hs = this.#setting
         if (hs.showScore) {
             this.#elements.score.classList.remove('hidden');
         } else {
             this.#elements.score.classList.add('hidden');
+        }
+        if (player.canBuy && hs.showBuyMenu) {
+            this.#elements.buyMenu.classList.remove('hidden');
+        } else {
+            this.#elements.buyMenu.classList.add('hidden');
         }
 
         this.#elements.money.innerText = player.money
@@ -365,6 +425,7 @@ export class HUD {
     `;
 
         this.#elements.score = elementHud.querySelector('#scoreboard')
+        this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img')

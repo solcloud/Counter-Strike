@@ -5,6 +5,7 @@ export class Player {
         money: null,
         item: null,
         canAttack: null,
+        canBuy: null,
         slots: null,
         health: null,
         position: null,
@@ -45,16 +46,16 @@ export class Player {
     }
 
     getTeamIndex() {
-        return +(this.data.isAttacker)
+        return (this.data.isAttacker ? 1 : 0)
     }
 
     getOtherTeamIndex() {
-        return +(!this.data.isAttacker)
+        return (this.data.isAttacker ? 0 : 1)
     }
 
     getId() {
         if (this.data.id === null) {
-            throw new Error("NO id set")
+            throw new Error("No ID set")
         }
         return this.data.id
     }

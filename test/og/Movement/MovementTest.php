@@ -232,7 +232,7 @@ class MovementTest extends BaseTestCase
             },
             $this->waitXTicks(Setting::tickCountCrouch()),
             function (Player $p) {
-                $this->assertFalse($p->isCrouching());
+                $this->assertTrue($p->isCrouching());
             },
             function (Player $p) {
                 $p->stand();

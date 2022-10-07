@@ -37,7 +37,7 @@ export class Control {
                 return
             }
 
-            if (pointer.isLocked && game.playerMe.canAttack) {
+            if (pointer.isLocked && game.playerMe.data.canAttack) {
                 attack = true
                 let lookAt = threeHorizontalRotationToServer(pointer.getObject().rotation)
                 shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
@@ -94,9 +94,6 @@ export class Control {
                 case 'ShiftLeft':
                     shifting = true;
                     break;
-                case 'Tab':
-                    hud.showScore()
-                    break;
             }
         });
         document.addEventListener('keyup', function (event) {
@@ -144,8 +141,8 @@ export class Control {
                 case 'ShiftLeft':
                     running = true;
                     break;
-                case 'Tab':
-                    hud.hideScore()
+                case 'KeyB':
+                    hud.toggleBuyMenu()
                     break;
             }
         });

@@ -67,7 +67,8 @@
     text-align: center;
 }
 
-#hud #scoreboard {
+#hud #scoreboard,
+#hud #buy-menu {
     font-size: 16px;
     padding: 1rem;
     position: absolute;

@@ -36,7 +36,7 @@ export class Game {
         this.#paused = true
         this.score = score
         this.#hud.pause(msg, timeMs)
-        this.#hud.updateRoundsHistory(this.score)
+        this.#hud.requestFullScoreBoardUpdate(this.score)
     }
 
     unpause() {
@@ -66,7 +66,7 @@ export class Game {
         this.score = score;
         this.#round = newRoundNumber
         this.#hud.displayTopMessage(winner + ' wins')
-        this.#hud.updateRoundsHistory(this.score)
+        this.#hud.requestFullScoreBoardUpdate(this.score)
     }
 
     isPlaying() {
@@ -99,13 +99,14 @@ export class Game {
     }
 
     playerKilled(playerIdDead, playerIdCulprit, wasHeadshot, killItemId) {
+        const culpritPlayer = this.players[playerIdCulprit];
         const deadPlayer = this.players[playerIdDead];
+
         deadPlayer.get3DObject().visible = false
         this.alivePlayers[deadPlayer.getTeamIndex()]--
-        // TODO update scoreboard player row
 
         this.#hud.showKill(
-            this.players[playerIdCulprit].data,
+            culpritPlayer.data,
             deadPlayer.data,
             wasHeadshot,
             this.playerMe.data,
@@ -114,7 +115,7 @@ export class Game {
     }
 
     createPlayer(data) {
-        const player = new Player(data, this.#world.spawnPlayer(data.id, data.color, this.playerMe.isAttacker !== data.isAttacker))
+        const player = new Player(data, this.#world.spawnPlayer(data.color, this.playerMe.isAttacker !== data.isAttacker))
         if (this.players[data.id]) {
             throw new Error('Player already exist with id ' + data.id)
         }
@@ -139,11 +140,9 @@ export class Game {
     tick(state) {
         const game = this
 
-        if (state.events.length) {
-            state.events.forEach(function (event) {
-                game.eventProcessor.process(event)
-            })
-        }
+        state.events.forEach(function (event) {
+            game.eventProcessor.process(event)
+        })
 
         if (this.#options === false) {
             return
@@ -155,23 +154,32 @@ export class Game {
                 player = game.createPlayer(playerState)
             }
 
-            const player3DObject = player.get3DObject()
-            player3DObject.getObjectByName('head').position.y = playerState.heightSight
-            player3DObject.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
+            player.get3DObject().getObjectByName('head').position.y = playerState.heightSight
+            player.get3DObject().position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
 
-            if (game.playerMe.getId() === playerState.id) {
-                player.updateData(playerState)
-                if (game.playerMe.getEquippedSlotId() !== playerState.item.slot) {
-                    game.equip(playerState.item.slot)
-                }
-            } else {
-                player.data.item = playerState.item
-                player.data.isAttacker = playerState.isAttacker
-                game.updateOtherPlayersModels(player3DObject, playerState)
-            }
+            game.updatePlayerData(player, playerState)
         })
 
         this.render()
+    }
+
+    updatePlayerData(player, serverState) {
+        if (this.playerMe.getId() === serverState.id) { // if me
+            if (this.playerMe.getEquippedSlotId() !== serverState.item.slot) {
+                this.equip(serverState.item.slot)
+            }
+        }
+
+        if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
+            if (player.data.money !== serverState.money) {
+                this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
+            }
+            player.updateData(serverState)
+        } else {
+            player.data.item = serverState.item
+            player.data.isAttacker = serverState.isAttacker
+            this.updateOtherPlayersModels(player.get3DObject(), serverState)
+        }
     }
 
     meIsAlive() {
@@ -180,7 +188,12 @@ export class Game {
 
     updateOtherPlayersModels(playerObject, data) {
         playerObject.rotation.y = serverRotationToThreeRadian(data.look.horizontal)
-        this.#world.updatePlayerModel(playerObject, data)
+
+        const body = playerObject.getObjectByName('body')
+        if (body.position.y !== data.heightBody) { // update body height position if changed
+            // TODO probably keyframe time based animation from userData like body.position = body.userData.animation[data.playerAnimationId]
+            body.position.y = data.heightBody
+        }
     }
 
     render() {

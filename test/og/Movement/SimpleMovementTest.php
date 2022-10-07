@@ -3,6 +3,7 @@
 namespace Test\Movement;
 
 use cs\Core\GameState;
+use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Setting;
 use Test\BaseTestCase;
@@ -63,6 +64,20 @@ class SimpleMovementTest extends BaseTestCase
 
         $game->start();
         $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
+    }
+
+    public function testPlayerCrouchSpeed(): void
+    {
+        $game = $this->createTestGame();
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->crouch(),
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $p->moveForward(),
+            $this->endGame(),
+        ]);
+
+        $game->start();
+        $this->assertSame(Setting::moveDistanceCrouchPerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
     }
 
     public function testPlayerMovementWalkSpeed(): void

@@ -16,7 +16,7 @@ class CrouchTest extends BaseTestCase
         $player = $game->getPlayer(1);
 
         $scale = $player->getBoundingRadius();
-        $start = $player->getPositionImmutable()->clone()->addZ(3 * $scale);
+        $start = $player->getPositionImmutable()->clone()->addZ(2 * $scale);
         $ceiling = new Box($start->clone()->addY(Setting::playerHeadHeightCrouch() + 1)->addX(-2 * $scale), 4 * $scale, $scale, 10);
         $game->getWorld()->addBox($ceiling);
         $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, Setting::playerHeadHeightStand(), 10));
@@ -34,6 +34,7 @@ class CrouchTest extends BaseTestCase
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
             $this->endGame(),
         ];
 
@@ -43,12 +44,12 @@ class CrouchTest extends BaseTestCase
 
     public function testCanCrouchIntoTunnel(): void
     {
-        $depth = Setting::moveDistanceCrouchPerTick() * 4;
+        $depth = Setting::moveDistanceCrouchPerTick() * 3;
         $game = $this->createTestGame();
         $player = $game->getPlayer(1);
 
         $scale = $player->getBoundingRadius();
-        $start = $player->getPositionImmutable()->clone()->addZ(3 * $scale);
+        $start = $player->getPositionImmutable()->clone()->addZ(2 * $scale);
         $ceiling = new Box($start->clone()->addY(Setting::playerHeadHeightCrouch() + 1)->addX(-2 * $scale), 4 * $scale, $scale, $depth);
         $game->getWorld()->addBox($ceiling);
         $game->getWorld()->addBox(new Box($start->clone()->addX(-2 * $scale - 1), $scale, Setting::playerHeadHeightStand(), $depth));
@@ -72,6 +73,7 @@ class CrouchTest extends BaseTestCase
                 $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight());
                 $this->assertLessThan($ceiling->getBase()->y, $p->getPositionImmutable()->y + $p->getHeadHeight());
             },
+            fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),

@@ -88,7 +88,7 @@ export class World {
         return me
     }
 
-    spawnPlayer(id, colorIndex, isOpponent) {
+    spawnPlayer(colorIndex, isOpponent) {
         const newPlayer = this.#createPlayer(colorIndex, isOpponent)
         this.#scene.add(newPlayer)
 
@@ -142,14 +142,6 @@ export class World {
 
     render() {
         this.#renderer.render(this.#scene, this.#camera);
-    }
-
-    updatePlayerModel(player, data) {
-        const body = player.getObjectByName('body')
-        if (body.position.y !== data.heightBody) { // update body height position if changed
-            // TODO probably keyframe time based animation from userData like body.position = body.userData.animation[data.playerAnimationId]
-            body.position.y = data.heightBody
-        }
     }
 
     getCamera() {
