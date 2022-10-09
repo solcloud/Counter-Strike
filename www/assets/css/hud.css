@@ -76,12 +76,31 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.86);
-    height: 70%;
+    height: 72%;
     max-height: 1200px;
     width: 65%;
     max-width: 1200px;
     color: white;
     overflow-y: auto;
+}
+
+#hud #buy-menu {
+    pointer-events: initial;
+}
+
+#hud #buy-menu p.disabled {
+    pointer-events: none;
+    text-decoration: line-through;
+    background-color: #7e6262;
+}
+
+#hud #buy-menu a {
+    color: #43b4fd;
+    cursor: pointer;
+}
+
+#hud #buy-menu a:hover {
+    color: #c4646c;
 }
 
 #hud #scoreboard small {
@@ -101,6 +120,7 @@
     width: 70px;
     padding-top: 22px;
 }
+
 #hud #scoreboard .score-my p,
 #hud #scoreboard .score-opponent p {
     font-size: 14px;

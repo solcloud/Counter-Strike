@@ -142,7 +142,7 @@ export class Control {
                     running = true;
                     break;
                 case 'KeyB':
-                    hud.toggleBuyMenu()
+                    hud.toggleBuyMenu(() => pointer.isLocked && pointer.unlock())
                     break;
             }
         });
@@ -150,6 +150,12 @@ export class Control {
         this.#localPlayerActions = function () {
             let serverAction = []
 
+            if (game.buyList.length) {
+                game.buyList.forEach(function (buyMenuItemId) {
+                    serverAction.push('buy ' + buyMenuItemId)
+                })
+                game.buyList = []
+            }
             if (moveForward) {
                 serverAction.push('forward')
             }

@@ -30,7 +30,12 @@ let launchGame
         const canvas = await world.init(setting.map, setting.world)
         hud.createHud(elementHud)
         control.init(world.getCamera())
-        document.addEventListener("click", () => control.requestLock())
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains('hud-action')) {
+                return
+            }
+            control.requestLock()
+        }, {capture: true})
         canvasParent.appendChild(canvas)
         canvasParent.appendChild(stats.dom);
 

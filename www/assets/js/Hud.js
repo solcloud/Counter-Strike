@@ -32,6 +32,7 @@ export class HUD {
     }
     #countDownIntervalId = null;
     #scoreObject = null;
+    #lastBuyMenuPlayerMoney = null;
 
     setGame(game) {
         this.#game = game
@@ -50,8 +51,11 @@ export class HUD {
         this.#setting.showScore = false
     }
 
-    toggleBuyMenu() {
+    toggleBuyMenu(getCursorCallback) {
         this.#setting.showBuyMenu = !this.#setting.showBuyMenu
+        if (this.#setting.showBuyMenu) {
+            getCursorCallback()
+        }
     }
 
     hideBuyMenu() {
@@ -324,6 +328,35 @@ export class HUD {
         this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
     }
 
+    #refreshBuyMenu(playerData) {
+        if (this.#lastBuyMenuPlayerMoney === playerData.money && this.#elements.buyMenu.innerHTML !== '') {
+            return
+        }
+
+        const money = playerData.money
+        const isAttacker = playerData.isAttacker
+        const buyMenuElement = this.#elements.buyMenu
+        this.#lastBuyMenuPlayerMoney = money
+
+        buyMenuElement.innerHTML = `
+            <h3>Equipment:</h3>
+            <p${money < 1000 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="10" class="hud-action action-buy">Buy Kevlar + Helmet for $ 1,000</a></p>
+            <h3>Pistols:</h3>
+        ${isAttacker
+            ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="11" class="hud-action action-buy">Buy Glock for $ 200</a></p>`
+            : `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="8" class="hud-action action-buy">Buy USP for $ 200</a></p>`
+        }
+            <p${money < 250 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="9" class="hud-action action-buy">Buy P-250 for $ 250</a></p>
+            <h3>Rifles:</h3>
+        ${isAttacker
+            ? `<p${money < 2700 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="1" class="hud-action action-buy">Buy AK-47 for $ 2,700</a></p>`
+            : `<p${money < 3100 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="7" class="hud-action action-buy">Buy M4-A1 for $ 3,100</a></p>`
+        }
+            <hr>
+            <h3 style="text-align:right">Your money: ${money}</h3>
+        `;
+    }
+
     updateHud(player) {
         this.#updateScoreBoard()
         const hs = this.#setting
@@ -333,8 +366,10 @@ export class HUD {
             this.#elements.score.classList.add('hidden');
         }
         if (player.canBuy && hs.showBuyMenu) {
+            this.#refreshBuyMenu(player)
             this.#elements.buyMenu.classList.remove('hidden');
         } else {
+            this.#elements.buyMenu.innerHTML = ''
             this.#elements.buyMenu.classList.add('hidden');
         }
 
@@ -368,9 +403,7 @@ export class HUD {
         <div id="scoreboard" class="hidden">
             <div id="scoreboard-detail"></div>
         </div>
-        <div id="buy-menu" class="hidden">
-             BuyMenu weapon stats (ammo, kill award ($), damage, fire rate, recoil control, accurate range, armor penetration) and each hit box damage
-        </div>
+        <div id="buy-menu" class="hidden"></div>
         <section>
             <div class="left">
                 <div class="top">
@@ -442,5 +475,14 @@ export class HUD {
         this.#elements.aliveOpponentTeam = elementHud.querySelector('.team-opponent-alive')
         this.#elements.time = elementHud.querySelector('#time')
         this.#elements.killFeed = elementHud.querySelector('.kill-feed')
+
+        const game = this.#game
+        this.#elements.buyMenu.addEventListener('click', function (e) {
+            if (!e.target.classList.contains('action-buy')) {
+                return
+            }
+
+            game.buyList.push(e.target.dataset.buyMenuItemId)
+        }, {capture: true})
     }
 }

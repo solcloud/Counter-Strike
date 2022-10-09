@@ -14,6 +14,7 @@ export class Game {
     eventProcessor
     score = null
     alivePlayers = [0, 0]
+    buyList = []
     players = []
     playerMe = null
 

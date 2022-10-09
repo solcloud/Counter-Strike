@@ -30,6 +30,7 @@ class BuyMenu
             BuyMenuItem::RIFLE_AK => $this->forAttackerStore ? new Weapon\RifleAk() : null,
             BuyMenuItem::RIFLE_M4A4 => !$this->forAttackerStore ? new  Weapon\RifleM4A4() : null,
             BuyMenuItem::PISTOL_USP => !$this->forAttackerStore ? new  Weapon\PistolUsp() : null,
+            BuyMenuItem::PISTOL_GLOCK => $this->forAttackerStore ? new  Weapon\PistolGlock() : null,
             BuyMenuItem::PISTOL_P250 => new  Weapon\PistolP250(),
             BuyMenuItem::GRENADE_FLASH => new Equipment\Flashbang(),
             BuyMenuItem::GRENADE_SMOKE => new Equipment\Smoke(),
@@ -37,12 +38,11 @@ class BuyMenu
             BuyMenuItem::GRENADE_HE => new Equipment\HighExplosive(),
             BuyMenuItem::GRENADE_MOLOTOV => $this->forAttackerStore ? new Equipment\Molotov() : new Equipment\Incendiary(),
             BuyMenuItem::KEVLAR_BODY_AND_HEAD => new Equipment\Kevlar(true),
-            default => null,
+            default => throw new GameException("Unknown buy request for side '{$this->forAttackerStore}' and item '{$buyCandidate->name}'"),
         };
 
         if (!$item) {
-            $side = $this->forAttackerStore ? "Attacker" : "Defender";
-            throw new GameException("Unknown '{$side}' buy request for item '{$buyCandidate->name}'");
+            return null;
         }
 
         if (!isset($this->itemBuyCount[$item->getId()])) {
