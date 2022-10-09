@@ -236,7 +236,7 @@ final class Player
             "money"       => $this->getInventory()->getDollars(),
             "item"        => $equippedItem->toArray(),
             "canAttack"   => $equippedItem->canAttack($this->world->getTickId()),
-            "canBuy"      => true, // todo
+            "canBuy"      => $this->world->canBuy($this),
             "slots"       => $this->getInventory()->getFilledSlots(),
             "health"      => $this->health,
             "position"    => $this->position->toArray(),

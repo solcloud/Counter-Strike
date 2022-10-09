@@ -2,6 +2,7 @@
 
 namespace Test\World;
 
+use cs\Core\Box;
 use cs\Core\Collision;
 use cs\Core\Floor;
 use cs\Core\Point;
@@ -210,6 +211,32 @@ class CollisionTest extends BaseTest
         ];
         foreach ($points as $point) {
             $this->assertFalse(Collision::pointWithSphere($point, $sphereCenter, $sphereRadius), "Point: {$point}");
+        }
+    }
+
+    public function testPointWithBox(): void
+    {
+        $box = new Box(new Point(1, 1, 1), 10, 2, 4);
+
+        $points = [
+            new Point(1, 1, 3),
+            new Point(2, 2, 4),
+            new Point(11, 2, 1),
+            new Point(10, 3, 3),
+        ];
+        foreach ($points as $point) {
+            $this->assertTrue(Collision::pointWithBox($point, $box), "Point: {$point}");
+        }
+        $points = [
+            new Point(1, 1, -3),
+            new Point(2, 4, 4),
+            new Point(12, 2, 1),
+            new Point(-1, 3, 3),
+            new Point(2, 2, 0),
+            new Point(2, 2, 6),
+        ];
+        foreach ($points as $point) {
+            $this->assertFalse(Collision::pointWithBox($point, $box), "Point: {$point}");
         }
     }
 

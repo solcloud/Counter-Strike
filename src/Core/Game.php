@@ -38,6 +38,7 @@ class Game
     private int $roundNumber = 1;
     private int $roundStartTickId = 0;
     private int $roundTickCount = 0;
+    private int $buyTimeTickCount = 0;
     private int $playersCountAttackers = 0;
     private int $playersCountDefenders = 0;
     private bool $paused = true;
@@ -57,6 +58,7 @@ class Game
     private function initialize(): void
     {
         $this->roundTickCount = Util::millisecondsToFrames($this->properties->round_time_ms);
+        $this->buyTimeTickCount = Util::millisecondsToFrames($this->properties->buy_time_sec * 1000);
         $this->startRoundFreezeTime = new PauseStartEvent($this, PauseReason::FREEZE_TIME, function (): void {
             $this->paused = false;
             $this->addEvent(new PauseEndEvent());
@@ -187,6 +189,11 @@ class Game
         return $this->tick;
     }
 
+    public function playersCanBuy(): bool
+    {
+        return ($this->tick <= $this->roundStartTickId + $this->buyTimeTickCount);
+    }
+
     public function loadMap(Map $map): void
     {
         $this->world->loadMap($map);
@@ -294,6 +301,7 @@ class Game
                 $player->getInventory()->earnMoney($this->calculateRoundMoneyAward($roundEndEvent, $player));
             }
             $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
+            $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide()));
             $player->setPosition($spawnPosition);
         }
         $this->bombPlanted = false;

@@ -24,7 +24,7 @@ class PlayerKillTest extends BaseTestCase
     {
         $startMoney = 6000;
         $player2Commands = [
-            fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_M4A4),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_M4A4)),
             fn(Player $p) => $p->getSight()->lookHorizontal(180),
             $this->waitNTicks(RifleAk::equipReadyTimeMs) - 2,
             $this->endGame(),

@@ -10,6 +10,10 @@ use cs\Core\Setting;
 
 class DefaultMap extends BoxMap
 {
+
+    /** @var Box[] */
+    private array $buyArea;
+
     public function __construct()
     {
         $attackers = [];
@@ -46,6 +50,19 @@ class DefaultMap extends BoxMap
 
         $this->setAttackersSpawnPositions($attackers);
         $this->setDefendersSpawnPositions($defenders);
+
+        $this->buyArea[0] = new Box((new Point())->addZ(26 * $scale), 43 * $scale, 2 * Setting::playerHeadHeightStand(), 6 * $scale);
+        $this->buyArea[1] = new Box(new Point(), 43 * $scale, 2 * Setting::playerHeadHeightStand(), 6 * $scale);
+    }
+
+    public function getSpawnRotationDefender(): int
+    {
+        return 180;
+    }
+
+    public function getBuyArea(bool $forAttackers): Box
+    {
+        return $this->buyArea[(int)$forAttackers];
     }
 
 }

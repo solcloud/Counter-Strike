@@ -45,7 +45,10 @@ trait InventoryTrait
 
     public function buyItem(BuyMenuItem $item): bool
     {
-        #if (canBuy()) // todo: check for buy menu area, buy time
+        if (!$this->world->canBuy($this)) {
+            return false;
+        }
+
         $equipEvent = $this->inventory->purchase($item);
         if ($equipEvent) {
             $this->addEvent($equipEvent, $this->eventIdPrimary);

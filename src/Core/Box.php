@@ -77,4 +77,19 @@ class Box extends SolidSurface
         return $this->lowerLeftPoint;
     }
 
+    /**
+     * @return array<string,int>
+     */
+    public function toArray(): array
+    {
+        return [
+            "width"  => $this->widthX,
+            "height" => $this->heightY,
+            "depth"  => $this->depthZ,
+            "x"      => $this->lowerLeftPoint->x,
+            "y"      => $this->lowerLeftPoint->y,
+            "z"      => $this->lowerLeftPoint->z,
+        ];
+    }
+
 }

@@ -45,6 +45,14 @@ export class Player {
         return this.custom.slotId
     }
 
+    getTeamName() {
+        return (this.isAttacker() ? 'Attackers' : 'Defenders')
+    }
+
+    getOtherTeamName() {
+        return (this.isAttacker() ? 'Defenders' : 'Attackers')
+    }
+
     getTeamIndex() {
         return (this.data.isAttacker ? 1 : 0)
     }

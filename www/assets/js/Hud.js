@@ -14,6 +14,7 @@ export class HUD {
         score: null,
         scoreDetail: null,
         buyMenu: null,
+        canBuyIcon: null,
         equippedItem: null,
         slotModel: null,
         inventory: null,
@@ -53,7 +54,7 @@ export class HUD {
 
     toggleBuyMenu(getCursorCallback) {
         this.#setting.showBuyMenu = !this.#setting.showBuyMenu
-        if (this.#setting.showBuyMenu) {
+        if (this.#setting.showBuyMenu && this.#game.playerMe.data.canBuy) {
             getCursorCallback()
         }
     }
@@ -138,8 +139,6 @@ export class HUD {
         const game = this.#game
         const scoreObject = this.#scoreObject;
         const meIsAttacker = game.playerMe.isAttacker()
-        const myTeam = (meIsAttacker ? 'Attackers' : 'Defenders')
-        const opponentTeam = (meIsAttacker ? 'Defenders' : 'Attackers')
         const myTeamIndex = game.playerMe.getTeamIndex()
         const otherTeamIndex = game.playerMe.getOtherTeamIndex()
 
@@ -147,7 +146,7 @@ export class HUD {
         <div>
             <table>
                 <tr>
-                    <td class="score-my color-me">${scoreObject.score[myTeamIndex]}<p>Score ${myTeam}</p></td>
+                    <td class="score-my color-me">${scoreObject.score[myTeamIndex]}<p>Score ${game.playerMe.getTeamName()}</p></td>
                     <td class="score-players players-my">
                         ${this.#renderPlayerStats(scoreObject.scoreboard[myTeamIndex], game.players, false)}
                     </td>
@@ -187,7 +186,7 @@ export class HUD {
         <div>
             <table>
                 <tr>
-                    <td class="score-opponent color-opponent">${scoreObject.score[otherTeamIndex]}<p>Score ${opponentTeam}</p></td>
+                    <td class="score-opponent color-opponent">${scoreObject.score[otherTeamIndex]}<p>Score ${game.playerMe.getOtherTeamName()}</p></td>
                     <td class="score-players players-opponent">
                         ${this.#renderPlayerStats(scoreObject.scoreboard[otherTeamIndex], game.players, true)}
                     </td>
@@ -339,21 +338,20 @@ export class HUD {
         this.#lastBuyMenuPlayerMoney = money
 
         buyMenuElement.innerHTML = `
-            <h3>Equipment:</h3>
+            <p class="title">${this.#game.playerMe.getTeamName()} Buy Store. Your money balance $ <strong>${money}</strong></p>
+            <h3>Equipment</h3>
             <p${money < 1000 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="10" class="hud-action action-buy">Buy Kevlar + Helmet for $ 1,000</a></p>
-            <h3>Pistols:</h3>
+            <h3>Pistols</h3>
         ${isAttacker
             ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="11" class="hud-action action-buy">Buy Glock for $ 200</a></p>`
             : `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="8" class="hud-action action-buy">Buy USP for $ 200</a></p>`
         }
             <p${money < 250 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="9" class="hud-action action-buy">Buy P-250 for $ 250</a></p>
-            <h3>Rifles:</h3>
+            <h3>Rifles</h3>
         ${isAttacker
             ? `<p${money < 2700 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="1" class="hud-action action-buy">Buy AK-47 for $ 2,700</a></p>`
             : `<p${money < 3100 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="7" class="hud-action action-buy">Buy M4-A1 for $ 3,100</a></p>`
         }
-            <hr>
-            <h3 style="text-align:right">Your money: ${money}</h3>
         `;
     }
 
@@ -365,6 +363,7 @@ export class HUD {
         } else {
             this.#elements.score.classList.add('hidden');
         }
+        this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
         if (player.canBuy && hs.showBuyMenu) {
             this.#refreshBuyMenu(player)
             this.#elements.buyMenu.classList.remove('hidden');
@@ -412,7 +411,7 @@ export class HUD {
                         <br><br><br>
                         <br><br><br>
                     </div>
-                    <div class="money bg"><span data-money>0</span> $ 🛒</div>
+                    <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
                 </div>
                 <div class="bottom">
                     <div class="health row bg">
@@ -459,6 +458,7 @@ export class HUD {
 
         this.#elements.score = elementHud.querySelector('#scoreboard')
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
+        this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img')

@@ -9,6 +9,10 @@ require __DIR__ . '/../vendor/autoload.php';
 $map = new Map\DefaultMap();
 ////////
 
+$buyAreas = [
+    $map->getBuyArea(false)->toArray(),
+    $map->getBuyArea(true)->toArray(),
+];
 $spawnAttackers = [];
 foreach ($map->getSpawnPositionAttacker() as $point) {
     $spawnAttackers[] = $point->toArray();
@@ -19,14 +23,7 @@ foreach ($map->getSpawnPositionDefender() as $point) {
 }
 $boxes = [];
 foreach ($map->getBoxes() as $box) {
-    $boxes[] = [
-        "width"  => $box->widthX,
-        "height" => $box->heightY,
-        "depth"  => $box->depthZ,
-        "x"      => $box->getBase()->x,
-        "y"      => $box->getBase()->y,
-        "z"      => $box->getBase()->z,
-    ];
+    $boxes[] = $box->toArray();
 }
 ?>
 <!Doctype html>
@@ -166,6 +163,32 @@ foreach ($map->getBoxes() as $box) {
         })
     }
 
+    function buyAreas() {
+        const buyAreas = JSON.parse('<?= json_encode($buyAreas) ?>');
+
+        let box = buyAreas[0];
+        const areaDefenders = new THREE.Mesh(
+            new THREE.BoxGeometry(box.width, box.height, box.depth),
+            new THREE.MeshStandardMaterial({color: 0x0000DD, wireframe: true, transparent: true, opacity: 0.1})
+        );
+        areaDefenders.position.set(box.x, box.y, -1 * box.z)
+        areaDefenders.translateX(box.width / 2)
+        areaDefenders.translateY(box.height / 2)
+        areaDefenders.translateZ(box.depth / -2)
+
+        box = buyAreas[1];
+        const areaAttackers = new THREE.Mesh(
+            new THREE.BoxGeometry(box.width, box.height, box.depth),
+            new THREE.MeshStandardMaterial({color: 0xDD0000, wireframe: true, transparent: true, opacity: 0.1})
+        );
+        areaAttackers.position.set(box.x, box.y, -1 * box.z)
+        areaAttackers.translateX(box.width / 2)
+        areaAttackers.translateY(box.height / 2)
+        areaAttackers.translateZ(box.depth / -2)
+
+        scene.add(areaDefenders, areaAttackers);
+    }
+
     function animate() {
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
@@ -174,6 +197,7 @@ foreach ($map->getBoxes() as $box) {
     init()
     object()
     spawns()
+    buyAreas()
     animate()
 </script>
 </body>

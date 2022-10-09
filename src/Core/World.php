@@ -140,6 +140,21 @@ class World
         return Collision::circleWithPlane($position->to2D('xz'), $radius, $floor);
     }
 
+    public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset = 90): int
+    {
+        if (null === $this->map) {
+            throw new GameException("No map is loaded! Cannot spawn players.");
+        }
+
+        if ($isAttacker) {
+            $base = $this->map->getSpawnRotationAttacker();
+        } else {
+            $base = $this->map->getSpawnRotationDefender();
+        }
+
+        return $base + rand(-$maxRandomOffset, $maxRandomOffset);
+    }
+
     public function getPlayerSpawnPosition(bool $isAttacker, bool $randomizeSpawnPosition): Point
     {
         if (null === $this->map) {
@@ -216,6 +231,24 @@ class World
         }
 
         return $hits;
+    }
+
+    private function isInsideBuyArea(Player $player): bool
+    {
+        if (null === $this->map) {
+            throw new GameException("No map is loaded! Cannot load buy areas.");
+        }
+
+        $buyArea = $this->map->getBuyArea($player->isPlayingOnAttackerSide());
+        return Collision::pointWithBox($player->getPositionImmutable(), $buyArea);
+    }
+
+    public function canBuy(Player $player): bool
+    {
+        if (!$this->game->playersCanBuy()) {
+            return false;
+        }
+        return ($this->isInsideBuyArea($player));
     }
 
     public function getTickId(): int

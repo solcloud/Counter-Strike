@@ -17,6 +17,8 @@ class GameProperty
     public int $half_time_freeze_sec = 4;
     const FREEZE_TIME_SEC = 'freeze_time_sec';
     public int $freeze_time_sec = 15;
+    const BUY_TIME_SEC = 'buy_time_sec';
+    public int $buy_time_sec = 20;
     const ROUND_END_COOL_DOWN_SEC = 'round_end_cool_down_sec';
     public int $round_end_cool_down_sec = 4;
     /** @var int[] */

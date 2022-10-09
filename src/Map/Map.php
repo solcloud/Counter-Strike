@@ -2,6 +2,7 @@
 
 namespace cs\Map;
 
+use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Wall;
@@ -64,5 +65,17 @@ abstract class Map
     {
         return $this->spawnPositionDefender;
     }
+
+    public function getSpawnRotationAttacker(): int
+    {
+        return 0;
+    }
+
+    public function getSpawnRotationDefender(): int
+    {
+        return 0;
+    }
+
+    public abstract function getBuyArea(bool $forAttackers): Box;
 
 }

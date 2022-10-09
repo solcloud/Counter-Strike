@@ -114,4 +114,20 @@ class Collision
         );
     }
 
+    public static function pointWithBox(Point $point, Box $box): bool
+    {
+        $base = $box->getBase();
+        if ($point->x < $base->x || $point->x > $base->x + $box->widthX) {
+            return false;
+        }
+        if ($point->y < $base->y || $point->y > $base->y + $box->heightY) {
+            return false;
+        }
+        if ($point->z < $base->z || $point->z > $base->z + $box->depthZ) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

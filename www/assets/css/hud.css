@@ -94,6 +94,17 @@
     background-color: #7e6262;
 }
 
+#hud #buy-menu .title {
+    font-size: 22px;
+    text-align: center;
+}
+
+#hud #buy-menu h3 {
+    border-bottom: 2px solid #317000;
+    margin: 0;
+    padding: 12px 20px;
+}
+
 #hud #buy-menu a {
     color: #43b4fd;
     cursor: pointer;
