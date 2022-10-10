@@ -5,6 +5,7 @@ namespace cs\Core;
 use cs\Enum\GameOverReason;
 use cs\Enum\PauseReason;
 use cs\Enum\RoundEndReason;
+use cs\Enum\SoundType;
 use cs\Event\Event;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
@@ -235,6 +236,8 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerCulprit, $bullet->getShootItem()->getId(), $headShot));
+        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
     public function playerFallDamageKilledEvent(Player $playerDead): void
@@ -243,6 +246,8 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerDead, Floor::class, false));
+        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
     public function endRound(RoundEndEvent $roundEndEvent): void

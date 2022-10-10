@@ -6,6 +6,8 @@ use cs\Core\Inventory;
 use cs\Core\Item;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
+use cs\Enum\SoundType;
+use cs\Event\SoundEvent;
 
 trait InventoryTrait
 {
@@ -40,7 +42,11 @@ trait InventoryTrait
 
     public function dropEquippedItem(): void
     {
-        $this->inventory->dropEquipped();
+        $item = $this->inventory->dropEquipped();
+        if ($item) {
+            $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_DROP);
+            $this->world->makeSound($sound->setPlayer($this)->setItem($item));
+        }
     }
 
     public function buyItem(BuyMenuItem $item): bool
@@ -52,6 +58,8 @@ trait InventoryTrait
         $equipEvent = $this->inventory->purchase($item);
         if ($equipEvent) {
             $this->addEvent($equipEvent, $this->eventIdPrimary);
+            $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_BUY);
+            $this->world->makeSound($sound->setPlayer($this));
             return true;
         }
 

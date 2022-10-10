@@ -233,14 +233,9 @@ class World
         return $hits;
     }
 
-    private function isInsideBuyArea(Player $player): bool
+    public function makeSound(SoundEvent $soundEvent): void
     {
-        if (null === $this->map) {
-            throw new GameException("No map is loaded! Cannot load buy areas.");
-        }
-
-        $buyArea = $this->map->getBuyArea($player->isPlayingOnAttackerSide());
-        return Collision::pointWithBox($player->getPositionImmutable(), $buyArea);
+        $this->game->addSoundEvent($soundEvent);
     }
 
     public function canBuy(Player $player): bool
@@ -248,7 +243,11 @@ class World
         if (!$this->game->playersCanBuy()) {
             return false;
         }
-        return ($this->isInsideBuyArea($player));
+
+        if (null === $this->map) {
+            throw new GameException("No map is loaded! Cannot load buy areas.");
+        }
+        return Collision::pointWithBox($player->getPositionImmutable(), $this->map->getBuyArea($player->isPlayingOnAttackerSide()));
     }
 
     public function getTickId(): int
@@ -309,7 +308,7 @@ class World
             $soundEvent->setSurface($hit);
         }
 
-        $this->game->addSoundEvent($soundEvent);
+        $this->makeSound($soundEvent);
     }
 
     public function isCollisionWithOtherPlayers(int $playerId, Point $point, int $radius, int $height): bool

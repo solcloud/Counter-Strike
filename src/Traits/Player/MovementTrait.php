@@ -9,7 +9,9 @@ use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Enum\ItemType;
+use cs\Enum\SoundType;
 use cs\Event\PlayerMovementEvent;
+use cs\Event\SoundEvent;
 
 trait MovementTrait
 {
@@ -157,6 +159,11 @@ trait MovementTrait
                 $target->setY($newY);
                 $looseFloor = true;
             }
+        }
+
+        if ($this->isRunning() && !$this->isFlying() && !$orig->equals($target)) {
+            $sound = new SoundEvent($target, SoundType::PLAYER_STEP);
+            $this->world->makeSound($sound->setPlayer($this));
         }
 
         return $target;

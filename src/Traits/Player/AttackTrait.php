@@ -2,8 +2,10 @@
 
 namespace cs\Traits\Player;
 
+use cs\Enum\SoundType;
 use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
+use cs\Event\SoundEvent;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
 
@@ -22,6 +24,8 @@ trait AttackTrait
 
         $result = $item->attack($this->createAttackEvent());
         if ($result) {
+            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+            $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
         return null;
@@ -64,6 +68,8 @@ trait AttackTrait
         $event = $item->reload();
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
+            $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_RELOAD);
+            $this->world->makeSound($sound->setPlayer($this)->setItem($item));
         }
     }
 

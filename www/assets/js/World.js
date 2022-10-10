@@ -146,7 +146,7 @@ export class World {
         return canvas;
     }
 
-    playSound(soundPath, position, refDistance = 2) {
+    playSound(soundPath, position, refDistance = 1) {
         const sound = this.#sound
         const audioSource = new THREE.Object3D()
         audioSource.position.set(position.x, position.y, -position.z)

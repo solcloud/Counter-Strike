@@ -19,19 +19,22 @@ class SoundEvent extends TickEvent
     {
     }
 
-    public function setItem(?Item $item): void
+    public function setItem(?Item $item): self
     {
         $this->item = $item;
+        return $this;
     }
 
-    public function setPlayer(?Player $player): void
+    public function setPlayer(?Player $player): self
     {
         $this->player = $player;
+        return $this;
     }
 
-    public function setSurface(?SolidSurface $surface): void
+    public function setSurface(?SolidSurface $surface): self
     {
         $this->surface = $surface;
+        return $this;
     }
 
     public function serialize(): array

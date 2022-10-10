@@ -12,5 +12,7 @@ enum SoundType: int
     case ITEM_DROP = 4;
     case ITEM_BUY = 5;
     case BULLET_HIT = 6;
+    case PLAYER_DEAD = 7;
+    case ITEM_RELOAD = 8;
 
 }

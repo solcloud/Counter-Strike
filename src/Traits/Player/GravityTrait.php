@@ -5,7 +5,9 @@ namespace cs\Traits\Player;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Setting;
+use cs\Enum\SoundType;
 use cs\Event\PlayerGravityEvent;
+use cs\Event\SoundEvent;
 
 trait GravityTrait
 {
@@ -34,6 +36,8 @@ trait GravityTrait
             $candidate->setY($y);
             $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
             if ($floorCandidate) {
+                $sound = new SoundEvent($this->getPositionImmutable(), SoundType::PLAYER_GROUND_TOUCH);
+                $this->world->makeSound($sound->setPlayer($this)->setSurface($floorCandidate));
                 $this->setActiveFloor($floorCandidate);
                 $targetYPosition = $y;
                 break;

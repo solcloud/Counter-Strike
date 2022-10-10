@@ -27,20 +27,24 @@ class RoundTest extends BaseTestCase
             $this->endGame(),
         ];
 
-        $events = [];
+        $killEvents = [];
         $gameProperty = new GameProperty();
         $gameProperty->max_rounds = 1;
         $game = $this->createTestGame(null, $gameProperty);
         $break = false;
-        $game->onEvents(function (array $e) use (&$events, &$break): void {
+        $game->onEvents(function (array $events) use (&$killEvents, &$break): void {
             if ($break) {
                 return;
             }
-            if ($e[0] instanceof GameOverEvent) {
+            if ($events[0] instanceof GameOverEvent) {
                 $break = true;
             }
 
-            $events[] = $e;
+            foreach ($events as $event) {
+                if ($event instanceof KillEvent) {
+                    $killEvents[] = $event;
+                }
+            }
         });
 
         $this->assertSame(1, $game->getRoundNumber());
@@ -50,20 +54,12 @@ class RoundTest extends BaseTestCase
         $this->assertTrue($break);
         $this->assertFalse($game->getPlayer(1)->isAlive());
 
-        $gameOver = array_pop($events);
-        $this->assertIsArray($gameOver);
-        $this->assertCount(1, $gameOver);
-        $this->assertInstanceOf(GameOverEvent::class, $gameOver[0]);
-
-        $killEvents = array_pop($events);
-        $this->assertIsArray($killEvents);
-        $this->assertCount(2, $killEvents);
+        $this->assertCount(1, $killEvents);
         $killEvent = $killEvents[0];
         $this->assertInstanceOf(KillEvent::class, $killEvent);
         $this->assertFalse($killEvent->wasHeadShot());
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
         $this->assertSame(1, $killEvent->getPlayerCulprit()->getId());
-        $this->assertInstanceOf(RoundEndEvent::class, $killEvents[1]);
     }
 
     public function testFreezeTime(): void
