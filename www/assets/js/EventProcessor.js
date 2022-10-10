@@ -95,7 +95,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.SoundEvent] = function (data) {
-            // TODO HRTF https://threejs.org/docs/#api/en/audio/Audio https://threejs.org/examples/?q=audio#webaudio_orientation
+            game.playSound(data)
         }
 
         this.#callbacks = eventsCallback

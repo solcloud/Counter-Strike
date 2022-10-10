@@ -29,7 +29,7 @@ class Server
     private int $countDefenders = 0;
     private int $blockListMax = 500;
     private int $serverLag = 0;
-    private int $tickMicrosecond;
+    private int $tickNanoSeconds;
 
     /** @var array<string,int> [ipAddress-port => playerId] */
     private array $loggedPlayers = [];
@@ -50,10 +50,10 @@ class Server
         if ($tickMs < 0) {
             throw new GameException("Negative tickMs given");
         } elseif ($tickMs === 0) { // tests only
-            $this->tickMicrosecond = 0;
+            $this->tickNanoSeconds = 0;
         } else {
             Util::$TICK_RATE = $tickMs;
-            $this->tickMicrosecond = $tickMs * 1000;
+            $this->tickNanoSeconds = $tickMs * 1000000;
         }
     }
 
@@ -102,7 +102,7 @@ class Server
         $this->sendGameStateToClients();
 
         $tickId = 0;
-        $usLast = (int)(microtime(true) * 1000000);
+        $nsLast = hrtime(true);
 
         while (true) {
             $this->receiveClientsCommands();
@@ -111,21 +111,22 @@ class Server
             if ($gameOverEvent) {
                 break;
             }
+            $tickId++;
 
-            $usCurrent = (int)(microtime(true) * 1000000);
-            $delta = $usCurrent - $usLast;
-            $sleepTimeUs = 0;
-            if ($delta + 100 < $this->tickMicrosecond) {
-                $sleepTimeUs = $this->tickMicrosecond - $delta - 100;
-                usleep($sleepTimeUs);
+            // Sleep time
+            $nsCurrent = hrtime(true);
+            $nsDelta = $nsCurrent - $nsLast;
+            if ($nsDelta < $this->tickNanoSeconds) {
+                $sleepTimeNs = $this->tickNanoSeconds - $nsDelta;
+                $nsLast = $nsCurrent + $sleepTimeNs;
+                time_nanosleep(0, $sleepTimeNs);
             } else {
                 if ($this->serverLag === 0) {
-                    $this->log("First Server tick lag detected on tick '{$tickId}'", LogLevel::WARNING);
+                    $this->log('First Server tick lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
                 }
                 $this->serverLag++;
+                $nsLast = $nsCurrent;
             }
-            $usLast = $usCurrent + $sleepTimeUs;
-            $tickId++;
         }
 
         return $tickId;

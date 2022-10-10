@@ -4,11 +4,14 @@ export class World {
     #scene;
     #camera;
     #renderer;
+    #sound;
     #playerModel;
     #objectLoader;
+    #audioLoader;
 
     constructor() {
         this.#objectLoader = new THREE.ObjectLoader()
+        this.#audioLoader = new THREE.AudioLoader();
     }
 
     async #loadMap(scene, map) {
@@ -36,14 +39,17 @@ export class World {
     }
 
     async init(map, setting) {
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xdadada);
+        const scene = new THREE.Scene()
+        scene.background = new THREE.Color(0xdadada)
 
         this.#playerModel = await this.#loadJSON('/resources/model/player.json')
         await this.#loadMap(scene, map)
 
-        const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999);
+        const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
+        const listener = new THREE.AudioListener()
+        camera.add(listener)
+        this.#sound = new THREE.PositionalAudio(listener)
 
         const glParameters = {}
         if (!setting.prefer_performance) {
@@ -138,6 +144,26 @@ export class World {
         ctx.fillText(playerText, resolution / 2, resolution / 2)
 
         return canvas;
+    }
+
+    playSound(soundPath, position, refDistance = 2) {
+        const sound = this.#sound
+        const audioSource = new THREE.Object3D()
+        audioSource.position.set(position.x, position.y, -position.z)
+        this.#scene.add(audioSource);
+        audioSource.add(sound)
+
+        this.#audioLoader.load(soundPath, function (buffer) {
+            sound.setBuffer(buffer)
+            sound.setRefDistance(refDistance)
+            sound.setVolume(1.0)
+            sound.setLoop(false)
+            sound.onEnded(function () {
+                audioSource.clear()
+                audioSource.removeFromParent()
+            })
+            sound.play()
+        });
     }
 
     render() {

@@ -70,6 +70,11 @@ export class Game {
         this.#hud.requestFullScoreBoardUpdate(this.score)
     }
 
+    playSound(data) {
+        let soundPath = '/resources/sound/pong.mp3' // TODO
+        this.#world.playSound(soundPath, data.position)
+    }
+
     isPlaying() {
         return this.#started
     }
