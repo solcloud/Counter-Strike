@@ -142,7 +142,7 @@ export class Control {
                     running = true;
                     break;
                 case 'KeyB':
-                    hud.toggleBuyMenu(() => pointer.isLocked && pointer.unlock())
+                    hud.toggleBuyMenu()
                     break;
             }
         });
@@ -224,6 +224,13 @@ export class Control {
             return
         }
         this.#pointerLock.lock()
+    }
+
+    requestUnLock() {
+        if (!this.#pointerLock.isLocked) {
+            return
+        }
+        this.#pointerLock.unlock()
     }
 
     getTickAction() {

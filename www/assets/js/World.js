@@ -4,7 +4,7 @@ export class World {
     #scene;
     #camera;
     #renderer;
-    #sound;
+    #soundListener;
     #playerModel;
     #objectLoader;
     #audioLoader;
@@ -49,7 +49,7 @@ export class World {
         camera.rotation.reorder("YXZ")
         const listener = new THREE.AudioListener()
         camera.add(listener)
-        this.#sound = new THREE.PositionalAudio(listener)
+        this.#soundListener = listener
 
         const glParameters = {}
         if (!setting.prefer_performance) {
@@ -147,22 +147,22 @@ export class World {
     }
 
     playSound(soundPath, position, refDistance = 1) {
-        const sound = this.#sound
+        const sound = new THREE.PositionalAudio(this.#soundListener)
         const audioSource = new THREE.Object3D()
         audioSource.position.set(position.x, position.y, -position.z)
-        this.#scene.add(audioSource);
+        this.#scene.add(audioSource)
         audioSource.add(sound)
 
         this.#audioLoader.load(soundPath, function (buffer) {
             sound.setBuffer(buffer)
             sound.setRefDistance(refDistance)
-            sound.setVolume(1.0)
+            sound.setVolume(50)
             sound.setLoop(false)
-            sound.onEnded(function () {
+            sound.play()
+            sound.source.addEventListener('ended', function () {
                 audioSource.clear()
                 audioSource.removeFromParent()
             })
-            sound.play()
         });
     }
 

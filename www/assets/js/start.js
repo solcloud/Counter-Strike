@@ -16,7 +16,7 @@ let launchGame
     const stats = new Stats();
     const game = new Game(world, hud, stats);
     const control = new Control(game, hud)
-    hud.setGame(game)
+    hud.injectDependency(game, control)
 
 ////////////
 

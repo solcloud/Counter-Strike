@@ -2,6 +2,7 @@ import * as Enum from "./Enums.js";
 
 export class HUD {
     #game
+    #cursor
     #setting = {
         showScore: false,
         showBuyMenu: false
@@ -35,8 +36,9 @@ export class HUD {
     #scoreObject = null;
     #lastBuyMenuPlayerMoney = null;
 
-    setGame(game) {
+    injectDependency(game, cursor) {
         this.#game = game
+        this.#cursor = cursor
     }
 
     pause(msg, timeMs) {
@@ -52,11 +54,8 @@ export class HUD {
         this.#setting.showScore = false
     }
 
-    toggleBuyMenu(getCursorCallback) {
+    toggleBuyMenu() {
         this.#setting.showBuyMenu = !this.#setting.showBuyMenu
-        if (this.#setting.showBuyMenu && this.#game.playerMe.data.canBuy) {
-            getCursorCallback()
-        }
     }
 
     hideBuyMenu() {
@@ -365,9 +364,11 @@ export class HUD {
         }
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
         if (player.canBuy && hs.showBuyMenu) {
+            this.#cursor.requestUnLock()
             this.#refreshBuyMenu(player)
             this.#elements.buyMenu.classList.remove('hidden');
-        } else {
+        } else if (!this.#elements.buyMenu.classList.contains('hidden')) {
+            this.#cursor.requestLock()
             this.#elements.buyMenu.innerHTML = ''
             this.#elements.buyMenu.classList.add('hidden');
         }

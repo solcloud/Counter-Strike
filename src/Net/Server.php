@@ -226,6 +226,10 @@ class Server
 
     private function loginPlayer(string $playerAddress, int $playerPort, string $msg): void
     {
+        if (isset($this->loggedPlayers["{$playerAddress}-{$playerPort}"])) {
+            return;
+        }
+
         $playersCount = count($this->clients);
         if ($playersCount >= $this->setting->playersMax) {
             $this->error("Too many players");

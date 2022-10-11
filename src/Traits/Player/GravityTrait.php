@@ -36,7 +36,7 @@ trait GravityTrait
             $candidate->setY($y);
             $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
             if ($floorCandidate) {
-                $sound = new SoundEvent($this->getPositionImmutable(), SoundType::PLAYER_GROUND_TOUCH);
+                $sound = new SoundEvent($this->getPositionImmutable()->setY($y), SoundType::PLAYER_GROUND_TOUCH);
                 $this->world->makeSound($sound->setPlayer($this)->setSurface($floorCandidate));
                 $this->setActiveFloor($floorCandidate);
                 $targetYPosition = $y;

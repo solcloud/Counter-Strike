@@ -68,7 +68,7 @@ trait AttackTrait
         $event = $item->reload();
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
-            $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_RELOAD);
+            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_RELOAD);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
         }
     }

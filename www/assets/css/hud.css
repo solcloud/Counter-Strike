@@ -76,10 +76,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.86);
-    height: 72%;
-    max-height: 1200px;
-    width: 65%;
+    min-width: 700px;
     max-width: 1200px;
+    max-height: 1200px;
     color: white;
     overflow-y: auto;
 }
