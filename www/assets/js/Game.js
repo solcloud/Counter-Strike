@@ -130,7 +130,7 @@ export class Game {
     }
 
     attack() {
-        // TODO attack feedback (audiovisual)
+        this.#hud.showShot()
     }
 
     equip(slotId) {

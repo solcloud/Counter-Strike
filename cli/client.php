@@ -18,7 +18,9 @@ $socket->write('login ' . $loginCode);
 while (true) {
     $response = $socket->read(10241024);
     if ($command) {
-        $socket->write($command);
+        if ($command !== 'afk') {
+            $socket->write($command);
+        }
         continue;
     }
 

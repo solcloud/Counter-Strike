@@ -18,6 +18,7 @@ export class HUD {
         canBuyIcon: null,
         equippedItem: null,
         slotModel: null,
+        shotModel: null,
         inventory: null,
         money: null,
         health: null,
@@ -32,6 +33,7 @@ export class HUD {
         time: null,
         killFeed: null,
     }
+    #shotAnimationInterval = null;
     #countDownIntervalId = null;
     #scoreObject = null;
     #lastBuyMenuPlayerMoney = null;
@@ -354,6 +356,12 @@ export class HUD {
         `;
     }
 
+    showShot() {
+        clearTimeout(this.#shotAnimationInterval)
+        this.#elements.shotModel.classList.remove('hidden');
+        this.#shotAnimationInterval = setTimeout(() => this.#elements.shotModel.classList.add('hidden'), 30)
+    }
+
     updateHud(player) {
         this.#updateScoreBoard()
         const hs = this.#setting
@@ -399,7 +407,12 @@ export class HUD {
 
         elementHud.innerHTML = `
         <div id="cross">✛</div>
-        <div id="equipped-item"><img src="/resources/slot_2.png"></div>
+        <div id="equipped-item">
+            <div style="position:relative">
+                <img data-shot class="hidden" src="/resources/shot.gif">
+                <img data-slot src="/resources/slot_2.png">
+            </div>
+        </div>
         <div id="scoreboard" class="hidden">
             <div id="scoreboard-detail"></div>
         </div>
@@ -462,7 +475,8 @@ export class HUD {
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
-        this.#elements.slotModel = elementHud.querySelector('#equipped-item img')
+        this.#elements.slotModel = elementHud.querySelector('#equipped-item img[data-slot]')
+        this.#elements.shotModel = elementHud.querySelector('#equipped-item img[data-shot]')
         this.#elements.inventory = elementHud.querySelector('.inventory')
         this.#elements.money = elementHud.querySelector('[data-money]')
         this.#elements.health = elementHud.querySelector('[data-health]')

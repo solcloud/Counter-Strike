@@ -40,7 +40,7 @@ foreach ($map->getBoxes() as $box) {
     <textarea class="extra">Generating...</textarea>
 </div>
 <script>
-    let camera, scene, renderer, controls;
+    let camera, scene, renderer, controls, extra;
     const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
     const material = new THREE.MeshLambertMaterial({color: 0x664b17})
 
@@ -72,7 +72,7 @@ foreach ($map->getBoxes() as $box) {
     function object() {
         const json = '<?= json_encode($boxes, JSON_THROW_ON_ERROR) ?>';
         const data = JSON.parse(json);
-        const extra = new THREE.Group()
+        extra = new THREE.Group()
         extra.name = 'extra'
         const map = new THREE.Group()
         map.name = 'map'
@@ -127,14 +127,19 @@ foreach ($map->getBoxes() as $box) {
         const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
         const a1 = new THREE.AmbientLight(0xDADADA, .8)
         extra.add(s1, d1, a1, lightTarget, bulb);
-        const ramp1 = createRamp()
-        ramp1.position.z = -80.1
-        extra.add(ramp1)
 
         scene.add(map, extra)
         renderer.render(scene, camera);
         document.querySelector('textarea.map').innerText = JSON.stringify(map.toJSON())
         document.querySelector('textarea.extra').innerText = JSON.stringify(extra.toJSON())
+    }
+
+    function extraGeometry() {
+        if (<?= (int)($map::class === Map\DefaultMap::class) ?>) {
+            const ramp1 = createRamp()
+            ramp1.position.z = -80.1
+            extra.add(ramp1)
+        }
     }
 
     function spawns() {
@@ -196,6 +201,7 @@ foreach ($map->getBoxes() as $box) {
 
     init()
     object()
+    extraGeometry()
     spawns()
     buyAreas()
     animate()

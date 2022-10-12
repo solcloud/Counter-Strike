@@ -80,6 +80,7 @@ class UtilTest extends BaseTestCase
     public function testRotatePointY(): void
     {
         $data = [
+            0   => [-45, 32],
             45  => [-10, 67],
             65  => [11, 73],
             149 => [79, 18],
@@ -89,6 +90,14 @@ class UtilTest extends BaseTestCase
 
         foreach ($data as $angle => $xz) {
             $this->assertSame($xz, Util::rotatePointY($angle, -45, 32, 15, 8));
+        }
+
+        $data = [
+            111 => [830, 2013],
+        ];
+
+        foreach ($data as $angle => $xz) {
+            $this->assertSame($xz, Util::rotatePointY($angle, 115, 478, 1000, 1000));
         }
     }
 

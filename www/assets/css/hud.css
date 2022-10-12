@@ -25,8 +25,13 @@
     transform: translateX(-50%);
 }
 
-#hud #equipped-item img {
+#hud #equipped-item img[data-slot] {
     width: 30vw;
+}
+
+#hud #equipped-item img[data-shot] {
+    position: absolute;
+    bottom: -160px;
 }
 
 #hud #cross {
