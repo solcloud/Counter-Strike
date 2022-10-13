@@ -10,8 +10,9 @@ export class World {
     #audioLoader;
 
     constructor() {
+        THREE.Cache.enabled = true
         this.#objectLoader = new THREE.ObjectLoader()
-        this.#audioLoader = new THREE.AudioLoader();
+        this.#audioLoader = new THREE.AudioLoader()
     }
 
     async #loadMap(scene, map) {

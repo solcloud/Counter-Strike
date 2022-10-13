@@ -11,6 +11,7 @@ export class Game {
     #hud
     #stats
     #world
+    #hudDebounceTicks = 1
     eventProcessor
     score = null
     alivePlayers = [0, 0]
@@ -204,8 +205,9 @@ export class Game {
 
     render() {
         this.#stats.begin()
-        if (this.#started) {
-            this.#hud.updateHud(this.playerMe.data) // TODO check performance and if heavy debounce to every x tick
+        if (this.#started && --this.#hudDebounceTicks === 0) {
+            this.#hudDebounceTicks = 4
+            this.#hud.updateHud(this.playerMe.data)
         }
         this.#world.render()
         this.#stats.end()

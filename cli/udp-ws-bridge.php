@@ -48,7 +48,7 @@ while (true) {
         if ($loginResponse === '' && $logged) {
             $loginResponse = $serverMsg;
         }
-        $ws->text($serverMsg);
+        $ws->send($serverMsg, 'text', false);
     } catch (ConnectionException $ex) {
         if ($ex->getCode() !== ConnectionException::TIMED_OUT) {
             throw $ex;
