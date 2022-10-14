@@ -2,15 +2,12 @@
 
 namespace Test\Simulation;
 
-use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
-use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Core\Util;
-use cs\Core\Wall;
-use cs\Map\TestMap;
+use cs\Map\Map;
 use cs\Net\PlayerControl;
 use cs\Net\Protocol\TextProtocol;
 use Test\BaseTest;
@@ -34,8 +31,7 @@ class StoreRequestTest extends BaseTest
 
     /**
      * @param array{actionData: array<string,int>, tickMs: int,
-     *     protocol: string, players: array<mixed>, properties: array<string,string|int|bool>,
-     *     walls: array<mixed>, floors: array<mixed>
+     *     protocol: string, players: array<mixed>, properties: array<string,string|int|bool>, map: array<mixed>
      * } $meta
      */
     private function _testRequest(SimulationTester $tester, array $meta, string &$data): void
@@ -51,19 +47,13 @@ class StoreRequestTest extends BaseTest
             [$tickId, $playerId, $request] = explode('~', $line);
             $playerRequests[(int)$tickId][(int)$playerId] = $protocol->parsePlayerControlCommands($request);
         }
+        $this->assertGreaterThan(0, $tickId);
 
-        $game = $this->createGame(count($playerRequests), GameProperty::fromArray($meta['properties']));
-        $game->loadMap(new TestMap());
-        foreach ($meta['walls'] as $wallData) {
-            $game->getWorld()->addWall(Wall::fromArray($wallData)); // @phpstan-ignore-line
-        }
-        foreach ($meta['floors'] as $floorData) {
-            $game->getWorld()->addFloor(Floor::fromArray($floorData)); // @phpstan-ignore-line
-        }
+        $game = $this->createGame((int)$tickId, GameProperty::fromArray($meta['properties']));
+        $game->loadMap(Map::fromArray($meta['map']));
         foreach ($meta['players'] as $playerData) {
             $player = Player::fromArray($playerData); // @phpstan-ignore-line
             $game->addPlayer($player);
-            $player->setPosition(Point::fromArray($playerData['position'])); // @phpstan-ignore-line
         }
 
         $playerControls = [];

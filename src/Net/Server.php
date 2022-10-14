@@ -291,18 +291,17 @@ class Server
      */
     private function saveRequestMetaData(): void
     {
-        $players = [];
-        foreach ($this->game->getPlayers() as $player) {
-            $players[$player->getId()] = $player->toArray();
+        if ($this->game->getProperties()->randomize_spawn_position) {
+            $this->error("Cannot serialize with GameProperty 'randomize_spawn_position' enabled");
         }
+
         file_put_contents($this->saveRequestsPath . '.json', json_encode([
             'tickMs'     => $this->setting->tickMs,
             'actionData' => Setting::getDataArray(),
             'protocol'   => get_class($this->protocol),
             'properties' => $this->game->getProperties()->toArray(),
-            'players'    => $players,
-            'walls'      => $this->game->getWorld()->getWalls(),
-            'floors'     => $this->game->getWorld()->getFloors(),
+            'players'    => array_map(fn(Player $p) => $p->toArray(), $this->game->getPlayers()),
+            'map'        => $this->game->getWorld()->getMap()?->toArray(),
         ], JSON_THROW_ON_ERROR));
     }
 

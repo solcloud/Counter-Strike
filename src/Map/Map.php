@@ -11,9 +11,9 @@ abstract class Map
 {
 
     /** @var Point[] */
-    private array $spawnPositionAttacker = [];
+    protected array $spawnPositionAttacker = [];
     /** @var Point[] */
-    private array $spawnPositionDefender = [];
+    protected array $spawnPositionDefender = [];
 
     /**
      * @param Point[] $positions
@@ -77,5 +77,30 @@ abstract class Map
     }
 
     public abstract function getBuyArea(bool $forAttackers): Box;
+
+    /**
+     * @return array<string,mixed>
+     */
+    public function toArray(): array
+    {
+        return [
+            'floors'                 => array_map(fn(Floor $o) => $o->toArray(), $this->getFloors()),
+            'walls'                  => array_map(fn(Wall $o) => $o->toArray(), $this->getWalls()),
+            'spawnAttackers'         => array_map(fn(Point $o) => $o->toArray(), $this->getSpawnPositionAttacker()),
+            'spawnDefenders'         => array_map(fn(Point $o) => $o->toArray(), $this->getSpawnPositionDefender()),
+            'buyAreaAttackers'       => $this->getBuyArea(true)->toArray(),
+            'buyAreaDefenders'       => $this->getBuyArea(false)->toArray(),
+            'spawnRotationAttackers' => $this->getSpawnRotationAttacker(),
+            'spawnRotationDefenders' => $this->getSpawnRotationDefender(),
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     */
+    public static function fromArray(array $data): ArrayMap
+    {
+        return new ArrayMap($data);
+    }
 
 }

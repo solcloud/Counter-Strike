@@ -24,3 +24,7 @@ function threeHorizontalRotationToServer(eulerYXZ) {
 function serverRotationToThreeRadian(angleDegree) {
     return degreeToRadian(360 - angleDegree)
 }
+
+function serverVerticalRotationToThreeRadian(angleDegree) {
+    return degreeToRadian(angleDegree - 90)
+}

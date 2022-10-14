@@ -359,4 +359,9 @@ class World
         return $output;
     }
 
+    public function getMap(): ?Map
+    {
+        return $this->map;
+    }
+
 }

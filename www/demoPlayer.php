@@ -155,13 +155,21 @@ $frameIdEnd = null;
         spawnPlayer: function (id, color, isAttacker) {
             const radiusHead = <?= Setting::playerHeadRadius() ?>;
             const sightHeight = <?= Setting::playerHeadHeightStand() - Setting::playerHeadRadius() ?>;
+
+            const sight = new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1, 150, 4),
+                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+            );
+            sight.translateY(sight.geometry.parameters.height / 2)
+
             const head = new THREE.Mesh(
                 new THREE.SphereGeometry(radiusHead),
                 new THREE.MeshBasicMaterial({color: 0xFF6600})
             );
             head.name = "head"
-            head.rotation.y = degreeToRadian(90)
+            head.rotation.reorder("YXZ")
             head.position.y = sightHeight
+            head.add(sight)
 
             const radiusBody = <?= Setting::playerBoundingRadius() ?>;
             const heightBody = <?= Setting::playerHeadHeightStand() ?>;
@@ -201,7 +209,9 @@ $frameIdEnd = null;
 
                 console.debug(frameId, playerState.id, playerState.position)
                 player.getObjectByName('head').position.y = playerState.heightSight
+                player.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(playerState.look.vertical)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
+                player.rotation.y = serverRotationToThreeRadian(playerState.look.horizontal)
             })
         }
     }

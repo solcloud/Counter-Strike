@@ -203,7 +203,7 @@ final class Player
     }
 
     /**
-     * @return array{id: int, color: int, isAttacker: bool, position: array{x: int, y: int, z: int}}
+     * @return array{id: int, color: int, isAttacker: bool}
      */
     public function toArray(): array
     {
@@ -211,7 +211,6 @@ final class Player
             'id'         => $this->getId(),
             'color'      => $this->getColor()->value,
             'isAttacker' => $this->isPlayingOnAttackerSide(),
-            'position'   => $this->position->toArray(),
         ];
     }
 

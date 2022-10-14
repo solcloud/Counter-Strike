@@ -92,4 +92,12 @@ class Box extends SolidSurface
         ];
     }
 
+    /**
+     * @param array<string,int> $data
+     */
+    public static function fromArray(array $data): self
+    {
+        return new self(new Point($data['x'], $data['y'], $data['z']), $data['width'], $data['height'], $data['depth']);
+    }
+
 }

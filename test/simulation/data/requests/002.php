@@ -10,6 +10,9 @@ return new class extends SimulationTester {
     public function onTickEnd(GameState $state, int $tick): void
     {
         $pp = $state->getPlayer(1)->getPositionImmutable();
+        if ($tick === 339) {
+            $this->assertPositionSame(new Point(1334, 79, 2435), $pp, "Tick: $tick");
+        }
         if ($pp->z > 2435) {
             $this->fail("Outside map, tick: $tick");
         }
@@ -28,7 +31,7 @@ return new class extends SimulationTester {
 
     public function onGameEnd(Game $game): void
     {
-        $this->assertPositionSame(new Point(1334, 79, 2435), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(1369, 0, 2435), $game->getPlayer(1)->getPositionImmutable());
     }
 
 };
