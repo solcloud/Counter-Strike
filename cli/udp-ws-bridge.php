@@ -16,6 +16,8 @@ $addressUdp = "udp://localhost:{$portUdp}";
 $udp = (new Factory())->createClient($addressUdp, 4);
 
 $ws = new Server([
+    'filter' => ['text'],
+    'fragment_size' => '8192',
     'port'    => $portWs,
     'timeout' => 8,
 ]);

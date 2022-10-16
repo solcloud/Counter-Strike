@@ -7,10 +7,6 @@ export class HUD {
         showScore: false,
         showBuyMenu: false
     }
-    #messages = {
-        top: '',
-        bottom: ''
-    }
     #elements = {
         score: null,
         scoreDetail: null,
@@ -199,7 +195,7 @@ export class HUD {
     }
 
     bombPlanted() {
-        this.#messages.bottom = '<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>40 seconds to detonation.'
+        this.displayBottomMessage('<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>40 seconds to detonation.')
     }
 
     #getPlayerName(player, playerMe) {
@@ -295,12 +291,16 @@ export class HUD {
     }
 
     startWarmup(timeMs) {
-        this.displayTopMessage('Warmup')
+        this.displayTopMessage('Waiting for all players to connect')
         this.#startCountDown(timeMs)
     }
 
     displayTopMessage(msg) {
-        this.#messages.top = msg
+        this.#elements.messageTop.innerText = msg
+    }
+
+    displayBottomMessage(msg) {
+        this.#elements.messageBottom.innerHTML = msg
     }
 
     clearAlerts() {
@@ -310,11 +310,11 @@ export class HUD {
     }
 
     clearTopMessage() {
-        this.#messages.top = ''
+        this.#elements.messageTop.innerText = ''
     }
 
     clearBottomMessage() {
-        this.#messages.bottom = ''
+        this.#elements.messageBottom.innerHTML = ''
     }
 
     equip(slotId, availableSlots) {
@@ -389,8 +389,6 @@ export class HUD {
         } else {
             this.#elements.ammo.innerText = `${player.item.name} - ${player.ammo} / ${player.ammoReserve}`
         }
-        this.#elements.messageTop.innerText = this.#messages.top
-        this.#elements.messageBottom.innerHTML = this.#messages.bottom
 
         let myTeamIndex = +player.isAttacker
         let otherTeamIndex = +!player.isAttacker

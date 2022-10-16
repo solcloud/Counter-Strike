@@ -61,6 +61,6 @@ export class WebSocketConnector {
 
 
             socket.send('') // ping
-        }, tickMs)
+        }, tickMs - 1)
     }
 }

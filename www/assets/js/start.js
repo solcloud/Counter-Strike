@@ -43,6 +43,7 @@ let launchGame
         game.onEnd(function (msg) {
             connector.close()
             alert("Game ended: " + msg)
+            window.location.reload()
         })
         game.onReady(function (options) {
             connector.startLoop(control, options.tickMs)
