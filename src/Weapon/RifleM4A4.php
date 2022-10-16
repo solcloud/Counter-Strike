@@ -23,6 +23,11 @@ final class RifleM4A4 extends AmmoBasedWeapon
     protected int $price = 3100;
     protected int $ammo = 30;
 
+    public function getName(): string
+    {
+        return 'M4-A4';
+    }
+
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
         return match ($hitBox) {

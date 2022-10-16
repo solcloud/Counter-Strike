@@ -6,12 +6,14 @@ use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\HitBox;
 use cs\Core\Player;
+use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
+use cs\Event\KillEvent;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
 use cs\Weapon\RifleM4A4;
@@ -169,20 +171,189 @@ class PlayerKillTest extends BaseTestCase
         $player2 = new Player(2, Color::GREEN, false);
         $player2->getSight()->lookAt(180, -18);
 
-        $game = $this->createOneRoundGame(Setting::tickCountCrouch() + 1);
+        $game = $this->createTestGame();
         $game->addPlayer($player2);
         $game->getPlayer(1)->crouch();
 
-        $game->start();
-        $this->assertSame(Setting::tickCountCrouch(), $game->getTickId());
-        $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
-        $this->assertSame(Setting::playerHeadHeightStand(), $player2->getHeadHeight());
-        $result = $player2->attack();
-        $this->assertNotNull($result);
+        $this->playPlayer($game, [
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
+            function (Player $p) {
+                $this->assertSame(-18, $p->getSight()->getRotationVertical());
+                $result = $p->attack();
+                $this->assertNotNull($result);
 
-        $hits = $result->getHits();
-        $this->assertCount(1, $hits);
-        $this->assertInstanceOf(Wall::class, $hits[0]);
+                $hits = $result->getHits();
+                $this->assertCount(1, $hits);
+                $this->assertInstanceOf(Wall::class, $hits[0]);
+            },
+            $this->endGame(),
+        ], $player2->getId());
+    }
+
+    public function testPlayerVerticalBullet(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->getSight()->lookAt(180, -20);
+
+        $game = $this->createTestGame();
+        $game->getPlayer(1)->crouch();
+        $game->addPlayer($player2);
+        $player2->setPosition((new Point())->addZ(200));
+
+        $this->playPlayer($game, [
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+
+                $hits = $result->getHits();
+                $this->assertGreaterThan(0, $result->getMoneyAward());
+                $this->assertCount(2, $hits);
+                $this->assertInstanceOf(HitBox::class, $hits[0]);
+                $this->assertInstanceOf(Wall::class, $hits[1]);
+            },
+            $this->endGame(),
+        ], $player2->getId());
+    }
+
+    public function testPlayerHorizontalVerticalBullet(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->getSight()->lookAt(209, -19);
+
+        $game = $this->createTestGame();
+        $game->getPlayer(1)->crouch();
+        $game->addPlayer($player2);
+        $player2->setPosition(new Point(100, 0, 200));
+
+        $this->playPlayer($game, [
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+
+                $hits = $result->getHits();
+                $this->assertGreaterThan(0, $result->getMoneyAward());
+                $this->assertCount(2, $hits);
+                $this->assertInstanceOf(HitBox::class, $hits[0]);
+                $this->assertInstanceOf(Wall::class, $hits[1]);
+            },
+            $this->endGame(),
+        ], $player2->getId());
+    }
+
+    public function testPlayerHorizontalVerticalUpBullet(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->crouch();
+        $player2->getSight()->lookAt(207, 6);
+
+        $game = $this->createTestGame();
+        $game->addPlayer($player2);
+        $player2->setPosition(new Point(100, 0, 200));
+
+        $this->playPlayer($game, [
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+
+                $hits = $result->getHits();
+                $this->assertGreaterThan(0, $result->getMoneyAward());
+                $this->assertCount(2, $hits);
+                $this->assertInstanceOf(HitBox::class, $hits[0]);
+                $this->assertInstanceOf(Wall::class, $hits[1]);
+            },
+            $this->endGame(),
+        ], $player2->getId());
+    }
+
+    public function testPlayerHorizontalVerticalUpBullet2(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->crouch();
+        $player2->getSight()->lookAt(47, 6);
+
+        $game = $this->createTestGame();
+        $game->getPlayer(1)->setPosition(new Point(1440, 0, 1457));
+        $game->addPlayer($player2);
+        $player2->setPosition(new Point(989, 0, 1037));
+
+        $this->playPlayer($game, [
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+
+                $hits = $result->getHits();
+                $this->assertGreaterThan(0, $result->getMoneyAward());
+                $this->assertCount(1, $hits);
+                $this->assertInstanceOf(HitBox::class, $hits[0]);
+            },
+            $this->endGame(),
+        ], $player2->getId());
+    }
+
+    public function testMultiRoundKills(): void
+    {
+        $player2 = new Player(2, Color::GREEN, false);
+        $player2->getSight()->lookHorizontal(180);
+
+        $game = $this->createTestGame(null, $this->createNoPauseGameProperty(15));
+        $game->addPlayer($player2);
+
+        $afterRoundWaitTicks = 2;
+        $killEventsCount = 0;
+        $game->onEvents(function (array $events) use (&$killEventsCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof KillEvent) {
+                    $killEventsCount++;
+                    $this->assertTrue($event->wasHeadShot());
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            function (Player $p) {
+                $ar = $p->attack();
+                $this->assertNotNull($ar);
+                $this->assertNotEmpty($ar->getHits());
+            },
+            $this->waitXTicks($afterRoundWaitTicks),
+            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            function (Player $p) {
+                $ar = $p->attack();
+                $this->assertNotNull($ar);
+                $this->assertNotEmpty($ar->getHits());
+            },
+            $this->waitXTicks($afterRoundWaitTicks),
+            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            function (Player $p) {
+                $ar = $p->attack();
+                $this->assertNotNull($ar);
+                $this->assertNotEmpty($ar->getHits());
+            },
+            $this->waitXTicks($afterRoundWaitTicks),
+            $this->endGame(),
+        ], $player2->getId());
+
+
+        $this->assertSame(3, $killEventsCount);
+        $this->assertSame(3, $game->getScore()->getScoreDefenders());
+        $this->assertSame(3 + 1, $game->getRoundNumber());
     }
 
 }

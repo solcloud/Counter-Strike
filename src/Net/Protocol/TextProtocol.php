@@ -26,27 +26,14 @@ class TextProtocol extends Protocol
     }
 
     /**
-     * @param Player[] $playersArray
-     * @param Event[] $eventsArray
+     * @param Player[] $players
+     * @param Event[] $events
      */
-    private function serialize(array $playersArray, array $eventsArray): string
+    public function serialize(array $players, array $events): string
     {
-        $players = [];
-        foreach ($playersArray as $player) {
-            $players[] = $player->serialize();
-        }
-
-        $events = [];
-        foreach ($eventsArray as $event) {
-            $events[] = [
-                'code' => $event->getCode(),
-                'data' => $event->serialize(),
-            ];
-        }
-
         return json_encode([
-            "players" => $players,
-            "events"  => $events,
+            "players" => array_map(fn(Player $p) => $p->serialize(), $players, []),
+            "events"  => array_map(fn(Event $e) => ['code' => $e->getCode(), 'data' => $e->serialize()], $events),
         ], JSON_THROW_ON_ERROR);
     }
 

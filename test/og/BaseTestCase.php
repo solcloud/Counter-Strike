@@ -105,6 +105,18 @@ abstract class BaseTestCase extends BaseTest
         return $game;
     }
 
+    protected function createNoPauseGameProperty(int $maxRounds = 1): GameProperty
+    {
+        $properties = new GameProperty();
+        $properties->max_rounds = $maxRounds;
+        $properties->freeze_time_sec = 0;
+        $properties->half_time_freeze_sec = 0;
+        $properties->round_end_cool_down_sec = 0;
+        $properties->randomize_spawn_position = false;
+
+        return $properties;
+    }
+
     /**
      * @param array<string,int|string> $gameProperties
      * @deprecated rather use createTestGame() maybe

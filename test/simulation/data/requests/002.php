@@ -31,7 +31,7 @@ return new class extends SimulationTester {
 
     public function onGameEnd(Game $game): void
     {
-        $this->assertPositionSame(new Point(1369, 0, 2435), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(1370, 0, 2435), $game->getPlayer(1)->getPositionImmutable());
     }
 
 };

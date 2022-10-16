@@ -95,12 +95,4 @@ abstract class Map
         ];
     }
 
-    /**
-     * @param array<string,mixed> $data
-     */
-    public static function fromArray(array $data): ArrayMap
-    {
-        return new ArrayMap($data);
-    }
-
 }

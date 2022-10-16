@@ -167,6 +167,7 @@ final class Player
     {
         $this->health -= abs($healthDamage);
         if ($this->health <= 0) {
+            $this->health = 0;
             $this->onPlayerDied();
         }
     }

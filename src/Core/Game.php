@@ -300,13 +300,14 @@ class Game
     private function roundReset(bool $firstRound, RoundEndEvent $roundEndEvent): void
     {
         $this->world->roundReset();
+        $randomizeSpawn = $this->properties->randomize_spawn_position;
         foreach ($this->players as $player) {
             $player->roundReset();
             if (!$firstRound) {
                 $player->getInventory()->earnMoney($this->calculateRoundMoneyAward($roundEndEvent, $player));
             }
-            $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
-            $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide()));
+            $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $randomizeSpawn);
+            $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(), $randomizeSpawn ? 80 : 0));
             $player->setPosition($spawnPosition);
         }
         $this->bombPlanted = false;

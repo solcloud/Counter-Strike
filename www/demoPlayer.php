@@ -1,6 +1,8 @@
 <?php
 
 use cs\Core\Setting;
+use cs\Event\EventList;
+use cs\Event\KillEvent;
 
 if (getenv('DEVTOKEN') !== 'dev') {
     exit;
@@ -66,7 +68,7 @@ $frameIdEnd = null;
     }
     $frameIdEnd = $frameId;
     ?>
-    frames[<?= $frameId ?>] = JSON.parse('<?= json_encode($state, JSON_THROW_ON_ERROR) ?>');
+    frames[<?= $frameId ?>] = JSON.parse('<?= addcslashes(json_encode($state, JSON_THROW_ON_ERROR), "'\\") ?>');
     <?php endforeach; ?>
 </script>
 <div class="container">
@@ -152,19 +154,20 @@ $frameIdEnd = null;
             this.gl.render(this.scene, this.camera);
         },
         players: [],
-        spawnPlayer: function (id, color, isAttacker) {
+        spawnPlayer: function (id, colorIndex, isAttacker) {
+            const color = isAttacker ? new THREE.Color(0xff9145) : new THREE.Color(0x43b4fd)
             const radiusHead = <?= Setting::playerHeadRadius() ?>;
             const sightHeight = <?= Setting::playerHeadHeightStand() - Setting::playerHeadRadius() ?>;
 
             const sight = new THREE.Mesh(
                 new THREE.CylinderGeometry(1, 1, 150, 4),
-                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+                new THREE.MeshBasicMaterial({color})
             );
             sight.translateY(sight.geometry.parameters.height / 2)
 
             const head = new THREE.Mesh(
                 new THREE.SphereGeometry(radiusHead),
-                new THREE.MeshBasicMaterial({color: 0xFF6600})
+                new THREE.MeshBasicMaterial({color})
             );
             head.name = "head"
             head.rotation.reorder("YXZ")
@@ -175,20 +178,20 @@ $frameIdEnd = null;
             const heightBody = <?= Setting::playerHeadHeightStand() ?>;
             const body = new THREE.Mesh(
                 new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 16),
-                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2), transparent: true, opacity: .4})
+                new THREE.MeshBasicMaterial({color, transparent: true, opacity: .4})
             );
             body.translateY(body.geometry.parameters.height / 2)
             body.name = "body"
 
             const body0 = new THREE.Mesh(
                 new THREE.CylinderGeometry(1, 1, heightBody, 16),
-                new THREE.MeshBasicMaterial({color: new THREE.Color(0, color * 4, isAttacker ? 255 : 2)})
+                new THREE.MeshBasicMaterial({color, opacity: .2})
             );
             body0.translateY(body0.geometry.parameters.height / 2)
 
             const boundingRadius = new THREE.Mesh(
                 new THREE.CircleGeometry(<?= Setting::playerBoundingRadius() ?>, 16),
-                new THREE.MeshBasicMaterial({color: 0xFF6600, side: THREE.DoubleSide})
+                new THREE.MeshBasicMaterial({color, side: THREE.DoubleSide})
             );
             boundingRadius.rotateX(degreeToRadian(90))
 
@@ -200,6 +203,11 @@ $frameIdEnd = null;
         },
         renderFrame: function (frameId, state) {
             const self = this
+            state.events.forEach(function (event) {
+                if (event.code === <?= EventList::map[KillEvent::class] ?>) {
+                    console.log("KillEvent - frame: " + frameId, event.data)
+                }
+            })
             state.players.forEach(function (playerState) {
                 let player = self.players[playerState.id]
                 if (player === undefined) {
@@ -207,7 +215,7 @@ $frameIdEnd = null;
                     self.players[playerState.id] = player
                 }
 
-                console.debug(frameId, playerState.id, playerState.position)
+                console.debug(frameId, playerState.id, playerState.position, playerState.health)
                 player.getObjectByName('head').position.y = playerState.heightSight
                 player.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(playerState.look.vertical)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))

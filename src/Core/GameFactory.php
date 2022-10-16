@@ -35,6 +35,7 @@ class GameFactory
         $properties->freeze_time_sec = 0;
         $properties->half_time_freeze_sec = 0;
         $properties->round_time_ms = 982123;
+        $properties->round_end_cool_down_sec = 0;
         $properties->randomize_spawn_position = false;
 
         return new Game($properties);

@@ -55,7 +55,7 @@ abstract class Item
 
     public function getName(): string
     {
-        return ItemName::map[$this->getId()] ?? 'Unknown';
+        return 'Unknown: ' . $this->getId();
     }
 
     public function getId(): string

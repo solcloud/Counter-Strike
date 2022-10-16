@@ -7,7 +7,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Setting;
 use cs\Core\Util;
-use cs\Map\Map;
+use cs\Map\ArrayMap;
 use cs\Net\PlayerControl;
 use cs\Net\Protocol\TextProtocol;
 use Test\BaseTest;
@@ -45,12 +45,14 @@ class StoreRequestTest extends BaseTest
         $playerRequests = [];
         foreach (explode("\n", $data) as $line) {
             [$tickId, $playerId, $request] = explode('~', $line);
-            $playerRequests[(int)$tickId][(int)$playerId] = $protocol->parsePlayerControlCommands($request);
+            $tickId = (int)$tickId;
+            $playerRequests[$tickId][(int)$playerId] = $protocol->parsePlayerControlCommands($request);
         }
+        $this->assertNotEmpty($playerRequests);
         $this->assertGreaterThan(0, $tickId);
 
-        $game = $this->createGame((int)$tickId, GameProperty::fromArray($meta['properties']));
-        $game->loadMap(Map::fromArray($meta['map']));
+        $game = $this->createGame($tickId, GameProperty::fromArray($meta['properties']));
+        $game->loadMap(new ArrayMap($meta['map']));
         foreach ($meta['players'] as $playerData) {
             $player = Player::fromArray($playerData); // @phpstan-ignore-line
             $game->addPlayer($player);
@@ -84,12 +86,13 @@ class StoreRequestTest extends BaseTest
         $tester->onGameStart($game);
         $game->start();
         $tester->onGameEnd($game);
+        $this->assertSame($tickId, $game->getTickId());
     }
 
     protected function createGame(int $tickMax, GameProperty $properties): TestGame
     {
         $game = new TestGame($properties);
-        $game->setTickMax($tickMax);
+        $game->setTickMax($tickMax + 1);
         return $game;
     }
 

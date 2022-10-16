@@ -15,12 +15,15 @@ $factory = new Factory();
 $socket = $factory->createClient($address, 4);
 
 $socket->write('login ' . $loginCode);
+if ($command === 'afk') {
+    sleep(1);
+    exit;
+}
+
 while (true) {
     $response = $socket->read(10241024);
     if ($command) {
-        if ($command !== 'afk') {
-            $socket->write($command);
-        }
+        $socket->write($command);
         continue;
     }
 

@@ -23,6 +23,11 @@ final class RifleAk extends AmmoBasedWeapon
     protected int $price = 2700;
     protected int $ammo = 30;
 
+    public function getName(): string
+    {
+        return 'AK-47';
+    }
+
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
         return match ($hitBox) {

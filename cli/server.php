@@ -2,8 +2,7 @@
 
 use cs\Core\ConsoleLogger;
 use cs\Core\GameFactory;
-use cs\Core\Map;
-use cs\Map\DefaultMap;
+use cs\Map as Maps;
 use cs\Net\ClueSocket;
 use cs\Net\Server;
 use cs\Net\ServerSetting;
@@ -23,7 +22,7 @@ $logger->info("Starting server on '{$bindAddress}', waiting maximum of '{$settin
 $net = new ClueSocket($bindAddress);
 
 $game = ($debug ? GameFactory::createDebug() : GameFactory::createDefaultCompetitive());
-$game->loadMap(new DefaultMap());
+$game->loadMap(new Maps\DefaultMap());
 
 $server = new Server($game, $settings, $net);
 $server->setLogger($logger);

@@ -21,6 +21,10 @@ final class PistolGlock extends AmmoBasedWeapon
     protected int $price = 200;
     protected int $ammo = self::magazineCapacity;
 
+    public function getName(): string
+    {
+        return 'Glock';
+    }
 
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {

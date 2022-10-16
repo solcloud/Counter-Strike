@@ -28,14 +28,15 @@ class SphereHitBox implements HitIntersect
     public function calculateWorldCoordinate(Player $player, Point $centerModifier = new Point()): Point
     {
         $angle = $player->getSight()->getRotationHorizontal();
-        $point = $player->getPositionImmutable()->add($centerModifier);
+        $center = $player->getPositionImmutable()->add($centerModifier);
+        $point = $center->clone()->add($this->relativeCenter);
 
         if ($angle === 0) {
-            return $point->add($this->relativeCenter);
+            return $point;
         }
 
-        [$x, $z] = Util::rotatePointY($angle, $this->relativeCenter->x, $this->relativeCenter->z, $point->x, $point->z);
-        return $point->setX($x)->setZ($z)->addY($this->relativeCenter->y);
+        [$x, $z] = Util::rotatePointY($angle, $point->x, $point->z, $center->x, $center->z);
+        return $point->setX($x)->setZ($z);
     }
 
     public function getRelativeCenter(): Point

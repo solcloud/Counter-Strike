@@ -92,13 +92,12 @@ class UtilTest extends BaseTestCase
             $this->assertSame($xz, Util::rotatePointY($angle, -45, 32, 15, 8));
         }
 
-        $data = [
-            111 => [830, 2013],
-        ];
-
-        foreach ($data as $angle => $xz) {
-            $this->assertSame($xz, Util::rotatePointY($angle, 115, 478, 1000, 1000));
-        }
+        $this->assertSame([830, 2013], Util::rotatePointY(111, 115, 478, 1000, 1000));
+        $this->assertSame([10, 1000], Util::rotatePointY(45, 300, 300, 1000, 1000));
+        $this->assertSame([300, 300], Util::rotatePointY(0, 300, 300, 1000, 1000));
+        $this->assertSame([-39, 39], Util::rotatePointY(10, -45, 32, 0, 0 ));
+        $this->assertSame([-31, 45], Util::rotatePointY(20, -45, 32, 0, 0 ));
+        $this->assertSame([-9, 54], Util::rotatePointY(45, -45, 32, 0, 0 ));
     }
 
     public function testPointToPointDistance(): void

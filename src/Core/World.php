@@ -140,7 +140,7 @@ class World
         return Collision::circleWithPlane($position->to2D('xz'), $radius, $floor);
     }
 
-    public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset = 90): int
+    public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset): int
     {
         if (null === $this->map) {
             throw new GameException("No map is loaded! Cannot spawn players.");

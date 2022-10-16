@@ -54,11 +54,11 @@ class HitBoxTest extends BaseTest
         $player = new Player(1, Color::GREEN, true, new Point(15, -20, 8));
         $y = -8;
         $data = [
-            45  => [-10, 67],
-            65  => [11, 73],
-            149 => [79, 18],
-            192 => [69, -28],
-            322 => [-47, -10],
+            45  => [6, 62],
+            65  => [25, 62],
+            149 => [70, 4],
+            192 => [52, -33],
+            322 => [-40, 6],
         ];
 
         foreach ($data as $angle => $xz) {
@@ -72,7 +72,15 @@ class HitBoxTest extends BaseTest
         $sphere = new SphereHitBox(new Point(-45, 12, 32), 38);
         $player = new Player(1, Color::GREEN, true);
         $player->getSight()->lookHorizontal(45);
-        $this->assertPositionSame(new Point(-10, -8, 67), $sphere->calculateWorldCoordinate($player, new Point(15, -20, 8)));
+        $this->assertPositionSame(new Point(6, -8, 62), $sphere->calculateWorldCoordinate($player, new Point(15, -20, 8)));
+    }
+
+    public function testSphereWorldCoordinate(): void
+    {
+        $sphere = new SphereHitBox(new Point(0, 0, 0), 30);
+        $player = new Player(1, Color::GREEN, true);
+        $player->getSight()->lookHorizontal(108);
+        $this->assertPositionNotSame(new Point(499, 0, 3277), $sphere->calculateWorldCoordinate($player, new Point(1440, 0, 1457)));
     }
 
     public function testSphereHitBoxIntersect(): void
@@ -80,6 +88,8 @@ class HitBoxTest extends BaseTest
         $sphere = new SphereHitBox(new Point(-45, 12, 32), 38);
         $player = new Player(1, Color::GREEN, true);
 
+        $this->assertFalse($sphere->intersect($player, new Point(-10, -8, 67)));
+        $player->getSight()->lookHorizontal(10);
         $this->assertFalse($sphere->intersect($player, new Point(-10, -8, 67)));
         $player->getSight()->lookHorizontal(20);
         $this->assertTrue($sphere->intersect($player, new Point(-10, -8, 67)));

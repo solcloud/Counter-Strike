@@ -32,8 +32,13 @@ final class AttackEvent
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide);
         $result = new AttackResult($bullet);
 
+        $prevPos = null;
         while ($bullet->isActive()) {
             $newPos = $this->nextPosition($bullet);
+            if ($prevPos && $newPos->equals($prevPos)) {
+                continue;
+            }
+            $prevPos = $newPos->clone();
             $bullet->move($newPos);
             $hits = $this->world->calculateHits($bullet);
             if ($hits === []) {
