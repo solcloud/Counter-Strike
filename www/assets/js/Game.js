@@ -1,5 +1,6 @@
 import {EventProcessor} from "./EventProcessor.js";
 import {Player} from "./Player.js";
+import {InventorySlot, SoundType} from "./Enums.js";
 
 export class Game {
     #round = 1
@@ -72,8 +73,67 @@ export class Game {
     }
 
     playSound(data) {
-        let soundPath = './resources/sound/pong.mp3' // TODO
-        this.#world.playSound(soundPath, data.position)
+        let soundPath = this.#getSoundPath(data.type, data.item, data.player, data.surface)
+        if (soundPath) {
+            this.#world.playSound(soundPath, data.position)
+        }
+    }
+
+    #getSoundPath(type, item, playerId, surfaceStrength) {
+        let songName = null
+
+        if (type === SoundType.ITEM_DROP) {
+            songName = '12734__leady__dropping-a-gun.wav'
+        } else if (type === SoundType.ITEM_RELOAD) {
+            if (item.slot === InventorySlot.SLOT_SECONDARY) {
+                songName = '618047__mono832__reload.mp3'
+            } else {
+                songName = '15545__lagthenoggin__reload.mp3'
+            }
+            // shotgun 621155__ktfreesound__reload-escopeta-m7.wav
+        } else if (type === SoundType.BULLET_HIT) {
+            if (surfaceStrength) {
+                if (surfaceStrength > 2000) {
+                    songName = '51381__robinhood76__00119-trzepak-3.wav'
+                } else {
+                    songName = '108737__branrainey__boing.wav'
+                }
+            } else if (playerId) {
+                // TODO headshot - 249821__spookymodem__weapon-blow.wav , 632704__adh-dreaming__fly-on-the-wall-snare.wav
+                songName = '512138__beezlefm__item-sound.wav'
+            }
+        } else if (type === SoundType.PLAYER_GROUND_TOUCH) {
+            songName = '211500__taira-komori__knocking-wall.mp3'
+        } else if (type === SoundType.PLAYER_STEP) {
+            if (playerId === this.playerMe.getId()) {
+                songName = '422990__dkiller2204__sfxrunground1.wav'
+            } else {
+                songName = '221626__moodpie__body-impact.wav'
+            }
+        } else if (type === SoundType.ITEM_ATTACK) {
+            if (item.slot === InventorySlot.SLOT_SECONDARY) {
+                songName = '387480__cosmicembers__dart-thud-2.wav'
+            } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
+                songName = '513421__pomeroyjoshua__anu-clap-09.wav'
+            } else {
+                songName = '558117__abdrtar__move.mp3'
+            }
+        } else if (type === SoundType.ITEM_BUY) {
+            songName = '434781__stephenbist__luggage-drop-1.wav'
+        }
+
+        /*
+        TODO:
+        no ammo - 323403__gosfx__sound-1.mp3 , 369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav , 448987__matrixxx__weapon-ready.wav
+        halftime - 538422__rosa-orenes256__referee-whistle-sound.wav
+        bomb planted - 555042__bittermelonheart__soccer-ball-kick.wav
+         */
+
+        if (songName) {
+            return './resources/sound/' + songName
+        }
+        console.log("No song defined for: " + arguments)
+        return null
     }
 
     isPlaying() {

@@ -157,7 +157,7 @@ export class World {
         this.#audioLoader.load(soundPath, function (buffer) {
             sound.setBuffer(buffer)
             sound.setRefDistance(refDistance)
-            sound.setVolume(50)
+            sound.setVolume(30)
             sound.setLoop(false)
             sound.play()
             sound.source.addEventListener('ended', function () {

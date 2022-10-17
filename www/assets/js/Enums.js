@@ -5,6 +5,9 @@ export {
     Color,
     ColorNames,
     RoundEndReasonIcon,
+    SoundType,
+    BuyMenuItem,
+    InventorySlot,
 }
 
 // server/src/Event/EventList.php
@@ -64,4 +67,47 @@ const RoundEndReasonIcon = {
     1: '⏱',
     2: '✂',
     3: '💣',
+}
+
+// server/src/Enum/SoundType.php
+const SoundType = {
+    PLAYER_GROUND_TOUCH: 0,
+    PLAYER_STEP: 1,
+    ITEM_ATTACK: 2,
+    ITEM_ATTACK2: 3,
+    ITEM_DROP: 4,
+    ITEM_BUY: 5,
+    BULLET_HIT: 6,
+    PLAYER_DEAD: 7,
+    ITEM_RELOAD: 8,
+}
+
+// server/src/Enum/BuyMenuItem.php
+const BuyMenuItem = {
+    RIFLE_AK: 1,
+    GRENADE_FLASH: 2,
+    GRENADE_SMOKE: 3,
+    GRENADE_MOLOTOV: 4,
+    GRENADE_HE: 5,
+    GRENADE_DECOY: 6,
+    RIFLE_M4A4: 7,
+    PISTOL_USP: 8,
+    PISTOL_P250: 9,
+    KEVLAR_BODY_AND_HEAD: 10,
+    PISTOL_GLOCK: 11,
+}
+
+// server/src/Enum/InventorySlot.php
+const InventorySlot = {
+    SLOT_KNIFE: 0,
+    SLOT_PRIMARY: 1,
+    SLOT_SECONDARY: 2,
+    SLOT_BOMB_KIT: 3,
+    SLOT_GRENADE_DECOY: 4,
+    SLOT_GRENADE_MOLOTOV: 5,
+    SLOT_GRENADE_SMOKE: 6,
+    SLOT_GRENADE_FLASH: 7,
+    SLOT_GRENADE_HE: 8,
+    SLOT_TASER: 9,
+    SLOT_KEVLAR: 10,
 }
