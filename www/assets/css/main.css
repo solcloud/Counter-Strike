@@ -83,7 +83,7 @@ h2 {
 }
 
 #ui {
-    background: rgba(0, 0, 0, .2) url("/assets/imgs/bg1.jpg") center center;
+    background: rgba(0, 0, 0, .2) url("./../imgs/bg1.jpg") center center;
     background-size: cover;
     box-shadow: inset 0 0 50px #000000;
 }

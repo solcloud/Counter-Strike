@@ -16,10 +16,10 @@ export class World {
     }
 
     async #loadMap(scene, map) {
-        const mapData = await this.#loadJSON(`/resources/map/${map}.json`)
+        const mapData = await this.#loadJSON(`./resources/map/${map}.json`)
         scene.add(mapData)
 
-        const mapDataExtra = await this.#loadJSON(`/resources/map/${map}-extra.json`)
+        const mapDataExtra = await this.#loadJSON(`./resources/map/${map}-extra.json`)
         // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
         const lightTarget = mapDataExtra.getObjectByName('light-target')
         mapDataExtra.traverse(function (object) {
@@ -43,7 +43,7 @@ export class World {
         const scene = new THREE.Scene()
         scene.background = new THREE.Color(0xdadada)
 
-        this.#playerModel = await this.#loadJSON('/resources/model/player.json')
+        this.#playerModel = await this.#loadJSON('./resources/model/player.json')
         await this.#loadMap(scene, map)
 
         const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999)
@@ -106,7 +106,7 @@ export class World {
         const color = new THREE.Color(Enum.Color[colorIndex])
         const headMaterial = new THREE.MeshPhongMaterial({
             map: new THREE.TextureLoader().load(
-                '/resources/face.png'
+                './resources/face.png'
             )
         })
         const bodyTexture = new THREE.Texture(

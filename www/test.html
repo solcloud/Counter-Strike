@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Test</title>
-    <script src="/assets/threejs/three.js"></script>
-    <script src="/assets/js/utils.js"></script>
+    <script src="./assets/threejs/three.js"></script>
+    <script src="./assets/js/utils.js"></script>
     <style>
         body {
             margin: 0;
@@ -41,7 +41,7 @@
             new THREE.SphereGeometry(1),
             new THREE.MeshBasicMaterial({
                 map: new THREE.TextureLoader().load(
-                    '/resources/face.png'
+                    './resources/face.png'
                 )
             })
         );

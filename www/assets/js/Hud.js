@@ -318,7 +318,7 @@ export class HUD {
     }
 
     equip(slotId, availableSlots) {
-        this.#elements.slotModel.src = `/resources/slot_${slotId}.png`
+        this.#elements.slotModel.src = `./resources/slot_${slotId}.png`
         this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
             node.classList.remove('highlight', 'hidden')
             if (!availableSlots[node.dataset.slot]) {
@@ -407,8 +407,8 @@ export class HUD {
         <div id="cross">✛</div>
         <div id="equipped-item">
             <div style="position:relative">
-                <img data-shot class="hidden" src="/resources/shot.gif">
-                <img data-slot src="/resources/slot_2.png">
+                <img data-shot class="hidden" src="./resources/shot.gif">
+                <img data-slot src="./resources/slot_2.png">
             </div>
         </div>
         <div id="scoreboard" class="hidden">

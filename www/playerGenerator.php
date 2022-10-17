@@ -52,8 +52,8 @@ foreach ($collider->getHitBoxes() as $box) {
 <head>
     <meta charset="UTF-8">
     <title>Player model Generator</title>
-    <script src="/assets/threejs/three.js"></script>
-    <script src="/assets/threejs/orbit-control.js"></script>
+    <script src="./assets/threejs/three.js"></script>
+    <script src="./assets/threejs/orbit-control.js"></script>
 </head>
 <body style="margin:0">
 <div style="position:absolute">
@@ -140,7 +140,7 @@ foreach ($collider->getHitBoxes() as $box) {
         renderer.render(scene, camera);
         document.querySelector('textarea').innerText = JSON.stringify(player.toJSON())
 
-        head.children[0].material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('/resources/face.png')})
+        head.children[0].material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('./resources/face.png')})
     }
 
     function extra() {

@@ -54,9 +54,9 @@ $frameIdEnd = null;
             width: 100%;
         }
     </style>
-    <script src="/assets/threejs/three.js"></script>
-    <script src="/assets/threejs/orbit-control.js"></script>
-    <script src="/assets/js/utils.js"></script>
+    <script src="./assets/threejs/three.js"></script>
+    <script src="./assets/threejs/orbit-control.js"></script>
+    <script src="./assets/js/utils.js"></script>
 </head>
 <body>
 <script>

@@ -57,8 +57,8 @@
     </div>
 </div>
 
-<script src="assets/threejs/three.js?v=144"></script>
-<script src="assets/threejs/pointer-lock.js?v=144"></script>
+<script src="./assets/threejs/three.js?v=144"></script>
+<script src="./assets/threejs/pointer-lock.js?v=144"></script>
 <script src="./assets/js/utils.js"></script>
 <script>
     const modal = document.getElementById('modal')
@@ -147,7 +147,7 @@
             map: map
         }
         console.log("Launching game", setting)
-        import("/assets/js/start.js").then(async (ns) => {
+        import("./assets/js/start.js").then(async (ns) => {
             await ns.launchGame(document.body, hud, setting)
         })
     }

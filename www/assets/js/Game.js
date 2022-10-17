@@ -72,7 +72,7 @@ export class Game {
     }
 
     playSound(data) {
-        let soundPath = '/resources/sound/pong.mp3' // TODO
+        let soundPath = './resources/sound/pong.mp3' // TODO
         this.#world.playSound(soundPath, data.position)
     }
 
