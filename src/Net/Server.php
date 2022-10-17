@@ -121,9 +121,7 @@ class Server
                 $nsLast = $nsCurrent + $sleepTimeNs;
                 time_nanosleep(0, $sleepTimeNs);
             } else {
-                if ($this->serverLag === 0) {
-                    $this->log('First Server tick lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
-                }
+                $this->log('Server lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
                 $this->serverLag++;
                 $nsLast = $nsCurrent;
             }

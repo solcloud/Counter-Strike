@@ -1,4 +1,6 @@
-export class WebSocketConnector {
+const dgram = require('dgram');
+
+export class UdpSocketConnector {
     #game;
     #socket;
     sendIntervalId;
@@ -8,45 +10,45 @@ export class WebSocketConnector {
     }
 
     close() {
-        this.#socket.send('CLOSE')
         this.#socket.close()
     }
 
-    connect(address, loginCode) {
+    connect(ip, port, loginCode) {
         let logged = false;
 
-        const socket = new WebSocket(address);
+        const socket = dgram.createSocket('udp4');
         this.#socket = socket
 
         const connector = this
         const game = this.#game
-        socket.onclose = function () {
+        socket.on('close', function () {
             clearInterval(connector.sendIntervalId)
-            console.log("WebSocket closed")
-        };
-        socket.onerror = function (error) {
-            alert(`Cannot connect to '${address}'`)
-            console.log("WebSocket error: " + error.message)
-        };
-        socket.onopen = function () {
-            console.log("WebSocket connection established.")
+            console.log("UdpSocket closed")
+        });
+        socket.on('error', function (error) {
+            alert(`Cannot connect to '${ip}:${port}'`)
+            console.log("UdpSocket error: " + error.message)
+        });
+        socket.on('connect', function () {
+            console.log("UdpSocket connection established.")
             if (!logged) {
                 console.log("Sending login code to server.")
                 socket.send("login " + loginCode)
                 logged = true
             }
-        };
-        socket.onmessage = function (event) {
+        });
+        socket.on('message', function (msg) {
             let state
             try {
-                state = JSON.parse(event.data)
+                state = JSON.parse(msg.toString())
             } catch (err) {
                 game.end("Message parse error! " + err.message)
                 return
             }
             game.tick(state)
-        };
+        });
 
+        socket.connect(port, ip)
     }
 
     startLoop(control, tickMs) {
@@ -54,13 +56,14 @@ export class WebSocketConnector {
         const socket = this.#socket
 
         this.sendIntervalId = setInterval(function () {
-            if (game.isPlaying() && game.meIsAlive()) {
-                socket.send(control.getTickAction())
-                return
+            if (!game.isPlaying() || !game.meIsAlive()) {
+                return;
             }
 
-
-            socket.send('') // ping
+            let data = control.getTickAction()
+            if (data !== '') {
+                socket.send(data)
+            }
         }, tickMs)
     }
 }
