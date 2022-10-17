@@ -19,12 +19,12 @@
     </testsuites>
     <coverage>
         <include>
-            <directory>src/</directory>
+            <directory>server/src/</directory>
         </include>
         <exclude>
-            <directory>src/Equipment/</directory>
-            <directory>src/Map/</directory>
-            <directory>src/Weapon/</directory>
+            <directory>server/src/Equipment/</directory>
+            <directory>server/src/Map/</directory>
+            <directory>server/src/Weapon/</directory>
         </exclude>
     </coverage>
 </phpunit>

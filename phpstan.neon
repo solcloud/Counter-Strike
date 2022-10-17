@@ -5,6 +5,6 @@ includes:
 parameters:
     paths:
         - cli/
-        - src/
+        - server/src/
         - test/
     level: max
