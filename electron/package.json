@@ -2,7 +2,7 @@
     "main": "main.js",
     "scripts": {
         "dev": "electron --no-sandbox .",
-        "build": "electron-packager . build --platform=all --asar --executable-name=csf --ignore='\\.php$' --out='build'"
+        "build": "electron-packager . build --platform=all --asar --executable-name=start_game --ignore='\\.php$' --out='build'"
     },
     "devDependencies": {
         "electron": "*",
