@@ -27,6 +27,11 @@ abstract class Item
         return false;
     }
 
+    public function reset(): void
+    {
+        // empty hook
+    }
+
     public function isUserDroppable(): bool
     {
         if ($this->getType() === ItemType::TYPE_KNIFE) {

@@ -1,4 +1,4 @@
-const dgram = require('dgram');
+const dgram = window.nodeApi.dgram
 
 export class UdpSocketConnector {
     #game;

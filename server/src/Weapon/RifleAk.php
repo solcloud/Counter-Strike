@@ -21,7 +21,7 @@ final class RifleAk extends AmmoBasedWeapon
 
     protected bool $isWeaponPrimary = true;
     protected int $price = 2700;
-    protected int $ammo = 30;
+    protected int $ammo = self::magazineCapacity;
 
     public function getName(): string
     {

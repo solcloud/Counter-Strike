@@ -74,9 +74,13 @@ export class Game {
 
     playSound(data) {
         let soundPath = this.#getSoundPath(data.type, data.item, data.player, data.surface)
-        if (soundPath) {
-            this.#world.playSound(soundPath, data.position)
+        if (!soundPath) {
+            return
         }
+
+        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY]
+        let myPlayerSound = (data.player && data.player === this.playerMe.getId() && myPlayerTypes.includes(data.type))
+        this.#world.playSound(soundPath, data.position, myPlayerSound)
     }
 
     #getSoundPath(type, item, playerId, surfaceStrength) {

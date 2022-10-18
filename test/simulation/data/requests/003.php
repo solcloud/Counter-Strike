@@ -1,6 +1,7 @@
 <?php
 
 use cs\Core\Game;
+use cs\Core\GameState;
 use cs\Event\KillEvent;
 use cs\Weapon\RifleAk;
 use Test\Simulation\SimulationTester;
@@ -19,6 +20,16 @@ return new class extends SimulationTester {
         }
     }
 
+    public function onTickEnd(GameState $state, int $tick): void
+    {
+        if ($tick === 200) {
+            $item = $state->getPlayer(1)->getEquippedItem();
+            $this->assertInstanceOf(RifleAk::class, $item);
+            $this->assertSame(20, $item->getAmmo());
+            $this->assertSame(90, $item->getAmmoReserve());
+        }
+    }
+
     public function onGameEnd(Game $game): void
     {
         $this->assertSame(10, $this->killEvents);
@@ -29,7 +40,10 @@ return new class extends SimulationTester {
         $this->assertSame(0, $game->getScore()->getPlayerStat(2)->getKills());
         $this->assertSame(1, $game->getScore()->getPlayerStat(2)->getDeaths());
         $this->assertSame(RifleAk::killAward * 10 + 3250, $game->getPlayer(1)->getMoney());
-        $this->assertInstanceOf(RifleAk::class, $game->getPlayer(1)->getEquippedItem());
+        $item = $game->getPlayer(1)->getEquippedItem();
+        $this->assertInstanceOf(RifleAk::class, $item);
+        $this->assertSame(30, $item->getAmmo());
+        $this->assertSame(90, $item->getAmmoReserve());
     }
 
 };

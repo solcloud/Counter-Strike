@@ -38,6 +38,10 @@ class Inventory
             $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
             $this->armorType = ArmorType::NONE;
+        } else {
+            foreach ($this->items as $item) {
+                $item->reset();
+            }
         }
 
         $this->store = new BuyMenu($isAttackerSide);

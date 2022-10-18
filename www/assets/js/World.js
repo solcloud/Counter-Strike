@@ -147,17 +147,23 @@ export class World {
         return canvas;
     }
 
-    playSound(soundPath, position, refDistance = 1) {
+    playSound(soundPath, position, inPlayerHead, refDistance = 1) {
         const sound = new THREE.PositionalAudio(this.#soundListener)
         const audioSource = new THREE.Object3D()
-        audioSource.position.set(position.x, position.y, -position.z)
-        this.#scene.add(audioSource)
         audioSource.add(sound)
+
+        if (inPlayerHead) {
+            audioSource.position.setY(-20)
+            this.#camera.add(audioSource)
+        } else {
+            audioSource.position.set(position.x, position.y, -position.z)
+            this.#scene.add(audioSource)
+        }
 
         this.#audioLoader.load(soundPath, function (buffer) {
             sound.setBuffer(buffer)
             sound.setRefDistance(refDistance)
-            sound.setVolume(30)
+            sound.setVolume(50)
             sound.setLoop(false)
             sound.play()
             sound.source.addEventListener('ended', function () {
