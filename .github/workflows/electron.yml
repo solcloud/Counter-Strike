@@ -16,13 +16,13 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: "Install Linux dependencies"
-        timeout-minutes: 1
+        timeout-minutes: 3
         run: |
           sudo apt-get update && sudo apt-get install -y \
             npm
 
       - name: "Install Node dependencies"
-        timeout-minutes: 2
+        timeout-minutes: 3
         run: |
           npm install
 
@@ -30,3 +30,8 @@ jobs:
         timeout-minutes: 3
         run: |
           npm run build
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binary-linux
+          path: electron/build/csf-linux*/
