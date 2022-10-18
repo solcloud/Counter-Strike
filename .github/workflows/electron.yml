@@ -24,13 +24,16 @@ jobs:
       - name: "Install Node dependencies"
         timeout-minutes: 3
         run: |
+          cd electron/
           npm install
 
       - name: "Build Electron apps"
         timeout-minutes: 3
         run: |
+          cd electron/
           npm run build
 
+      - name: "Publish Artifacts"
       - uses: actions/upload-artifact@v3
         with:
           name: binary-linux
