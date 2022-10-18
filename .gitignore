@@ -1,2 +1,4 @@
 /vendor/
+/electron/package-lock.json
+/electron/build/
 /electron/node_modules/

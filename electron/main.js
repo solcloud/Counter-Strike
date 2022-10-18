@@ -15,5 +15,5 @@ app.whenReady().then(() => {
         }
     })
 
-    win.loadFile('../www/index.html')
+    win.loadFile('./www/index.html')
 })

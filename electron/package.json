@@ -1,9 +1,11 @@
 {
     "main": "main.js",
     "scripts": {
-        "start": "electron --no-sandbox ."
+        "dev": "electron --no-sandbox .",
+        "build": "electron-packager . build --platform=all --asar --executable-name=csf --ignore='\\.php$' --out='build'"
     },
     "devDependencies": {
-        "electron": "^21.1.1"
+        "electron": "*",
+        "electron-packager": "*"
     }
 }
