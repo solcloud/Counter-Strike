@@ -31,6 +31,7 @@ jobs:
         timeout-minutes: 3
         run: |
           cd electron/
+          rm -rf build/
           npm run build
 
       - uses: actions/upload-artifact@v3
