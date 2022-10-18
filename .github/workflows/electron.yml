@@ -1,0 +1,29 @@
+name: "Electron"
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'electron/'
+      - 'www/'
+
+jobs:
+  electron-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install Linux dependencies"
+        timeout-minutes: 1
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            npm
+
+      - name: "Install Node dependencies"
+        timeout-minutes: 2
+        run: |
+          npm install
+
+      - name: "Build Electron apps"
+        timeout-minutes: 3
+        run: |
+          npm run build
