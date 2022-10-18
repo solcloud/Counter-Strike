@@ -19,7 +19,7 @@ jobs:
         timeout-minutes: 3
         run: |
           sudo apt-get update && sudo apt-get install -y \
-            npm
+            npm zip
 
       - name: "Install Node dependencies"
         timeout-minutes: 3
@@ -28,27 +28,26 @@ jobs:
           npm install
 
       - name: "Build Electron apps"
-        timeout-minutes: 3
+        timeout-minutes: 5
         run: |
           cd electron/
           rm -rf build/
-          ls -lah .
           npm run build
+          zip -r linux.zip build/build-linux*/
+          zip -r windows.zip build/build-win*/
+          zip -r macos.zip build/build-mas*/
 
-      - uses: actions/upload-artifact@v3
+      - name: "Publish Artifacts"
+        uses: actions/upload-artifact@v3
         with:
-          name: binary-linux
-          path: electron/build/build-linux*/
+          name: linux.zip
+          path: electron/linux.zip
           if-no-files-found: error
       - uses: actions/upload-artifact@v3
         with:
-          name: binary-windows
-          path: electron/build/build-win*/
+          name: windows.zip
+          path: electron/windows.zip
       - uses: actions/upload-artifact@v3
         with:
-          name: binary-mac-darwin
-          path: electron/build/build-darwin*/
-      - uses: actions/upload-artifact@v3
-        with:
-          name: binary-mac-app-store
-          path: electron/build/build-mas*/
+          name: macos.zip
+          path: electron/macos.zip
