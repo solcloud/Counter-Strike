@@ -2,7 +2,6 @@
 
 namespace cs\Equipment;
 
-use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
@@ -11,11 +10,6 @@ class Flashbang extends BaseEquipment
 
     private int $quantity = 1;
     protected int $price = 200;
-
-    public function getId(): int
-    {
-        return BuyMenuItem::GRENADE_FLASH->value;
-    }
 
     public function getType(): ItemType
     {

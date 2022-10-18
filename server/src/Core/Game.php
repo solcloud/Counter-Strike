@@ -3,6 +3,7 @@
 namespace cs\Core;
 
 use cs\Enum\GameOverReason;
+use cs\Enum\ItemId;
 use cs\Enum\PauseReason;
 use cs\Enum\RoundEndReason;
 use cs\Enum\SoundType;
@@ -245,7 +246,7 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->removeKill();
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
-        $this->addEvent(new KillEvent($playerDead, $playerDead, 0, false));
+        $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::SOLID_SURFACE, false));
         $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }

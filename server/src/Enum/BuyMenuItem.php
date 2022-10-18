@@ -5,7 +5,6 @@ namespace cs\Enum;
 enum BuyMenuItem: int
 {
 
-    # case 0 reserved
     case RIFLE_AK = 1;
     case GRENADE_FLASH = 2;
     case GRENADE_SMOKE = 3;

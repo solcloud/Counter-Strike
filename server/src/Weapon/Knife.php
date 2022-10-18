@@ -4,7 +4,6 @@ namespace cs\Weapon;
 
 use cs\Core\Bullet;
 use cs\Enum\ArmorType;
-use cs\Enum\BuyMenuItem;
 use cs\Enum\HitBoxType;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
@@ -26,11 +25,6 @@ final class Knife extends BaseWeapon implements AttackEnable
     public function getSlot(): InventorySlot
     {
         return InventorySlot::SLOT_KNIFE;
-    }
-
-    public function getId(): int
-    {
-        return BuyMenuItem::KNIFE->value;
     }
 
     public function getName(): string

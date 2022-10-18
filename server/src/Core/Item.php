@@ -3,6 +3,7 @@
 namespace cs\Core;
 
 use cs\Enum\InventorySlot;
+use cs\Enum\ItemId;
 use cs\Enum\ItemName;
 use cs\Enum\ItemType;
 use cs\Equipment\Flashbang;
@@ -63,7 +64,10 @@ abstract class Item
         return 'Unknown: ' . get_class($this);
     }
 
-    public abstract function getId(): int;
+    public function getId(): int
+    {
+        return ItemId::$map[get_class($this)];
+    }
 
     public function setSkinId(int $skinId): void
     {
