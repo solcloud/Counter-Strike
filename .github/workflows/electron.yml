@@ -1,0 +1,59 @@
+name: "Electron"
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'electron/'
+      - 'www/'
+
+jobs:
+  electron-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Install Linux dependencies"
+        timeout-minutes: 3
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            npm zip
+
+      - name: "Install Node dependencies"
+        timeout-minutes: 3
+        run: |
+          cd electron/
+          npm install
+
+      - name: "Build Electron apps"
+        timeout-minutes: 5
+        run: |
+          cd electron/
+          rm -rf build/
+          npm run build
+          zip -r linux.zip build/build-linux*/
+          zip -r windows.zip build/build-win*/
+          zip -r macos.zip build/build-mas*/
+
+      - name: "Publish Linux Artifact"
+        timeout-minutes: 5
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux.zip
+          path: electron/linux.zip
+          if-no-files-found: error
+
+      - name: "Publish Windows Artifact"
+        timeout-minutes: 5
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows.zip
+          path: electron/windows.zip
+          if-no-files-found: error
+
+      - name: "Publish MacOS Artifact"
+        timeout-minutes: 5
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos.zip
+          path: electron/macos.zip
+          if-no-files-found: error
