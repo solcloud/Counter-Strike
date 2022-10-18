@@ -8,7 +8,7 @@ enum InventorySlot: int
     case SLOT_KNIFE = 0;
     case SLOT_PRIMARY = 1;
     case SLOT_SECONDARY = 2;
-    case SLOT_BOMB_KIT = 3;
+    case SLOT_BOMB = 3;
 
     case SLOT_GRENADE_DECOY = 4;
     case SLOT_GRENADE_MOLOTOV = 5;

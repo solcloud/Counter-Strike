@@ -9,7 +9,7 @@ use cs\Weapon;
 
 class BuyMenu
 {
-    /** @var array<string,int> */
+    /** @var array<int,int> */
     private array $itemBuyCount = [];
     private int $grenadeCount = 0;
     private int $grenadeCountMax = 4;
@@ -36,8 +36,10 @@ class BuyMenu
             BuyMenuItem::GRENADE_SMOKE => new Equipment\Smoke(),
             BuyMenuItem::GRENADE_DECOY => new Equipment\Decoy(),
             BuyMenuItem::GRENADE_HE => new Equipment\HighExplosive(),
-            BuyMenuItem::GRENADE_MOLOTOV => $this->forAttackerStore ? new Equipment\Molotov() : new Equipment\Incendiary(),
+            BuyMenuItem::GRENADE_MOLOTOV => $this->forAttackerStore ? new Equipment\Molotov() : null,
+            BuyMenuItem::GRENADE_INCENDIARY => $this->forAttackerStore ? null : new Equipment\Incendiary(),
             BuyMenuItem::KEVLAR_BODY_AND_HEAD => new Equipment\Kevlar(true),
+            BuyMenuItem::KEVLAR_BODY => new Equipment\Kevlar(false),
             default => throw new GameException("Unknown buy request for side '{$this->forAttackerStore}' and item '{$buyCandidate->name}'"),
         };
 

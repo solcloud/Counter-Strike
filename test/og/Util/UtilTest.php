@@ -29,7 +29,7 @@ class UtilTest extends BaseTestCase
             3,
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             function (Player $p) use (&$called): void {
-                $this->assertSame($p->getEquippedItem()->getId(), RifleAk::class);
+                $this->assertInstanceOf(RifleAk::class, $p->getEquippedItem());
                 $called = true;
             },
         ];

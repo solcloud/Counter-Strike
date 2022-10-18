@@ -6,7 +6,7 @@ function radianToDegree(radian) {
     return Math.round(THREE.MathUtils.radToDeg(radian))
 }
 
-function threeHorizontalRotationToServer(eulerYXZ) {
+function threeRotationToServer(eulerYXZ) {
     let horizontal = radianToDegree(eulerYXZ.y)
     const vertical = radianToDegree(eulerYXZ.x)
 
@@ -21,7 +21,7 @@ function threeHorizontalRotationToServer(eulerYXZ) {
     return [360 - horizontal, vertical]
 }
 
-function serverRotationToThreeRadian(angleDegree) {
+function serverHorizontalRotationToThreeRadian(angleDegree) {
     return degreeToRadian(360 - angleDegree)
 }
 

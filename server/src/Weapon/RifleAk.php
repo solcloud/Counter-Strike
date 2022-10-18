@@ -3,6 +3,7 @@
 namespace cs\Weapon;
 
 use cs\Enum\ArmorType;
+use cs\Enum\BuyMenuItem;
 use cs\Enum\HitBoxType;
 
 final class RifleAk extends AmmoBasedWeapon
@@ -22,6 +23,11 @@ final class RifleAk extends AmmoBasedWeapon
     protected bool $isWeaponPrimary = true;
     protected int $price = 2700;
     protected int $ammo = self::magazineCapacity;
+
+    public function getId(): int
+    {
+        return BuyMenuItem::RIFLE_AK->value;
+    }
 
     public function getName(): string
     {

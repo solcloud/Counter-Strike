@@ -140,7 +140,7 @@ final class Setting
         return self::$cacheFloat['flyingMovementSpeedMultiplier'];
     }
 
-    public static function getWeaponPrimarySpeedMultiplier(string $itemId): float
+    public static function getWeaponPrimarySpeedMultiplier(int $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"])) {
             self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"] = (self::$data["weaponPrimarySpeedMultiplier-{$itemId}"] ?? 0.6);
@@ -148,7 +148,7 @@ final class Setting
         return self::$cacheFloat["getWeaponPrimarySpeedMultiplier-{$itemId}"];
     }
 
-    public static function getWeaponSecondarySpeedMultiplier(string $itemId): float
+    public static function getWeaponSecondarySpeedMultiplier(int $itemId): float
     {
         if (!isset(self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"])) {
             self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = (self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 0.8);

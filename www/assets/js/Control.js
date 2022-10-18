@@ -1,3 +1,5 @@
+import {InventorySlot} from "./Enums.js";
+
 export class Control {
     #pointerLock;
     #localPlayerActions;
@@ -31,6 +33,7 @@ export class Control {
         this.#pointerLock = new THREE.PointerLockControls(camera, document.body)
         const pointer = this.#pointerLock
 
+        // todo: use binds object for action shortcut and allow changing in settings
         document.addEventListener("click", function (event) {
             event.preventDefault()
             if (!(game.isPlaying() && game.meIsAlive())) {
@@ -39,7 +42,7 @@ export class Control {
 
             if (pointer.isLocked && game.playerMe.data.canAttack) {
                 attack = true
-                let lookAt = threeHorizontalRotationToServer(pointer.getObject().rotation)
+                let lookAt = threeRotationToServer(pointer.getObject().rotation)
                 shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
                 game.attack()
             }
@@ -50,9 +53,9 @@ export class Control {
             }
 
             if (event.deltaY > 0) {
-                equip = 2
+                equip = InventorySlot.SLOT_SECONDARY
             } else {
-                equip = 1
+                equip = InventorySlot.SLOT_PRIMARY
             }
         })
         document.addEventListener('keydown', function (event) {
@@ -126,13 +129,16 @@ export class Control {
                     reload = true;
                     break;
                 case 'KeyQ':
-                    equip = 0;
+                    equip = InventorySlot.SLOT_KNIFE;
                     break;
                 case 'Digit1':
-                    equip = 1;
+                    equip = InventorySlot.SLOT_PRIMARY;
                     break;
                 case 'Digit2':
-                    equip = 2;
+                    equip = InventorySlot.SLOT_SECONDARY;
+                    break;
+                case 'Digit5':
+                    equip = InventorySlot.SLOT_BOMB;
                     break;
                 case 'CapsLock':
                 case 'ControlLeft':
@@ -207,7 +213,7 @@ export class Control {
                 attack = false
             } else {
                 let horizontal, vertical
-                [horizontal, vertical] = threeHorizontalRotationToServer(pointer.getObject().rotation)
+                [horizontal, vertical] = threeRotationToServer(pointer.getObject().rotation)
                 let action = `lookAt ${horizontal} ${vertical}`
                 if (lastLookAt !== action) {
                     serverAction.push(action)

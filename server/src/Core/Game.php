@@ -245,7 +245,7 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->removeKill();
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
-        $this->addEvent(new KillEvent($playerDead, $playerDead, Floor::class, false));
+        $this->addEvent(new KillEvent($playerDead, $playerDead, 0, false));
         $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }

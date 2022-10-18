@@ -264,9 +264,7 @@ export class HUD {
         row.append(dead)
         parentElement.append(row)
 
-        setTimeout(function () {
-            row.remove()
-        }, 3000)
+        setTimeout(() => row.remove(), 3000)
     }
 
     roundStart(roundTimeMs) {
@@ -341,17 +339,17 @@ export class HUD {
         buyMenuElement.innerHTML = `
             <p class="title">${this.#game.playerMe.getTeamName()} Buy Store. Your money balance $ <strong>${money}</strong></p>
             <h3>Equipment</h3>
-            <p${money < 1000 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="10" class="hud-action action-buy">Buy Kevlar + Helmet for $ 1,000</a></p>
+            <p${money < 1000 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.KEVLAR_BODY_AND_HEAD}" class="hud-action action-buy">Buy Kevlar + Helmet for $ 1,000</a></p>
             <h3>Pistols</h3>
         ${isAttacker
-            ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="11" class="hud-action action-buy">Buy Glock for $ 200</a></p>`
-            : `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="8" class="hud-action action-buy">Buy USP for $ 200</a></p>`
+            ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.PISTOL_GLOCK}" class="hud-action action-buy">Buy Glock for $ 200</a></p>`
+            : `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.PISTOL_USP}" class="hud-action action-buy">Buy USP for $ 200</a></p>`
         }
-            <p${money < 250 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="9" class="hud-action action-buy">Buy P-250 for $ 250</a></p>
+            <p${money < 250 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.PISTOL_P250}" class="hud-action action-buy">Buy P-250 for $ 250</a></p>
             <h3>Rifles</h3>
         ${isAttacker
-            ? `<p${money < 2700 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="1" class="hud-action action-buy">Buy AK-47 for $ 2,700</a></p>`
-            : `<p${money < 3100 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="7" class="hud-action action-buy">Buy M4-A1 for $ 3,100</a></p>`
+            ? `<p${money < 2700 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.RIFLE_AK}" class="hud-action action-buy">Buy AK-47 for $ 2,700</a></p>`
+            : `<p${money < 3100 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.RIFLE_M4A4}" class="hud-action action-buy">Buy M4-A1 for $ 3,100</a></p>`
         }
         `;
     }
@@ -390,8 +388,8 @@ export class HUD {
             this.#elements.ammo.innerText = `${player.item.name} - ${player.ammo} / ${player.ammoReserve}`
         }
 
-        let myTeamIndex = +player.isAttacker
-        let otherTeamIndex = +!player.isAttacker
+        let myTeamIndex = this.#game.playerMe.getTeamIndex()
+        let otherTeamIndex = this.#game.playerMe.getOtherTeamIndex()
         this.#elements.scoreMyTeam.innerHTML = this.#game.score.score[myTeamIndex]
         this.#elements.scoreOpponentTeam.innerHTML = this.#game.score.score[otherTeamIndex]
         this.#elements.aliveMyTeam.innerHTML = this.#game.alivePlayers[myTeamIndex]
@@ -408,7 +406,7 @@ export class HUD {
         <div id="equipped-item">
             <div style="position:relative">
                 <img data-shot class="hidden" src="./resources/shot.gif">
-                <img data-slot src="./resources/slot_2.png">
+                <img data-slot src="./resources/slot_${Enum.InventorySlot.SLOT_SECONDARY}.png">
             </div>
         </div>
         <div id="scoreboard" class="hidden">
@@ -455,10 +453,10 @@ export class HUD {
                 <div class="kill-feed">
                 </div>
                 <div class="inventory">
-                    <p data-slot="0">Knife  [q]</p>
-                    <p class="hidden" data-slot="1">Primary [1]</p>
-                    <p class="highlight" data-slot="2">Secondary [2]</p>
-                    <p class="hidden" data-slot="3">Bomb [5]</p>
+                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife  [q]</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary [1]</p>
+                    <p class="highlight" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary [2]</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb [5]</p>
                 </div>
                 <div>
                     <span data-ammo class="ammo bg">

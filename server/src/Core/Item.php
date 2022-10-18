@@ -60,13 +60,10 @@ abstract class Item
 
     public function getName(): string
     {
-        return 'Unknown: ' . $this->getId();
+        return 'Unknown: ' . get_class($this);
     }
 
-    public function getId(): string
-    {
-        return get_class($this);
-    }
+    public abstract function getId(): int;
 
     public function setSkinId(int $skinId): void
     {
@@ -91,7 +88,7 @@ abstract class Item
         if ($this->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
             return true;
         }
-        if ($this->getId() === Flashbang::class && $this->getQuantity() < 2) {
+        if (($this instanceof Flashbang) && $this->getQuantity() < 2) {
             return true;
         }
 

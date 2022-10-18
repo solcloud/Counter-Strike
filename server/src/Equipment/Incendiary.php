@@ -2,6 +2,7 @@
 
 namespace cs\Equipment;
 
+use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
@@ -9,6 +10,11 @@ class Incendiary extends BaseEquipment
 {
 
     protected int $price = 600;
+
+    public function getId(): int
+    {
+        return BuyMenuItem::GRENADE_INCENDIARY->value;
+    }
 
     public function getType(): ItemType
     {

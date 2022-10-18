@@ -17,6 +17,6 @@ interface AttackEnable
 
     public function getKillAward(): int;
 
-    public function getId(): string;
+    public function getId(): int;
 
 }

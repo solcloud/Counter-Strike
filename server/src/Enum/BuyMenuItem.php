@@ -4,6 +4,8 @@ namespace cs\Enum;
 
 enum BuyMenuItem: int
 {
+
+    # case 0 reserved
     case RIFLE_AK = 1;
     case GRENADE_FLASH = 2;
     case GRENADE_SMOKE = 3;
@@ -15,6 +17,9 @@ enum BuyMenuItem: int
     case PISTOL_P250 = 9;
     case KEVLAR_BODY_AND_HEAD = 10;
     case PISTOL_GLOCK = 11;
+    case KEVLAR_BODY = 12;
+    case GRENADE_INCENDIARY = 13;
+    case KNIFE = 14;
 
 
 }

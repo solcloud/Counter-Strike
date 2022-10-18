@@ -239,6 +239,8 @@ export class Game {
             if (this.playerMe.getEquippedSlotId() !== serverState.item.slot) {
                 this.equip(serverState.item.slot)
             }
+        } else {
+            this.updateOtherPlayersModels(player.get3DObject(), serverState)
         }
 
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
@@ -249,7 +251,6 @@ export class Game {
         } else {
             player.data.item = serverState.item
             player.data.isAttacker = serverState.isAttacker
-            this.updateOtherPlayersModels(player.get3DObject(), serverState)
         }
     }
 
@@ -258,7 +259,7 @@ export class Game {
     }
 
     updateOtherPlayersModels(playerObject, data) {
-        playerObject.rotation.y = serverRotationToThreeRadian(data.look.horizontal)
+        playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
 
         const body = playerObject.getObjectByName('body')
         if (body.position.y !== data.heightBody) { // update body height position if changed

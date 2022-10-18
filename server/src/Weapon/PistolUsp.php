@@ -3,6 +3,7 @@
 namespace cs\Weapon;
 
 use cs\Enum\ArmorType;
+use cs\Enum\BuyMenuItem;
 use cs\Enum\HitBoxType;
 
 final class PistolUsp extends AmmoBasedWeapon
@@ -20,6 +21,11 @@ final class PistolUsp extends AmmoBasedWeapon
     protected bool $isWeaponPrimary = false;
     protected int $price = 200;
     protected int $ammo = self::magazineCapacity;
+
+    public function getId(): int
+    {
+        return BuyMenuItem::PISTOL_USP->value;
+    }
 
     public function getName(): string
     {

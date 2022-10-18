@@ -10,7 +10,7 @@ final class KillEvent extends TickEvent
     public function __construct(
         private Player $playerDead,
         private Player $playerCulprit,
-        private string $attackItemId,
+        private int    $attackItemId,
         private bool   $headShot,
     )
     {
@@ -31,7 +31,7 @@ final class KillEvent extends TickEvent
         return $this->headShot;
     }
 
-    public function getAttackItemId(): string
+    public function getAttackItemId(): int
     {
         return $this->attackItemId;
     }

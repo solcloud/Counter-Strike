@@ -3,6 +3,7 @@
 namespace cs\Equipment;
 
 use cs\Enum\ArmorType;
+use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
@@ -22,6 +23,11 @@ class Kevlar extends BaseEquipment
     public function getArmorType(): ArmorType
     {
         return $this->bodyPlusHelmet ? ArmorType::BODY_AND_HEAD : ArmorType::BODY;
+    }
+
+    public function getId(): int
+    {
+        return $this->bodyPlusHelmet ? BuyMenuItem::KEVLAR_BODY_AND_HEAD->value : BuyMenuItem::KEVLAR_BODY->value;
     }
 
     public function getType(): ItemType

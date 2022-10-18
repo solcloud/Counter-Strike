@@ -219,7 +219,7 @@ $frameIdEnd = null;
                 player.getObjectByName('head').position.y = playerState.heightSight
                 player.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(playerState.look.vertical)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
-                player.rotation.y = serverRotationToThreeRadian(playerState.look.horizontal)
+                player.rotation.y = serverHorizontalRotationToThreeRadian(playerState.look.horizontal)
             })
         }
     }
