@@ -5,6 +5,9 @@ on:
     paths:
       - 'electron/'
       - 'www/'
+  pull_request:
+    branches: [master]
+
 
 jobs:
   electron-build:
