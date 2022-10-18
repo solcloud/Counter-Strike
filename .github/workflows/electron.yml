@@ -33,7 +33,6 @@ jobs:
           cd electron/
           npm run build
 
-      - name: "Publish Artifacts"
       - uses: actions/upload-artifact@v3
         with:
           name: binary-linux
