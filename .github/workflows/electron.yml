@@ -33,8 +33,6 @@ jobs:
           cd electron/
           rm -rf build/
           ls -lah .
-          rm -rf build/*
-          rmdir build/
           npm run build
 
       - uses: actions/upload-artifact@v3
