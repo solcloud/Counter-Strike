@@ -37,4 +37,17 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: binary-linux
-          path: electron/build/csf-linux*/
+          path: electron/build/build-linux*/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binary-windows
+          path: electron/build/build-win*/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binary-mac-darwin
+          path: electron/build/build-darwin*/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binary-mac-app-store
+          path: electron/build/build-mas*/
