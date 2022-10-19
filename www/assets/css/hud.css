@@ -217,8 +217,18 @@
     border-top-width: 2px;
 }
 
-#hud .radar {
-    margin-bottom: 2rem;
+#hud #radar {
+    margin: 4px 0 2rem 4px;
+    width: 250px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 0 5px 0 rgba(23, 21, 21, 0.8);
+}
+
+#hud #radar-canvas {
+    width: 100%;
+    height: 100%;
 }
 
 #hud .bg {

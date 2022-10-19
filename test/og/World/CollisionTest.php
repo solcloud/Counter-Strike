@@ -280,5 +280,12 @@ class CollisionTest extends BaseTest
         }
     }
 
+    public function testPlaneWithPlane(): void
+    {
+        $this->assertTrue(Collision::planeWithPlane(new Point2D(0, 0), 3440, 950, new Point2D(45, 0), 88, 190));
+        $this->assertTrue(Collision::planeWithPlane(new Point2D(45, 0), 3440, 950, new Point2D(45, 0), 88, 190));
+        $this->assertFalse(Collision::planeWithPlane(new Point2D(145, 0), 3440, 950, new Point2D(45, 0), 88, 190));
+    }
+
 
 }

@@ -2,6 +2,7 @@ import * as Enum from "./Enums.js";
 import {BuyMenu} from "./hud/BuyMenu.js";
 import {ScoreBoard} from "./hud/ScoreBoard.js";
 import {KillFeed} from "./hud/KillFeed.js";
+import {Radar} from "./hud/Radar.js";
 
 export class HUD {
     #game
@@ -9,6 +10,7 @@ export class HUD {
     #buyMenu = null;
     #scoreBoard = null;
     #killFeed = null;
+    #radar = null;
     #setting = {
         showScore: false,
         showBuyMenu: false
@@ -153,6 +155,9 @@ export class HUD {
 
     updateHud(player) {
         const hs = this.#setting
+        if (this.#radar) {
+            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerMe.getId())
+        }
         if (this.#scoreBoardData !== null) {
             this.#scoreBoard.update(this.#scoreBoardData)
             this.#scoreBoardData = null
@@ -190,7 +195,7 @@ export class HUD {
         this.#elements.aliveOpponentTeam.innerHTML = this.#game.alivePlayers[otherTeamIndex]
     }
 
-    createHud(elementHud) {
+    createHud(elementHud, map, mapSize) {
         if (this.#elements.score) {
             throw new Error("HUD already created")
         }
@@ -210,14 +215,13 @@ export class HUD {
         <section>
             <div class="left">
                 <div class="top">
-                    <div class="radar">
-                        <br><br><br>
-                        <br><br><br>
-                        <br><br><br>
+                    <div id="radar">
+                        <canvas id="radar-canvas"></canvas>
                     </div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
                 </div>
                 <div class="bottom">
+                    <div id="fps-stats"></div>
                     <div class="health row bg">
                         <div class="hp">
                             ➕ <span data-health>100</span>
@@ -285,6 +289,18 @@ export class HUD {
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)
         this.#scoreBoard = new ScoreBoard(game, this.#elements.scoreDetail)
         this.#killFeed = new KillFeed(this.#scoreBoard, this.#elements.killFeed)
+
+        const self = this
+        const radarImage = new Image()
+        radarImage.onload = function () {
+            const radarCanvas = elementHud.querySelector('#radar-canvas')
+            radarCanvas.width = this.width
+            radarCanvas.height = this.height
+            const scaleX = Math.floor(radarCanvas.width / mapSize.x * 100) / 100
+            const scaleY = Math.floor(radarCanvas.height / mapSize.y * 100) / 100
+            self.#radar = new Radar(radarCanvas, radarImage, scaleX + 0.003, scaleY + 0.005)
+        }
+        radarImage.src = `./resources/map/${map}.png`
 
         this.#elements.buyMenu.addEventListener('click', function (e) {
             if (!e.target.classList.contains('action-buy')) {

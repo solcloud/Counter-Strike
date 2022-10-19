@@ -9,6 +9,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $map = new Map\DefaultMap();
 ////////
 
+$radarMapGenerator = (isset($_GET['radar']));
 $buyAreas = [
     $map->getBuyArea(false)->toArray(),
     $map->getBuyArea(true)->toArray(),
@@ -46,14 +47,21 @@ foreach ($map->getBoxes() as $box) {
 
     function init() {
         scene = new THREE.Scene();
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
-        camera.position.y = 4000
 
         renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        if (<?= (int)!$radarMapGenerator ?>) {
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
         document.body.appendChild(renderer.domElement);
+
+        if (<?= (int)$radarMapGenerator ?>) {
+            camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 9000)
+        } else {
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
+        }
+        camera.position.y = 4000
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
         scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
@@ -97,10 +105,12 @@ foreach ($map->getBoxes() as $box) {
                 center.position.set(box.width / 2, box.height / 2, box.depth / -2)
                 center.visible = false
                 map.add(center)
-                camera.position.x = center.position.x;
-                camera.position.z = center.position.z;
-                camera.lookAt(camera.position.x, 0, camera.position.z)
-                controls.update()
+                if (<?= (int)!$radarMapGenerator ?>) {
+                    camera.position.x = center.position.x;
+                    camera.position.z = center.position.z;
+                    camera.lookAt(camera.position.x, 0, camera.position.z)
+                    controls.update()
+                }
 
                 mesh.castShadow = false
                 mesh.material = worldMaterial
@@ -202,8 +212,10 @@ foreach ($map->getBoxes() as $box) {
     init()
     object()
     extraGeometry()
-    spawns()
-    buyAreas()
+    if (<?= (int)!$radarMapGenerator ?>) {
+        spawns()
+        buyAreas()
+    }
     animate()
 </script>
 </body>

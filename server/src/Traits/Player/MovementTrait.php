@@ -192,12 +192,12 @@ trait MovementTrait
             return true;
         }
 
-        // Try step over low height wall
+        // Try step over ONE low height wall
         $floor = null;
-        if ($zWall) {
+        if ($zWall && !$xWall) {
             $floor = $this->canStepOverWall($zWall, $candidate);
         }
-        if ($xWall && !$floor) {
+        if (!$zWall && $xWall && !$floor) {
             $floor = $this->canStepOverWall($xWall, $candidate);
         }
         if ($floor) {

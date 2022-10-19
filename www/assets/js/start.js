@@ -16,6 +16,9 @@ let launchGame
     const game = new Game(world, hud, stats);
     const control = new Control(game, hud)
     hud.injectDependency(game, control)
+    const mapSizes = {
+        "default": {x: 3440, y: 2560},
+    }
 
 ////////////
 
@@ -28,7 +31,7 @@ let launchGame
         let connector
         initialized = true
         const canvas = await world.init(setting.map, setting.world)
-        hud.createHud(elementHud)
+        hud.createHud(elementHud, setting.map, mapSizes[setting.map])
         control.init(world.getCamera())
         document.addEventListener("click", function (e) {
             if (e.target.classList.contains('hud-action')) {
@@ -37,7 +40,8 @@ let launchGame
             control.requestLock()
         }, {capture: true})
         canvasParent.appendChild(canvas)
-        canvasParent.appendChild(stats.dom)
+        stats.dom.style.position = 'inherit'
+        elementHud.querySelector('#fps-stats').appendChild(stats.dom)
 
         game.onEnd(function (msg) {
             connector.close()

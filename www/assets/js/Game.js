@@ -278,6 +278,11 @@ export class Game {
         }
     }
 
+    getMyTeamPlayers() {
+        let meIsAttacker = this.playerMe.isAttacker()
+        return this.players.filter((player) => player.isAttacker() === meIsAttacker)
+    }
+
     meIsAlive() {
         return this.playerMe.isAlive()
     }
