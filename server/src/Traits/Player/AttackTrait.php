@@ -8,6 +8,7 @@ use cs\Event\AttackResult;
 use cs\Event\SoundEvent;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
+use cs\Weapon\AmmoBasedWeapon;
 
 trait AttackTrait
 {
@@ -19,6 +20,11 @@ trait AttackTrait
         }
         $item = $this->getEquippedItem();
         if (!($item instanceof AttackEnable)) {
+            return null;
+        }
+        if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
+            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
+            $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return null;
         }
 

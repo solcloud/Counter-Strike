@@ -44,7 +44,6 @@ export class Control {
                 attack = true
                 let lookAt = threeRotationToServer(pointer.getObject().rotation)
                 shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
-                game.attack()
             }
         })
         document.addEventListener('wheel', (event) => {
@@ -208,6 +207,7 @@ export class Control {
             }
 
             if (attack) {
+                game.attack()
                 serverAction.push(shootLookAt)
                 serverAction.push('attack')
                 attack = false

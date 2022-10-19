@@ -64,6 +64,7 @@ export class EventProcessor {
                     msg = "Timeout defenders"
                     break
                 case PauseReason.HALF_TIME:
+                    game.gameStartOrHalfTimeOrEnd()
                     msg = "Half time"
                     break
             }
@@ -83,6 +84,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.GameStartEvent] = function (options) {
+            game.gameStartOrHalfTimeOrEnd()
             game.setOptions(options)
         }
 

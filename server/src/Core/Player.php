@@ -235,7 +235,7 @@ final class Player
             "color"       => $this->getColor()->value,
             "money"       => $this->getInventory()->getDollars(),
             "item"        => $equippedItem->toArray(),
-            "canAttack"   => $equippedItem->canAttack($this->world->getTickId()),
+            "canAttack"   => $this->world->canAttack($this),
             "canBuy"      => $this->world->canBuy($this),
             "slots"       => $this->getInventory()->getFilledSlots(),
             "health"      => $this->health,

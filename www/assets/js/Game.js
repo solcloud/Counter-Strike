@@ -50,6 +50,7 @@ export class Game {
 
     end(msg) {
         console.log('Game ended')
+        this.gameStartOrHalfTimeOrEnd()
         if (this.#endCallback) {
             this.#endCallback(msg)
         }
@@ -72,70 +73,91 @@ export class Game {
         this.#hud.requestFullScoreBoardUpdate(this.score)
     }
 
+    gameStartOrHalfTimeOrEnd() {
+        this.#world.playSound('538422__rosa-orenes256__referee-whistle-sound.wav', null, true)
+    }
+
     playSound(data) {
-        let soundPath = this.#getSoundPath(data.type, data.item, data.player, data.surface)
-        if (!soundPath) {
+        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface)
+        if (!soundName) {
             return
         }
 
         let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY]
         let myPlayerSound = (data.player && data.player === this.playerMe.getId() && myPlayerTypes.includes(data.type))
-        this.#world.playSound(soundPath, data.position, myPlayerSound)
+        this.#world.playSound(soundName, data.position, myPlayerSound)
     }
 
-    #getSoundPath(type, item, playerId, surfaceStrength) {
-        let songName = null
-
-        if (type === SoundType.ITEM_DROP) {
-            songName = '12734__leady__dropping-a-gun.wav'
-        } else if (type === SoundType.ITEM_RELOAD) {
-            if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                songName = '618047__mono832__reload.mp3'
+    #getSoundName(type, item, playerId, surfaceStrength) {
+        if (type === SoundType.PLAYER_STEP) {
+            if (playerId === this.playerMe.getId()) {
+                return '422990__dkiller2204__sfxrunground1.wav'
             } else {
-                songName = '15545__lagthenoggin__reload.mp3'
+                return '221626__moodpie__body-impact.wav'
+            }
+        }
+
+        if (type === SoundType.ITEM_ATTACK) {
+            if (item.slot === InventorySlot.SLOT_SECONDARY) {
+                return '387480__cosmicembers__dart-thud-2.wav'
+            } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
+                return '513421__pomeroyjoshua__anu-clap-09.wav'
+            } else {
+                return '558117__abdrtar__move.mp3'
+            }
+        }
+
+        if (type === SoundType.ITEM_RELOAD) {
+            if (item.slot === InventorySlot.SLOT_SECONDARY) {
+                return '618047__mono832__reload.mp3'
+            } else {
+                return '15545__lagthenoggin__reload.mp3'
             }
             // shotgun 621155__ktfreesound__reload-escopeta-m7.wav
-        } else if (type === SoundType.BULLET_HIT) {
+        }
+
+        if (type === SoundType.BULLET_HIT_HEADSHOT) {
+            return (playerId === this.playerMe.getId()) ? '249821__spookymodem__weapon-blow.wav' : '632704__adh-dreaming__fly-on-the-wall-snare.wav'
+        }
+
+        if (type === SoundType.BULLET_HIT) {
             if (surfaceStrength) {
                 if (surfaceStrength > 2000) {
-                    songName = '51381__robinhood76__00119-trzepak-3.wav'
+                    return '51381__robinhood76__00119-trzepak-3.wav'
                 } else {
-                    songName = '108737__branrainey__boing.wav'
+                    return '108737__branrainey__boing.wav'
                 }
             } else if (playerId) {
-                // TODO headshot - 249821__spookymodem__weapon-blow.wav , 632704__adh-dreaming__fly-on-the-wall-snare.wav
-                songName = '512138__beezlefm__item-sound.wav'
+                return '512138__beezlefm__item-sound.wav'
             }
-        } else if (type === SoundType.PLAYER_GROUND_TOUCH) {
-            songName = '211500__taira-komori__knocking-wall.mp3'
-        } else if (type === SoundType.PLAYER_STEP) {
-            if (playerId === this.playerMe.getId()) {
-                songName = '422990__dkiller2204__sfxrunground1.wav'
-            } else {
-                songName = '221626__moodpie__body-impact.wav'
-            }
-        } else if (type === SoundType.ITEM_ATTACK) {
+        }
+
+        if (type === SoundType.PLAYER_GROUND_TOUCH) {
+            return '211500__taira-komori__knocking-wall.mp3'
+        }
+
+        if (type === SoundType.ITEM_DROP) {
+            return '12734__leady__dropping-a-gun.wav'
+        }
+
+        if (type === SoundType.ATTACK_NO_AMMO) {
             if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                songName = '387480__cosmicembers__dart-thud-2.wav'
+                return '323403__gosfx__sound-1.mp3'
             } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
-                songName = '513421__pomeroyjoshua__anu-clap-09.wav'
+                return '448987__matrixxx__weapon-ready.wav'
             } else {
-                songName = '558117__abdrtar__move.mp3'
+                return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
             }
-        } else if (type === SoundType.ITEM_BUY) {
-            songName = '434781__stephenbist__luggage-drop-1.wav'
         }
 
-        /*
-        TODO:
-        no ammo - 323403__gosfx__sound-1.mp3 , 369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav , 448987__matrixxx__weapon-ready.wav
-        halftime - 538422__rosa-orenes256__referee-whistle-sound.wav
-        bomb planted - 555042__bittermelonheart__soccer-ball-kick.wav
-         */
-
-        if (songName) {
-            return './resources/sound/' + songName
+        if (type === SoundType.BOMB_PLANTED) {
+            return '555042__bittermelonheart__soccer-ball-kick.wav'
         }
+
+        if (type === SoundType.ITEM_BUY) {
+            return '434781__stephenbist__luggage-drop-1.wav'
+        }
+
         console.log("No song defined for: " + arguments)
         return null
     }
@@ -195,7 +217,9 @@ export class Game {
     }
 
     attack() {
-        this.#hud.showShot()
+        if (this.playerMe.data.ammo > 0) {
+            this.#hud.showShot()
+        }
     }
 
     equip(slotId) {

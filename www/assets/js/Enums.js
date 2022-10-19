@@ -80,6 +80,9 @@ const SoundType = {
     BULLET_HIT: 6,
     PLAYER_DEAD: 7,
     ITEM_RELOAD: 8,
+    BULLET_HIT_HEADSHOT: 9,
+    ATTACK_NO_AMMO: 10,
+    BOMB_PLANTED: 11,
 }
 
 // server/src/Enum/BuyMenuItem.php

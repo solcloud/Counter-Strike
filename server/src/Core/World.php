@@ -238,6 +238,18 @@ class World
         $this->game->addSoundEvent($soundEvent);
     }
 
+    public function canAttack(Player $player): bool
+    {
+        if ($this->game->isPaused()) {
+            return false;
+        }
+        if (!$player->isAlive()) {
+            return false;
+        }
+
+        return $player->getEquippedItem()->canAttack($this->getTickId());
+    }
+
     public function canBuy(Player $player): bool
     {
         if (!$this->game->playersCanBuy()) {
@@ -300,9 +312,9 @@ class World
         return null;
     }
 
-    public function bulletHit(Hittable $hit, Point $position): void
+    public function bulletHit(Hittable $hit, Point $position, bool $wasHeadshot): void
     {
-        $soundEvent = new SoundEvent($position, SoundType::BULLET_HIT);
+        $soundEvent = new SoundEvent($position, $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT);
         $soundEvent->setPlayer($hit->getPlayer());
         if ($hit instanceof SolidSurface) {
             $soundEvent->setSurface($hit);

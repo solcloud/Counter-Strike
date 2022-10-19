@@ -127,6 +127,7 @@ abstract class Item
     public function toArray(): array
     {
         return [
+            'id'   => $this->getId(),
             'type' => $this->getType()->value,
             'slot' => $this->getSlot()->value,
             'name' => $this->getName(),

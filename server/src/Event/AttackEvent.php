@@ -48,7 +48,7 @@ final class AttackEvent
             foreach ($hits as $hit) {
                 $bullet->lowerDamage($hit->getHitAntiForce());
                 $result->addHit($hit);
-                $this->world->bulletHit($hit, $newPos->clone());
+                $this->world->bulletHit($hit, $newPos->clone(), $hit->wasHeadShot());
             }
         }
         return $result;

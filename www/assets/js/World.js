@@ -147,7 +147,7 @@ export class World {
         return canvas;
     }
 
-    playSound(soundPath, position, inPlayerHead, refDistance = 1) {
+    playSound(soundName, position, inPlayerHead, refDistance = 1) {
         const sound = new THREE.PositionalAudio(this.#soundListener)
         const audioSource = new THREE.Object3D()
         audioSource.add(sound)
@@ -160,7 +160,7 @@ export class World {
             this.#scene.add(audioSource)
         }
 
-        this.#audioLoader.load(soundPath, function (buffer) {
+        this.#audioLoader.load('./resources/sound/' + soundName, function (buffer) {
             sound.setBuffer(buffer)
             sound.setRefDistance(refDistance)
             sound.setVolume(50)
