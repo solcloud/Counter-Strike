@@ -31,25 +31,41 @@ export class Control {
         let reload = false
         let equip = false
         let drop = false
+        let spraying = false
 
         const self = this
         const game = this.#game
         const hud = this.#hud
         this.#pointerLock = new THREE.PointerLockControls(camera, document.body)
         const pointer = this.#pointerLock
+        let sprayTriggerStartMs = null;
+        const sprayTriggerDeltaMs = 80; // TODO settings
 
         // todo: use binds object for action shortcut and allow changing in settings
-        document.addEventListener("click", function (event) {
+        document.addEventListener("mouseup", function (event) {
             event.preventDefault()
+            spraying = false
+            sprayTriggerStartMs = null
+        })
+        document.addEventListener("mousedown", function (event) {
+            event.preventDefault()
+            spraying = false
             if (!(game.isPlaying() && game.meIsAlive())) {
                 return
             }
 
-            if (pointer.isLocked && game.playerMe.data.canAttack) {
-                attack = true
-                let lookAt = self.getRotation()
-                shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
+            if (!pointer.isLocked || !game.playerMe.data.canAttack) {
+                return;
             }
+
+            if (game.playerMe.getEquippedSlotId() === InventorySlot.SLOT_PRIMARY) {
+                sprayTriggerStartMs = Date.now()
+                spraying = true
+            }
+
+            attack = true
+            let lookAt = self.getRotation()
+            shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
         })
         document.addEventListener('wheel', (event) => {
             if (!(game.isPlaying() && game.meIsAlive())) {
@@ -216,6 +232,11 @@ export class Control {
                 serverAction.push(shootLookAt)
                 serverAction.push('attack')
                 attack = false
+            } else if (spraying && sprayTriggerStartMs && sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {
+                game.attack()
+                let rotation = self.getRotation()
+                serverAction.push(`lookAt ${rotation[0]} ${rotation[1]}`)
+                serverAction.push('attack')
             } else {
                 let horizontal, vertical
                 [horizontal, vertical] = self.getRotation()

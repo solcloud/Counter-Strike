@@ -50,9 +50,6 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         if ($this->reloading) {
             return false;
         }
-        if ($this->ammo === 0) {
-            return false;
-        }
 
         return ($this->lastAttackTick === 0 || $this->lastAttackTick + $this->fireRateTicks <= $tickId);
     }
@@ -60,6 +57,9 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
     public final function attack(AttackEvent $event): ?AttackResult
     {
         if (!$this->canAttack($event->getTickId())) {
+            return null;
+        }
+        if ($this->ammo === 0) {
             return null;
         }
 
