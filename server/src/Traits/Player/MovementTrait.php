@@ -196,8 +196,7 @@ trait MovementTrait
         $floor = null;
         if ($zWall && !$xWall) {
             $floor = $this->canStepOverWall($zWall, $candidate);
-        }
-        if (!$zWall && $xWall && !$floor) {
+        } elseif ($xWall && !$zWall) {
             $floor = $this->canStepOverWall($xWall, $candidate);
         }
         if ($floor) {

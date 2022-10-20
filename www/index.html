@@ -70,6 +70,10 @@
         fov: 70
     }
 
+    if (window.nodeApi) {
+        document.getElementById('join-url').value = 'udp://localhost:8080?map=default&code=acode'
+    }
+
     function router() {
         const hash = window.location.hash.substring(1)
         if (hash === '') {

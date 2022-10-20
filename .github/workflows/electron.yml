@@ -1,10 +1,8 @@
 name: "Electron"
 on:
-  push:
-    branches: [master]
-    paths:
-      - 'electron/'
-      - 'www/'
+  create:
+    tags:
+      - '*'
 
 jobs:
   electron-build:

@@ -156,7 +156,7 @@ export class HUD {
     updateHud(player) {
         const hs = this.#setting
         if (this.#radar) {
-            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerMe.getId())
+            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerMe.getId(), this.#cursor.getRotation()[0])
         }
         if (this.#scoreBoardData !== null) {
             this.#scoreBoard.update(this.#scoreBoardData)
@@ -195,7 +195,7 @@ export class HUD {
         this.#elements.aliveOpponentTeam.innerHTML = this.#game.alivePlayers[otherTeamIndex]
     }
 
-    createHud(elementHud, map, mapSize) {
+    createHud(elementHud, map) {
         if (this.#elements.score) {
             throw new Error("HUD already created")
         }
@@ -296,9 +296,7 @@ export class HUD {
             const radarCanvas = elementHud.querySelector('#radar-canvas')
             radarCanvas.width = this.width
             radarCanvas.height = this.height
-            const scaleX = Math.floor(radarCanvas.width / mapSize.x * 100) / 100
-            const scaleY = Math.floor(radarCanvas.height / mapSize.y * 100) / 100
-            self.#radar = new Radar(radarCanvas, radarImage, scaleX + 0.003, scaleY + 0.005)
+            self.#radar = new Radar(radarCanvas, radarImage, map)
         }
         radarImage.src = `./resources/map/${map}.png`
 

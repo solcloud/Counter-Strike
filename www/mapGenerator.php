@@ -36,7 +36,7 @@ foreach ($map->getBoxes() as $box) {
     <script src="./assets/threejs/orbit-control.js"></script>
 </head>
 <body style="margin:0">
-<div style="position:absolute">
+<div style="position:absolute;<?= $radarMapGenerator ? 'display:none;' : '' ?>">
     <textarea class="map">Generating...</textarea>
     <textarea class="extra">Generating...</textarea>
 </div>
@@ -49,7 +49,11 @@ foreach ($map->getBoxes() as $box) {
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer({antialias: true});
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        if (<?= (int)$radarMapGenerator ?>) {
+            renderer.setSize(800, 800);
+        } else {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
         if (<?= (int)!$radarMapGenerator ?>) {
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -57,14 +61,14 @@ foreach ($map->getBoxes() as $box) {
         document.body.appendChild(renderer.domElement);
 
         if (<?= (int)$radarMapGenerator ?>) {
-            camera = new THREE.OrthographicCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, 1, 9000)
+            camera = new THREE.OrthographicCamera(-400, 400, 400, -400, 1, 9000)
         } else {
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
+            scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
         }
         camera.position.y = 4000
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
     }
 
     function createRamp(startX = 1507.1, startY = 0, endX = 1676, endY = 140.1, depth = 80) {

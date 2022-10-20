@@ -219,10 +219,11 @@
 
 #hud #radar {
     margin: 4px 0 2rem 4px;
-    width: 250px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     overflow: hidden;
-    border-radius: 4px;
+    border-radius: 50%;
+    background-color: #000000;
     box-shadow: 0 0 5px 0 rgba(23, 21, 21, 0.8);
 }
 

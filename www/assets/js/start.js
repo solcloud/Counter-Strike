@@ -16,9 +16,6 @@ let launchGame
     const game = new Game(world, hud, stats);
     const control = new Control(game, hud)
     hud.injectDependency(game, control)
-    const mapSizes = {
-        "default": {x: 3440, y: 2560},
-    }
 
 ////////////
 
@@ -31,7 +28,7 @@ let launchGame
         let connector
         initialized = true
         const canvas = await world.init(setting.map, setting.world)
-        hud.createHud(elementHud, setting.map, mapSizes[setting.map])
+        hud.createHud(elementHud, setting.map)
         control.init(world.getCamera())
         document.addEventListener("click", function (e) {
             if (e.target.classList.contains('hud-action')) {

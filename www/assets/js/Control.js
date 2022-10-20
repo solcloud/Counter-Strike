@@ -11,6 +11,10 @@ export class Control {
         this.#hud = hud
     }
 
+    getRotation() {
+        return threeRotationToServer(this.#pointerLock.getObject().rotation)
+    }
+
     init(camera) {
         let shootLookAt = ''
         let lastLookAt = ''
@@ -28,6 +32,7 @@ export class Control {
         let equip = false
         let drop = false
 
+        const self = this
         const game = this.#game
         const hud = this.#hud
         this.#pointerLock = new THREE.PointerLockControls(camera, document.body)
@@ -42,7 +47,7 @@ export class Control {
 
             if (pointer.isLocked && game.playerMe.data.canAttack) {
                 attack = true
-                let lookAt = threeRotationToServer(pointer.getObject().rotation)
+                let lookAt = self.getRotation()
                 shootLookAt = `lookAt ${lookAt[0]} ${lookAt[1]}`
             }
         })
@@ -213,7 +218,7 @@ export class Control {
                 attack = false
             } else {
                 let horizontal, vertical
-                [horizontal, vertical] = threeRotationToServer(pointer.getObject().rotation)
+                [horizontal, vertical] = self.getRotation()
                 let action = `lookAt ${horizontal} ${vertical}`
                 if (lastLookAt !== action) {
                     serverAction.push(action)

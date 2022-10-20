@@ -92,9 +92,8 @@ export class Game {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === this.playerMe.getId()) {
                 return '422990__dkiller2204__sfxrunground1.wav'
-            } else {
-                return '221626__moodpie__body-impact.wav'
             }
+            return '221626__moodpie__body-impact.wav'
         }
 
         if (type === SoundType.ITEM_ATTACK) {
@@ -102,18 +101,16 @@ export class Game {
                 return '387480__cosmicembers__dart-thud-2.wav'
             } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
                 return '513421__pomeroyjoshua__anu-clap-09.wav'
-            } else {
-                return '558117__abdrtar__move.mp3'
             }
+            return '558117__abdrtar__move.mp3'
         }
 
         if (type === SoundType.ITEM_RELOAD) {
             if (item.slot === InventorySlot.SLOT_SECONDARY) {
                 return '618047__mono832__reload.mp3'
-            } else {
-                return '15545__lagthenoggin__reload.mp3'
             }
             // shotgun 621155__ktfreesound__reload-escopeta-m7.wav
+            return '15545__lagthenoggin__reload.mp3'
         }
 
         if (type === SoundType.BULLET_HIT_HEADSHOT) {
@@ -124,9 +121,8 @@ export class Game {
             if (surfaceStrength) {
                 if (surfaceStrength > 2000) {
                     return '51381__robinhood76__00119-trzepak-3.wav'
-                } else {
-                    return '108737__branrainey__boing.wav'
                 }
+                return '108737__branrainey__boing.wav'
             } else if (playerId) {
                 return '512138__beezlefm__item-sound.wav'
             }
@@ -145,9 +141,8 @@ export class Game {
                 return '323403__gosfx__sound-1.mp3'
             } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
                 return '448987__matrixxx__weapon-ready.wav'
-            } else {
-                return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
             }
+            return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
         }
 
         if (type === SoundType.BOMB_PLANTED) {
