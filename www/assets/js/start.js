@@ -61,6 +61,7 @@ let launchGame
             connector.connect(url.hostname, url.port, setting.code)
         } else {
             alert('Unknown protocol given')
+            window.location.reload()
         }
     }
 

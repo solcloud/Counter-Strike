@@ -9,6 +9,7 @@ export class Radar {
     #zoom
     #mapCenterX
     #mapCenterY
+    #padding
     #mapSizes = {
         "default": {x: 3440, y: 2560},
         "aim": {x: 2000, y: 2000},
@@ -26,9 +27,21 @@ export class Radar {
 
         this.#mapCenterX = Math.round(mapSize.x / 2)
         this.#mapCenterY = Math.round(mapSize.y / 2)
-        this.#scaleX = Math.floor(canvas.width / mapSize.x * 100) / 100 + 0.005
-        this.#scaleY = Math.floor(canvas.height / mapSize.y * 100) / 100 + 0.005
+        this.#scaleX = Math.round(canvas.width / mapSize.x * 1000) / 1000
+        this.#scaleY = Math.round(canvas.height / mapSize.y * 1000) / 1000
         this.#zoom = zoom
+
+        const cornerPaddingDivider = 3
+        this.#padding = {
+            x: {
+                min: Math.ceil(mapSize.x / cornerPaddingDivider),
+                max: mapSize.x - Math.floor(mapSize.x / cornerPaddingDivider),
+            },
+            y: {
+                min: Math.ceil(mapSize.y / cornerPaddingDivider),
+                max: mapSize.y - Math.floor(mapSize.y / cornerPaddingDivider),
+            },
+        }
     }
 
     update(players, idMe, rotationHorizontalMe) {
@@ -60,8 +73,8 @@ export class Radar {
             ctx.stroke()
         })
 
-        const meX = playerMe.data.position.x
-        const meY = playerMe.data.position.z
+        const meX = Math.min(Math.max(this.#padding.x.min, playerMe.data.position.x), this.#padding.x.max)
+        const meY = Math.min(Math.max(this.#padding.y.min, playerMe.data.position.z), this.#padding.y.max)
         const centerX = (meX > this.#mapCenterX ? -(meX - this.#mapCenterX) : this.#mapCenterX - meX)
         const centerY = (meY > this.#mapCenterY ? -(meY - this.#mapCenterY) : this.#mapCenterY - meY)
         ctx.resetTransform()

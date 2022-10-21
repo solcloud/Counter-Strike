@@ -8,6 +8,7 @@ export {
     SoundType,
     BuyMenuItem,
     InventorySlot,
+    ItemId,
 }
 
 // server/src/Event/EventList.php
@@ -113,4 +114,22 @@ const InventorySlot = {
     SLOT_GRENADE_HE: 8,
     SLOT_TASER: 9,
     SLOT_KEVLAR: 10,
+}
+
+// server/src/Enum/ItemId.php
+const ItemId = {
+    SolidSurface: 0,
+    Knife: 1,
+    PistolGlock: 2,
+    PistolP250: 3,
+    PistolUsp: 4,
+    RifleAk: 5,
+    RifleM4A4: 6,
+    Decoy: 30,
+    Flashbang: 31,
+    HighExplosive: 32,
+    Incendiary: 33,
+    Kevlar: 34,
+    Molotov: 35,
+    Smoke: 36,
 }

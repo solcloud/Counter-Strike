@@ -84,8 +84,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.GameStartEvent] = function (options) {
-            game.gameStartOrHalfTimeOrEnd()
-            game.setOptions(options)
+            game.gameStart(options)
         }
 
         eventsCallback[EventList.RoundEndCoolDownEvent] = function () {

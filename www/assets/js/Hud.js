@@ -251,7 +251,7 @@ export class HUD {
                 <div class="kill-feed">
                 </div>
                 <div class="inventory">
-                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife  [q]</p>
+                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife [q]</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary [1]</p>
                     <p class="highlight" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary [2]</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb [5]</p>

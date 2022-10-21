@@ -1,10 +1,10 @@
 import {InventorySlot} from "./Enums.js";
 
 export class Control {
-    #pointerLock;
-    #localPlayerActions;
     #game;
     #hud;
+    #pointerLock;
+    #localPlayerActions;
 
     constructor(game, hud) {
         this.#game = game
@@ -40,6 +40,7 @@ export class Control {
         const pointer = this.#pointerLock
         let sprayTriggerStartMs = null;
         const sprayTriggerDeltaMs = 80; // TODO settings
+        const sprayEnableSlots = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY]
 
         // todo: use binds object for action shortcut and allow changing in settings
         document.addEventListener("mouseup", function (event) {
@@ -49,8 +50,10 @@ export class Control {
         })
         document.addEventListener("mousedown", function (event) {
             event.preventDefault()
-            spraying = false
-            if (!(game.isPlaying() && game.meIsAlive())) {
+            if (spraying) {
+                spraying = false
+            }
+            if (!game.isPlaying() || game.isPaused() || !game.meIsAlive()) {
                 return
             }
 
@@ -58,7 +61,7 @@ export class Control {
                 return;
             }
 
-            if (game.playerMe.getEquippedSlotId() === InventorySlot.SLOT_PRIMARY) {
+            if (sprayEnableSlots.includes(game.playerMe.getEquippedSlotId())) {
                 sprayTriggerStartMs = Date.now()
                 spraying = true
             }

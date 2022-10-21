@@ -193,7 +193,7 @@ class Game
 
     public function playersCanBuy(): bool
     {
-        return ($this->tick <= $this->roundStartTickId + $this->buyTimeTickCount);
+        return ($this->isPaused() || $this->tick <= $this->roundStartTickId + $this->buyTimeTickCount);
     }
 
     public function loadMap(Map $map): void

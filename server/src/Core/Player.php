@@ -245,7 +245,7 @@ final class Player
             "heightSight" => $this->getSightHeight(),
             "heightBody"  => $this->getBodyHeight(),
             "height"      => $this->getHeadHeight(),
-            "armor"       => $this->armor, //TODO
+            "armor"       => $this->getInventory()->getArmor() === ArmorType::NONE ? 0 : 100, //TODO
             "ammo"        => $ammo,
             "ammoReserve" => $ammoReserve,
             "isReloading" => $reloading,

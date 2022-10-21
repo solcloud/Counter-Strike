@@ -7,7 +7,7 @@ function radianToDegree(radian) {
 }
 
 function threeRotationToServer(eulerYXZ) {
-    let horizontal = radianToDegree(eulerYXZ.y)
+    const horizontal = radianToDegree(eulerYXZ.y)
     const vertical = radianToDegree(eulerYXZ.x)
 
     if (horizontal === 0 || horizontal === -0) {

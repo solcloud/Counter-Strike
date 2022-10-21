@@ -1,6 +1,7 @@
 import {EventProcessor} from "./EventProcessor.js";
 import {Player} from "./Player.js";
-import {InventorySlot, SoundType} from "./Enums.js";
+import {SoundType} from "./Enums.js";
+import {SoundRepository} from "./SoundRepository.js";
 
 export class Game {
     #round = 1
@@ -12,6 +13,7 @@ export class Game {
     #hud
     #stats
     #world
+    #soundRepository
     #hudDebounceTicks = 1
     eventProcessor
     score = null
@@ -25,6 +27,7 @@ export class Game {
         this.#hud = hud
         this.#stats = stats
         this.eventProcessor = new EventProcessor(this)
+        this.#soundRepository = new SoundRepository()
     }
 
     pause(msg, score, timeMs) {
@@ -35,7 +38,10 @@ export class Game {
                 player.get3DObject().visible = true // respawn (show) all beside me
             }
         })
-        this.#started = true
+        if (!this.#started) {
+            this.gameStartOrHalfTimeOrEnd()
+            this.#started = true
+        }
         this.#paused = true
         this.score = score
         this.#hud.pause(msg, timeMs)
@@ -78,8 +84,9 @@ export class Game {
     }
 
     playSound(data) {
-        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface)
+        let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerMe.getId())
         if (!soundName) {
+            console.log("No song defined for: " + data)
             return
         }
 
@@ -88,73 +95,8 @@ export class Game {
         this.#world.playSound(soundName, data.position, myPlayerSound)
     }
 
-    #getSoundName(type, item, playerId, surfaceStrength) {
-        if (type === SoundType.PLAYER_STEP) {
-            if (playerId === this.playerMe.getId()) {
-                return '422990__dkiller2204__sfxrunground1.wav'
-            }
-            return '221626__moodpie__body-impact.wav'
-        }
-
-        if (type === SoundType.ITEM_ATTACK) {
-            if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                return '387480__cosmicembers__dart-thud-2.wav'
-            } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
-                return '513421__pomeroyjoshua__anu-clap-09.wav'
-            }
-            return '558117__abdrtar__move.mp3'
-        }
-
-        if (type === SoundType.ITEM_RELOAD) {
-            if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                return '618047__mono832__reload.mp3'
-            }
-            // shotgun 621155__ktfreesound__reload-escopeta-m7.wav
-            return '15545__lagthenoggin__reload.mp3'
-        }
-
-        if (type === SoundType.BULLET_HIT_HEADSHOT) {
-            return (playerId === this.playerMe.getId()) ? '249821__spookymodem__weapon-blow.wav' : '632704__adh-dreaming__fly-on-the-wall-snare.wav'
-        }
-
-        if (type === SoundType.BULLET_HIT) {
-            if (surfaceStrength) {
-                if (surfaceStrength > 2000) {
-                    return '51381__robinhood76__00119-trzepak-3.wav'
-                }
-                return '108737__branrainey__boing.wav'
-            } else if (playerId) {
-                return '512138__beezlefm__item-sound.wav'
-            }
-        }
-
-        if (type === SoundType.PLAYER_GROUND_TOUCH) {
-            return '211500__taira-komori__knocking-wall.mp3'
-        }
-
-        if (type === SoundType.ITEM_DROP) {
-            return '12734__leady__dropping-a-gun.wav'
-        }
-
-        if (type === SoundType.ATTACK_NO_AMMO) {
-            if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                return '323403__gosfx__sound-1.mp3'
-            } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
-                return '448987__matrixxx__weapon-ready.wav'
-            }
-            return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
-        }
-
-        if (type === SoundType.BOMB_PLANTED) {
-            return '555042__bittermelonheart__soccer-ball-kick.wav'
-        }
-
-        if (type === SoundType.ITEM_BUY) {
-            return '434781__stephenbist__luggage-drop-1.wav'
-        }
-
-        console.log("No song defined for: " + arguments)
-        return null
+    isPaused() {
+        return this.#paused
     }
 
     isPlaying() {
@@ -169,7 +111,7 @@ export class Game {
         this.#endCallback = callback
     }
 
-    setOptions(options) {
+    gameStart(options) {
         this.#options = options
         this.#hud.startWarmup(options.warmupSec * 1000)
 
@@ -228,6 +170,7 @@ export class Game {
     }
 
     tick(state) {
+        this.#stats.begin()
         const game = this
 
         state.events.forEach(function (event) {
@@ -250,7 +193,8 @@ export class Game {
             game.updatePlayerData(player, playerState)
         })
 
-        this.render()
+        this.#render()
+        this.#stats.end()
     }
 
     updatePlayerData(player, serverState) {
@@ -273,6 +217,15 @@ export class Game {
         }
     }
 
+    updateOtherPlayersModels(playerObject, data) {
+        playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
+
+        const body = playerObject.getObjectByName('body')
+        if (body.position.y !== data.heightBody) { // update body height position if changed
+            body.position.y = data.heightBody
+        }
+    }
+
     getMyTeamPlayers() {
         let meIsAttacker = this.playerMe.isAttacker()
         return this.players.filter((player) => player.isAttacker() === meIsAttacker)
@@ -282,23 +235,11 @@ export class Game {
         return this.playerMe.isAlive()
     }
 
-    updateOtherPlayersModels(playerObject, data) {
-        playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
-
-        const body = playerObject.getObjectByName('body')
-        if (body.position.y !== data.heightBody) { // update body height position if changed
-            // TODO probably keyframe time based animation from userData like body.position = body.userData.animation[data.playerAnimationId]
-            body.position.y = data.heightBody
-        }
-    }
-
-    render() {
-        this.#stats.begin()
+    #render() {
         if (this.#started && --this.#hudDebounceTicks === 0) {
             this.#hudDebounceTicks = 4
             this.#hud.updateHud(this.playerMe.data)
         }
         this.#world.render()
-        this.#stats.end()
     }
 }
