@@ -36,8 +36,6 @@ trait GravityTrait
             $candidate->setY($y);
             $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
             if ($floorCandidate) {
-                $sound = new SoundEvent($this->getPositionImmutable()->setY($y), SoundType::PLAYER_GROUND_TOUCH);
-                $this->world->makeSound($sound->setPlayer($this)->setSurface($floorCandidate));
                 $this->setActiveFloor($floorCandidate);
                 $targetYPosition = $y;
                 break;
@@ -47,6 +45,7 @@ trait GravityTrait
                 break;
             }
         }
+
         return $targetYPosition;
     }
 
@@ -54,7 +53,7 @@ trait GravityTrait
     {
         $this->activeFloor = $floor;
         if ($floor) {
-            $this->checkFallDamage($floor->getY());
+            $this->checkFallDamage($floor);
             $this->removeEvent($this->eventIdJump);
             $this->fallHeight = 0;
         } else {
@@ -62,9 +61,15 @@ trait GravityTrait
         }
     }
 
-    private function checkFallDamage(int $floorHeight): void
+    private function checkFallDamage(Floor $floor): void
     {
+        $floorHeight = $floor->getY();
         $fallHeight = $this->fallHeight - $floorHeight;
+        if ($fallHeight > 3 * Setting::playerObstacleOvercomeHeight()) {
+            $sound = new SoundEvent($this->getPositionImmutable()->setY($floorHeight), SoundType::PLAYER_GROUND_TOUCH);
+            $this->world->makeSound($sound->setPlayer($this)->setSurface($floor));
+        }
+
         $threshold = Setting::playerFallDamageThreshold();
         if ($fallHeight < $threshold) {
             return;
