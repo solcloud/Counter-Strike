@@ -6,12 +6,12 @@ import {Radar} from "./hud/Radar.js";
 
 export class HUD {
     #game
-    #cursor
+    #setting
     #buyMenu = null;
     #scoreBoard = null;
     #killFeed = null;
     #radar = null;
-    #setting = {
+    #showAble = {
         showScore: false,
         showBuyMenu: false
     }
@@ -41,9 +41,9 @@ export class HUD {
     #countDownIntervalId = null;
     #scoreBoardData = null;
 
-    injectDependency(game, cursor) {
+    injectDependency(game, setting) {
         this.#game = game
-        this.#cursor = cursor
+        this.#setting = setting
     }
 
     pause(msg, timeMs) {
@@ -51,24 +51,12 @@ export class HUD {
         this.displayTopMessage(msg)
     }
 
-    showScore() {
-        this.#setting.showScore = true
-    }
-
-    hideScore() {
-        this.#setting.showScore = false
-    }
-
     toggleBuyMenu() {
-        this.#setting.showBuyMenu = !this.#setting.showBuyMenu
+        this.#showAble.showBuyMenu = !this.#showAble.showBuyMenu
     }
 
-    hideBuyMenu() {
-        this.#setting.showBuyMenu = false
-    }
-
-    toggleScore() {
-        this.#setting.showScore = !this.#setting.showScore
+    toggleScore(enabled) {
+        this.#showAble.showScore = enabled
     }
 
     bombPlanted() {
@@ -154,26 +142,25 @@ export class HUD {
     }
 
     updateHud(player) {
-        const hs = this.#setting
         if (this.#radar) {
-            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerMe.getId(), this.#cursor.getRotation()[0])
+            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerMe.getId(), this.#game.getPlayerMeRotation()[0])
         }
         if (this.#scoreBoardData !== null) {
             this.#scoreBoard.update(this.#scoreBoardData)
             this.#scoreBoardData = null
         }
-        if (hs.showScore) {
+        if (this.#showAble.showScore) {
             this.#elements.score.classList.remove('hidden');
         } else {
             this.#elements.score.classList.add('hidden');
         }
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
-        if (player.canBuy && hs.showBuyMenu) {
-            this.#cursor.requestUnLock()
+        if (player.canBuy && this.#showAble.showBuyMenu) {
+            this.#game.requestPointerUnLock()
             this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
             this.#elements.buyMenu.classList.remove('hidden');
         } else if (!this.#elements.buyMenu.classList.contains('hidden')) {
-            this.#cursor.requestLock()
+            this.#game.requestPointerLock()
             this.#elements.buyMenu.innerHTML = ''
             this.#elements.buyMenu.classList.add('hidden');
         }
@@ -296,7 +283,7 @@ export class HUD {
             const radarCanvas = elementHud.querySelector('#radar-canvas')
             radarCanvas.width = this.width
             radarCanvas.height = this.height
-            self.#radar = new Radar(radarCanvas, radarImage, map)
+            self.#radar = new Radar(radarCanvas, radarImage, map, self.#setting.getRadarZoom())
         }
         radarImage.src = `./resources/map/${map}.png`
 

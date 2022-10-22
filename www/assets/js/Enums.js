@@ -9,6 +9,7 @@ export {
     BuyMenuItem,
     InventorySlot,
     ItemId,
+    Action,
 }
 
 // server/src/Event/EventList.php
@@ -132,4 +133,22 @@ const ItemId = {
     Kevlar: 34,
     Molotov: 35,
     Smoke: 36,
+}
+
+// PlayerAction.js
+const Action = {
+    MOVE_FORWARD: 1,
+    MOVE_LEFT: 2,
+    MOVE_BACK: 3,
+    MOVE_RIGHT: 4,
+    JUMP: 5,
+    CROUCH: 6,
+    WALK: 7,
+    RELOAD: 8,
+    EQUIP_KNIFE: 9,
+    EQUIP_PRIMARY: 10,
+    EQUIP_SECONDARY: 11,
+    EQUIP_BOMB: 12,
+    BUY_MENU: 13,
+    SCORE_BOARD: 14,
 }

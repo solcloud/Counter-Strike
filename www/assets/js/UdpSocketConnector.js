@@ -3,7 +3,7 @@ const dgram = window.nodeApi.dgram
 export class UdpSocketConnector {
     #game;
     #socket;
-    sendIntervalId;
+    #sendIntervalId;
 
     constructor(game) {
         this.#game = game
@@ -22,7 +22,7 @@ export class UdpSocketConnector {
         const connector = this
         const game = this.#game
         socket.on('close', function () {
-            clearInterval(connector.sendIntervalId)
+            clearInterval(connector.#sendIntervalId)
             console.log("UdpSocket closed")
         });
         socket.on('error', function (error) {
@@ -55,7 +55,7 @@ export class UdpSocketConnector {
         const game = this.#game
         const socket = this.#socket
 
-        this.sendIntervalId = setInterval(function () {
+        this.#sendIntervalId = setInterval(function () {
             if (!game.isPlaying() || !game.meIsAlive()) {
                 return;
             }

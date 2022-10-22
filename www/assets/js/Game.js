@@ -4,15 +4,16 @@ import {SoundType} from "./Enums.js";
 import {SoundRepository} from "./SoundRepository.js";
 
 export class Game {
+    #world
+    #hud
+    #stats
+    #pointer
     #round = 1
     #paused = false
     #started = false
     #options = false
     #readyCallback
     #endCallback
-    #hud
-    #stats
-    #world
     #soundRepository
     #hudDebounceTicks = 1
     eventProcessor
@@ -233,6 +234,28 @@ export class Game {
 
     meIsAlive() {
         return this.playerMe.isAlive()
+    }
+
+    setPointer(pointer) {
+        this.#pointer = pointer
+    }
+
+    getPlayerMeRotation() {
+        return threeRotationToServer(this.#pointer.getObject().rotation)
+    }
+
+    requestPointerLock() {
+        if (this.#pointer.isLocked) {
+            return
+        }
+        this.#pointer.lock()
+    }
+
+    requestPointerUnLock() {
+        if (!this.#pointer.isLocked) {
+            return
+        }
+        this.#pointer.unlock()
     }
 
     #render() {

@@ -1,7 +1,7 @@
 export class WebSocketConnector {
     #game;
     #socket;
-    sendIntervalId;
+    #sendIntervalId;
 
     constructor(game) {
         this.#game = game
@@ -21,7 +21,7 @@ export class WebSocketConnector {
         const connector = this
         const game = this.#game
         socket.onclose = function () {
-            clearInterval(connector.sendIntervalId)
+            clearInterval(connector.#sendIntervalId)
             console.log("WebSocket closed")
         };
         socket.onerror = function (error) {
@@ -53,7 +53,7 @@ export class WebSocketConnector {
         const game = this.#game
         const socket = this.#socket
 
-        this.sendIntervalId = setInterval(function () {
+        this.#sendIntervalId = setInterval(function () {
             if (game.isPlaying() && game.meIsAlive()) {
                 socket.send(control.getTickAction())
                 return

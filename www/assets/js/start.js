@@ -3,6 +3,8 @@ import {HUD} from "./Hud.js";
 import {Control} from "./Control.js";
 import {World} from "./World.js";
 import Stats from "./Stats.js";
+import {Setting} from "./Setting.js";
+import {PlayerAction} from "./PlayerAction.js";
 
 let launchGame
 (function () {
@@ -10,12 +12,14 @@ let launchGame
 ////////////
 
     let initialized = false
+    const setting = new Setting()
     const world = new World()
     const hud = new HUD()
     const stats = new Stats();
     const game = new Game(world, hud, stats);
-    const control = new Control(game, hud)
-    hud.injectDependency(game, control)
+    const action = new PlayerAction(game, hud)
+    const control = new Control(game, action, setting)
+    hud.injectDependency(game, setting)
 
 ////////////
 
@@ -28,13 +32,15 @@ let launchGame
         let connector
         initialized = true
         const canvas = await world.init(setting.map, setting.world)
+        const pointerLock = new THREE.PointerLockControls(world.getCamera(), document.body)
         hud.createHud(elementHud, setting.map)
-        control.init(world.getCamera())
+        control.init(pointerLock)
+        game.setPointer(pointerLock)
         document.addEventListener("click", function (e) {
             if (e.target.classList.contains('hud-action')) {
                 return
             }
-            control.requestLock()
+            game.requestPointerLock()
         }, {capture: true})
         canvasParent.appendChild(canvas)
         stats.dom.style.position = 'inherit'
