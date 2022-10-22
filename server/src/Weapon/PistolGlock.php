@@ -13,7 +13,7 @@ final class PistolGlock extends AmmoBasedWeapon
     public const magazineCapacity = 12;
     public const reserveAmmo = 120;
     public const killAward = 300;
-    public const fireRateMs = 35;
+    public const fireRateMs = 150;
     public const damage = 61;
     public const range = 5123;
 

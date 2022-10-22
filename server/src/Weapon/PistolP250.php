@@ -13,7 +13,7 @@ final class PistolP250 extends AmmoBasedWeapon
     public const magazineCapacity = 13;
     public const reserveAmmo = 26;
     public const killAward = 300;
-    public const fireRateMs = 35;
+    public const fireRateMs = 150;
     public const damage = 61;
     public const range = 5123;
 

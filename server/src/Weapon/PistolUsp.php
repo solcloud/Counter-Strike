@@ -13,7 +13,7 @@ final class PistolUsp extends AmmoBasedWeapon
     public const magazineCapacity = 12;
     public const reserveAmmo = 24;
     public const killAward = 300;
-    public const fireRateMs = 10;
+    public const fireRateMs = 170;
     public const damage = 116;
     public const range = 5123;
 

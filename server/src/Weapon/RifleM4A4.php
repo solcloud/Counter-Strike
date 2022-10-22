@@ -14,7 +14,7 @@ final class RifleM4A4 extends AmmoBasedWeapon
     public const reserveAmmo = 90;
     public const killAward = 300;
     public const runningSpeed = 215;
-    public const fireRateMs = 12;
+    public const fireRateMs = 90;
     public const damage = 33;
     public const armorPenetration = 67;
     public const range = 150123;

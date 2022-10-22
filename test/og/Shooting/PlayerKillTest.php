@@ -8,6 +8,7 @@ use cs\Core\HitBox;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Setting;
+use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
@@ -124,19 +125,25 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player2->isAlive());
 
         $tickId = $game->getTickId();
-        $game->tick(++$tickId);
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+            $game->tick(++$tickId);
+        }
         $this->assertNotNull($player2->attack());
         $this->assertTrue($player1->isAlive());
         $this->assertTrue($player2->isAlive());
         $this->assertSame(1, $game->getRoundNumber());
 
-        $game->tick(++$tickId);
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+            $game->tick(++$tickId);
+        }
         $this->assertNotNull($player2->attack());
         $this->assertFalse($player1->isAlive());
         $this->assertTrue($player2->isAlive());
         $this->assertSame(1, $game->getRoundNumber());
 
-        $game->tick(++$tickId);
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+            $game->tick(++$tickId);
+        }
         $this->assertFalse($game->getScore()->attackersIsWinning());
         $this->assertSame(0, $game->getScore()->getScoreAttackers());
         $this->assertSame(1, $game->getScore()->getScoreDefenders());

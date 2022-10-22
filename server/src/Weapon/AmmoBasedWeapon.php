@@ -37,9 +37,10 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
 
     public function reset(): void
     {
-        $this->reloading = false;
         $this->ammo = static::magazineCapacity;
         $this->ammoReserve = static::reserveAmmo;
+        $this->reloading = false;
+        $this->lastAttackTick = 0;
     }
 
     public function canAttack(int $tickId): bool

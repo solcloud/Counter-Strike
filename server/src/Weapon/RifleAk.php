@@ -14,7 +14,7 @@ final class RifleAk extends AmmoBasedWeapon
     public const reserveAmmo = 90;
     public const killAward = 300;
     public const runningSpeed = 215;
-    public const fireRateMs = 10;
+    public const fireRateMs = 100;
     public const damage = 36;
     public const armorPenetration = 77;
     public const range = 250123;
