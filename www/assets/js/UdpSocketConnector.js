@@ -52,14 +52,9 @@ export class UdpSocketConnector {
     }
 
     startLoop(control, tickMs) {
-        const game = this.#game
         const socket = this.#socket
 
         this.#sendIntervalId = setInterval(function () {
-            if (!game.isPlaying() || !game.meIsAlive()) {
-                return;
-            }
-
             let data = control.getTickAction()
             if (data !== '') {
                 socket.send(data)

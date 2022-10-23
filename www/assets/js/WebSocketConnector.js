@@ -50,17 +50,10 @@ export class WebSocketConnector {
     }
 
     startLoop(control, tickMs) {
-        const game = this.#game
         const socket = this.#socket
 
         this.#sendIntervalId = setInterval(function () {
-            if (game.isPlaying() && game.meIsAlive()) {
-                socket.send(control.getTickAction())
-                return
-            }
-
-
-            socket.send('') // ping
+            socket.send(control.getTickAction())
         }, tickMs)
     }
 }

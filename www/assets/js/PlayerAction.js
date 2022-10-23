@@ -37,9 +37,9 @@ export class PlayerAction {
         this.actionCallback[Action.MOVE_LEFT] = (enabled) => this.moveLeft(enabled)
         this.actionCallback[Action.MOVE_BACK] = (enabled) => this.moveBackward(enabled)
         this.actionCallback[Action.MOVE_RIGHT] = (enabled) => this.moveRight(enabled)
-        this.actionCallback[Action.JUMP] = (enabled) => this.jump(enabled)
-        this.actionCallback[Action.CROUCH] = (enabled) => this.crouch(enabled)
-        this.actionCallback[Action.WALK] = (enabled) => this.shift(enabled)
+        this.actionCallback[Action.JUMP] = (enabled) => enabled && this.jump()
+        this.actionCallback[Action.CROUCH] = (enabled) => enabled ? this.crouch() : this.stand()
+        this.actionCallback[Action.WALK] = (enabled) => enabled ? this.shift() : this.run()
         this.actionCallback[Action.RELOAD] = (enabled) => enabled && this.reload()
         this.actionCallback[Action.EQUIP_KNIFE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_KNIFE)
         this.actionCallback[Action.EQUIP_PRIMARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_PRIMARY)
@@ -47,6 +47,7 @@ export class PlayerAction {
         this.actionCallback[Action.EQUIP_BOMB] = (enabled) => enabled && this.equip(InventorySlot.SLOT_BOMB)
         this.actionCallback[Action.BUY_MENU] = (enabled) => enabled && this.#hud.toggleBuyMenu()
         this.actionCallback[Action.SCORE_BOARD] = (enabled) => this.#hud.toggleScore(enabled)
+        this.actionCallback[Action.DROP] = (enabled) => enabled && this.drop()
     }
 
     attack([x, y]) {
@@ -56,6 +57,10 @@ export class PlayerAction {
 
     equip(slotId) {
         this.#states.equip = slotId
+    }
+
+    drop() {
+        this.#states.drop = true
     }
 
     moveForward(enabled) {
@@ -74,16 +79,24 @@ export class PlayerAction {
         this.#states.moveRight = enabled
     }
 
-    jump(enabled) {
-        this.#states.jumping = enabled
+    jump() {
+        this.#states.jumping = true
     }
 
-    crouch(enabled) {
-        this.#states.crouching = enabled
+    stand() {
+        this.#states.standing = true
     }
 
-    shift(enabled) {
-        this.#states.shifting = enabled
+    crouch() {
+        this.#states.crouching = true
+    }
+
+    run() {
+        this.#states.running = true
+    }
+
+    shift() {
+        this.#states.shifting = true
     }
 
     reload() {

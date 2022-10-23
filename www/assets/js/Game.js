@@ -199,14 +199,6 @@ export class Game {
     }
 
     updatePlayerData(player, serverState) {
-        if (this.playerMe.getId() === serverState.id) { // if me
-            if (this.playerMe.getEquippedSlotId() !== serverState.item.slot) {
-                this.equip(serverState.item.slot)
-            }
-        } else {
-            this.updateOtherPlayersModels(player.get3DObject(), serverState)
-        }
-
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
             if (player.data.money !== serverState.money) {
                 this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
@@ -215,6 +207,14 @@ export class Game {
         } else {
             player.data.item = serverState.item
             player.data.isAttacker = serverState.isAttacker
+        }
+
+        if (this.playerMe.getId() === serverState.id) { // if me
+            if (this.playerMe.getEquippedSlotId() !== serverState.item.slot) {
+                this.equip(serverState.item.slot)
+            }
+        } else {
+            this.updateOtherPlayersModels(player.get3DObject(), serverState)
         }
     }
 

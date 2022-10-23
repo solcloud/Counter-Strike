@@ -39,16 +39,22 @@ export class Control {
             action.attack(game.getPlayerMeRotation())
         })
         document.addEventListener('wheel', (event) => {
-            event.preventDefault()
-
-            if (!(game.isPlaying() && game.meIsAlive())) {
+            if (!game.isPlaying() || !game.meIsAlive()) {
                 return
             }
 
-            if (event.deltaY > 0) {
-                action.equip(InventorySlot.SLOT_SECONDARY)
-            } else {
-                action.equip(InventorySlot.SLOT_PRIMARY)
+            if (event.deltaY > 0) { // wheel down
+                if (game.playerMe.data.slots[InventorySlot.SLOT_SECONDARY]) {
+                    action.equip(InventorySlot.SLOT_SECONDARY)
+                } else {
+                    action.equip(InventorySlot.SLOT_KNIFE)
+                }
+            } else { // wheel up
+                if (game.playerMe.data.slots[InventorySlot.SLOT_PRIMARY]) {
+                    action.equip(InventorySlot.SLOT_PRIMARY)
+                } else {
+                    action.equip(InventorySlot.SLOT_KNIFE)
+                }
             }
         })
         document.addEventListener('keydown', function (event) {
@@ -58,10 +64,7 @@ export class Control {
                 return
             }
 
-            const actionIndex = self.#setting.getBinds()[event.key]
-            if (actionIndex !== undefined) {
-                self.#action.actionCallback[actionIndex](true)
-            }
+            self.#processKeyboardEvent(event, true)
         });
         document.addEventListener('keyup', function (event) {
             event.preventDefault()
@@ -70,14 +73,21 @@ export class Control {
                 return
             }
 
-            const actionIndex = self.#setting.getBinds()[event.key]
-            if (actionIndex !== undefined) {
-                self.#action.actionCallback[actionIndex](false)
-            }
+            self.#processKeyboardEvent(event, false)
         });
     }
 
+    #processKeyboardEvent(event, isKeyDown) {
+        const actionIndex = this.#setting.getBinds()[event.code]
+        if (actionIndex !== undefined) {
+            this.#action.actionCallback[actionIndex](isKeyDown)
+        }
+    }
+
     getTickAction() {
-        return this.#action.getPlayerAction(this.#setting.getSprayTriggerDeltaMs())
+        if (this.#game.isPlaying() && this.#game.meIsAlive()) {
+            return this.#action.getPlayerAction(this.#setting.getSprayTriggerDeltaMs())
+        }
+        return ''
     }
 }

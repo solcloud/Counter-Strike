@@ -151,4 +151,5 @@ const Action = {
     EQUIP_BOMB: 12,
     BUY_MENU: 13,
     SCORE_BOARD: 14,
+    DROP: 15,
 }
