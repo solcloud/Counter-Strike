@@ -161,7 +161,7 @@ trait MovementTrait
             }
         }
 
-        if ($this->isRunning() && !$this->isFlying() && !$orig->equals($target)) {
+        if ($this->isRunning() && !$this->isCrouching() && !$this->isFlying() && !$orig->equals($target)) {
             $sound = new SoundEvent($target, SoundType::PLAYER_STEP);
             $this->world->makeSound($sound->setPlayer($this));
         }

@@ -146,7 +146,7 @@ export class Game {
     }
 
     createPlayer(data) {
-        const player = new Player(data, this.#world.spawnPlayer(data.color, this.playerMe.isAttacker !== data.isAttacker))
+        const player = new Player(data, this.#world.spawnPlayer(data.color, this.playerMe.isAttacker() !== data.isAttacker))
         if (this.players[data.id]) {
             throw new Error('Player already exist with id ' + data.id)
         }

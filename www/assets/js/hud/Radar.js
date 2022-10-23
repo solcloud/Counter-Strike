@@ -53,16 +53,18 @@ export class Radar {
         ctx.translate(0, this.#canvas.height)
         ctx.scale(this.#scaleX, this.#scaleY)
         players.forEach(function (player) {
+            if (!player.isAlive()) {
+                return
+            }
             if (player.getId() === idMe) {
                 playerMe = player
                 ctx.lineWidth = 12;
                 ctx.strokeStyle = "#462b02"
-                ctx.fillStyle = "#d9d9d9"
             } else {
                 ctx.lineWidth = 10;
                 ctx.strokeStyle = "#70a670"
-                ctx.fillStyle = "#" + Color[player.getId()].toString(16).padStart(6, '0');
             }
+            ctx.fillStyle = "#" + Color[player.getId()].toString(16).padStart(6, '0');
 
             ctx.beginPath()
             ctx.arc(player.data.position.x, -player.data.position.z, 50, 0, 2 * Math.PI)

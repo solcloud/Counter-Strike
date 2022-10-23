@@ -295,6 +295,7 @@ class Game
             $player->getInventory()->earnMoney(-$player->getInventory()->getDollars());
             $player->getInventory()->earnMoney($this->properties->start_money);
             $player->swapTeam();
+            $player->getInventory()->reset($player->isPlayingOnAttackerSide(), true);
         }
     }
 
