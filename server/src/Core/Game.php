@@ -290,7 +290,11 @@ class Game
 
     private function halfTimeSwapTeams(): void
     {
+        $attackersCount = $this->playersCountAttackers;
+        $this->playersCountAttackers = $this->playersCountDefenders;
+        $this->playersCountDefenders = $attackersCount;
         $this->score->swapTeams();
+
         foreach ($this->players as $player) {
             $player->getInventory()->earnMoney(-$player->getInventory()->getDollars());
             $player->getInventory()->earnMoney($this->properties->start_money);

@@ -6,6 +6,7 @@ use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Util;
+use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
@@ -14,6 +15,7 @@ use cs\Event\PauseStartEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
+use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
 class RoundTest extends BaseTestCase
@@ -129,15 +131,18 @@ class RoundTest extends BaseTestCase
         $game = $this->createGame([
             GameProperty::MAX_ROUNDS    => $maxRounds,
             GameProperty::ROUND_TIME_MS => 1,
+            GameProperty::START_MONEY   => 3000,
         ]);
         $game->setTickMax($maxRounds * 2);
 
         $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
+        $this->assertTrue($game->getPlayer(1)->buyItem(BuyMenuItem::RIFLE_AK));
         $this->assertTrue($game->getScore()->isTie());
 
         $game->start();
         $this->assertSame($maxRounds + 1, $game->getRoundNumber());
         $this->assertFalse($game->getPlayer(1)->isPlayingOnAttackerSide());
+        $this->assertNotInstanceOf(RifleAk::class, $game->getPlayer(1)->getEquippedItem());
         $this->assertFalse($game->getScore()->isTie());
         $this->assertTrue($game->getScore()->defendersIsWinning());
         $this->assertFalse($game->getScore()->attackersIsWinning());
