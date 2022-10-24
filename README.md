@@ -18,7 +18,7 @@ If attackers deploy graffiti bomb before round time ends, then round clock count
 
 This is NO violence game so there is no blood or violence visuals.
 
-Currently, there is no official public server available (as match making service is also WIP), but you can run server locally.
+Currently, there is no official public server available (as match making service is also WIP), but you can run server locally (or somebody can host it for you).
 
 ```bash
 git clone https://github.com/solcloud/Counter-Strike cs-football
@@ -33,31 +33,23 @@ For connecting using Web Browser you need WebSocket UDP bridge
 php cli/udp-ws-bridge.php 8081 # will start WebSocket listener on localhost:8081
 ```
 
+For better performance (no UDP bridge) download Electron app for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or run locally
+
+```bash
+cd electron/
+npm install
+npm run dev
+```
+
 ### NOT going to implement
-- sprays
 - burst fire
 - guns with absurd fire rate (M249, Negev, duals, ...)
 - different players model (same hit boxes for all players, only design change)
 - player breath animation or any player animation beside walking, crouching, jumping and look movement
-- lag compensation - when you lag it is your problem - your disadvantage (server will send every (second?) full state for client sync)
+- lag compensation - when you lag it is your problem - your disadvantage
 
 ### To Be Decided (maybe)
 - aim punch (probably only headshot and body shot with no kevlar)
 - aim spread
-- inspect weapon
 - gun/util hit boxes (maybe only when dropped)
 - backtrack (max only few ticks like 2)
-
-## TODO
-
-### Server
-- so many things...
-
-### Client
-- PHP (https://github.com/mario-deluna/php-game-framework, https://github.com/mario-deluna/php-glfw)
-- JAVA openGL GLUT
-- Jakt/Carbon/C++
-- JavaScript canvas/webGL three.js, ammo.js, cannon.js
-- NodeJS env/App image for better performance, raw UDP instead of WS, Ctr+W ...
-- Other
-  - Ask some famous youtubers (like Dani - give him week, milk, promise Jeremy phone number, say he can't do that etc.)

@@ -51,13 +51,10 @@ export class ScoreBoard {
         for (let [roundNumber, data] of Object.entries(history)) {
             roundNumber = parseInt(roundNumber)
             let iWasAttacker = meIsAttacker
-            if (roundNumber < halfTimeRoundNumber) {
+            if (roundNumber <= halfTimeRoundNumber) {
                 iWasAttacker = !meIsAttacker
             }
 
-            if (roundNumber === halfTimeRoundNumber) {
-                template += '<div class="round-number">|</div>'
-            }
             const myTeamWonThatRound = (iWasAttacker === data.attackersWins)
             const direction = (myTeamWonThatRound ? 'round-win-my-team' : 'round-win-other-team')
             template += `<div class="round-number">
@@ -66,6 +63,10 @@ export class ScoreBoard {
                 </span>
                 <div>${roundNumber % 5 === 0 ? roundNumber : ''}</div>
             </div>`
+
+            if (roundNumber === halfTimeRoundNumber) {
+                template += '<div class="round-number">|</div>'
+            }
         }
 
         return template
