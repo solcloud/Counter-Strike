@@ -64,7 +64,7 @@ export class Radar {
                 ctx.lineWidth = 10;
                 ctx.strokeStyle = "#70a670"
             }
-            ctx.fillStyle = "#" + Color[player.getId()].toString(16).padStart(6, '0');
+            ctx.fillStyle = "#" + Color[player.data.color].toString(16).padStart(6, '0');
 
             ctx.beginPath()
             ctx.arc(player.data.position.x, -player.data.position.z, 50, 0, 2 * Math.PI)

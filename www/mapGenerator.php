@@ -41,6 +41,7 @@ foreach ($map->getBoxes() as $box) {
     <textarea class="extra">Generating...</textarea>
 </div>
 <script>
+    const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
     let camera, scene, renderer, controls, extra;
     const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
     const material = new THREE.MeshLambertMaterial({color: 0x664b17})
@@ -49,18 +50,18 @@ foreach ($map->getBoxes() as $box) {
         scene = new THREE.Scene();
 
         renderer = new THREE.WebGLRenderer({antialias: true});
-        if (<?= (int)$radarMapGenerator ?>) {
+        if (forRadar) {
             renderer.setSize(800, 800);
         } else {
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-        if (<?= (int)!$radarMapGenerator ?>) {
+        if (!forRadar) {
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         }
         document.body.appendChild(renderer.domElement);
 
-        if (<?= (int)$radarMapGenerator ?>) {
+        if (forRadar) {
             camera = new THREE.OrthographicCamera(-400, 400, 400, -400, 1, 9000)
         } else {
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
@@ -109,7 +110,7 @@ foreach ($map->getBoxes() as $box) {
                 center.position.set(box.width / 2, box.height / 2, box.depth / -2)
                 center.visible = false
                 map.add(center)
-                if (<?= (int)!$radarMapGenerator ?>) {
+                if (!forRadar) {
                     camera.position.x = center.position.x;
                     camera.position.z = center.position.z;
                     camera.lookAt(camera.position.x, 0, camera.position.z)
@@ -216,7 +217,7 @@ foreach ($map->getBoxes() as $box) {
     init()
     object()
     extraGeometry()
-    if (<?= (int)!$radarMapGenerator ?>) {
+    if (!forRadar) {
         spawns()
         buyAreas()
     }
