@@ -1,9 +1,6 @@
 import {Action, InventorySlot} from "./Enums.js";
 
-
 export class PlayerAction {
-    #game
-    #hud
     #states = {
         shootLookAt: '',
         lastLookAt: '',
@@ -25,29 +22,26 @@ export class PlayerAction {
     }
     actionCallback = {}
 
-    constructor(game, hud) {
-        this.#game = game
-        this.#hud = hud
-
-        this.#loadCallbacks()
+    constructor(hud) {
+        this.#loadCallbacks(hud)
     }
 
-    #loadCallbacks() {
-        this.actionCallback[Action.MOVE_FORWARD] = (enabled) => this.moveForward(enabled)
-        this.actionCallback[Action.MOVE_LEFT] = (enabled) => this.moveLeft(enabled)
-        this.actionCallback[Action.MOVE_BACK] = (enabled) => this.moveBackward(enabled)
-        this.actionCallback[Action.MOVE_RIGHT] = (enabled) => this.moveRight(enabled)
-        this.actionCallback[Action.JUMP] = (enabled) => enabled && this.jump()
-        this.actionCallback[Action.CROUCH] = (enabled) => enabled ? this.crouch() : this.stand()
-        this.actionCallback[Action.WALK] = (enabled) => enabled ? this.shift() : this.run()
+    #loadCallbacks(hud) {
+        this.actionCallback[Action.MOVE_FORWARD] = (enabled) => this.#states.moveForward = enabled
+        this.actionCallback[Action.MOVE_LEFT] = (enabled) => this.#states.moveLeft = enabled
+        this.actionCallback[Action.MOVE_BACK] = (enabled) => this.#states.moveBackward = enabled
+        this.actionCallback[Action.MOVE_RIGHT] = (enabled) => this.#states.moveRight = enabled
+        this.actionCallback[Action.JUMP] = (enabled) => enabled && (this.#states.jumping = true)
+        this.actionCallback[Action.CROUCH] = (enabled) => enabled ? this.#states.crouching = true : this.#states.standing = true
+        this.actionCallback[Action.WALK] = (enabled) => enabled ? this.#states.shifting = true : this.#states.running = true
+        this.actionCallback[Action.DROP] = (enabled) => enabled && (this.#states.drop = true)
         this.actionCallback[Action.RELOAD] = (enabled) => enabled && this.reload()
         this.actionCallback[Action.EQUIP_KNIFE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_KNIFE)
         this.actionCallback[Action.EQUIP_PRIMARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_PRIMARY)
         this.actionCallback[Action.EQUIP_SECONDARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_SECONDARY)
         this.actionCallback[Action.EQUIP_BOMB] = (enabled) => enabled && this.equip(InventorySlot.SLOT_BOMB)
-        this.actionCallback[Action.BUY_MENU] = (enabled) => enabled && this.#hud.toggleBuyMenu()
-        this.actionCallback[Action.SCORE_BOARD] = (enabled) => this.#hud.toggleScore(enabled)
-        this.actionCallback[Action.DROP] = (enabled) => enabled && this.drop()
+        this.actionCallback[Action.BUY_MENU] = (enabled) => enabled && hud.toggleBuyMenu()
+        this.actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
     }
 
     attack([x, y]) {
@@ -57,46 +51,6 @@ export class PlayerAction {
 
     equip(slotId) {
         this.#states.equip = slotId
-    }
-
-    drop() {
-        this.#states.drop = true
-    }
-
-    moveForward(enabled) {
-        this.#states.moveForward = enabled
-    }
-
-    moveLeft(enabled) {
-        this.#states.moveLeft = enabled
-    }
-
-    moveBackward(enabled) {
-        this.#states.moveBackward = enabled
-    }
-
-    moveRight(enabled) {
-        this.#states.moveRight = enabled
-    }
-
-    jump() {
-        this.#states.jumping = true
-    }
-
-    stand() {
-        this.#states.standing = true
-    }
-
-    crouch() {
-        this.#states.crouching = true
-    }
-
-    run() {
-        this.#states.running = true
-    }
-
-    shift() {
-        this.#states.shifting = true
     }
 
     reload() {
@@ -117,9 +71,8 @@ export class PlayerAction {
         this.#states.sprayTriggerStartMs = null
     }
 
-    getPlayerAction(sprayTriggerDeltaMs) {
+    getPlayerAction(game, sprayTriggerDeltaMs) {
         let action = []
-        const game = this.#game
 
         if (game.buyList.length) {
             game.buyList.forEach(function (buyMenuItemId) {
@@ -173,15 +126,15 @@ export class PlayerAction {
         }
 
         if (this.#states.attack) {
-            game.attack()
+            game.attackFeedback()
             action.push(this.#states.shootLookAt)
             action.push('attack')
             this.#states.attack = false
         } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {
-            game.attack()
             let rotation = game.getPlayerMeRotation()
             action.push(`lookAt ${rotation[0]} ${rotation[1]}`)
             action.push('attack')
+            game.attackFeedback()
         } else {
             let horizontal, vertical
             [horizontal, vertical] = game.getPlayerMeRotation()

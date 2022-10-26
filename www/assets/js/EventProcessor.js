@@ -4,8 +4,7 @@ export class EventProcessor {
     #callbacks
 
     constructor(game) {
-        this.game = game
-        this.#loadCallbacks()
+        this.#loadCallbacks(game)
     }
 
     process(event) {
@@ -18,8 +17,7 @@ export class EventProcessor {
         return true
     }
 
-    #loadCallbacks() {
-        const game = this.game
+    #loadCallbacks(game) {
         const eventsCallback = {}
 
         eventsCallback[EventList.unknown] = function (data) {

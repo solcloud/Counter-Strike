@@ -17,7 +17,7 @@ let launchGame
     const hud = new HUD()
     const stats = new Stats();
     const game = new Game(world, hud, stats);
-    const action = new PlayerAction(game, hud)
+    const action = new PlayerAction(hud)
     const control = new Control(game, action, setting)
     hud.injectDependency(game, setting)
 

@@ -154,7 +154,7 @@ export class Game {
         return player
     }
 
-    attack() {
+    attackFeedback() {
         if (this.playerMe.data.ammo > 0) {
             this.#hud.showShot()
         }
