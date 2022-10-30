@@ -6,6 +6,7 @@ export class Player {
         item: null,
         canAttack: null,
         canBuy: null,
+        canPlant: null,
         slots: null,
         health: null,
         position: null,
@@ -20,7 +21,7 @@ export class Player {
         isReloading: null,
     }
     custom = {
-        slotId: 2
+        slotId: null
     }
     threeObject = null
 

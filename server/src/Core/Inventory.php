@@ -15,7 +15,7 @@ use cs\Weapon\PistolUsp;
 class Inventory
 {
 
-    /** @var Item[] */
+    /** @var Item[] slotId => Item */
     private array $items = [];
     private int $dollars = 0;
     private int $equippedSlot;
@@ -44,7 +44,19 @@ class Inventory
             }
         }
 
+        unset($this->items[InventorySlot::SLOT_BOMB->value]);
         $this->store = new BuyMenu($isAttackerSide);
+    }
+
+    public function removeBomb(): InventorySlot
+    {
+        unset($this->items[InventorySlot::SLOT_BOMB->value]);
+        if (isset($this->items[$this->lastEquippedSlotId])) {
+            $this->equippedSlot = $this->lastEquippedSlotId;
+        } else {
+            $this->equippedSlot = InventorySlot::SLOT_KNIFE->value;
+        }
+        return InventorySlot::from($this->equippedSlot);
     }
 
     public function getEquipped(): Item
@@ -130,6 +142,15 @@ class Inventory
         return $item->equip();
     }
 
+    public function pickup(Item $item): void
+    {
+        if (isset($this->items[$item->getSlot()->value])) {
+            return;
+        }
+
+        $this->items[$item->getSlot()->value] = $item;
+    }
+
     public function getDollars(): int
     {
         return $this->dollars;
@@ -170,6 +191,11 @@ class Inventory
     public function getArmor(): ArmorType
     {
         return $this->armorType;
+    }
+
+    public function has(int $slotId): bool
+    {
+        return (isset($this->items[$slotId]));
     }
 
 }

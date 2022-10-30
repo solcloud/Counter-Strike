@@ -6,6 +6,7 @@ use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\InventorySlot;
 use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
 use cs\Equipment\HighExplosive;
@@ -37,6 +38,7 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertSame(0, $game->getPlayer(1)->getMoney());
         $this->playPlayer($game, $playerCommands);
         $this->assertSame(0, $game->getPlayer(1)->getMoney());
+        $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_BOMB->value));
 
         $knife = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(Knife::class, $knife);
@@ -125,16 +127,16 @@ class SimpleInventoryTest extends BaseTestCase
         $startMoney = 6000;
 
         $playerCommands = [
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_SMOKE),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_MOLOTOV),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_FLASH),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_FLASH),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_HE),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
             #
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_SMOKE),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_HE),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_MOLOTOV),
-            fn(Player $p) => $p->buyItem(BuyMenuItem::GRENADE_DECOY),
+            fn(Player $p) => $this->assertFalse($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertFalse($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $this->assertFalse($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertFalse($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertFalse($p->buyItem(BuyMenuItem::GRENADE_HE)),
         ];
 
         $game = $this->createOneRoundGame(count($playerCommands), [
@@ -142,7 +144,7 @@ class SimpleInventoryTest extends BaseTestCase
         ]);
         $this->playPlayer($game, $playerCommands);
         $this->assertSame(6000 - 1100, $game->getPlayer(1)->getMoney());
-        $this->assertCount(5, $game->getPlayer(1)->getInventory()->getItems());
+        $this->assertCount(6, $game->getPlayer(1)->getInventory()->getItems());
         foreach ($game->getPlayer(1)->getInventory()->getItems() as $item) {
             $this->assertNotInstanceOf(HighExplosive::class, $item);
             $this->assertNotInstanceOf(Decoy::class, $item);

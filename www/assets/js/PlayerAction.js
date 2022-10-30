@@ -50,6 +50,7 @@ export class PlayerAction {
     }
 
     equip(slotId) {
+        this.sprayingDisable()
         this.#states.equip = slotId
     }
 

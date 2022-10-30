@@ -13,6 +13,10 @@ class GameProperty
     public int $max_rounds = 30;
     const ROUND_TIME_MS = 'round_time_ms';
     public int $round_time_ms = 115000; // 1:55 min
+    const BOMB_EXPLODE_TIME_MS = 'bomb_explode_time_ms';
+    public int $bomb_explode_time_ms = 40000;
+    const BOMB_PLANT_TIME_MS = 'bomb_plant_time_ms';
+    public int $bomb_plant_time_ms = 3200;
     const HALF_TIME_FREEZE_SEC = 'half_time_freeze_sec';
     public int $half_time_freeze_sec = 4;
     const FREEZE_TIME_SEC = 'freeze_time_sec';

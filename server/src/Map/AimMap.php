@@ -36,6 +36,11 @@ class AimMap extends BoxMap
         return $this->getBoxes()[0];
     }
 
+    public function getPlantArea(): Box
+    {
+        return $this->getBoxes()[0];
+    }
+
     public function getSpawnRotationAttacker(): int
     {
         return rand(0, 359);

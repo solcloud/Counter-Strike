@@ -4,6 +4,7 @@ namespace Test;
 
 use Closure;
 use cs\Core\Game;
+use cs\Event\GameOverEvent;
 use cs\Net\Protocol\TextProtocol;
 
 /**
@@ -33,7 +34,7 @@ class TestGame extends Game
             if ($this->onTickCallback) {
                 call_user_func($this->onTickCallback, $this->getState());
             }
-            $this->tick($tickId);
+            $gameOverEventOrNull = $this->tick($tickId);
             $events = $this->consumeTickEvents();
             if ($this->onEventsCallback && $events !== []) {
                 call_user_func($this->onEventsCallback, $events);
@@ -43,6 +44,9 @@ class TestGame extends Game
             }
             if ($debug) {
                 $this->gameStates[$tickId + 1] = json_decode($protocol->serialize($this->getPlayers(), $events));
+            }
+            if ($gameOverEventOrNull) {
+                break;
             }
         }
     }

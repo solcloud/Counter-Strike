@@ -59,8 +59,14 @@ export class SoundRepository {
             return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
         }
 
+        if (type === SoundType.BOMB_PLANTING) {
+            return '36106__jak-damage__digi-code-door-uncatch.wav'
+        }
         if (type === SoundType.BOMB_PLANTED) {
             return '555042__bittermelonheart__soccer-ball-kick.wav'
+        }
+        if (type === SoundType.BOMB_EXPLODED) {
+            return '209984__zimbot__explosionbombblastambiente.wav'
         }
 
         if (type === SoundType.ITEM_BUY) {

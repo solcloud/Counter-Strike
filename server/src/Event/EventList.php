@@ -16,6 +16,7 @@ final class EventList
         RoundEndCoolDownEvent::class => 7,
         KillEvent::class             => 8,
         SoundEvent::class            => 9,
+        PlantEvent::class            => 10,
     ];
 
 }

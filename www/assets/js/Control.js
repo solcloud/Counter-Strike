@@ -15,7 +15,7 @@ export class Control {
         const self = this
         const action = this.#action
         const game = this.#game
-        const sprayEnableSlots = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY]
+        const sprayEnableSlots = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_BOMB]
 
         document.addEventListener("mouseup", function (event) {
             event.preventDefault()

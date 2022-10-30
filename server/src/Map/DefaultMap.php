@@ -13,6 +13,7 @@ class DefaultMap extends BoxMap
 
     /** @var Box[] */
     private array $buyArea;
+    private Box $plantArea;
 
     public function __construct()
     {
@@ -51,6 +52,7 @@ class DefaultMap extends BoxMap
         $this->setAttackersSpawnPositions($attackers);
         $this->setDefendersSpawnPositions($defenders);
 
+        $this->plantArea = new Box(new Point(43 * $scale / 2 - 300, 0, 32 * $scale / 2 - 200), 600, 4, 400);
         $this->buyArea[0] = new Box((new Point())->addZ(26 * $scale), 43 * $scale, 2 * Setting::playerHeadHeightStand(), 6 * $scale);
         $this->buyArea[1] = new Box(new Point(), 43 * $scale, 2 * Setting::playerHeadHeightStand(), 6 * $scale);
     }
@@ -63,6 +65,11 @@ class DefaultMap extends BoxMap
     public function getBuyArea(bool $forAttackers): Box
     {
         return $this->buyArea[(int)$forAttackers];
+    }
+
+    public function getPlantArea(): Box
+    {
+        return $this->plantArea;
     }
 
 }

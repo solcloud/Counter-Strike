@@ -43,10 +43,13 @@ trait InventoryTrait
     public function dropEquippedItem(): void
     {
         $item = $this->inventory->dropEquipped();
-        if ($item) {
-            $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_DROP);
-            $this->world->makeSound($sound->setPlayer($this)->setItem($item));
+        if (!$item) {
+            return;
         }
+
+        // TODO world drop/pick items
+        $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_DROP);
+        $this->world->makeSound($sound->setPlayer($this)->setItem($item));
     }
 
     public function buyItem(BuyMenuItem $item): bool

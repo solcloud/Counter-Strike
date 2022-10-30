@@ -3,6 +3,7 @@
 namespace cs\Traits\Player;
 
 use cs\Enum\SoundType;
+use cs\Equipment\Bomb;
 use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
 use cs\Event\SoundEvent;
@@ -19,6 +20,12 @@ trait AttackTrait
             return null;
         }
         $item = $this->getEquippedItem();
+
+        if ($item instanceof Bomb) {
+            $this->world->tryPlantBomb($this);
+            return null;
+        }
+
         if (!($item instanceof AttackEnable)) {
             return null;
         }

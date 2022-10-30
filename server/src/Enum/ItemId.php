@@ -10,6 +10,7 @@ class ItemId
 {
 
     public const SOLID_SURFACE = 0;
+    public const BOMB = 50;
 
     /** @var array<string,int> */
     public static array $map = [
@@ -29,6 +30,8 @@ class ItemId
         Equipment\Kevlar::class        => 34,
         Equipment\Molotov::class       => 35,
         Equipment\Smoke::class         => 36,
+
+        Equipment\Bomb::class => 50,
     ];
 
 }

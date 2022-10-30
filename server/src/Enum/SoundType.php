@@ -17,5 +17,9 @@ enum SoundType: int
     case BULLET_HIT_HEADSHOT = 9;
     case ATTACK_NO_AMMO = 10;
     case BOMB_PLANTED = 11;
+    case BOMB_PLANTING = 12;
+    case BOMB_EXPLODED = 13;
+    case BOMB_DEFUSING = 14;
+    case BOMB_DEFUSED = 15;
 
 }

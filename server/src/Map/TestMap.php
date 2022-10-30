@@ -24,4 +24,9 @@ class TestMap extends Map
         return $this->buyArea;
     }
 
+    public function getPlantArea(): Box
+    {
+        return $this->buyArea;
+    }
+
 }

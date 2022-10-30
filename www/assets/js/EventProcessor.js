@@ -97,6 +97,10 @@ export class EventProcessor {
             game.playSound(data)
         }
 
+        eventsCallback[EventList.PlantEvent] = function (data) {
+            game.bombPlanted(data.timeMs, data.position)
+        }
+
         this.#callbacks = eventsCallback
     }
 }

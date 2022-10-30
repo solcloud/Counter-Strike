@@ -78,6 +78,8 @@ abstract class Map
 
     public abstract function getBuyArea(bool $forAttackers): Box;
 
+    public abstract function getPlantArea(): Box;
+
     /**
      * @return array<string,mixed>
      */
@@ -90,6 +92,7 @@ abstract class Map
             'spawnDefenders'         => array_map(fn(Point $o) => $o->toArray(), $this->getSpawnPositionDefender()),
             'buyAreaAttackers'       => $this->getBuyArea(true)->toArray(),
             'buyAreaDefenders'       => $this->getBuyArea(false)->toArray(),
+            'plantArea'              => $this->getPlantArea()->toArray(),
             'spawnRotationAttackers' => $this->getSpawnRotationAttacker(),
             'spawnRotationDefenders' => $this->getSpawnRotationDefender(),
         ];

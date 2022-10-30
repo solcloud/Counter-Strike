@@ -19,19 +19,32 @@ class PlayerControl
         return $this->gameState->isPaused();
     }
 
+    private function isPlantingOrDefusing(): bool
+    {
+        return $this->player->isPlantingOrDefusing();
+    }
+
     public function stand(): void
     {
+        if ($this->isPlantingOrDefusing()) {
+            return;
+        }
+
         $this->player->stand();
     }
 
     public function crouch(): void
     {
+        if ($this->isPlantingOrDefusing()) {
+            return;
+        }
+
         $this->player->crouch();
     }
 
     public function walk(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -40,7 +53,7 @@ class PlayerControl
 
     public function run(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -49,7 +62,7 @@ class PlayerControl
 
     public function jump(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -113,12 +126,16 @@ class PlayerControl
         if ($slot === null) {
             return;
         }
+        if ($this->player->getEquippedItem()->getSlot() === $slot) {
+            return;
+        }
+
         $this->player->equip($slot);
     }
 
     public function forward(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -127,7 +144,7 @@ class PlayerControl
 
     public function backward(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -136,7 +153,7 @@ class PlayerControl
 
     public function left(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 
@@ -145,7 +162,7 @@ class PlayerControl
 
     public function right(): void
     {
-        if ($this->gamePaused()) {
+        if ($this->gamePaused() || $this->isPlantingOrDefusing()) {
             return;
         }
 

@@ -2,7 +2,9 @@
 
 namespace cs\Core;
 
+use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
+use cs\Equipment\Bomb;
 use cs\Event\SoundEvent;
 use cs\Interface\Hittable;
 use cs\Map\Map;
@@ -23,6 +25,8 @@ class World
     private array $spawnPositionTakes = [];
     /** @var array<int,Point[]> */
     private array $spawnCandidates;
+    private int $lastBombPlantTick = -1;
+    private int $lastBombPlantPlayer = -1;
 
     public function __construct(private Game $game)
     {
@@ -250,6 +254,27 @@ class World
         return $player->getEquippedItem()->canAttack($this->getTickId());
     }
 
+    public function canPlant(Player $player): bool
+    {
+        if ($player->getEquippedItem()->getSlot() !== InventorySlot::SLOT_BOMB) {
+            return false;
+        }
+        if ($player->isFlying()) {
+            return false;
+        }
+        if (!$player->isAlive()) {
+            return false;
+        }
+        if ($this->game->isPaused()) {
+            return false;
+        }
+
+        if (null === $this->map) {
+            throw new GameException("No map is loaded! Cannot load plant areas.");
+        }
+        return Collision::pointWithBox($player->getPositionImmutable(), $this->map->getPlantArea());
+    }
+
     public function canBuy(Player $player): bool
     {
         if (!$this->game->playersCanBuy()) {
@@ -321,6 +346,45 @@ class World
         }
 
         $this->makeSound($soundEvent);
+    }
+
+    public function tryPlantBomb(Player $player): void
+    {
+        if (!$this->canPlant($player)) {
+            return;
+        }
+
+        /** @var Bomb $bomb */
+        $bomb = $player->getEquippedItem();
+        if ($this->lastBombPlantTick + 10 < $this->getTickId()) { // TODO do timeMs delta instead
+            $bomb->reset();
+            $player->stop();
+            $player->crouch();
+            $sound = new SoundEvent($player->getPositionImmutable()->addY(10), SoundType::BOMB_PLANTING);
+            $this->makeSound($sound->setPlayer($player)->setItem($bomb));
+        }
+        $this->lastBombPlantTick = $this->getTickId();
+        $this->lastBombPlantPlayer = $player->getId();
+
+        $planted = $bomb->plant();
+        if ($planted) {
+            $player->equip($player->getInventory()->removeBomb());
+            $bomb->setPosition($player->getPositionImmutable());
+            $this->game->bombPlanted();
+            $player->stand();
+        }
+    }
+
+    public function isPlantingOrDefusing(Player $player): bool
+    {
+        if (
+            $this->lastBombPlantPlayer === $player->getId() &&
+            ($this->lastBombPlantTick === $this->getTickId() || $this->lastBombPlantTick + 1 === $this->getTickId())
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function isCollisionWithOtherPlayers(int $playerId, Point $point, int $radius, int $height): bool

@@ -24,6 +24,7 @@ const EventList = {
     RoundEndCoolDownEvent: 7,
     KillEvent: 8,
     SoundEvent: 9,
+    PlantEvent: 10,
 }
 
 // server/src/Enum/GameOverReason.php
@@ -85,6 +86,8 @@ const SoundType = {
     BULLET_HIT_HEADSHOT: 9,
     ATTACK_NO_AMMO: 10,
     BOMB_PLANTED: 11,
+    BOMB_PLANTING: 12,
+    BOMB_EXPLODED: 13,
 }
 
 // server/src/Enum/BuyMenuItem.php
@@ -133,6 +136,7 @@ const ItemId = {
     Kevlar: 34,
     Molotov: 35,
     Smoke: 36,
+    Bomb: 50,
 }
 
 // PlayerAction.js

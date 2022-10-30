@@ -7,11 +7,13 @@ use cs\Enum\ItemId;
 use cs\Enum\PauseReason;
 use cs\Enum\RoundEndReason;
 use cs\Enum\SoundType;
+use cs\Equipment\Bomb;
 use cs\Event\Event;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
 use cs\Event\PauseStartEvent;
+use cs\Event\PlantEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
@@ -21,6 +23,7 @@ use cs\Map\Map;
 class Game
 {
 
+    private Bomb $bomb;
     private World $world;
     private Score $score;
     private GameState $state;
@@ -45,16 +48,16 @@ class Game
     private int $playersCountDefenders = 0;
     private bool $paused = true;
     private bool $roundEndCoolDown = false;
-    private bool $bombPlanted = false; // TODO
+    private bool $bombPlanted = false;
+    private int $bombEventId;
 
     public function __construct(GameProperty $properties = new GameProperty())
     {
+        $this->bomb = new Bomb($properties->bomb_plant_time_ms);
         $this->state = new GameState($this);
         $this->world = new World($this);
         $this->score = new Score($properties->loss_bonuses);
         $this->properties = $properties;
-
-        $this->initialize();
     }
 
     private function initialize(): void
@@ -75,6 +78,9 @@ class Game
     public function tick(int $tickId): ?GameOverEvent
     {
         $this->tick = $tickId;
+        if ($tickId === 0) {
+            $this->initialize();
+        }
 
         if ($this->gameOver) {
             $this->tickEvents = [$this->gameOver];
@@ -102,27 +108,23 @@ class Game
         if ($this->roundEndCoolDown) {
             return;
         }
-        // TODO bomb check, planted, timer
 
         if ($this->playersCountAttackers > 0 && $attackersAlive === 0) {
-            $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, false, RoundEndReason::ALL_ENEMIES_ELIMINATED));
+            $this->roundEnd(false, RoundEndReason::ALL_ENEMIES_ELIMINATED);
             return;
         }
         if ($this->playersCountDefenders > 0 && $defendersAlive === 0) {
-            $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, true, RoundEndReason::ALL_ENEMIES_ELIMINATED));
+            $this->roundEnd(true, RoundEndReason::ALL_ENEMIES_ELIMINATED);
             return;
         }
 
-        if ($this->roundStartTickId + $this->roundTickCount === $this->tick) {
-            $this->roundEndCoolDown = true;
-            $this->addEvent(new RoundEndEvent($this, false, RoundEndReason::TIME_RUNS_OUT));
+        if (!$this->bombPlanted && $this->roundStartTickId + $this->roundTickCount === $this->tick) {
+            $this->roundEnd(false, RoundEndReason::TIME_RUNS_OUT);
             return;
         }
     }
 
-    private function addEvent(Event $event): void
+    private function addEvent(Event $event): int
     {
         $eventId = $this->eventId++;
         $this->events[$eventId] = $event;
@@ -130,6 +132,7 @@ class Game
         $event->onComplete[] = fn(Event $e) => $this->removeEvent($e->customId);
 
         $this->tickEvents[] = $event;
+        return $eventId;
     }
 
     private function removeEvent(int $eventId): void
@@ -169,6 +172,9 @@ class Game
         $this->world->addPlayerCollider(new PlayerCollider($player));
         if ($player->isPlayingOnAttackerSide()) {
             $this->playersCountAttackers++;
+            if ($this->playersCountAttackers === 1) {
+                $this->spawnBomb();
+            }
         } else {
             $this->playersCountDefenders++;
         }
@@ -251,6 +257,61 @@ class Game
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
+    public function playerBombKilledEvent(Player $playerDead): void
+    {
+        $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::BOMB, false));
+        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($sound->setPlayer($playerDead)->setItem($this->bomb));
+    }
+
+    public function spawnBomb(): void
+    {
+        if ($this->playersCountAttackers === 0) {
+            return;
+        }
+
+        $this->bombPlanted = false;
+        $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
+        $attackers[rand(0, count($attackers) - 1)]->getInventory()->pickup($this->bomb);
+    }
+
+    public function bombDefused(): void
+    {
+        // TODO
+        $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
+        $this->addSoundEvent($sound->setItem($this->bomb));
+        unset($this->events[$this->bombEventId]);
+    }
+
+    public function bombPlanted(): void
+    {
+        $this->bombPlanted = true;
+        $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_PLANTED);
+        $this->addSoundEvent($sound->setItem($this->bomb));
+
+        $event = new PlantEvent(function (): void {
+            $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_EXPLODED);
+            $this->addSoundEvent($sound->setItem($this->bomb));
+            $this->roundEnd(true, RoundEndReason::BOMB_EXPLODED);
+
+            foreach ($this->getAlivePlayers() as $player) {
+                $this->bomb->explodeDamageToPlayer($player);
+                if (!$player->isAlive()) {
+                    $this->playerBombKilledEvent($player);
+                }
+            }
+        }, $this->properties->bomb_explode_time_ms, $this->bomb->getPosition());
+        $this->bombEventId = $this->addEvent($event);
+    }
+
+    protected function roundEnd(bool $attackersWins, RoundEndReason $reason): void
+    {
+        $this->roundEndCoolDown = true;
+        $roundEndEvent = new RoundEndEvent($this, $attackersWins, $reason);
+        $roundEndEvent->onComplete[] = fn() => $this->endRound($roundEndEvent); // TODO call it immediately?
+        $this->addEvent($roundEndEvent);
+    }
+
     public function endRound(RoundEndEvent $roundEndEvent): void
     {
         $this->roundNumber++;
@@ -316,7 +377,7 @@ class Game
             $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(), $randomizeSpawn ? 80 : 0));
             $player->setPosition($spawnPosition);
         }
-        $this->bombPlanted = false;
+        $this->spawnBomb();
     }
 
     private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int
@@ -372,6 +433,14 @@ class Game
     public function getProperties(): GameProperty
     {
         return $this->properties;
+    }
+
+    /**
+     * @return Player[]
+     */
+    private function getAlivePlayers(): array
+    {
+        return array_filter($this->players, fn(Player $player) => $player->isAlive());
     }
 
     /**

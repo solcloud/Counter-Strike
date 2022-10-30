@@ -66,4 +66,9 @@ class ArrayMap extends Map
         return Box::fromArray($this->data['buyAreaDefenders']); // @phpstan-ignore-line
     }
 
+    public function getPlantArea(): Box
+    {
+        return Box::fromArray($this->data['plantArea']); // @phpstan-ignore-line
+    }
+
 }

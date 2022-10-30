@@ -172,6 +172,11 @@ final class Player
         }
     }
 
+    public function isPlantingOrDefusing(): bool
+    {
+        return $this->world->isPlantingOrDefusing($this);
+    }
+
     public function getHealth(): int
     {
         return $this->health;
@@ -237,6 +242,7 @@ final class Player
             "item"        => $equippedItem->toArray(),
             "canAttack"   => $this->world->canAttack($this),
             "canBuy"      => $this->world->canBuy($this),
+            "canPlant"    => $this->world->canPlant($this),
             "slots"       => $this->getInventory()->getFilledSlots(),
             "health"      => $this->health,
             "position"    => $this->position->toArray(),

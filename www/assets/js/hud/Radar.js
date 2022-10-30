@@ -75,6 +75,10 @@ export class Radar {
             ctx.stroke()
         })
 
+        if (!playerMe) { // TODO spectate alive teammates
+            return
+        }
+
         const meX = Math.min(Math.max(this.#padding.x.min, playerMe.data.position.x), this.#padding.x.max)
         const meY = Math.min(Math.max(this.#padding.y.min, playerMe.data.position.z), this.#padding.y.max)
         const centerX = (meX > this.#mapCenterX ? -(meX - this.#mapCenterX) : this.#mapCenterX - meX)

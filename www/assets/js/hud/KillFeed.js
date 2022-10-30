@@ -1,3 +1,5 @@
+import {ItemId} from "../Enums.js";
+
 export class KillFeed {
     #element
     #scoreBoard
@@ -8,9 +10,16 @@ export class KillFeed {
     }
 
     showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
+        let killedByBomb = false
         this.#scoreBoard.updatePlayerIsDead(playerDead)
-        if (playerCulprit.id === playerDead.id) { // suicide
-            this.#scoreBoard.updatePlayerKills(playerDead, -1)
+        if (playerCulprit.id === playerDead.id) { // suicide or bomb
+            if (killedItemId === ItemId.SolidSurface) { // suicide
+                this.#scoreBoard.updatePlayerKills(playerDead, -1)
+            } else if (killedItemId === ItemId.Bomb) { // bomb
+                killedByBomb = true
+            } else {
+                throw new Error("New killing item?")
+            }
         } else if (playerCulprit.isAttacker === playerDead.isAttacker) { // team kill
             this.#scoreBoard.updatePlayerKills(playerCulprit, -1)
         } else {
@@ -20,7 +29,7 @@ export class KillFeed {
         const culprit = document.createElement('span')
         const culpritOnMyTeam = (playerCulprit.isAttacker === playerMe.isAttacker)
         culprit.classList.add(culpritOnMyTeam ? 'team-me' : 'team-opponent')
-        culprit.innerText = this.#scoreBoard.getPlayerName(playerCulprit, playerMe)
+        culprit.innerText = killedByBomb ? '💣' : this.#scoreBoard.getPlayerName(playerCulprit, playerMe)
 
         const dead = document.createElement('span')
         const deadOnyMyTeam = (playerDead.isAttacker === playerMe.isAttacker)

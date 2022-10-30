@@ -42,7 +42,7 @@ foreach ($map->getBoxes() as $box) {
 </div>
 <script>
     const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
-    let camera, scene, renderer, controls, extra;
+    let camera, scene, renderer, controls, map, extra;
     const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
     const material = new THREE.MeshLambertMaterial({color: 0x664b17})
 
@@ -87,7 +87,7 @@ foreach ($map->getBoxes() as $box) {
         const data = JSON.parse(json);
         extra = new THREE.Group()
         extra.name = 'extra'
-        const map = new THREE.Group()
+        map = new THREE.Group()
         map.name = 'map'
 
         let first = true, center, maxHeight
@@ -141,12 +141,12 @@ foreach ($map->getBoxes() as $box) {
         s1.target = lightTarget
         const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
         const a1 = new THREE.AmbientLight(0xDADADA, .8)
-        extra.add(s1, d1, a1, lightTarget, bulb);
+        extra.add(s1, d1, a1, lightTarget);
+        if (!forRadar) {
+            extra.add(bulb)
+        }
 
         scene.add(map, extra)
-        renderer.render(scene, camera);
-        document.querySelector('textarea.map').innerText = JSON.stringify(map.toJSON())
-        document.querySelector('textarea.extra').innerText = JSON.stringify(extra.toJSON())
     }
 
     function extraGeometry() {
@@ -209,6 +209,21 @@ foreach ($map->getBoxes() as $box) {
         scene.add(areaDefenders, areaAttackers);
     }
 
+    function plants() {
+        const box = JSON.parse('<?= json_encode($map->getPlantArea()->toArray()) ?>');
+
+        const area = new THREE.Mesh(
+            new THREE.BoxGeometry(box.width, box.height, box.depth),
+            new THREE.MeshStandardMaterial({color: 0xFF6600})
+        );
+
+        area.position.set(box.x, box.y - 0.1, -1 * box.z)
+        area.translateX(box.width / 2)
+        area.translateY(box.height / 2)
+        area.translateZ(box.depth / -2)
+        extra.add(area);
+    }
+
     function animate() {
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
@@ -221,6 +236,10 @@ foreach ($map->getBoxes() as $box) {
         spawns()
         buyAreas()
     }
+    plants()
+    renderer.render(scene, camera);
+    document.querySelector('textarea.map').innerText = JSON.stringify(map.toJSON())
+    document.querySelector('textarea.extra').innerText = JSON.stringify(extra.toJSON())
     animate()
 </script>
 </body>

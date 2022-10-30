@@ -25,7 +25,7 @@ abstract class Item
 
     public function canAttack(int $tickId): bool
     {
-        return false;
+        return ($this->equipped);
     }
 
     public function reset(): void

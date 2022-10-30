@@ -8,22 +8,22 @@ use cs\Enum\RoundEndReason;
 final class RoundEndEvent extends TickEvent
 {
     public readonly int $roundNumberEnded;
+    /** @var array<mixed> */
+    private array $scoreData;
 
-    public function __construct(private Game $game, public readonly bool $attackersWins, public readonly RoundEndReason $reason)
+    public function __construct(Game $game, public readonly bool $attackersWins, public readonly RoundEndReason $reason)
     {
-        $this->roundNumberEnded = $this->game->getRoundNumber();
-        parent::__construct(function (): void {
-            $this->game->endRound($this);
-        });
+        $this->roundNumberEnded = $game->getRoundNumber();
+        $this->scoreData = $game->getScore()->toArray();
     }
 
     public function serialize(): array
     {
         return [
             'roundNumber'    => $this->roundNumberEnded,
-            'newRoundNumber' => $this->game->getRoundNumber(),
+            'newRoundNumber' => $this->roundNumberEnded + 1,
             'attackersWins'  => $this->attackersWins,
-            'score'          => $this->game->getScore()->toArray(),
+            'score'          => $this->scoreData,
         ];
     }
 

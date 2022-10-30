@@ -52,6 +52,12 @@ trait MovementTrait
         $this->setActiveFloor($this->world->findFloor($this->position));
     }
 
+    public function stop(): void
+    {
+        $this->moveX = 0;
+        $this->moveZ = 0;
+    }
+
     public function moveForward(): void
     {
         $this->moveZ = 1;

@@ -20,6 +20,7 @@ export class HUD {
         scoreDetail: null,
         buyMenu: null,
         canBuyIcon: null,
+        canPlantIcon: null,
         equippedItem: null,
         slotModel: null,
         shotModel: null,
@@ -59,8 +60,11 @@ export class HUD {
         this.#showAble.showScore = enabled
     }
 
-    bombPlanted() {
-        this.displayBottomMessage('<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>40 seconds to detonation.')
+    bombPlanted(detonationTimeSec) {
+        this.#resetCountDown()
+        this.#elements.time.innerText = '⚠️ 💣'
+        this.displayBottomMessage(`<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>${detonationTimeSec} seconds to detonation.`)
+        setTimeout(() => this.clearBottomMessage(), 3000)
     }
 
     requestFullScoreBoardUpdate(scoreBoardData) {
@@ -80,8 +84,12 @@ export class HUD {
         this.#startCountDown(roundTimeMs)
     }
 
-    #startCountDown(timeMs) {
+    #resetCountDown() {
         clearInterval(this.#countDownIntervalId)
+    }
+
+    #startCountDown(timeMs) {
+        this.#resetCountDown()
         let roundTimeSec = Math.floor(timeMs / 1000)
 
         const timeElement = this.#elements.time
@@ -149,12 +157,9 @@ export class HUD {
             this.#scoreBoard.update(this.#scoreBoardData)
             this.#scoreBoardData = null
         }
-        if (this.#showAble.showScore) {
-            this.#elements.score.classList.remove('hidden');
-        } else {
-            this.#elements.score.classList.add('hidden');
-        }
+        this.#elements.score.classList.toggle('hidden', !this.#showAble.showScore);
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
+        this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
         if (player.canBuy && this.#showAble.showBuyMenu) {
             this.#game.requestPointerUnLock()
             this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
@@ -206,6 +211,7 @@ export class HUD {
                         <canvas id="radar-canvas"></canvas>
                     </div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
+                    <div data-can-plant class="hidden" style="margin:22px 4px">⇣&nbsp;💣&nbsp;⇣</div>
                 </div>
                 <div class="bottom">
                     <div id="fps-stats"></div>
@@ -238,10 +244,10 @@ export class HUD {
                 <div class="kill-feed">
                 </div>
                 <div class="inventory">
-                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife [q]</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary [1]</p>
-                    <p class="highlight" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary [2]</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb [5]</p>
+                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb</p>
                 </div>
                 <div>
                     <span data-ammo class="ammo bg">
@@ -254,6 +260,7 @@ export class HUD {
         this.#elements.score = elementHud.querySelector('#scoreboard')
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
+        this.#elements.canPlantIcon = elementHud.querySelector('[data-can-plant]')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img[data-slot]')

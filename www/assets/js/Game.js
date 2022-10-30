@@ -16,6 +16,7 @@ export class Game {
     #endCallback
     #soundRepository
     #hudDebounceTicks = 1
+    #bombTimerId = null;
     eventProcessor
     score = null
     alivePlayers = [0, 0]
@@ -72,6 +73,7 @@ export class Game {
     }
 
     roundEnd(attackersWins, newRoundNumber, score) {
+        clearInterval(this.#bombTimerId)
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
         this.score = score;
@@ -87,13 +89,33 @@ export class Game {
     playSound(data) {
         let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerMe.getId())
         if (!soundName) {
-            console.log("No song defined for: " + data)
+            console.warn("No song defined for", data)
             return
         }
 
-        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY]
+        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTED]
         let myPlayerSound = (data.player && data.player === this.playerMe.getId() && myPlayerTypes.includes(data.type))
         this.#world.playSound(soundName, data.position, myPlayerSound)
+    }
+
+    bombPlanted(timeMs, position) {
+        const world = this.#world
+        this.#hud.bombPlanted(timeMs / 1000)
+        //world.spawnBomb(position) TODO
+
+        const tenSecWarningSecCount = timeMs / 1000 - 10
+        let tickSecondsCount = 0;
+        this.#bombTimerId = setInterval(function () {
+            if (tickSecondsCount === tenSecWarningSecCount) {
+                world.playSound('88532__northern87__woosh-northern87.wav', null, true)
+            }
+            world.playSound('536422__rudmer-rotteveel__setting-electronic-timer-1-beep.wav', position, false)
+            tickSecondsCount++;
+        }, 1000)
+    }
+
+    bombDefused() {
+        clearInterval(this.#bombTimerId)
     }
 
     isPaused() {
