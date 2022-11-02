@@ -23,6 +23,7 @@ export class Game {
     buyList = []
     players = []
     playerMe = null
+    playerSpectate = null
 
     constructor(world, hud, stats) {
         this.#world = world
@@ -36,7 +37,14 @@ export class Game {
         console.log("Pause: " + msg + " for " + timeMs + "ms")
         const game = this
         this.players.forEach(function (player) {
-            if (player.getId() !== game.playerMe.getId()) {
+            if (player.getId() === game.playerMe.getId()) {
+                if (game.playerSpectate.getId() !== game.playerMe.getId()) { // reset spectate camera to our player
+                    const camera = game.#world.getCamera()
+                    camera.removeFromParent()
+                    player.get3DObject().getObjectByName('head').add(camera)
+                    game.playerSpectate = game.playerMe
+                }
+            } else {
                 player.get3DObject().visible = true // respawn (show) all beside me
             }
         })
@@ -74,6 +82,8 @@ export class Game {
 
     roundEnd(attackersWins, newRoundNumber, score) {
         clearInterval(this.#bombTimerId)
+        this.#world.removeBomb()
+
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
         this.score = score;
@@ -87,21 +97,25 @@ export class Game {
     }
 
     playSound(data) {
-        let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerMe.getId())
+        if (data.type === SoundType.ITEM_ATTACK && data.player === this.playerSpectate.getId()) {
+            this.attackFeedback(data.item)
+        }
+
+        let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerSpectate.getId())
         if (!soundName) {
             console.warn("No song defined for", data)
             return
         }
 
         let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTED]
-        let myPlayerSound = (data.player && data.player === this.playerMe.getId() && myPlayerTypes.includes(data.type))
+        let myPlayerSound = (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type))
         this.#world.playSound(soundName, data.position, myPlayerSound)
     }
 
     bombPlanted(timeMs, position) {
         const world = this.#world
         this.#hud.bombPlanted(timeMs / 1000)
-        //world.spawnBomb(position) TODO
+        world.spawnBomb(position)
 
         const tenSecWarningSecCount = timeMs / 1000 - 10
         let tickSecondsCount = 0;
@@ -145,6 +159,7 @@ export class Game {
 
         this.playerMe = new Player(options.player, this.#world.createPlayerMe())
         this.players[playerId] = this.playerMe;
+        this.playerSpectate = this.playerMe
 
         if (this.#readyCallback) {
             this.#readyCallback(this.#options)
@@ -152,8 +167,9 @@ export class Game {
     }
 
     playerKilled(playerIdDead, playerIdCulprit, wasHeadshot, killItemId) {
-        const culpritPlayer = this.players[playerIdCulprit];
-        const deadPlayer = this.players[playerIdDead];
+        const culpritPlayer = this.players[playerIdCulprit]
+        const deadPlayer = this.players[playerIdDead]
+        deadPlayer.data.health = 0
 
         deadPlayer.get3DObject().visible = false
         this.alivePlayers[deadPlayer.getTeamIndex()]--
@@ -162,9 +178,35 @@ export class Game {
             culpritPlayer.data,
             deadPlayer.data,
             wasHeadshot,
-            this.playerMe.data,
+            this.playerSpectate.data,
             killItemId
         )
+
+        if (playerIdDead === this.playerSpectate.getId()) {
+            this.spectatePlayer()
+        }
+    }
+
+    spectatePlayer(directionNext = true) {
+        if (this.playerMe.isAlive() || this.alivePlayers[this.playerMe.getTeamIndex()] === 0) {
+            return
+        }
+
+        let teammates = this.getMyTeamPlayers()
+        if (!directionNext) {
+            teammates = [...teammates].reverse()
+        }
+
+        const startId = this.playerSpectate.getId()
+        let match = teammates.find((player) => startId > player.getId() && player.isAlive())
+        if (!match) {
+            match = teammates.find((player) => player.isAlive())
+        }
+
+        const camera = this.#world.getCamera()
+        camera.removeFromParent()
+        match.get3DObject().getObjectByName('head').add(camera)
+        this.playerSpectate = match
     }
 
     createPlayer(data) {
@@ -176,19 +218,19 @@ export class Game {
         return player
     }
 
-    attackFeedback() {
-        if (this.playerMe.data.ammo > 0) {
+    attackFeedback(item) {
+        if (this.playerSpectate.data.ammo > 0) {
             this.#hud.showShot()
         }
     }
 
     equip(slotId) {
-        if (!this.playerMe.data.slots[slotId]) {
+        if (!this.playerSpectate.data.slots[slotId]) {
             return false
         }
 
-        this.playerMe.equip(slotId)
-        this.#hud.equip(slotId, this.playerMe.data.slots)
+        this.playerSpectate.equip(slotId)
+        this.#hud.equip(slotId, this.playerSpectate.data.slots)
         return true
     }
 
@@ -231,8 +273,8 @@ export class Game {
             player.data.isAttacker = serverState.isAttacker
         }
 
-        if (this.playerMe.getId() === serverState.id) { // if me
-            if (this.playerMe.getEquippedSlotId() !== serverState.item.slot) {
+        if (this.playerMe.getId() === serverState.id || this.playerSpectate.getId() === serverState.id) {
+            if (this.playerSpectate.isInventoryChanged(serverState)) {
                 this.equip(serverState.item.slot)
             }
         } else {
@@ -258,12 +300,23 @@ export class Game {
         return this.playerMe.isAlive()
     }
 
+    meIsSpectating() {
+        return (!this.meIsAlive())
+    }
+
     setPointer(pointer) {
         this.#pointer = pointer
     }
 
     getPlayerMeRotation() {
         return threeRotationToServer(this.#pointer.getObject().rotation)
+    }
+
+    getPlayerSpectateRotation() {
+        if (this.playerSpectate.getId() === this.playerMe.getId()) {
+            return this.getPlayerMeRotation()
+        }
+        return [this.playerSpectate.data.look.horizontal, this.playerSpectate.data.look.vertical]
     }
 
     requestPointerLock() {
@@ -283,7 +336,7 @@ export class Game {
     #render() {
         if (this.#started && --this.#hudDebounceTicks === 0) {
             this.#hudDebounceTicks = 4
-            this.#hud.updateHud(this.playerMe.data)
+            this.#hud.updateHud(this.playerSpectate.data)
         }
         this.#world.render()
     }

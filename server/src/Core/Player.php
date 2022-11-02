@@ -33,7 +33,7 @@ final class Player
     private int $headHeight; // highest player point
     private bool $isAttacking = false;
 
-    // Event IDs, sequence, ascending order priority
+    // Event IDs, sequence - ascending order priority
     private int $eventIdPrimary = 0;
     private int $eventIdJump = 1;
     private int $eventIdCrouch = 2;

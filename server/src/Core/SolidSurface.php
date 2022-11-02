@@ -8,7 +8,7 @@ abstract class SolidSurface implements Hittable
 {
     protected int $hitAntiForce = 25123;
 
-    public function getHitAntiForce(): int
+    public function getHitAntiForce(Point $point): int
     {
         return $this->hitAntiForce;
     }

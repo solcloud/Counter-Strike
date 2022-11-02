@@ -26,17 +26,23 @@ export class Control {
             event.preventDefault()
 
             action.sprayingDisable()
-            if (!game.isPlaying() || game.isPaused() || !game.meIsAlive()) {
+            if (!game.isPlaying() || game.isPaused()) {
                 return
             }
-            if (!pointer.isLocked || !game.playerMe.data.canAttack) {
+            if (game.meIsSpectating() && (event.buttons === 1 || event.buttons === 2)) {
+                game.spectatePlayer(event.buttons === 1)
+                return
+            }
+            if (!game.meIsAlive() || !pointer.isLocked || !game.playerMe.data.canAttack) {
                 return;
             }
 
-            if (sprayEnableSlots.includes(game.playerMe.getEquippedSlotId())) {
-                action.sprayingEnable()
+            if (event.buttons === 1) {
+                if (sprayEnableSlots.includes(game.playerMe.getEquippedSlotId())) {
+                    action.sprayingEnable()
+                }
+                action.attack(game.getPlayerMeRotation())
             }
-            action.attack(game.getPlayerMeRotation())
         })
         document.addEventListener('wheel', (event) => {
             if (!game.isPlaying() || !game.meIsAlive()) {

@@ -14,7 +14,7 @@ class World
     private const WALL_X = 0;
     private const WALL_Z = 1;
 
-    private ?Map $map;
+    private ?Map $map = null;
     /** @var PlayerCollider[] */
     private array $playersColliders = [];
     /** @var array<int,array<int,Wall[]>> (x|z)BaseCoordinate:Wall[] */
@@ -146,30 +146,17 @@ class World
 
     public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset): int
     {
-        if (null === $this->map) {
-            throw new GameException("No map is loaded! Cannot spawn players.");
-        }
-
-        if ($isAttacker) {
-            $base = $this->map->getSpawnRotationAttacker();
-        } else {
-            $base = $this->map->getSpawnRotationDefender();
-        }
-
+        $base = $isAttacker ? $this->getMap()->getSpawnRotationAttacker() : $this->getMap()->getSpawnRotationDefender();
         return $base + rand(-$maxRandomOffset, $maxRandomOffset);
     }
 
     public function getPlayerSpawnPosition(bool $isAttacker, bool $randomizeSpawnPosition): Point
     {
-        if (null === $this->map) {
-            throw new GameException("No map is loaded! Cannot spawn players.");
-        }
-
         $key = (int)$isAttacker;
         if (isset($this->spawnCandidates[$key])) {
             $source = $this->spawnCandidates[$key];
         } else {
-            $source = ($isAttacker ? $this->map->getSpawnPositionAttacker() : $this->map->getSpawnPositionDefender());
+            $source = ($isAttacker ? $this->getMap()->getSpawnPositionAttacker() : $this->getMap()->getSpawnPositionDefender());
             if ($randomizeSpawnPosition) {
                 shuffle($source);
             }
@@ -226,7 +213,6 @@ class World
         $floor = $this->findFloor($bullet->getPosition());
         if ($floor) {
             $hits[] = $floor;
-            return $hits; // no floor is penetrable
         }
 
         $wall = $this->isWallAt($bullet->getPosition());
@@ -269,10 +255,7 @@ class World
             return false;
         }
 
-        if (null === $this->map) {
-            throw new GameException("No map is loaded! Cannot load plant areas.");
-        }
-        return Collision::pointWithBox($player->getPositionImmutable(), $this->map->getPlantArea());
+        return Collision::pointWithBox($player->getPositionImmutable(), $this->getMap()->getPlantArea());
     }
 
     public function canBuy(Player $player): bool
@@ -281,10 +264,7 @@ class World
             return false;
         }
 
-        if (null === $this->map) {
-            throw new GameException("No map is loaded! Cannot load buy areas.");
-        }
-        return Collision::pointWithBox($player->getPositionImmutable(), $this->map->getBuyArea($player->isPlayingOnAttackerSide()));
+        return Collision::pointWithBox($player->getPositionImmutable(), $this->getMap()->getBuyArea($player->isPlayingOnAttackerSide()));
     }
 
     public function getTickId(): int
@@ -356,7 +336,7 @@ class World
 
         /** @var Bomb $bomb */
         $bomb = $player->getEquippedItem();
-        if ($this->lastBombPlantTick + 10 < $this->getTickId()) { // TODO do timeMs delta instead
+        if ($this->lastBombPlantTick + Util::millisecondsToFrames(200) < $this->getTickId()) {
             $bomb->reset();
             $player->stop();
             $player->crouch();
@@ -370,7 +350,7 @@ class World
         if ($planted) {
             $player->equip($player->getInventory()->removeBomb());
             $bomb->setPosition($player->getPositionImmutable());
-            $this->game->bombPlanted();
+            $this->game->bombPlanted($player);
             $player->stand();
         }
     }
@@ -387,10 +367,10 @@ class World
         return false;
     }
 
-    public function isCollisionWithOtherPlayers(int $playerId, Point $point, int $radius, int $height): bool
+    public function isCollisionWithOtherPlayers(int $playerIdSkip, Point $point, int $radius, int $height): bool
     {
         foreach ($this->playersColliders as $collider) {
-            if ($collider->getPlayerId() === $playerId) {
+            if ($collider->getPlayerId() === $playerIdSkip) {
                 continue;
             }
 
@@ -435,8 +415,12 @@ class World
         return $output;
     }
 
-    public function getMap(): ?Map
+    public function getMap(): Map
     {
+        if (null === $this->map) {
+            throw new GameException("No map is loaded!");
+        }
+
         return $this->map;
     }
 

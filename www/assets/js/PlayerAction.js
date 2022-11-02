@@ -127,7 +127,6 @@ export class PlayerAction {
         }
 
         if (this.#states.attack) {
-            game.attackFeedback()
             action.push(this.#states.shootLookAt)
             action.push('attack')
             this.#states.attack = false
@@ -135,7 +134,6 @@ export class PlayerAction {
             let rotation = game.getPlayerMeRotation()
             action.push(`lookAt ${rotation[0]} ${rotation[1]}`)
             action.push('attack')
-            game.attackFeedback()
         } else {
             let horizontal, vertical
             [horizontal, vertical] = game.getPlayerMeRotation()

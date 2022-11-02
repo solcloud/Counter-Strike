@@ -42,6 +42,9 @@ class Inventory
             foreach ($this->items as $item) {
                 $item->reset();
             }
+            if (!isset($this->items[InventorySlot::SLOT_SECONDARY->value])) {
+                $this->items[InventorySlot::SLOT_SECONDARY->value] = ($isAttackerSide ? new PistolGlock(true) : new PistolUsp(true));
+            }
         }
 
         unset($this->items[InventorySlot::SLOT_BOMB->value]);

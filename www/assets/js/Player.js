@@ -10,7 +10,10 @@ export class Player {
         slots: null,
         health: null,
         position: null,
-        look: null,
+        look: {
+            horizontal: null,
+            vertical: null,
+        },
         isAttacker: null,
         heightSight: null,
         heightBody: null,
@@ -21,7 +24,8 @@ export class Player {
         isReloading: null,
     }
     custom = {
-        slotId: null
+        slotId: null,
+        slots: null,
     }
     threeObject = null
 
@@ -32,6 +36,7 @@ export class Player {
 
     equip(slotId) {
         this.custom.slotId = slotId
+        this.custom.slots = JSON.stringify(this.data.slots)
     }
 
     updateData(serverData) {
@@ -44,6 +49,10 @@ export class Player {
 
     getEquippedSlotId() {
         return this.custom.slotId
+    }
+
+    isInventoryChanged(serverState) {
+        return (this.getEquippedSlotId() !== serverState.item.slot || this.custom.slots !== JSON.stringify(serverState.slots))
     }
 
     getTeamName() {

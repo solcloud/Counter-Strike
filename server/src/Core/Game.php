@@ -58,6 +58,8 @@ class Game
         $this->world = new World($this);
         $this->score = new Score($properties->loss_bonuses);
         $this->properties = $properties;
+
+        $this->initialize();
     }
 
     private function initialize(): void
@@ -78,9 +80,6 @@ class Game
     public function tick(int $tickId): ?GameOverEvent
     {
         $this->tick = $tickId;
-        if ($tickId === 0) {
-            $this->initialize();
-        }
 
         if ($this->gameOver) {
             $this->tickEvents = [$this->gameOver];
@@ -264,7 +263,7 @@ class Game
         $this->addSoundEvent($sound->setPlayer($playerDead)->setItem($this->bomb));
     }
 
-    public function spawnBomb(): void
+    private function spawnBomb(): void
     {
         if ($this->playersCountAttackers === 0) {
             return;
@@ -275,17 +274,19 @@ class Game
         $attackers[rand(0, count($attackers) - 1)]->getInventory()->pickup($this->bomb);
     }
 
-    public function bombDefused(): void
+    public function bombDefused(Player $defuser): void
     {
         // TODO
+        $defuser->getInventory()->earnMoney(300);
         $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
         $this->addSoundEvent($sound->setItem($this->bomb));
         unset($this->events[$this->bombEventId]);
     }
 
-    public function bombPlanted(): void
+    public function bombPlanted(Player $planter): void
     {
         $this->bombPlanted = true;
+        $planter->getInventory()->earnMoney(300);
         $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_PLANTED);
         $this->addSoundEvent($sound->setItem($this->bomb));
 
@@ -312,7 +313,7 @@ class Game
         $this->addEvent($roundEndEvent);
     }
 
-    public function endRound(RoundEndEvent $roundEndEvent): void
+    private function endRound(RoundEndEvent $roundEndEvent): void
     {
         $this->roundNumber++;
         $this->score->roundEnd($roundEndEvent);
@@ -357,9 +358,9 @@ class Game
         $this->score->swapTeams();
 
         foreach ($this->players as $player) {
+            $player->swapTeam();
             $player->getInventory()->earnMoney(-$player->getInventory()->getDollars());
             $player->getInventory()->earnMoney($this->properties->start_money);
-            $player->swapTeam();
             $player->getInventory()->reset($player->isPlayingOnAttackerSide(), true);
         }
     }

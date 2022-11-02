@@ -2,7 +2,7 @@
 
 namespace cs\Core;
 
-class Box extends SolidSurface
+class Box
 {
 
     /**

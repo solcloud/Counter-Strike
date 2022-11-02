@@ -6,6 +6,7 @@ export class World {
     #renderer;
     #soundListener;
     #playerModel;
+    #bombModel;
     #objectLoader;
     #audioLoader;
 
@@ -44,6 +45,9 @@ export class World {
         scene.background = new THREE.Color(0xdadada)
 
         this.#playerModel = await this.#loadJSON('./resources/model/player.json')
+        this.#bombModel = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({color: 0xFF1111}))
+        this.#bombModel.visible = false
+        scene.add(this.#bombModel)
         await this.#loadMap(scene, map)
 
         const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999)
@@ -100,6 +104,15 @@ export class World {
         this.#scene.add(newPlayer)
 
         return newPlayer
+    }
+
+    spawnBomb(position) {
+        this.#bombModel.position.set(position.x, position.y, -position.z)
+        this.#bombModel.visible = true
+    }
+
+    removeBomb() {
+        this.#bombModel.visible = false
     }
 
     #createPlayer(colorIndex, isOpponent) {

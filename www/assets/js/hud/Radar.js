@@ -31,21 +31,18 @@ export class Radar {
         this.#scaleY = Math.round(canvas.height / mapSize.y * 1000) / 1000
         this.#zoom = zoom
 
-        const cornerPaddingDivider = 3
-        this.#padding = {
-            x: {
-                min: Math.ceil(mapSize.x / cornerPaddingDivider),
-                max: mapSize.x - Math.floor(mapSize.x / cornerPaddingDivider),
-            },
-            y: {
-                min: Math.ceil(mapSize.y / cornerPaddingDivider),
-                max: mapSize.y - Math.floor(mapSize.y / cornerPaddingDivider),
-            },
+        this.#padding = {x: {min: 0, max: mapSize.x}, y: {min: 0, max: mapSize.y}}
+        if (zoom < 1.5) {
+            const cornerPaddingDivider = 3
+            this.#padding.x.min = Math.ceil(mapSize.x / cornerPaddingDivider)
+            this.#padding.x.max = mapSize.x - this.#padding.x.min
+            this.#padding.y.min = Math.ceil(mapSize.y / cornerPaddingDivider)
+            this.#padding.y.max = mapSize.y - this.#padding.y.min
         }
     }
 
-    update(players, idMe, rotationHorizontalMe) {
-        let playerMe
+    update(players, idSpectator, spectatorRotationHorizontal) {
+        let spectator
         const ctx = this.#ctx
         ctx.resetTransform()
         ctx.drawImage(this.#image, 0, 0, this.#canvas.width, this.#canvas.height)
@@ -56,8 +53,8 @@ export class Radar {
             if (!player.isAlive()) {
                 return
             }
-            if (player.getId() === idMe) {
-                playerMe = player
+            if (player.getId() === idSpectator) {
+                spectator = player
                 ctx.lineWidth = 12;
                 ctx.strokeStyle = "#462b02"
             } else {
@@ -75,18 +72,18 @@ export class Radar {
             ctx.stroke()
         })
 
-        if (!playerMe) { // TODO spectate alive teammates
+        if (!spectator) {
             return
         }
 
-        const meX = Math.min(Math.max(this.#padding.x.min, playerMe.data.position.x), this.#padding.x.max)
-        const meY = Math.min(Math.max(this.#padding.y.min, playerMe.data.position.z), this.#padding.y.max)
+        const meX = Math.min(Math.max(this.#padding.x.min, spectator.data.position.x), this.#padding.x.max)
+        const meY = Math.min(Math.max(this.#padding.y.min, spectator.data.position.z), this.#padding.y.max)
         const centerX = (meX > this.#mapCenterX ? -(meX - this.#mapCenterX) : this.#mapCenterX - meX)
         const centerY = (meY > this.#mapCenterY ? -(meY - this.#mapCenterY) : this.#mapCenterY - meY)
         ctx.resetTransform()
         ctx.globalCompositeOperation = "copy";
         ctx.translate(this.#canvas.width / 2, this.#canvas.height / 2)
-        ctx.rotate(-rotationHorizontalMe * Math.PI / 180)
+        ctx.rotate(-spectatorRotationHorizontal * Math.PI / 180)
         ctx.scale(this.#zoom, this.#zoom)
         ctx.translate(this.#canvas.width / -2, this.#canvas.height / -2)
         ctx.drawImage(ctx.canvas, centerX * this.#scaleX, -centerY * this.#scaleY);

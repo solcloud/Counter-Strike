@@ -29,7 +29,7 @@ class HitBox implements Hittable
         $this->wasHeadShot = false;
     }
 
-    public function getHitAntiForce(): int
+    public function getHitAntiForce(Point $point): int
     {
         if ($this->type === HitBoxType::HEAD) {
             if ($this->player->getArmorType()->hasArmorHead()) {

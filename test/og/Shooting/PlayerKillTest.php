@@ -58,6 +58,42 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame($startMoney - $gun->getPrice() + $gun->getKillAward(), $player2->getMoney());
     }
 
+    public function testOnePlayerCanKillOtherWallBang(): void
+    {
+        $player2Commands = [
+            fn(Player $p) => $p->getSight()->lookHorizontal(150),
+            $this->endGame(),
+        ];
+        $player2 = new Player(2, Color::GREEN, false);
+
+        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $game->getPlayer(1)->setPosition(new Point(50, 0, 50));
+        $game->getWorld()->addWall(new Wall(new Point(35, 1, 80), true, 20));
+        $game->addPlayer($player2);
+        $player2->setPosition($player2->getPositionImmutable()->addZ(100));
+        $this->playPlayer($game, $player2Commands, $player2->getId());
+        $this->assertTrue($game->getScore()->isTie());
+
+        $result = $player2->attack();
+        $gun = $player2->getEquippedItem();
+        $this->assertInstanceOf(PistolUsp::class, $gun);
+        $this->assertNotNull($result);
+        $hits = $result->getHits();
+        $this->assertSame($gun::killAward, $result->getMoneyAward());
+        $this->assertCount(3, $hits);
+        $this->assertInstanceOf(Wall::class, $hits[0]);
+        $headHit = $hits[1];
+        $this->assertInstanceOf(HitBox::class, $headHit);
+        $this->assertInstanceOf(Wall::class, $hits[2]);
+
+        $playerOne = $headHit->getPlayer();
+        $this->assertInstanceOf(Player::class, $playerOne);
+        $this->assertFalse($playerOne->isAlive());
+        $this->assertNull($player2->attack());
+        $this->assertTrue($headHit->getType() === HitBoxType::HEAD);
+        $this->assertSame($gun::magazineCapacity - 1, $gun->getAmmo());
+    }
+
     public function testBulletHitOnePlayerOnlyOneHitBox(): void
     {
         $player2 = new Player(2, Color::GREEN, false);

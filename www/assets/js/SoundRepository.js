@@ -31,6 +31,10 @@ export class SoundRepository {
             return (playerId === playerMeId) ? '249821__spookymodem__weapon-blow.wav' : '632704__adh-dreaming__fly-on-the-wall-snare.wav'
         }
 
+        if (type === SoundType.PLAYER_DEAD) {
+            return '387161__rdaly95__hero-death.wav'
+        }
+
         if (type === SoundType.BULLET_HIT) {
             if (surfaceStrength) {
                 if (surfaceStrength > 2000) {

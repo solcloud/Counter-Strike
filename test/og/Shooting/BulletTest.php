@@ -29,8 +29,8 @@ class BulletTest extends BaseTestCase
         ];
 
         $game = $this->createGame([GameProperty::START_MONEY => 16000]);
-        $game->getWorld()->addWall(new Wall(new Point(0, $spawn->y, $spawn->z + $gunHeight + 1), true, 2 * $spawn->x));
-        $game->getWorld()->addWall(new Wall(new Point($spawn->x + $gunHeight + 1, $spawn->y, 0), false, 2 * $spawn->z));
+        $game->getWorld()->addWall(new Wall(new Point(-1000, $spawn->y, $spawn->z + $gunHeight + 1), true, 2 * $spawn->x + 2000));
+        $game->getWorld()->addWall(new Wall(new Point(2 * $spawn->x, $spawn->y, -1000), false, 2 * $spawn->z + 2000));
         $game->getWorld()->addFloor(new Floor(new Point(0, $gunHeight * 2, 0), PHP_INT_MAX, PHP_INT_MAX));
         $this->playPlayer($game, $playerCommands);
 

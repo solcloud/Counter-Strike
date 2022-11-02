@@ -299,7 +299,7 @@ class Server
             'protocol'   => get_class($this->protocol),
             'properties' => $this->game->getProperties()->toArray(),
             'players'    => array_map(fn(Player $p) => $p->toArray(), $this->game->getPlayers()),
-            'map'        => $this->game->getWorld()->getMap()?->toArray(),
+            'map'        => $this->game->getWorld()->getMap()->toArray(),
         ], JSON_THROW_ON_ERROR));
     }
 

@@ -4,6 +4,8 @@ namespace cs\Core;
 
 abstract class Plane extends SolidSurface
 {
+    private const PLANE_WALL_BANG_MARGIN = 20;
+
     private Point2D $point2DStart;
     private Point2D $point2DEnd;
 
@@ -11,6 +13,23 @@ abstract class Plane extends SolidSurface
     {
         $this->point2DStart = $this->start->to2D($axis2d);
         $this->point2DEnd = $this->end->to2D($axis2d);
+    }
+
+    public function getHitAntiForce(Point $point): int
+    {
+        if ($this->point2DStart->x <= 0 || $this->point2DStart->y <= 0) { // World boundary, cannot penetrate
+            return 999999;
+        }
+
+        $hit = $point->to2D($this->axis2d);
+        if ($hit->x - $this->point2DStart->x <= self::PLANE_WALL_BANG_MARGIN || $this->point2DEnd->x - $hit->x <= self::PLANE_WALL_BANG_MARGIN) {
+            return 10;
+        }
+        if ($hit->y - $this->point2DStart->y <= self::PLANE_WALL_BANG_MARGIN || $this->point2DEnd->y - $hit->y <= self::PLANE_WALL_BANG_MARGIN) {
+            return 10;
+        }
+
+        return parent::getHitAntiForce($point);
     }
 
     public function intersect(Point2D $point, int $radius = 0): bool
