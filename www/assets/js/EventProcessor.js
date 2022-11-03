@@ -62,7 +62,7 @@ export class EventProcessor {
                     msg = "Timeout defenders"
                     break
                 case PauseReason.HALF_TIME:
-                    game.gameStartOrHalfTimeOrEnd()
+                    game.halfTime()
                     msg = "Half time"
                     break
             }

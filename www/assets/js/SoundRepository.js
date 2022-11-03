@@ -2,9 +2,9 @@ import {InventorySlot, SoundType} from "./Enums.js";
 
 export class SoundRepository {
 
-    getSoundName(type, item, playerId, surfaceStrength, playerMeId) {
+    getSoundName(type, item, playerId, surfaceStrength, playerSpectateId) {
         if (type === SoundType.PLAYER_STEP) {
-            if (playerId === playerMeId) {
+            if (playerId === playerSpectateId) {
                 return '422990__dkiller2204__sfxrunground1.wav'
             }
             return '221626__moodpie__body-impact.wav'
@@ -28,7 +28,7 @@ export class SoundRepository {
         }
 
         if (type === SoundType.BULLET_HIT_HEADSHOT) {
-            return (playerId === playerMeId) ? '249821__spookymodem__weapon-blow.wav' : '632704__adh-dreaming__fly-on-the-wall-snare.wav'
+            return (playerId === playerSpectateId) ? '249821__spookymodem__weapon-blow.wav' : '632704__adh-dreaming__fly-on-the-wall-snare.wav'
         }
 
         if (type === SoundType.PLAYER_DEAD) {
@@ -64,6 +64,9 @@ export class SoundRepository {
         }
 
         if (type === SoundType.BOMB_PLANTING) {
+            if (playerId === playerSpectateId) {
+                return '536422__rudmer-rotteveel__setting-electronic-timer-1-beep.wav'
+            }
             return '36106__jak-damage__digi-code-door-uncatch.wav'
         }
         if (type === SoundType.BOMB_PLANTED) {

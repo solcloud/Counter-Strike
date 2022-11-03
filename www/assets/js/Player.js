@@ -85,4 +85,15 @@ export class Player {
     isAlive() {
         return (this.data.health > 0)
     }
+
+    respawn() {
+        this.data.health = 100
+        this.get3DObject().visible = true
+    }
+
+    died() {
+        this.data.health = 0
+        this.get3DObject().visible = false
+    }
+
 }

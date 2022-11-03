@@ -33,7 +33,7 @@ export class Control {
                 game.spectatePlayer(event.buttons === 1)
                 return
             }
-            if (!game.meIsAlive() || !pointer.isLocked || !game.playerMe.data.canAttack) {
+            if (!pointer.isLocked || !game.playerMe.data.canAttack) {
                 return;
             }
 

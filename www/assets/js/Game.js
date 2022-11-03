@@ -35,6 +35,9 @@ export class Game {
 
     pause(msg, score, timeMs) {
         console.log("Pause: " + msg + " for " + timeMs + "ms")
+        clearInterval(this.#bombTimerId)
+        this.#world.removeBomb()
+
         const game = this
         this.players.forEach(function (player) {
             if (player.getId() === game.playerMe.getId()) {
@@ -45,11 +48,11 @@ export class Game {
                     game.playerSpectate = game.playerMe
                 }
             } else {
-                player.get3DObject().visible = true // respawn (show) all beside me
+                player.respawn()
             }
         })
         if (!this.#started) {
-            this.gameStartOrHalfTimeOrEnd()
+            this.#gameStartOrHalfTimeOrEnd()
             this.#started = true
         }
         this.#paused = true
@@ -66,7 +69,7 @@ export class Game {
 
     end(msg) {
         console.log('Game ended')
-        this.gameStartOrHalfTimeOrEnd()
+        this.#gameStartOrHalfTimeOrEnd()
         if (this.#endCallback) {
             this.#endCallback(msg)
         }
@@ -81,9 +84,6 @@ export class Game {
     }
 
     roundEnd(attackersWins, newRoundNumber, score) {
-        clearInterval(this.#bombTimerId)
-        this.#world.removeBomb()
-
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
         this.score = score;
@@ -92,7 +92,11 @@ export class Game {
         this.#hud.requestFullScoreBoardUpdate(this.score)
     }
 
-    gameStartOrHalfTimeOrEnd() {
+    halfTime() {
+        this.#gameStartOrHalfTimeOrEnd()
+    }
+
+    #gameStartOrHalfTimeOrEnd() {
         this.#world.playSound('538422__rosa-orenes256__referee-whistle-sound.wav', null, true)
     }
 
@@ -107,25 +111,31 @@ export class Game {
             return
         }
 
-        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTED]
+        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTING, SoundType.BOMB_PLANTED]
         let myPlayerSound = (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type))
         this.#world.playSound(soundName, data.position, myPlayerSound)
     }
 
     bombPlanted(timeMs, position) {
         const world = this.#world
-        this.#hud.bombPlanted(timeMs / 1000)
         world.spawnBomb(position)
 
-        const tenSecWarningSecCount = timeMs / 1000 - 10
+        const bombSecCount = Math.round(timeMs / 1000)
+        this.#hud.bombPlanted(bombSecCount)
+
+        const tenSecWarningSecCount = Math.round(timeMs / 1000 - 10)
         let tickSecondsCount = 0;
-        this.#bombTimerId = setInterval(function () {
+        let bombTimerId = setInterval(function () {
+            if (tickSecondsCount === bombSecCount) {
+                clearInterval(bombTimerId)
+            }
             if (tickSecondsCount === tenSecWarningSecCount) {
                 world.playSound('88532__northern87__woosh-northern87.wav', null, true)
             }
             world.playSound('536422__rudmer-rotteveel__setting-electronic-timer-1-beep.wav', position, false)
             tickSecondsCount++;
         }, 1000)
+        this.#bombTimerId = bombTimerId
     }
 
     bombDefused() {
@@ -169,16 +179,15 @@ export class Game {
     playerKilled(playerIdDead, playerIdCulprit, wasHeadshot, killItemId) {
         const culpritPlayer = this.players[playerIdCulprit]
         const deadPlayer = this.players[playerIdDead]
-        deadPlayer.data.health = 0
 
-        deadPlayer.get3DObject().visible = false
+        deadPlayer.died()
         this.alivePlayers[deadPlayer.getTeamIndex()]--
 
         this.#hud.showKill(
             culpritPlayer.data,
             deadPlayer.data,
             wasHeadshot,
-            this.playerSpectate.data,
+            this.playerMe.data,
             killItemId
         )
 
@@ -246,16 +255,12 @@ export class Game {
             return
         }
 
-        state.players.forEach(function (playerState) {
-            let player = game.players[playerState.id]
+        state.players.forEach(function (serverState) {
+            let player = game.players[serverState.id]
             if (player === undefined) {
-                player = game.createPlayer(playerState)
+                player = game.createPlayer(serverState)
             }
-
-            player.get3DObject().getObjectByName('head').position.y = playerState.heightSight
-            player.get3DObject().position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
-
-            game.updatePlayerData(player, playerState)
+            game.updatePlayerData(player, serverState)
         })
 
         this.#render()
@@ -263,6 +268,9 @@ export class Game {
     }
 
     updatePlayerData(player, serverState) {
+        player.get3DObject().getObjectByName('head').position.y = serverState.heightSight
+        player.get3DObject().position.set(serverState.position.x, serverState.position.y, -serverState.position.z)
+
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
             if (player.data.money !== serverState.money) {
                 this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)

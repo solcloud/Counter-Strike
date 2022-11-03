@@ -305,11 +305,11 @@ class Game
         $this->bombEventId = $this->addEvent($event);
     }
 
-    protected function roundEnd(bool $attackersWins, RoundEndReason $reason): void
+    public function roundEnd(bool $attackersWins, RoundEndReason $reason): void
     {
         $this->roundEndCoolDown = true;
         $roundEndEvent = new RoundEndEvent($this, $attackersWins, $reason);
-        $roundEndEvent->onComplete[] = fn() => $this->endRound($roundEndEvent); // TODO call it immediately?
+        $roundEndEvent->onComplete[] = fn() => $this->endRound($roundEndEvent);
         $this->addEvent($roundEndEvent);
     }
 
