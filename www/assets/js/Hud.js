@@ -136,7 +136,7 @@ export class HUD {
         this.#elements.slotModel.src = `./resources/slot_${slotId}.png`
         this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
             node.classList.remove('highlight', 'hidden')
-            if (!availableSlots[node.dataset.slot]) {
+            if (availableSlots[node.dataset.slot] === undefined) {
                 node.classList.add('hidden')
             }
         })

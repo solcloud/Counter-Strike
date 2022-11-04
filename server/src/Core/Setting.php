@@ -79,7 +79,7 @@ final class Setting
     public static function jumpDistancePerTick(): int
     {
         if (!isset(self::$cacheInt['jumpDistancePerTick'])) {
-            self::$cacheInt['jumpDistancePerTick'] = (int)ceil(Setting::playerJumpHeight() / self::tickCountJump());
+            self::$cacheInt['jumpDistancePerTick'] = (int)ceil(self::playerJumpHeight() / self::tickCountJump());
         }
         return self::$cacheInt['jumpDistancePerTick'];
     }
@@ -87,7 +87,7 @@ final class Setting
     public static function crouchDistancePerTick(): int
     {
         if (!isset(self::$cacheInt['crouchDistancePerTick'])) {
-            self::$cacheInt['crouchDistancePerTick'] = (int)ceil((Setting::playerHeadHeightStand() - Setting::playerHeadHeightCrouch()) / self::tickCountCrouch());
+            self::$cacheInt['crouchDistancePerTick'] = (int)ceil((self::playerHeadHeightStand() - self::playerHeadHeightCrouch()) / self::tickCountCrouch());
         }
         return self::$cacheInt['crouchDistancePerTick'];
     }

@@ -28,8 +28,15 @@ trait CrouchTrait
                 $targetHeadHeight = $this->headHeight + $event->moveOffset;
                 $candidate = $this->position->clone();
                 for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, Setting::playerHeadHeightStand()); $h++) {
-                    $floorCandidate = $this->world->findFloor($candidate->addY($h), $this->getBoundingRadius());
-                    if ($floorCandidate) {
+                    $candidate->setY($this->position->y + $h);
+                    if ($this->world->findFloor($candidate, $this->getBoundingRadius())) {
+                        $event->reset();
+                        $this->addEvent($event, $this->eventIdCrouch);
+                        break;
+                    }
+                    if ($this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $this->getBoundingRadius(), 2)) {
+                        $event->reset();
+                        $this->addEvent($event, $this->eventIdCrouch);
                         break;
                     }
                     $this->headHeight = $h;

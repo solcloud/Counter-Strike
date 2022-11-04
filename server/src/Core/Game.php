@@ -270,6 +270,7 @@ class Game
         }
 
         $this->bombPlanted = false;
+        /** @var Player[] $attackers */
         $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
         $attackers[rand(0, count($attackers) - 1)]->getInventory()->pickup($this->bomb);
     }

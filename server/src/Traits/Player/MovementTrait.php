@@ -48,7 +48,7 @@ trait MovementTrait
     public function setPosition(Point $newPosition): void
     {
         $this->position = $newPosition->clone();
-        $this->moveX = $this->moveZ = 0;
+        $this->stop();
         $this->setActiveFloor($this->world->findFloor($this->position));
     }
 
@@ -86,7 +86,7 @@ trait MovementTrait
             }
 
             $this->position = $this->processMovement($this->moveX, $this->moveZ, $this->position);
-            $this->moveX = $this->moveZ = 0;
+            $this->stop();
         });
     }
 
@@ -144,7 +144,7 @@ trait MovementTrait
         $candidate = $target->clone();
         for ($i = 1; $i <= $distanceTarget; $i++) {
             [$x, $z] = Util::horizontalMovementXZ($angle, $i);
-            $candidate->setX($orig->x + $x)->setZ($orig->z + $z); // TODO check or enforce that candidate is growing only by 1 from previous target
+            $candidate->setX($orig->x + $x)->setZ($orig->z + $z); // TODO check or better enforce that candidate is growing only max by 1 from previous target
             if ($candidate->equals($target)) {
                 continue;
             }

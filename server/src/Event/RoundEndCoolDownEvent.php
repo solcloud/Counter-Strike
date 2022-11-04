@@ -2,7 +2,7 @@
 
 namespace cs\Event;
 
-class RoundEndCoolDownEvent extends TimeoutEvent
+final class RoundEndCoolDownEvent extends TimeoutEvent
 {
 
 }

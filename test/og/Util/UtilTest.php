@@ -17,6 +17,8 @@ class UtilTest extends BaseTestCase
 
     public function testMsToTickConstantTenOnTest(): void
     {
+        $this->assertSame(0, Util::millisecondsToFrames(0));
+        $this->assertSame(1, Util::millisecondsToFrames(1));
         $this->assertSame(1, Util::millisecondsToFrames(10));
         $this->assertSame(123, Util::millisecondsToFrames(1230));
         $this->assertSame(240, Util::millisecondsToFrames(RifleAk::reloadTimeMs));

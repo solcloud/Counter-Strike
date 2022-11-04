@@ -41,7 +41,7 @@ class ServerTest extends BaseTestCase
 
     public function testServer(): void
     {
-        $game = GameFactory::createTest();
+        $game = GameFactory::createDebug();
         $map = new TestMap();
         $game->loadMap($map);
         $spawnPos = $map->getSpawnPositionAttacker()[0];

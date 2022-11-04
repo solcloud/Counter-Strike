@@ -12,21 +12,6 @@ class GameFactory
         return new Game($properties);
     }
 
-    public static function createTest(): Game
-    {
-        $properties = new GameProperty();
-        $properties->randomize_spawn_position = false;
-        $properties->max_rounds = 4;
-        $properties->freeze_time_sec = 0;
-        $properties->half_time_freeze_sec = 0;
-        $properties->round_end_cool_down_sec = 0;
-
-        return new Game($properties);
-    }
-
-    /**
-     * @codeCoverageIgnore
-     */
     public static function createDebug(): Game
     {
         $properties = new GameProperty();

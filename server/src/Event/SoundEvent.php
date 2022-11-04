@@ -8,7 +8,7 @@ use cs\Core\Point;
 use cs\Core\SolidSurface;
 use cs\Enum\SoundType;
 
-class SoundEvent extends TickEvent
+final class SoundEvent extends TickEvent
 {
 
     private ?Item $item = null;

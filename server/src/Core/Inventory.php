@@ -15,7 +15,7 @@ use cs\Weapon\PistolUsp;
 class Inventory
 {
 
-    /** @var Item[] slotId => Item */
+    /** @var Item[] [slotId => Item] */
     private array $items = [];
     private int $dollars = 0;
     private int $equippedSlot;
@@ -48,18 +48,23 @@ class Inventory
         }
 
         unset($this->items[InventorySlot::SLOT_BOMB->value]);
-        $this->store = new BuyMenu($isAttackerSide);
+        $this->store = new BuyMenu($isAttackerSide, $this->items);
     }
 
-    public function removeBomb(): InventorySlot
+    private function updateEquippedSlot(): int
     {
-        unset($this->items[InventorySlot::SLOT_BOMB->value]);
         if (isset($this->items[$this->lastEquippedSlotId])) {
             $this->equippedSlot = $this->lastEquippedSlotId;
         } else {
             $this->equippedSlot = InventorySlot::SLOT_KNIFE->value;
         }
-        return InventorySlot::from($this->equippedSlot);
+        return $this->equippedSlot;
+    }
+
+    public function removeBomb(): InventorySlot
+    {
+        unset($this->items[InventorySlot::SLOT_BOMB->value]);
+        return InventorySlot::from($this->updateEquippedSlot());
     }
 
     public function getEquipped(): Item
@@ -75,11 +80,7 @@ class Inventory
 
         $item = $this->items[$this->equippedSlot];
         unset($this->items[$this->equippedSlot]);
-        if (isset($this->items[$this->lastEquippedSlotId])) {
-            $this->equippedSlot = $this->lastEquippedSlotId;
-        } else {
-            $this->equippedSlot = InventorySlot::SLOT_KNIFE->value;
-        }
+        $this->updateEquippedSlot();
 
         $item->unEquip();
         return $item;
@@ -145,13 +146,14 @@ class Inventory
         return $item->equip();
     }
 
-    public function pickup(Item $item): void
+    public function pickup(Item $item): bool
     {
         if (isset($this->items[$item->getSlot()->value])) {
-            return;
+            return false;
         }
 
         $this->items[$item->getSlot()->value] = $item;
+        return true;
     }
 
     public function getDollars(): int
@@ -179,13 +181,13 @@ class Inventory
     }
 
     /**
-     * @return array<int,int> [slotId => 1 (item count)]
+     * @return array<int,int> [slotId => itemCount]
      */
     public function getFilledSlots(): array
     {
         $slots = [];
         foreach ($this->items as $slotId => $item) {
-            $slots[$slotId] = 1;
+            $slots[$slotId] = $item->getQuantity();
         }
 
         return $slots;

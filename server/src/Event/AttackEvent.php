@@ -81,7 +81,7 @@ final class AttackEvent
 
         [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $bullet->getDistanceTraveled());
         $target = $this->origin->clone();
-        $target->setX($target->x + $x)->setY($target->y + $y)->setZ($target->z + $z);
+        $target->addX($x)->addY($y)->addZ($z);
         return $target;
     }
 

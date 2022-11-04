@@ -161,6 +161,9 @@ final class Player
     public function lowerArmor(int $armorDamage): void
     {
         $this->armor -= abs($armorDamage);
+        if ($this->armor < 0) {
+            $this->armor = 0;
+        }
     }
 
     public function lowerHealth(int $healthDamage): void
@@ -201,7 +204,7 @@ final class Player
     }
 
     /**
-     * @param array{id: int, color: int, isAttacker: bool, position: array{x: int, y: int, z: int}} $data
+     * @param array{id: int, color: int, isAttacker: bool} $data
      */
     public static function fromArray(array $data): self
     {

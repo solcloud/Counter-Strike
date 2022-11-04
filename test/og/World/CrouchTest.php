@@ -78,7 +78,6 @@ class CrouchTest extends BaseTestCase
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
-            fn(Player $p) => $p->stand(),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $p->moveBackward(),
             fn(Player $p) => $p->moveBackward(),

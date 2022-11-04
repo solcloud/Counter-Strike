@@ -4,9 +4,8 @@ namespace cs\Core;
 
 class GameState
 {
-    public function __construct(
-        private Game $game,
-    )
+
+    public function __construct(private Game $game)
     {
     }
 
