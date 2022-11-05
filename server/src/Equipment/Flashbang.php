@@ -26,6 +26,11 @@ class Flashbang extends BaseEquipment
         return $this->quantity;
     }
 
+    public function getMaxQuantity(): int
+    {
+        return 2;
+    }
+
     public function getMaxBuyCount(): int
     {
         return 2;

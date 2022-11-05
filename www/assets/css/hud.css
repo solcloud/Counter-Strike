@@ -29,7 +29,8 @@
     width: 30vw;
 }
 
-#hud #equipped-item img[data-shot] {
+#hud #equipped-item img[data-shot],
+#hud #equipped-item img[data-drop] {
     position: absolute;
     bottom: -160px;
 }

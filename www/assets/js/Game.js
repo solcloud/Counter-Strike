@@ -36,7 +36,7 @@ export class Game {
     pause(msg, score, timeMs) {
         console.log("Pause: " + msg + " for " + timeMs + "ms")
         clearInterval(this.#bombTimerId)
-        this.#world.removeBomb()
+        this.#world.reset()
 
         const game = this
         this.players.forEach(function (player) {
@@ -103,6 +103,15 @@ export class Game {
     playSound(data) {
         if (data.type === SoundType.ITEM_ATTACK && data.player === this.playerSpectate.getId()) {
             this.attackFeedback(data.item)
+        }
+        if (data.type === SoundType.ITEM_PICKUP) {
+            this.#world.itemPickup(data.position, data.item)
+        }
+        if (data.type === SoundType.ITEM_DROP) {
+            this.#world.itemDrop(data.position, data.item)
+            if (data.player === this.playerSpectate.getId()) {
+                this.dropFeedback(data.item)
+            }
         }
 
         let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerSpectate.getId())
@@ -229,8 +238,12 @@ export class Game {
 
     attackFeedback(item) {
         if (this.playerSpectate.data.ammo > 0) {
-            this.#hud.showShot()
+            this.#hud.showShot(item)
         }
+    }
+
+    dropFeedback(item) {
+        this.#hud.showDropAnimation(item)
     }
 
     equip(slotId) {

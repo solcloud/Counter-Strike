@@ -9,6 +9,7 @@ export class World {
     #bombModel;
     #objectLoader;
     #audioLoader;
+    #dropItems = [];
 
     constructor() {
         THREE.Cache.enabled = true
@@ -111,7 +112,46 @@ export class World {
         this.#bombModel.visible = true
     }
 
-    removeBomb() {
+    itemDrop(position, item) {
+        const dropItem = new THREE.Mesh(new THREE.SphereGeometry(30), new THREE.MeshBasicMaterial({color: 0xaecf75}))
+        dropItem.position.set(position.x, position.y, -position.z)
+        dropItem.userData.itemId = item.id
+        this.#scene.add(dropItem)
+
+        this.#dropItems.push(dropItem)
+    }
+
+    itemPickup(position, item) {
+        for (let i = 0; i < this.#dropItems.length; i++) {
+            const dropItem = this.#dropItems[i]
+            if (!dropItem || dropItem.userData.itemId !== item.id) {
+                continue
+            }
+
+            if (dropItem.position.x === position.x && dropItem.position.y === position.y && dropItem.position.z === -position.z) {
+                dropItem.clear()
+                dropItem.removeFromParent()
+                dropItem.geometry.dispose()
+                dropItem.material.dispose()
+
+                delete this.#dropItems[i]
+                return
+            }
+        }
+    }
+
+    reset() {
+        this.#removeBomb()
+        this.#dropItems.forEach(function (item) {
+            item.clear()
+            item.removeFromParent()
+            item.geometry.dispose()
+            item.material.dispose()
+        })
+        this.#dropItems = []
+    }
+
+    #removeBomb() {
         this.#bombModel.visible = false
     }
 

@@ -72,7 +72,7 @@ class Inventory
         return $this->items[$this->equippedSlot];
     }
 
-    public function dropEquipped(): ?Item
+    public function removeEquipped(): ?Item
     {
         if (!$this->getEquipped()->isUserDroppable()) {
             return null;
@@ -105,7 +105,7 @@ class Inventory
         return true;
     }
 
-    public function purchase(BuyMenuItem $buyCandidate): ?EquipEvent
+    public function purchase(Player $player, BuyMenuItem $buyCandidate): ?EquipEvent
     {
         $item = $this->store->get($buyCandidate);
         if (!$item || !$this->canBuy($item)) {
@@ -120,7 +120,7 @@ class Inventory
                 $item = $alreadyHave;
             } else {
                 $this->equip($item->getSlot());
-                $this->dropEquipped();
+                $player->dropEquippedItem();
             }
         }
 
@@ -148,10 +148,15 @@ class Inventory
 
     public function pickup(Item $item): bool
     {
-        if (isset($this->items[$item->getSlot()->value])) {
+        $haveIt = $this->items[$item->getSlot()->value] ?? false;
+        if ($haveIt && $haveIt->getQuantity() === $haveIt->getMaxQuantity()) {
             return false;
         }
 
+        if ($haveIt) {
+            $haveIt->incrementQuantity();
+            return true;
+        }
         $this->items[$item->getSlot()->value] = $item;
         return true;
     }

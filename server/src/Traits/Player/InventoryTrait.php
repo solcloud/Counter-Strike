@@ -40,16 +40,15 @@ trait InventoryTrait
         return $this->inventory->getEquipped();
     }
 
-    public function dropEquippedItem(): void
+    public function dropEquippedItem(): ?Item
     {
-        $item = $this->inventory->dropEquipped();
+        $item = $this->inventory->removeEquipped();
         if (!$item) {
-            return;
+            return null;
         }
 
-        // TODO world drop/pick items
-        $sound = new SoundEvent($this->getPositionImmutable(), SoundType::ITEM_DROP);
-        $this->world->makeSound($sound->setPlayer($this)->setItem($item));
+        $this->world->dropItem($this, $item);
+        return $item;
     }
 
     public function buyItem(BuyMenuItem $item): bool
@@ -58,7 +57,7 @@ trait InventoryTrait
             return false;
         }
 
-        $equipEvent = $this->inventory->purchase($item);
+        $equipEvent = $this->inventory->purchase($this, $item);
         if ($equipEvent) {
             $this->addEvent($equipEvent, $this->eventIdPrimary);
             $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_BUY);

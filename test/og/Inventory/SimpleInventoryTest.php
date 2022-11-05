@@ -11,6 +11,7 @@ use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
 use cs\Equipment\HighExplosive;
 use cs\Weapon\Knife;
+use cs\Weapon\PistolGlock;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
@@ -72,6 +73,43 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertInstanceOf(Knife::class, $knife);
         $this->assertFalse($knife->isUserDroppable());
         $game->getPlayer(1)->dropEquippedItem();
+    }
+
+    public function testDropAndPickupItem(): void
+    {
+        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->getEquippedItem()),
+            $this->endGame(),
+        ]);
+    }
+
+    public function testDropAndInstantPickupItem(): void
+    {
+        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookVertical(90),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->getEquippedItem()),
+            $this->endGame(),
+        ]);
     }
 
     public function testPlayerBuyWeapons(): void

@@ -24,6 +24,7 @@ export class HUD {
         equippedItem: null,
         slotModel: null,
         shotModel: null,
+        dropModel: null,
         inventory: null,
         money: null,
         health: null,
@@ -143,10 +144,16 @@ export class HUD {
         this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
     }
 
-    showShot() {
+    showShot(item) {
         clearTimeout(this.#shotAnimationInterval)
         this.#elements.shotModel.classList.remove('hidden');
         this.#shotAnimationInterval = setTimeout(() => this.#elements.shotModel.classList.add('hidden'), 30)
+    }
+
+    showDropAnimation(item) {
+        clearTimeout(this.#shotAnimationInterval)
+        this.#elements.dropModel.classList.remove('hidden');
+        this.#shotAnimationInterval = setTimeout(() => this.#elements.dropModel.classList.add('hidden'), 100)
     }
 
     updateHud(player) {
@@ -197,6 +204,7 @@ export class HUD {
         <div id="equipped-item">
             <div style="position:relative">
                 <img data-shot class="hidden" src="./resources/shot.gif">
+                <img data-drop class="hidden" src="./resources/drop.gif">
                 <img data-slot src="./resources/slot_${Enum.InventorySlot.SLOT_SECONDARY}.png">
             </div>
         </div>
@@ -265,6 +273,7 @@ export class HUD {
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img[data-slot]')
         this.#elements.shotModel = elementHud.querySelector('#equipped-item img[data-shot]')
+        this.#elements.dropModel = elementHud.querySelector('#equipped-item img[data-drop]')
         this.#elements.inventory = elementHud.querySelector('.inventory')
         this.#elements.money = elementHud.querySelector('[data-money]')
         this.#elements.health = elementHud.querySelector('[data-health]')

@@ -49,7 +49,7 @@ class Game
     private bool $paused = true;
     private bool $roundEndCoolDown = false;
     private bool $bombPlanted = false;
-    private int $bombEventId;
+    private ?int $bombEventId = null;
 
     public function __construct(GameProperty $properties = new GameProperty())
     {
@@ -265,14 +265,24 @@ class Game
 
     private function spawnBomb(): void
     {
+        $this->bombReset();
+        $this->bombPlanted = false;
         if ($this->playersCountAttackers === 0) {
             return;
         }
 
-        $this->bombPlanted = false;
         /** @var Player[] $attackers */
         $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
         $attackers[rand(0, count($attackers) - 1)]->getInventory()->pickup($this->bomb);
+    }
+
+    private function bombReset(): void
+    {
+        $this->bomb->reset();
+        if (null !== $this->bombEventId) {
+            unset($this->events[$this->bombEventId]);
+            $this->bombEventId = null;
+        }
     }
 
     public function bombDefused(Player $defuser): void
@@ -281,7 +291,7 @@ class Game
         $defuser->getInventory()->earnMoney(300);
         $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
         $this->addSoundEvent($sound->setItem($this->bomb));
-        unset($this->events[$this->bombEventId]);
+        $this->bombReset();
     }
 
     public function bombPlanted(Player $planter): void
@@ -302,6 +312,7 @@ class Game
                     $this->playerBombKilledEvent($player);
                 }
             }
+            $this->bombEventId = null;
         }, $this->properties->bomb_explode_time_ms, $this->bomb->getPosition());
         $this->bombEventId = $this->addEvent($event);
     }

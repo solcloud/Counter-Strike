@@ -17,6 +17,8 @@ class World
     private ?Map $map = null;
     /** @var PlayerCollider[] */
     private array $playersColliders = [];
+    /** @var DropItem[] */
+    private array $dropItems = [];
     /** @var array<int,array<int,Wall[]>> (x|z)BaseCoordinate:Wall[] */
     private array $walls = [];
     /** @var array<int,Floor[]> yCoordinate:Floor[] */
@@ -36,6 +38,7 @@ class World
     {
         $this->spawnCandidates = [];
         $this->spawnPositionTakes = [];
+        $this->dropItems = [];
         foreach ($this->playersColliders as $playerCollider) {
             $playerCollider->roundReset();
         }
@@ -179,6 +182,35 @@ class World
     public function addPlayerCollider(PlayerCollider $player): void
     {
         $this->playersColliders[] = $player;
+    }
+
+    public function tryPickDropItems(Player $player): void
+    {
+        foreach ($this->dropItems as $key => $dropItem) {
+            if (!Collision::cylinderWithCylinder(
+                $dropItem->getPosition(), $dropItem->getBoundingRadius(), $dropItem->getHeight(),
+                $player->getPositionImmutable(), $player->getBoundingRadius(), $player->getHeadHeight()
+            )) {
+                continue;
+            }
+
+            if ($player->getInventory()->pickup($dropItem->getItem())) {
+                $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
+                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem()));
+                unset($this->dropItems[$key]);
+            }
+        }
+    }
+
+    public function dropItem(Player $player, Item $item): void
+    {
+        $dropItem = new DropItem($item);
+        $dropPosition = $dropItem->calculateDropPosition($player, $this, $item);
+        if ($dropPosition) {
+            $this->dropItems[] = $dropItem;
+            $sound = new SoundEvent($dropPosition, SoundType::ITEM_DROP);
+            $this->makeSound($sound->setPlayer($player)->setItem($item));
+        }
     }
 
     /**
@@ -367,7 +399,22 @@ class World
         return false;
     }
 
-    public function isCollisionWithOtherPlayers(int $playerIdSkip, Point $point, int $radius, int $height): bool
+    public function isWallOrFloorCollision(Point $candidate, int $radius): bool
+    {
+        if ($this->findFloor($candidate, $radius)) {
+            return true;
+        }
+        if ($this->checkZSideWallCollision($candidate, $radius, $radius)) {
+            return true;
+        }
+        if ($this->checkXSideWallCollision($candidate, $radius, $radius)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isCollisionWithOtherPlayers(int $playerIdSkip, Point $point, int $radius, int $height): ?Player
     {
         foreach ($this->playersColliders as $collider) {
             if ($collider->getPlayerId() === $playerIdSkip) {
@@ -375,11 +422,11 @@ class World
             }
 
             if ($collider->collide($point, $radius, $height)) {
-                return true;
+                return $this->game->getPlayer($collider->getPlayerId());
             }
         }
 
-        return false;
+        return null;
     }
 
     /**

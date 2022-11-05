@@ -50,9 +50,19 @@ abstract class Item
         return 5;
     }
 
+    public function getMaxQuantity(): int
+    {
+        return 1;
+    }
+
     public function getQuantity(): int
     {
         return 1;
+    }
+
+    public function incrementQuantity(): void
+    {
+        // empty hook
     }
 
     public abstract function getType(): ItemType;

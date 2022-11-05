@@ -88,6 +88,9 @@ const SoundType = {
     BOMB_PLANTED: 11,
     BOMB_PLANTING: 12,
     BOMB_EXPLODED: 13,
+    BOMB_DEFUSING: 14,
+    BOMB_DEFUSED: 15,
+    ITEM_PICKUP: 16,
 }
 
 // server/src/Enum/BuyMenuItem.php

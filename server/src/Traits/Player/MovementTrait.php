@@ -30,6 +30,11 @@ trait MovementTrait
         $this->isWalking = true;
     }
 
+    public function isMoving(): bool
+    {
+        return ($this->moveX <> 0 || $this->moveZ <> 0);
+    }
+
     public function isWalking(): bool
     {
         return $this->isWalking;
@@ -81,11 +86,12 @@ trait MovementTrait
     protected function createMovementEvent(): PlayerMovementEvent
     {
         return new PlayerMovementEvent(function (): void {
-            if ($this->moveX === 0 && $this->moveZ === 0) {
+            if (!$this->isMoving()) {
                 return;
             }
 
             $this->position = $this->processMovement($this->moveX, $this->moveZ, $this->position);
+            $this->world->tryPickDropItems($this);
             $this->stop();
         });
     }
@@ -249,7 +255,7 @@ trait MovementTrait
 
     private function collisionWithPlayer(Point $candidate, int $radius): bool
     {
-        return $this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $radius, $this->getHeadHeight());
+        return (null !== $this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $radius, $this->getHeadHeight()));
     }
 
     private function canStepOverWall(Wall $wall, Point $candidate): ?Floor

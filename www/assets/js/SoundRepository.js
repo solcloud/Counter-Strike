@@ -79,6 +79,9 @@ export class SoundRepository {
         if (type === SoundType.ITEM_BUY) {
             return '434781__stephenbist__luggage-drop-1.wav'
         }
+        if (type === SoundType.ITEM_PICKUP) {
+            return '434781__stephenbist__luggage-drop-1.wav'
+        }
 
         return null
     }

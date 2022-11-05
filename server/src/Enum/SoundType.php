@@ -21,5 +21,6 @@ enum SoundType: int
     case BOMB_EXPLODED = 13;
     case BOMB_DEFUSING = 14;
     case BOMB_DEFUSED = 15;
+    case ITEM_PICKUP = 16;
 
 }
