@@ -39,7 +39,7 @@ trait AttackTrait
 
         $result = $item->attack($this->createAttackEvent());
         if ($result) {
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
+            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
@@ -56,7 +56,7 @@ trait AttackTrait
         if ($item instanceof Knife) {
             $result = $item->attackSecondary($this->createAttackEvent());
             if ($result) {
-                $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+                $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
                 $this->world->makeSound($sound->setPlayer($this)->setItem($item));
                 return $this->processAttackResult($result);
             }
