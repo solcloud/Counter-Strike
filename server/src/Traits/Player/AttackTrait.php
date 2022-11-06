@@ -10,6 +10,7 @@ use cs\Event\SoundEvent;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
 use cs\Weapon\AmmoBasedWeapon;
+use cs\Weapon\Knife;
 
 trait AttackTrait
 {
@@ -19,6 +20,7 @@ trait AttackTrait
         if ($this->isAttacking) {
             return null;
         }
+        $this->isAttacking = true;
         $item = $this->getEquippedItem();
 
         if ($item instanceof Bomb) {
@@ -37,7 +39,7 @@ trait AttackTrait
 
         $result = $item->attack($this->createAttackEvent());
         if ($result) {
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
@@ -46,7 +48,21 @@ trait AttackTrait
 
     public function attackSecondary(): ?AttackResult
     {
-        return null; // TODO
+        $item = $this->getEquippedItem();
+        if (!($item instanceof AttackEnable)) {
+            return null;
+        }
+
+        if ($item instanceof Knife) {
+            $result = $item->attackSecondary($this->createAttackEvent());
+            if ($result) {
+                $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+                $this->world->makeSound($sound->setPlayer($this)->setItem($item));
+                return $this->processAttackResult($result);
+            }
+        }
+
+        return null;
     }
 
     private function processAttackResult(AttackResult $result): AttackResult
@@ -57,7 +73,6 @@ trait AttackTrait
 
     protected function createAttackEvent(): AttackEvent
     {
-        $this->isAttacking = true;
         $origin = $this->getPositionImmutable();
         $origin->addY($this->getSightHeight());
 

@@ -137,8 +137,12 @@ export class World {
         }
     }
 
-    bulletWallHit(position, surface) {
-        const hit = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .5, 8, 2), new THREE.MeshBasicMaterial({color: 0x1e1c1b}))
+    bulletWallHit(position, surface, radius) {
+        const hit = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius, radius, .4, 8, 1),
+            new THREE.MeshBasicMaterial({color: new THREE.Color(`hsl(23, 24%, ${Math.random() * 18}%, 1)`)})
+        )
+        hit.translateY(hit.geometry.parameters.height / 2)
         if (surface.plane === 'zy') {
             hit.rotateZ(degreeToRadian(-90))
         } else if (surface.plane === 'xy') {

@@ -2,7 +2,8 @@ import {Action, InventorySlot} from "./Enums.js";
 
 export class PlayerAction {
     #states = {
-        shootLookAt: '',
+        attackLookAt: '',
+        attack2LookAt: '',
         lastLookAt: '',
         sprayTriggerStartMs: null,
         moveForward: false,
@@ -13,6 +14,7 @@ export class PlayerAction {
         crouching: false,
         standing: false,
         attack: false,
+        attack2: false,
         shifting: false,
         running: false,
         reload: false,
@@ -46,7 +48,12 @@ export class PlayerAction {
 
     attack([x, y]) {
         this.#states.attack = true
-        this.#states.shootLookAt = `lookAt ${x} ${y}`
+        this.#states.attackLookAt = `lookAt ${x} ${y}`
+    }
+
+    attack2([x, y]) {
+        this.#states.attack2 = true
+        this.#states.attack2LookAt = `lookAt ${x} ${y}`
     }
 
     equip(slotId) {
@@ -126,8 +133,13 @@ export class PlayerAction {
             this.#states.equip = false
         }
 
+        if (this.#states.attack2) {
+            action.push(this.#states.attack2LookAt)
+            action.push('attack2')
+            this.#states.attack2 = false
+        }
         if (this.#states.attack) {
-            action.push(this.#states.shootLookAt)
+            action.push(this.#states.attackLookAt)
             action.push('attack')
             this.#states.attack = false
         } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {

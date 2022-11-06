@@ -354,10 +354,14 @@ class World
         return null;
     }
 
-    public function bulletHit(Hittable $hit, Point $position, bool $wasHeadshot): void
+    public function bulletHit(Hittable $hit, Bullet $bullet, bool $wasHeadshot): void
     {
-        $soundEvent = new SoundEvent($position, $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT);
+        $soundEvent = new SoundEvent($bullet->getPosition()->clone(), $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT);
         $soundEvent->setPlayer($hit->getPlayer());
+        $item = $bullet->getShootItem();
+        if ($item instanceof Item) {
+            $soundEvent->setItem($item);
+        }
         if ($hit instanceof SolidSurface) {
             $soundEvent->setSurface($hit);
         }

@@ -37,6 +37,9 @@ export class Control {
                 return;
             }
 
+            if (event.buttons === 2) {
+                action.attack2(game.getPlayerMeRotation())
+            }
             if (event.buttons === 1) {
                 if (sprayEnableSlots.includes(game.playerMe.getEquippedSlotId())) {
                     action.sprayingEnable()

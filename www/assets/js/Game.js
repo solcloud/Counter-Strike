@@ -1,6 +1,6 @@
 import {EventProcessor} from "./EventProcessor.js";
 import {Player} from "./Player.js";
-import {SoundType} from "./Enums.js";
+import {InventorySlot, SoundType} from "./Enums.js";
 import {SoundRepository} from "./SoundRepository.js";
 
 export class Game {
@@ -107,8 +107,8 @@ export class Game {
         if (data.type === SoundType.ITEM_PICKUP) {
             this.#world.itemPickup(data.position, data.item)
         }
-        if (data.type === SoundType.BULLET_HIT && data.surface) {
-            this.#world.bulletWallHit(data.position, data.surface)
+        if (data.type === SoundType.BULLET_HIT && data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
+            this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
         }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)

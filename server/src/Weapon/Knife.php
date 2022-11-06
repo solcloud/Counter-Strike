@@ -13,6 +13,7 @@ use cs\Interface\AttackEnable;
 
 final class Knife extends BaseWeapon implements AttackEnable
 {
+    public const killAward = 1500;
     public const stabMaxDistance = 100;
     public const equipReadyTimeMs = 500;
     private bool $primaryAttack = true;
