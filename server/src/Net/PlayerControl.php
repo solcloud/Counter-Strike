@@ -117,7 +117,7 @@ class PlayerControl
 
     public function use(): void
     {
-        // TODO
+        $this->player->use();
     }
 
     public function equip(int $slotId): void

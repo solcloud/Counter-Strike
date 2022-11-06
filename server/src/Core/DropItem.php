@@ -23,7 +23,7 @@ class DropItem
         $start = $player->getPositionImmutable()->addY($player->getSightHeight());
         $horizontalAngle = $player->getSight()->getRotationHorizontal();
         $verticalAngle = $player->getSight()->getRotationVertical();
-        $distance = (($player->isMoving() || $player->isJumping()) ? 8 * $playerRadius : 3 * $playerRadius) + $this->radius;
+        $distance = (($player->isMoving() || $player->isJumping()) ? 10 * $playerRadius : 4 * $playerRadius) + $this->radius;
 
         $candidate = $start->clone();
         $lastCandidate = $candidate->clone();
@@ -38,7 +38,7 @@ class DropItem
             if ($collisionPlayer && $collisionPlayer->getInventory()->pickup($item)) {
                 return null;
             }
-            if ($world->isWallOrFloorCollision($candidate, $this->radius)) {
+            if ($world->isWallOrFloorCollision($lastCandidate, $candidate, $this->radius)) {
                 break;
             }
 

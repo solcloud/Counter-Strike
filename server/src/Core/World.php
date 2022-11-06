@@ -213,6 +213,11 @@ class World
         }
     }
 
+    public function playerUse(Player $player): void
+    {
+        // TODO
+    }
+
     /**
      * @return Hittable[]
      */
@@ -399,16 +404,25 @@ class World
         return false;
     }
 
-    public function isWallOrFloorCollision(Point $candidate, int $radius): bool
+    public function isWallOrFloorCollision(Point $start, Point $candidate, int $radius): bool
     {
         if ($this->findFloor($candidate, $radius)) {
             return true;
         }
-        if ($this->checkZSideWallCollision($candidate, $radius, $radius)) {
-            return true;
+
+        if ($start->x <> $candidate->x) {
+            $xGrowing = ($start->x < $candidate->x);
+            $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
+            if ($this->checkXSideWallCollision($baseX, $radius, $radius)) {
+                return true;
+            }
         }
-        if ($this->checkXSideWallCollision($candidate, $radius, $radius)) {
-            return true;
+        if ($start->z <> $candidate->z) {
+            $zGrowing = ($start->z < $candidate->z);
+            $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
+            if ($this->checkZSideWallCollision($baseZ, $radius, $radius)) {
+                return true;
+            }
         }
 
         return false;
@@ -460,6 +474,15 @@ class World
             }
         }
         return $output;
+    }
+
+    /**
+     * @return DropItem[]
+     * @internal
+     */
+    public function getDropItems(): array
+    {
+        return $this->dropItems;
     }
 
     public function getMap(): Map

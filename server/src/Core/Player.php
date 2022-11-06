@@ -113,6 +113,11 @@ final class Player
         $this->world->playerDiedToFallDamage($this);
     }
 
+    public function use(): void
+    {
+        $this->world->playerUse($this);
+    }
+
     public function getHeadHeight(): int
     {
         return $this->headHeight;

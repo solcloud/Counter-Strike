@@ -105,6 +105,11 @@ abstract class BaseTestCase extends BaseTest
         return $game;
     }
 
+    protected function createNoPauseGame(int $maxRounds = 1): TestGame
+    {
+        return $this->createTestGame(null, $this->createNoPauseGameProperty($maxRounds));
+    }
+
     protected function createNoPauseGameProperty(int $maxRounds = 1): GameProperty
     {
         $properties = new GameProperty();

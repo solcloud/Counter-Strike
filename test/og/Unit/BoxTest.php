@@ -1,14 +1,14 @@
 <?php
 
-namespace Test\World;
+namespace Test\Unit;
 
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Wall;
-use Test\BaseTestCase;
+use Test\BaseTest;
 
-class BoxTest extends BaseTestCase
+class BoxTest extends BaseTest
 {
 
     public function testBox(): void

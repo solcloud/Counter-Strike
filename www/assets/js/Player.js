@@ -3,7 +3,12 @@ export class Player {
         id: null,
         color: null,
         money: null,
-        item: null,
+        item: {
+            id: null,
+            type: null,
+            slot: null,
+            name: null,
+        },
         canAttack: null,
         canBuy: null,
         canPlant: null,

@@ -11,7 +11,7 @@ class KnifeAttackTest extends BaseTestCase
 
     public function testBlankStab(): void
     {
-        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
             $this->waitNTicks(Knife::equipReadyTimeMs) + 1,
             function () use ($game) {

@@ -21,6 +21,15 @@ use Test\BaseTestCase;
 class RoundTest extends BaseTestCase
 {
 
+    public function testMsToTickConstantTenOnTest(): void
+    {
+        $this->assertSame(0, Util::millisecondsToFrames(0));
+        $this->assertSame(1, Util::millisecondsToFrames(1));
+        $this->assertSame(1, Util::millisecondsToFrames(10));
+        $this->assertSame(123, Util::millisecondsToFrames(1230));
+        $this->assertSame(240, Util::millisecondsToFrames(RifleAk::reloadTimeMs));
+    }
+
     public function testRoundEndWhenNoPlayersAreAlive(): void
     {
         $playerCommands = [
@@ -29,11 +38,9 @@ class RoundTest extends BaseTestCase
             $this->endGame(),
         ];
 
-        $killEvents = [];
-        $gameProperty = new GameProperty();
-        $gameProperty->max_rounds = 1;
-        $game = $this->createTestGame(null, $gameProperty);
         $break = false;
+        $killEvents = [];
+        $game = $this->createNoPauseGame();
         $game->onEvents(function (array $events) use (&$killEvents, &$break): void {
             if ($break) {
                 return;
@@ -62,6 +69,23 @@ class RoundTest extends BaseTestCase
         $this->assertFalse($killEvent->wasHeadShot());
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
         $this->assertSame(1, $killEvent->getPlayerCulprit()->getId());
+    }
+
+    public function testSkippingTicksPlayerSimulation(): void
+    {
+        $called = false;
+        $playerCommands = [
+            $this->waitXTicks(10),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
+            function (Player $p) use (&$called): void {
+                $this->assertInstanceOf(RifleAk::class, $p->getEquippedItem());
+                $called = true;
+            },
+        ];
+
+        $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
+        $this->assertSame(12, $game->getTickId());
+        $this->assertTrue($called);
     }
 
     public function testFreezeTime(): void

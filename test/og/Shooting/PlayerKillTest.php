@@ -66,7 +66,7 @@ class PlayerKillTest extends BaseTestCase
         ];
         $player2 = new Player(2, Color::GREEN, false);
 
-        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $game = $this->createNoPauseGame();
         $game->getPlayer(1)->setPosition(new Point(50, 0, 50));
         $game->getWorld()->addWall(new Wall(new Point(35, 1, 80), true, 20));
         $game->addPlayer($player2);
@@ -352,7 +352,7 @@ class PlayerKillTest extends BaseTestCase
         $player2 = new Player(2, Color::GREEN, false);
         $player2->getSight()->lookHorizontal(180);
 
-        $game = $this->createTestGame(null, $this->createNoPauseGameProperty(15));
+        $game = $this->createNoPauseGame(15);
         $game->addPlayer($player2);
 
         $afterRoundWaitTicks = 2;

@@ -2,7 +2,7 @@ import {InventorySlot, SoundType} from "./Enums.js";
 
 export class SoundRepository {
 
-    getSoundName(type, item, playerId, surfaceStrength, playerSpectateId) {
+    getSoundName(type, item, playerId, surface, playerSpectateId) {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
                 return '422990__dkiller2204__sfxrunground1.wav'
@@ -36,8 +36,8 @@ export class SoundRepository {
         }
 
         if (type === SoundType.BULLET_HIT) {
-            if (surfaceStrength) {
-                if (surfaceStrength > 2000) {
+            if (surface) {
+                if (surface.force > 1000) {
                     return '51381__robinhood76__00119-trzepak-3.wav'
                 }
                 return '108737__branrainey__boing.wav'
@@ -80,9 +80,13 @@ export class SoundRepository {
             return '434781__stephenbist__luggage-drop-1.wav'
         }
         if (type === SoundType.ITEM_PICKUP) {
-            return '434781__stephenbist__luggage-drop-1.wav'
+            if (playerId === playerSpectateId || item.slot === InventorySlot.SLOT_BOMB) {
+                return '434781__stephenbist__luggage-drop-1.wav'
+            }
+            return null
         }
 
+        console.warn("No song defined for", arguments)
         return null
     }
 

@@ -1,45 +1,15 @@
 <?php
 
-namespace Test\Util;
+namespace Test\Unit;
 
-use cs\Core\GameProperty;
-use cs\Core\Player;
 use cs\Core\PlayerCamera;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Util;
-use cs\Enum\BuyMenuItem;
-use cs\Weapon\RifleAk;
-use Test\BaseTestCase;
+use Test\BaseTest;
 
-class UtilTest extends BaseTestCase
+class UtilTest extends BaseTest
 {
-
-    public function testMsToTickConstantTenOnTest(): void
-    {
-        $this->assertSame(0, Util::millisecondsToFrames(0));
-        $this->assertSame(1, Util::millisecondsToFrames(1));
-        $this->assertSame(1, Util::millisecondsToFrames(10));
-        $this->assertSame(123, Util::millisecondsToFrames(1230));
-        $this->assertSame(240, Util::millisecondsToFrames(RifleAk::reloadTimeMs));
-    }
-
-    public function testSkippingTicksPlayerSimulation(): void
-    {
-        $called = false;
-        $playerCommands = [
-            3,
-            fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
-            function (Player $p) use (&$called): void {
-                $this->assertInstanceOf(RifleAk::class, $p->getEquippedItem());
-                $called = true;
-            },
-        ];
-
-        $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
-        $this->assertSame(5, $game->getTickId());
-        $this->assertTrue($called);
-    }
 
     public function testPlayerCameraAngles(): void
     {
@@ -97,9 +67,9 @@ class UtilTest extends BaseTestCase
         $this->assertSame([830, 2013], Util::rotatePointY(111, 115, 478, 1000, 1000));
         $this->assertSame([10, 1000], Util::rotatePointY(45, 300, 300, 1000, 1000));
         $this->assertSame([300, 300], Util::rotatePointY(0, 300, 300, 1000, 1000));
-        $this->assertSame([-39, 39], Util::rotatePointY(10, -45, 32, 0, 0 ));
-        $this->assertSame([-31, 45], Util::rotatePointY(20, -45, 32, 0, 0 ));
-        $this->assertSame([-9, 54], Util::rotatePointY(45, -45, 32, 0, 0 ));
+        $this->assertSame([-39, 39], Util::rotatePointY(10, -45, 32, 0, 0));
+        $this->assertSame([-31, 45], Util::rotatePointY(20, -45, 32, 0, 0));
+        $this->assertSame([-9, 54], Util::rotatePointY(45, -45, 32, 0, 0));
     }
 
     public function testPointToPointDistance(): void

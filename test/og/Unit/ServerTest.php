@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Protocol;
+namespace Test\Unit;
 
 use cs\Core\Game;
 use cs\Core\GameException;
@@ -14,9 +14,9 @@ use cs\Net\ProtocolWriter;
 use cs\Net\Server;
 use cs\Net\ServerSetting;
 use cs\Net\TestConnector;
-use Test\BaseTestCase;
+use Test\BaseTest;
 
-class ServerTest extends BaseTestCase
+class ServerTest extends BaseTest
 {
     /**
      * @param string[] $clientRequests

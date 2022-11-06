@@ -5,13 +5,17 @@ namespace Test\Inventory;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
+use cs\Core\Point;
+use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\Color;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
 use cs\Equipment\HighExplosive;
 use cs\Weapon\Knife;
 use cs\Weapon\PistolGlock;
+use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
@@ -77,7 +81,7 @@ class SimpleInventoryTest extends BaseTestCase
 
     public function testDropAndPickupItem(): void
     {
-        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolGlock::equipReadyTimeMs),
@@ -98,7 +102,7 @@ class SimpleInventoryTest extends BaseTestCase
 
     public function testDropAndInstantPickupItem(): void
     {
-        $game = $this->createTestGame(null, $this->createNoPauseGameProperty());
+        $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->lookVertical(90),
             fn(Player $p) => $p->equipSecondaryWeapon(),
@@ -110,6 +114,61 @@ class SimpleInventoryTest extends BaseTestCase
             fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->getEquippedItem()),
             $this->endGame(),
         ]);
+    }
+
+    public function testDropToOtherPlayer(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+        $game->getPlayer(2)->setPosition(new Point(150, 0, 150));
+
+        $game->getPlayer(1)->equipSecondaryWeapon();
+        $game->getPlayer(1)->dropEquippedItem();
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(220, -15),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolUsp::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(PistolUsp::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            $this->endGame(),
+        ], 2);
+
+        $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+    }
+
+    public function testDropWallCollision(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+        $game->getPlayer(2)->setPosition(new Point(150, 0, 150));
+        $wall = new Wall(new Point(80), false, 500);
+        $game->getWorld()->addWall($wall);
+
+        $game->getPlayer(1)->equipSecondaryWeapon();
+        $game->getPlayer(1)->dropEquippedItem();
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(220, -15),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolUsp::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(PistolUsp::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            $this->endGame(),
+        ], 2);
+
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+        $dropItems = $game->getWorld()->getDropItems();
+        $this->assertCount(2, $dropItems);
+        $this->assertSame($wall->getBase() + 1, $dropItems[1]->getPosition()->addX(-$dropItems[1]->getBoundingRadius())->x);
     }
 
     public function testPlayerBuyWeapons(): void

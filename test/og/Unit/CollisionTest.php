@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\World;
+namespace Test\Unit;
 
 use cs\Core\Box;
 use cs\Core\Collision;

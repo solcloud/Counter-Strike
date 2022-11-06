@@ -95,6 +95,11 @@ class Point
         return $this->addX($other->x)->addY($other->y)->addZ($other->z);
     }
 
+    public function addPart(int $x, int $y, int $z): self
+    {
+        return $this->addX($x)->addY($y)->addZ($z);
+    }
+
     public function __toString(): string
     {
         return "Point({$this->x},{$this->y},{$this->z})";

@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Protocol;
+namespace Test\Unit;
 
 use cs\Core\Game;
 use cs\Core\GameProperty;
@@ -11,9 +11,9 @@ use cs\Net\PlayerControl;
 use cs\Net\Protocol;
 use cs\Net\ProtocolReader;
 use cs\Net\ProtocolWriter;
-use Test\BaseTestCase;
+use Test\BaseTest;
 
-class ProtocolTest extends BaseTestCase
+class ProtocolTest extends BaseTest
 {
 
     public function testPlayerControlMethods(): void

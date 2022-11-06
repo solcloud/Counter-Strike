@@ -4,7 +4,6 @@ namespace Test;
 
 use Closure;
 use cs\Core\Game;
-use cs\Event\GameOverEvent;
 use cs\Net\Protocol\TextProtocol;
 
 /**

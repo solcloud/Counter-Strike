@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Shooting;
+namespace Test\Unit;
 
 use cs\Core\Player;
 use cs\Core\Point;

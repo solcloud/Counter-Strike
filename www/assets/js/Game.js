@@ -107,6 +107,9 @@ export class Game {
         if (data.type === SoundType.ITEM_PICKUP) {
             this.#world.itemPickup(data.position, data.item)
         }
+        if (data.type === SoundType.BULLET_HIT && data.surface) {
+            this.#world.bulletWallHit(data.position, data.surface)
+        }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)
             if (data.player === this.playerSpectate.getId()) {
@@ -116,11 +119,10 @@ export class Game {
 
         let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerSpectate.getId())
         if (!soundName) {
-            console.warn("No song defined for", data)
             return
         }
 
-        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTING, SoundType.BOMB_PLANTED]
+        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTING, SoundType.BOMB_PLANTED, SoundType.ITEM_PICKUP]
         let myPlayerSound = (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type))
         this.#world.playSound(soundName, data.position, myPlayerSound)
     }

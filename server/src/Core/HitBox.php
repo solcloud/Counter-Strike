@@ -52,8 +52,13 @@ class HitBox implements Hittable
             return false;
         }
 
-        // TODO do back hit box based on player and bullet angle, or add HitBoxBack geometry
-        return false;
+        // probably easier to add HitBoxBack geometry once there is real player model
+        $playerPos = $this->player->getPositionImmutable();
+        $d1Squared = Util::distanceSquared($playerPos, $bullet->getPosition());
+        [$x, $y, $z] = Util::movementXYZ($this->player->getSight()->getRotationHorizontal(), 0, 10);
+        $playerPos->addPart($x, $y, $z);
+        $d2Squared = Util::distanceSquared($playerPos, $bullet->getPosition());
+        return ($d2Squared > $d1Squared);
     }
 
     public function registerHit(Bullet $bullet): void

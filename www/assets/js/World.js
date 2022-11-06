@@ -10,6 +10,7 @@ export class World {
     #objectLoader;
     #audioLoader;
     #dropItems = [];
+    #decals = [];
 
     constructor() {
         THREE.Cache.enabled = true
@@ -129,26 +130,41 @@ export class World {
             }
 
             if (dropItem.position.x === position.x && dropItem.position.y === position.y && dropItem.position.z === -position.z) {
-                dropItem.clear()
-                dropItem.removeFromParent()
-                dropItem.geometry.dispose()
-                dropItem.material.dispose()
-
+                this.destroyObject(dropItem)
                 delete this.#dropItems[i]
                 return
             }
         }
     }
 
+    bulletWallHit(position, surface) {
+        const hit = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .5, 8, 2), new THREE.MeshBasicMaterial({color: 0x1e1c1b}))
+        if (surface.plane === 'zy') {
+            hit.rotateZ(degreeToRadian(-90))
+        } else if (surface.plane === 'xy') {
+            hit.rotateX(degreeToRadian(-90))
+        }
+        hit.position.set(position.x + 0.1, position.y + 0.1, -position.z + 0.1)
+        this.#scene.add(hit)
+        this.#decals.push(hit)
+    }
+
+    clearDecals() {
+        this.#decals.forEach((item) => this.destroyObject(item))
+    }
+
     reset() {
         this.#removeBomb()
-        this.#dropItems.forEach(function (item) {
-            item.clear()
-            item.removeFromParent()
-            item.geometry.dispose()
-            item.material.dispose()
-        })
+        this.clearDecals()
+        this.#dropItems.forEach((item) => this.destroyObject(item))
         this.#dropItems = []
+    }
+
+    destroyObject(object) {
+        object.clear()
+        object.removeFromParent()
+        object.geometry.dispose()
+        object.material.dispose()
     }
 
     #removeBomb() {

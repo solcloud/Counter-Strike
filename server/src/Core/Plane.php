@@ -79,4 +79,9 @@ abstract class Plane extends SolidSurface
      */
     public abstract static function fromArray(array $data): self;
 
+    public function getPlane(): string
+    {
+        return $this->axis2d;
+    }
+
 }
