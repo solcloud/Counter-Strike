@@ -159,4 +159,5 @@ const Action = {
     BUY_MENU: 13,
     SCORE_BOARD: 14,
     DROP: 15,
+    USE: 16,
 }

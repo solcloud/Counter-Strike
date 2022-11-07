@@ -17,6 +17,8 @@ class GameProperty
     public int $bomb_explode_time_ms = 40000;
     const BOMB_PLANT_TIME_MS = 'bomb_plant_time_ms';
     public int $bomb_plant_time_ms = 3200;
+    const BOMB_DEFUSE_TIME_MS = 'bomb_defuse_time_ms';
+    public int $bomb_defuse_time_ms = 9960;
     const HALF_TIME_FREEZE_SEC = 'half_time_freeze_sec';
     public int $half_time_freeze_sec = 15;
     const FREEZE_TIME_SEC = 'freeze_time_sec';

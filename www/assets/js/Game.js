@@ -122,9 +122,16 @@ export class Game {
             return
         }
 
-        let myPlayerTypes = [SoundType.ITEM_RELOAD, SoundType.PLAYER_STEP, SoundType.ITEM_ATTACK, SoundType.ITEM_BUY, SoundType.BOMB_PLANTING, SoundType.BOMB_PLANTED, SoundType.ITEM_PICKUP]
-        let myPlayerSound = (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type))
-        this.#world.playSound(soundName, data.position, myPlayerSound)
+        const alwaysInHeadTypes = [
+            SoundType.BOMB_PLANTED, SoundType.BOMB_DEFUSED,
+        ]
+        const myPlayerTypes = [
+            SoundType.ITEM_RELOAD, SoundType.ITEM_PICKUP, SoundType.ITEM_ATTACK, SoundType.ITEM_ATTACK2, SoundType.ITEM_BUY,
+            SoundType.PLAYER_STEP, SoundType.ATTACK_NO_AMMO,
+            SoundType.BOMB_PLANTING, SoundType.BOMB_DEFUSING,
+        ]
+        let inPlayerSpectateHead = (alwaysInHeadTypes.includes(data.type) || (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type)))
+        this.#world.playSound(soundName, data.position, inPlayerSpectateHead)
     }
 
     bombPlanted(timeMs, position) {

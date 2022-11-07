@@ -12,15 +12,18 @@ class Bomb extends BaseEquipment
 {
 
     const MAX_BLAST_DISTANCE = 1000;
-    private bool $isArmed = true;
+
+    private Point $position;
     private int $plantTickCount = 0;
     private int $plantTickCountMax;
-    private Point $position;
+    private int $defuseTickCount = 0;
+    private int $defuseTickCountMax;
 
-    public function __construct(int $plantTimeMs)
+    public function __construct(int $plantTimeMs, int $defuseTimeMs)
     {
         parent::__construct();
         $this->plantTickCountMax = Util::millisecondsToFrames($plantTimeMs);
+        $this->defuseTickCountMax = Util::millisecondsToFrames($defuseTimeMs);
     }
 
     public function getName(): string
@@ -41,7 +44,7 @@ class Bomb extends BaseEquipment
     public function reset(): void
     {
         $this->plantTickCount = 0;
-        $this->isArmed = true;
+        $this->defuseTickCount = 0;
     }
 
     public function unEquip(): void
@@ -56,14 +59,10 @@ class Bomb extends BaseEquipment
         return ($this->plantTickCount >= $this->plantTickCountMax);
     }
 
-    public function isArmed(): bool
+    public function defuse(bool $hasKit): bool
     {
-        return $this->isArmed;
-    }
-
-    public function defused(): void
-    {
-        $this->isArmed = false;
+        $this->defuseTickCount += $hasKit ? 2 : 1;
+        return ($this->defuseTickCount >= $this->defuseTickCountMax);
     }
 
     public function setPosition(Point $position): void

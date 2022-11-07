@@ -10,6 +10,7 @@ export class PlayerAction {
         moveBackward: false,
         moveLeft: false,
         moveRight: false,
+        use: false,
         jumping: false,
         crouching: false,
         standing: false,
@@ -33,6 +34,7 @@ export class PlayerAction {
         this.actionCallback[Action.MOVE_LEFT] = (enabled) => this.#states.moveLeft = enabled
         this.actionCallback[Action.MOVE_BACK] = (enabled) => this.#states.moveBackward = enabled
         this.actionCallback[Action.MOVE_RIGHT] = (enabled) => this.#states.moveRight = enabled
+        this.actionCallback[Action.USE] = (enabled) => this.#states.use = enabled
         this.actionCallback[Action.JUMP] = (enabled) => enabled && (this.#states.jumping = true)
         this.actionCallback[Action.CROUCH] = (enabled) => enabled ? this.#states.crouching = true : this.#states.standing = true
         this.actionCallback[Action.WALK] = (enabled) => enabled ? this.#states.shifting = true : this.#states.running = true
@@ -99,6 +101,9 @@ export class PlayerAction {
         }
         if (this.#states.moveBackward) {
             action.push('backward')
+        }
+        if (this.#states.use) {
+            action.push('use')
         }
         if (this.#states.jumping) {
             action.push('jump')

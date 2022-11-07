@@ -11,6 +11,7 @@ export class Setting {
             'KeyA': Action.MOVE_LEFT,
             'KeyS': Action.MOVE_BACK,
             'KeyD': Action.MOVE_RIGHT,
+            'KeyE': Action.USE,
             'Space': Action.JUMP,
             'ControlLeft': Action.CROUCH,
             'ShiftLeft': Action.WALK,

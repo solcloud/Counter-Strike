@@ -53,7 +53,7 @@ class Game
 
     public function __construct(GameProperty $properties = new GameProperty())
     {
-        $this->bomb = new Bomb($properties->bomb_plant_time_ms);
+        $this->bomb = new Bomb($properties->bomb_plant_time_ms, $properties->bomb_defuse_time_ms);
         $this->state = new GameState($this);
         $this->world = new World($this);
         $this->score = new Score($properties->loss_bonuses);
@@ -191,6 +191,11 @@ class Game
         return $this->paused;
     }
 
+    public function isBombActive(): bool
+    {
+        return $this->bombPlanted && $this->bombEventId !== null;
+    }
+
     public function getTickId(): int
     {
         return $this->tick;
@@ -287,10 +292,10 @@ class Game
 
     public function bombDefused(Player $defuser): void
     {
-        // TODO
         $defuser->getInventory()->earnMoney(300);
         $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
         $this->addSoundEvent($sound->setItem($this->bomb));
+        $this->roundEnd(false, RoundEndReason::BOMB_DEFUSED);
         $this->bombReset();
     }
 

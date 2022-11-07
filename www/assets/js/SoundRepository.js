@@ -63,6 +63,15 @@ export class SoundRepository {
             return '369009__flying-deer-fx__hit-01-mouth-fx-impact-with-object.wav'
         }
 
+        if (type === SoundType.BOMB_DEFUSING) {
+            if (playerId === playerSpectateId) {
+                return '162900__qubodup__scissors-snap.flac'
+            }
+            return '349662__insanity54__c4armed.ogg'
+        }
+        if (type === SoundType.BOMB_DEFUSED) {
+            return '338133__spectre-of-pain__bombdefused.mp3'
+        }
         if (type === SoundType.BOMB_PLANTING) {
             if (playerId === playerSpectateId) {
                 return '536422__rudmer-rotteveel__setting-electronic-timer-1-beep.wav'

@@ -4,6 +4,7 @@ namespace cs\Core;
 
 use cs\Enum\ArmorType;
 use cs\Enum\Color;
+use cs\Enum\InventorySlot;
 use cs\Event\Event;
 use cs\Traits\Player as PlayerTrait;
 use cs\Weapon\AmmoBasedWeapon;
@@ -193,6 +194,11 @@ final class Player
     public function getArmorType(): ArmorType
     {
         return $this->inventory->getArmor();
+    }
+
+    public function hasDefuseKit(): bool
+    {
+        return $this->inventory->has(InventorySlot::SLOT_KIT->value);
     }
 
     public function swapTeam(): void
