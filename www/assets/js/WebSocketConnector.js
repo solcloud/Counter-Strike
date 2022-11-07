@@ -12,10 +12,10 @@ export class WebSocketConnector {
         this.#socket.close()
     }
 
-    connect(address, loginCode) {
+    connect(host, port, loginCode) {
         let logged = false;
 
-        const socket = new WebSocket(address);
+        const socket = new WebSocket(`ws://${host}:${port}`);
         this.#socket = socket
 
         const connector = this
@@ -25,7 +25,7 @@ export class WebSocketConnector {
             console.log("WebSocket closed")
         };
         socket.onerror = function (error) {
-            alert(`Cannot connect to '${address}'`)
+            alert(`Cannot connect to '${host}:${port}'`)
             console.log("WebSocket error: " + error.message)
         };
         socket.onopen = function () {

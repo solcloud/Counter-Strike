@@ -6,7 +6,6 @@ import {Radar} from "./hud/Radar.js";
 
 export class HUD {
     #game
-    #setting
     #buyMenu = null;
     #scoreBoard = null;
     #killFeed = null;
@@ -43,9 +42,8 @@ export class HUD {
     #countDownIntervalId = null;
     #scoreBoardData = null;
 
-    injectDependency(game, setting) {
+    injectDependency(game) {
         this.#game = game
-        this.#setting = setting
     }
 
     pause(msg, timeMs) {
@@ -194,7 +192,7 @@ export class HUD {
         this.#elements.aliveOpponentTeam.innerHTML = this.#game.alivePlayers[otherTeamIndex]
     }
 
-    createHud(elementHud, map) {
+    createHud(elementHud, map, setting) {
         if (this.#elements.score) {
             throw new Error("HUD already created")
         }
@@ -299,7 +297,7 @@ export class HUD {
             const radarCanvas = elementHud.querySelector('#radar-canvas')
             radarCanvas.width = this.width
             radarCanvas.height = this.height
-            self.#radar = new Radar(radarCanvas, radarImage, map, self.#setting.getRadarZoom())
+            self.#radar = new Radar(radarCanvas, radarImage, map, setting.getRadarZoom())
         }
         radarImage.src = `./resources/map/${map}.png`
 

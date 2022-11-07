@@ -15,7 +15,7 @@
     </header>
     <div id="menu">
         <button onclick="showModal('modal-join')">Play</button>
-        <button onclick="loadUserSetting();showModal('modal-setting')">Settings</button>
+        <button onclick="showModal('modal-setting')">Settings</button>
         <button onclick="window.close()">Quit</button>
     </div>
     <footer>
@@ -34,25 +34,11 @@
         </p>
     </div>
     <div data-name="modal-setting" class="hidden">
-        <div class="text-warning">
-            <form id="setting-form">
-                <p>
-                    <label>
-                        <input name="prefer_performance" type="checkbox"> Prefer performance over quality
-                    </label>
-                </p>
-                <p>
-                    <label>
-                        Field of view
-                        <input min="10" name="fov" type="number">
-                    </label>
-                </p>
-            </form>
-        </div>
+        <textarea rows="8" id="setting-form"></textarea>
         <p class="flex">
             <button onclick="closeModal()" class="btn">× Close</button>
             <span>&nbsp;</span>
-            <button onclick="saveSetting(new URLSearchParams(new FormData(document.getElementById('setting-form'))));closeModal()" class="btn">✓ Save</button>
+            <button onclick="saveSetting(document.getElementById('setting-form').value);closeModal()" class="btn">✓ Save</button>
         </p>
     </div>
 </div>
@@ -60,101 +46,37 @@
 <script src="./assets/threejs/three.js?v=144"></script>
 <script src="./assets/threejs/pointer-lock.js?v=144"></script>
 <script src="./assets/js/utils.js"></script>
+<script type="module">
+    import {Setting} from "./assets/js/Setting.js";
+
+    const settingElement = document.getElementById('setting-form')
+    if (settingElement) {
+        const userSettings = localStorage.getItem('setting')
+        if (userSettings === null || userSettings === '') {
+            const setting = new Setting()
+            settingElement.value = JSON.stringify(setting.getSetting(), null, 2)
+        } else {
+            settingElement.value = userSettings
+        }
+    }
+</script>
 <script>
-    "use strict"
     const modal = document.getElementById('modal')
     const ui = document.getElementById('ui')
     const hud = document.getElementById('hud')
-    const validMaps = ['default', 'aim']
-    const defaultSetting = {
-        prefer_performance: false,
-        fov: 70
-    }
-
-    if (window.nodeApi) {
-        document.getElementById('join-url').value = 'udp://localhost:8080?map=default&code=acode'
-    }
-
-    function router() {
-        const hash = window.location.hash.substring(1)
-        if (hash === '') {
-            return
-        }
-        const params = new URLSearchParams(hash)
-        if (!params.has('action')) {
-            return
-        }
-
-        switch (params.get('action')) {
-            case 'join':
-                joinGame(params.get('map'), params.get('url'), params.get('code'))
-                break
-        }
-    }
-
-    function loadUserSetting() {
-        const data = loadSetting()
-        const base = document.querySelector('#setting-form')
-
-        Object.entries(data).forEach(function ([key, value]) {
-            const element = base.querySelector(`[name="${key}"]`)
-            if (element === null) {
-                console.log("Undefined key: " + key)
-                return
-            }
-            if (typeof value === 'boolean') {
-                element.checked = value
-            } else {
-                element.value = value
-            }
-        })
-    }
-
-    function saveSetting(data) {
-        if (data.has('prefer_performance')) {
-            defaultSetting.prefer_performance = true
-        }
-        defaultSetting.fov = data.get('fov')
-
-        localStorage.setItem('setting', JSON.stringify(defaultSetting))
-    }
-
-    function loadSetting() {
-        const userSetting = localStorage.getItem('setting')
-        if (userSetting === null) {
-            return defaultSetting
-        }
-
-        return JSON.parse(userSetting)
-    }
 
     function joinGameUrl(url) {
-        const query = url.substring(url.indexOf('?') + 1)
-        const params = new URLSearchParams(query)
-        joinGame(params.get('map'), url.substring(0, url.indexOf('?')), params.get('code'))
-    }
-
-    function joinGame(map, url, code) {
-        if (!map || !url || !code) {
-            alert("Invalid parameters")
-            return
-        }
-        if (!validMaps.includes(map)) {
-            alert("Invalid map given")
-        }
-
         modal.remove()
         ui.remove()
-        const setting = {
-            world: loadSetting(),
-            code: code,
-            url: url,
-            map: map
-        }
-        console.log("Launching game", setting)
+
+        console.log("Launching game")
         import("./assets/js/start.js").then(async (ns) => {
-            await ns.launchGame(document.body, hud, setting)
+            await ns.launchGame(document.body, hud, localStorage.getItem('setting'), url)
         })
+    }
+
+    function saveSetting(json) {
+        localStorage.setItem('setting', json)
     }
 
     function closeModal() {
@@ -174,12 +96,18 @@
         menu.classList.remove('hidden')
     }
 
+</script>
+<script>
+    if (window.nodeApi) {
+        document.getElementById('join-url').value = 'udp://localhost:8080?map=default&code=acode'
+    }
+    if (window.location.search === '?dev-join-attacker') {
+        joinGameUrl(document.getElementById('join-url').value)
+    }
     window.addEventListener('beforeunload', (e) => {
         e.preventDefault();
         return "Are you sure to leave this page?"
     });
-    window.addEventListener('hashchange', router);
-    router()
 </script>
 </body>
 </html>

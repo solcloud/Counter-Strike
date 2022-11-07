@@ -13,7 +13,7 @@ export class UdpSocketConnector {
         this.#socket.close()
     }
 
-    connect(ip, port, loginCode) {
+    connect(host, port, loginCode) {
         let logged = false;
 
         const socket = dgram.createSocket('udp4');
@@ -26,7 +26,7 @@ export class UdpSocketConnector {
             console.log("UdpSocket closed")
         });
         socket.on('error', function (error) {
-            alert(`Cannot connect to '${ip}:${port}'`)
+            alert(`Cannot connect to '${host}:${port}'`)
             console.log("UdpSocket error: " + error.message)
         });
         socket.on('connect', function () {
@@ -48,7 +48,7 @@ export class UdpSocketConnector {
             game.tick(state)
         });
 
-        socket.connect(port, ip)
+        socket.connect(port, host)
     }
 
     startLoop(control, tickMs) {

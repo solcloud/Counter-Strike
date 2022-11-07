@@ -5,13 +5,13 @@ export class Control {
     #action
     #setting
 
-    constructor(game, action, setting) {
+    constructor(game, action) {
         this.#game = game
         this.#action = action
-        this.#setting = setting
     }
 
-    init(pointer) {
+    init(pointer, setting) {
+        this.#setting = setting
         const self = this
         const action = this.#action
         const game = this.#game

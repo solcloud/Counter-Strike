@@ -11,30 +11,49 @@ let launchGame
 
 ////////////
 
+    const validMaps = ['default', 'aim']
     let initialized = false
-    const setting = new Setting()
     const world = new World()
     const hud = new HUD()
     const stats = new Stats();
     const game = new Game(world, hud, stats);
     const action = new PlayerAction(hud)
-    const control = new Control(game, action, setting)
-    hud.injectDependency(game, setting)
+    const control = new Control(game, action)
+    hud.injectDependency(game)
 
 ////////////
 
 
-    launchGame = async function (canvasParent, elementHud, setting) {
+    launchGame = async function (canvasParent, elementHud, settingString, joinUrl) {
         if (initialized) {
             throw new Error("Game already launched")
         }
+        initialized = true
 
         let connector
-        initialized = true
-        const canvas = await world.init(setting.map, setting.world)
+        let url = new URL(joinUrl)
+        if (url.protocol === 'ws:') {
+            const ns = await import("./WebSocketConnector.js")
+            connector = new ns.WebSocketConnector(game)
+        } else if (url.protocol === 'udp:') {
+            const ns = await import("./UdpSocketConnector.js")
+            connector = new ns.UdpSocketConnector(game)
+            url = new URL(joinUrl.replace('udp://', 'https://')) // URL do not parse udp parts well, so do https instead
+        } else {
+            throw new Error('Unknown protocol given')
+        }
+
+        const loginCode = url.searchParams.get('code')
+        const map = url.searchParams.get('map')
+        if (!validMaps.includes(map)) {
+            throw new Error("Invalid map given")
+        }
+
+        const setting = new Setting(settingString)
+        const canvas = await world.init(map, setting)
         const pointerLock = new THREE.PointerLockControls(world.getCamera(), document.body)
-        hud.createHud(elementHud, setting.map)
-        control.init(pointerLock)
+        hud.createHud(elementHud, map, setting)
+        control.init(pointerLock, setting)
         game.setPointer(pointerLock)
         document.addEventListener("click", function (e) {
             if (e.target.classList.contains('hud-action')) {
@@ -55,20 +74,7 @@ let launchGame
             connector.startLoop(control, options.tickMs)
         })
 
-        const url = new URL(setting.url)
-        if (url.protocol === 'ws:') {
-            const ns = await import("./WebSocketConnector.js")
-            connector = new ns.WebSocketConnector(game)
-            connector.connect(setting.url, setting.code)
-        } else if (url.protocol === 'udp:') {
-            const ns = await import("./UdpSocketConnector.js")
-            connector = new ns.UdpSocketConnector(game)
-            let url = new URL(setting.url.replace('udp://', 'http://')) // URL do not parse udp parts well, so do http instead
-            connector.connect(url.hostname, url.port, setting.code)
-        } else {
-            alert('Unknown protocol given')
-            window.location.reload()
-        }
+        connector.connect(url.hostname, url.port, loginCode)
     }
 
 })()

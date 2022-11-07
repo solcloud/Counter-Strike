@@ -2,10 +2,12 @@ import {Action} from "./Enums.js";
 
 export class Setting {
     #setting = {
-        fov: 70,
-        radarZoom: 0.9,
-        sprayTriggerDeltaMs: 80,
-        preferPerformance: false,
+        base: {
+            fov: 70,
+            radarZoom: 0.9,
+            sprayTriggerDeltaMs: 80,
+            preferPerformance: false,
+        },
         bind: {
             'KeyW': Action.MOVE_FORWARD,
             'KeyA': Action.MOVE_LEFT,
@@ -26,12 +28,18 @@ export class Setting {
         },
     }
 
+    constructor(settingString = null) {
+        if (settingString) {
+            this.loadSettings(JSON.parse(settingString))
+        }
+    }
+
     loadSettings(settingObject) {
         this.#setting = settingObject
     }
 
-    serialize() {
-        return JSON.stringify(this.#setting)
+    getSetting() {
+        return JSON.parse(JSON.stringify(this.#setting))
     }
 
     getBinds() {
@@ -39,11 +47,19 @@ export class Setting {
     }
 
     getSprayTriggerDeltaMs() {
-        return this.#setting.sprayTriggerDeltaMs
+        return this.#setting.base.sprayTriggerDeltaMs
     }
 
     getRadarZoom() {
-        return this.#setting.radarZoom
+        return this.#setting.base.radarZoom
+    }
+
+    getFieldOfView() {
+        return this.#setting.base.fov
+    }
+
+    shouldPreferPerformance() {
+        return this.#setting.base.preferPerformance
     }
 
 }

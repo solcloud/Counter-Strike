@@ -52,19 +52,19 @@ export class World {
         scene.add(this.#bombModel)
         await this.#loadMap(scene, map)
 
-        const camera = new THREE.PerspectiveCamera(setting.fov, window.innerWidth / window.innerHeight, 1, 4999)
+        const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
         const listener = new THREE.AudioListener()
         camera.add(listener)
         this.#soundListener = listener
 
         const glParameters = {}
-        if (!setting.prefer_performance) {
+        if (!setting.shouldPreferPerformance()) {
             glParameters.antialias = true
         }
         const renderer = new THREE.WebGLRenderer(glParameters);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        if (!setting.prefer_performance) {
+        if (!setting.shouldPreferPerformance()) {
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             renderer.setPixelRatio(window.devicePixelRatio);
