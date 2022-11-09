@@ -2,27 +2,11 @@
 
 namespace cs\Core;
 
-/**
- * @property-read int $x
- * @property-read int $y
- */
 class Point2D
 {
 
-    public function __construct(private int $x = 0, private int $y = 0)
+    public function __construct(public int $x = 0, public int $y = 0)
     {
-    }
-
-    public function __get(string $name): int
-    {
-        if ($name === 'x') {
-            return $this->getX();
-        }
-        if ($name === 'y') {
-            return $this->getY();
-        }
-
-        throw new GameException("Invalid field '{$name}' given");
     }
 
     public function getX(): int

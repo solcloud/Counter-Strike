@@ -217,7 +217,7 @@ $frameIdEnd = null;
 
                 console.debug(frameId, playerState.id, playerState.position, playerState.health)
                 player.getObjectByName('head').position.y = playerState.heightSight
-                player.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(playerState.look.vertical)
+                player.getObjectByName('head').rotation.x = degreeToRadian(playerState.look.vertical - 90)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
                 player.rotation.y = serverHorizontalRotationToThreeRadian(playerState.look.horizontal)
             })

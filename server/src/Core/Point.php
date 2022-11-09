@@ -2,31 +2,11 @@
 
 namespace cs\Core;
 
-/**
- * @property-read int $x
- * @property-read int $y
- * @property-read int $z
- */
 class Point
 {
 
-    public function __construct(private int $x = 0, private int $y = 0, private int $z = 0)
+    public function __construct(public int $x = 0, public int $y = 0, public int $z = 0)
     {
-    }
-
-    public function __get(string $name): int
-    {
-        if ($name === 'x') {
-            return $this->getX();
-        }
-        if ($name === 'y') {
-            return $this->getY();
-        }
-        if ($name === 'z') {
-            return $this->getZ();
-        }
-
-        throw new GameException("Invalid field '{$name}' given");
     }
 
     public function getX(): int
@@ -97,7 +77,10 @@ class Point
 
     public function addPart(int $x, int $y, int $z): self
     {
-        return $this->addX($x)->addY($y)->addZ($z);
+        $this->x += $x;
+        $this->y += $y;
+        $this->z += $z;
+        return $this;
     }
 
     public function __toString(): string
@@ -112,9 +95,9 @@ class Point
 
     public function setFrom(self $point): void
     {
-        $this->setX($point->x);
-        $this->setY($point->y);
-        $this->setZ($point->z);
+        $this->x = $point->x;
+        $this->y = $point->y;
+        $this->z = $point->z;
     }
 
     public function to2D(string $XYaxis): Point2D

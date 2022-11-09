@@ -83,6 +83,10 @@ export class Player {
         return this.data.id
     }
 
+    getColorIndex() {
+        return this.data.color
+    }
+
     isAttacker() {
         return this.data.isAttacker
     }

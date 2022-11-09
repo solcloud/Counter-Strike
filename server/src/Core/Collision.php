@@ -18,18 +18,13 @@ class Collision
         );
     }
 
-    public static function pointWithCircle(Point2D $point, Point2D $circleCenter, int $circleRadius): bool
+    public static function pointWithCircle(int $pointX, int $pointY, int $circleCenterX, int $circleCenterY, int $circleRadius): bool
     {
         return (
-            pow($point->x - $circleCenter->x, 2) + pow($point->y - $circleCenter->y, 2)
+            pow($pointX - $circleCenterX, 2) + pow($pointY - $circleCenterY, 2)
             <=
             pow($circleRadius, 2)
         );
-    }
-
-    public static function circleWithCircle(Point2D $circleCenterA, int $circleRadiusA, Point2D $circleCenterB, int $circleRadiusB): bool
-    {
-        return static::pointWithCircle($circleCenterA, $circleCenterB, $circleRadiusA + $circleRadiusB);
     }
 
     public static function pointWithSphere(Point $point, Point $sphereCenter, int $sphereRadius): bool
@@ -53,8 +48,8 @@ class Collision
         }
 
         return self::pointWithCircle(
-            $cylinderBottomCenterA->to2D('xz'),
-            $cylinderBottomCenterB->to2D('xz'),
+            $cylinderBottomCenterA->x, $cylinderBottomCenterA->z,
+            $cylinderBottomCenterB->x, $cylinderBottomCenterB->z,
             $cylinderRadiusA + $cylinderRadiusB
         );
     }
@@ -65,7 +60,7 @@ class Collision
             return false;
         }
 
-        return self::pointWithCircle($point->to2D('xz'), $cylinderBottomCenter->to2D('xz'), $cylinderRadius);
+        return self::pointWithCircle($point->x, $point->z, $cylinderBottomCenter->x, $cylinderBottomCenter->z, $cylinderRadius);
     }
 
     public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, Point2D $pointB, int $planeWidthB, int $planeHeightB): bool

@@ -250,15 +250,15 @@ class World
         $angleVertical = $observer->getSight()->getRotationVertical();
         $angleHorizontal = $observer->getSight()->getRotationHorizontal();
 
-        $prevPos = null;
+        $prevPos = $start->clone();
         $candidate = $start->clone();
         for ($distance = $observer->getBoundingRadius(); $distance <= $maximumDistance; $distance++) {
             [$x, $y, $z] = Util::movementXYZ($angleHorizontal, $angleVertical, $distance);
             $candidate->setX($start->x + $x)->setY($start->y + $y)->setZ($start->z + $z);
-            if ($prevPos && $candidate->equals($prevPos)) {
+            if ($candidate->equals($prevPos)) {
                 continue;
             }
-            $prevPos = $candidate->clone();
+            $prevPos->setFrom($candidate);
 
             if (Collision::pointWithSphere($candidate, $targetCenter, $targetRadius)) {
                 return true;

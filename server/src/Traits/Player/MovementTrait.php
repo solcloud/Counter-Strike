@@ -50,6 +50,11 @@ trait MovementTrait
         return $this->position->clone();
     }
 
+    public function getReferenceToPosition(): Point
+    {
+        return $this->position;
+    }
+
     public function setPosition(Point $newPosition): void
     {
         $this->position = $newPosition->clone();

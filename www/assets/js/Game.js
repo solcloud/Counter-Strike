@@ -44,8 +44,13 @@ export class Game {
                 if (game.playerSpectate.getId() !== game.playerMe.getId()) { // reset spectate camera to our player
                     const camera = game.#world.getCamera()
                     camera.removeFromParent()
+                    camera.rotation.set(0, 0, 0)
+                    if (game.#pointer) {
+                        game.#pointer.reset()
+                    }
                     player.get3DObject().getObjectByName('head').add(camera)
                     game.playerSpectate = game.playerMe
+                    game.requestPointerLock()
                 }
             } else {
                 player.respawn()
@@ -210,6 +215,7 @@ export class Game {
         )
 
         if (playerIdDead === this.playerSpectate.getId()) {
+            this.requestPointerUnLock()
             this.spectatePlayer()
         }
     }
@@ -219,21 +225,30 @@ export class Game {
             return
         }
 
-        let teammates = this.getMyTeamPlayers()
-        if (!directionNext) {
-            teammates = [...teammates].reverse()
+        const myId = this.playerSpectate.getId()
+        let aliveAvailableSpectateMates = this.getMyTeamPlayers().filter((player) => player.isAlive() && myId !== player.getId())
+        if (aliveAvailableSpectateMates.length === 0) {
+            return;
         }
 
-        const startId = this.playerSpectate.getId()
-        let match = teammates.find((player) => startId > player.getId() && player.isAlive())
-        if (!match) {
-            match = teammates.find((player) => player.isAlive())
+        let ids = aliveAvailableSpectateMates.map((player) => player.getId()).sort()
+        if (!directionNext) {
+            ids.reverse()
+        }
+
+        let playerId = ids.find((id) => myId > id)
+        if (!playerId) {
+            playerId = ids.shift()
         }
 
         const camera = this.#world.getCamera()
         camera.removeFromParent()
-        match.get3DObject().getObjectByName('head').add(camera)
-        this.playerSpectate = match
+        camera.rotation.set(0, degreeToRadian(-90), 0)
+
+        const player = this.players[playerId]
+        player.get3DObject().getObjectByName('head').add(camera)
+        player.get3DObject().visible = false
+        this.playerSpectate = player
     }
 
     createPlayer(data) {
@@ -307,13 +322,16 @@ export class Game {
             if (this.playerSpectate.isInventoryChanged(serverState)) {
                 this.equip(serverState.item.slot)
             }
-        } else {
+        }
+        if (this.playerMe.getId() !== serverState.id) {
             this.updateOtherPlayersModels(player.get3DObject(), serverState)
         }
     }
 
     updateOtherPlayersModels(playerObject, data) {
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
+        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 60), -50) : data.look.vertical
+        playerObject.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(rotationVertical)
 
         const body = playerObject.getObjectByName('body')
         if (body.position.y !== data.heightBody) { // update body height position if changed
@@ -350,7 +368,7 @@ export class Game {
     }
 
     requestPointerLock() {
-        if (this.#pointer.isLocked) {
+        if (this.#pointer.isLocked || (this.playerMe && this.playerMe.getId() !== this.playerSpectate.getId())) {
             return
         }
         this.#pointer.lock()

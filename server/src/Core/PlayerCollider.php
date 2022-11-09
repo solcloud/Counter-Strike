@@ -11,6 +11,7 @@ class PlayerCollider
 
     /** @var HitBox[] */
     private array $hitBoxes = [];
+    private int $playerId;
 
     public function __construct(private Player $player)
     {
@@ -45,6 +46,7 @@ class PlayerCollider
             HitBoxType::LEG,
             new HitGeometry\HitBoxLegs(Setting::playerHeadHeightStand() - Setting::playerHeadHeightCrouch())
         );
+        $this->playerId = $player->getId();
     }
 
     public function roundReset(): void
@@ -86,7 +88,7 @@ class PlayerCollider
 
     public function getPlayerId(): int
     {
-        return $this->player->getId();
+        return $this->playerId;
     }
 
     public function collide(Point $point, int $radius, int $height): bool

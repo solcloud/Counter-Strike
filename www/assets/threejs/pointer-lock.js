@@ -97,6 +97,11 @@
                 scope.domElement.ownerDocument.exitPointerLock();
             };
 
+            this.reset = function () {
+                _euler.setFromQuaternion(camera.quaternion)
+                _vector.set(0, 0, 0)
+            }
+
             this.connect();
         }
 

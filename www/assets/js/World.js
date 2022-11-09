@@ -142,11 +142,11 @@ export class World {
             new THREE.CylinderGeometry(radius, radius, .4, 8, 1),
             new THREE.MeshBasicMaterial({color: new THREE.Color(`hsl(23, 24%, ${Math.random() * 18}%, 1)`)})
         )
-        hit.translateY(hit.geometry.parameters.height / 2)
+        hit.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
         if (surface.plane === 'zy') {
-            hit.rotateZ(degreeToRadian(-90))
+            hit.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), degreeToRadian(90))
         } else if (surface.plane === 'xy') {
-            hit.rotateX(degreeToRadian(-90))
+            hit.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), degreeToRadian(90))
         }
         hit.position.set(position.x + 0.1, position.y + 0.1, -position.z + 0.1)
         this.#scene.add(hit)

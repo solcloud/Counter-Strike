@@ -42,7 +42,7 @@ class DropItem
                 break;
             }
 
-            $lastCandidate = $candidate->clone();
+            $lastCandidate->setFrom($candidate);
         }
 
         while (true) {

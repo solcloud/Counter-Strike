@@ -72,6 +72,9 @@
         console.log("Launching game")
         import("./assets/js/start.js").then(async (ns) => {
             await ns.launchGame(document.body, hud, localStorage.getItem('setting'), url)
+        }).catch((error) => {
+            console.log(error)
+            alert(error)
         })
     }
 
@@ -101,7 +104,7 @@
     if (window.nodeApi) {
         document.getElementById('join-url').value = 'udp://localhost:8080?map=default&code=acode'
     }
-    if (window.location.search === '?dev-join-attacker') {
+    if (window.location.search === '?dev-join') {
         joinGameUrl(document.getElementById('join-url').value)
     }
     window.addEventListener('beforeunload', (e) => {

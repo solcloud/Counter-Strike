@@ -20,6 +20,7 @@ export class HUD {
         buyMenu: null,
         canBuyIcon: null,
         canPlantIcon: null,
+        spectateUi: null,
         equippedItem: null,
         slotModel: null,
         shotModel: null,
@@ -165,6 +166,7 @@ export class HUD {
         this.#elements.score.classList.toggle('hidden', !this.#showAble.showScore);
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
         this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
+        this.#elements.spectateUi.classList.toggle('hidden', this.#game.playerMe.getId() === this.#game.playerSpectate.getId());
         if (player.canBuy && this.#showAble.showBuyMenu) {
             this.#game.requestPointerUnLock()
             this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
@@ -216,6 +218,7 @@ export class HUD {
                     <div id="radar">
                         <canvas id="radar-canvas"></canvas>
                     </div>
+                    <div id="mode-spectate" class="hidden" style="padding:12px 4px">Spectating</div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
                     <div data-can-plant class="hidden" style="margin:22px 4px">⇣&nbsp;💣&nbsp;⇣</div>
                 </div>
@@ -267,6 +270,7 @@ export class HUD {
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.canPlantIcon = elementHud.querySelector('[data-can-plant]')
+        this.#elements.spectateUi = elementHud.querySelector('#mode-spectate')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
         this.#elements.slotModel = elementHud.querySelector('#equipped-item img[data-slot]')
