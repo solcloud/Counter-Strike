@@ -42,11 +42,15 @@ class UtilTest extends BaseTest
     public function testCubeDiagonalMovement(): void
     {
         $this->assertSame([1, 1, 1], Util::movementXYZ(45, 45, 1));
-        $this->assertSame([11, 11, 11], Util::movementXYZ(45, 45, 15));
-        $this->assertSame([3, 5, 6], Util::movementXYZ(22, 47, 7));
-        $this->assertSame([3, -5, 6], Util::movementXYZ(22, -47, 7));
-        $this->assertSame([58, 34, 13], Util::movementXYZ(77, 35, 60));
+        $this->assertSame([8, 11, 8], Util::movementXYZ(45, 45, 15));
+        $this->assertSame([2, 5, 5], Util::movementXYZ(22, 47, 7));
+        $this->assertSame([2, -5, 5], Util::movementXYZ(22, -47, 7));
+        $this->assertSame([48, 34, 11], Util::movementXYZ(77, 35, 60));
         $this->assertSame([2, 2, 5], Util::movementXYZ(18, 23, 5));
+        $this->assertSame([0, -5, 0], Util::movementXYZ(45, -89, 5));
+        $this->assertSame([1, -50, 1], Util::movementXYZ(45, -89, 50));
+        $this->assertSame([6, -49, 6], Util::movementXYZ(45, -80, 50));
+        $this->assertSame([10, -47, 14], Util::movementXYZ(35, -70, 50));
     }
 
     public function testRotatePointY(): void

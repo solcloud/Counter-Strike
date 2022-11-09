@@ -15,7 +15,7 @@ final class SoundEvent extends TickEvent
     private ?Player $player = null;
     private ?SolidSurface $surface = null;
 
-    public function __construct(private Point $position, private SoundType $type)
+    public function __construct(public readonly Point $position, public readonly SoundType $type)
     {
     }
 

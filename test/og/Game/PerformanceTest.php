@@ -16,47 +16,62 @@ use Test\BaseTestCase;
 class PerformanceTest extends BaseTestCase
 {
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (getenv('CI') !== false) {
+            $this->markTestSkipped('CI too slow');
+        }
+    }
+
     public function test1(): void
     {
+        ////////
+        $range = 2000;
         $playersCount = 10;
+        ////////
+
         $game = GameFactory::createDebug();
-        $game->loadMap($this->createMap());
+        $game->loadMap($this->createMap($range));
         for ($i = 1; $i <= $playersCount; $i++) {
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
-            $player->getSight()->lookAt(rand(-15, 15), rand(-10, 10));
+            $player->getSight()->lookAt(rand(-1, 1), rand(-1, 1));
             $this->assertInstanceOf(PistolGlock::class, $player->getEquippedItem());
         }
-        $this->assertCount($playersCount, $game->getPlayers());
+        $players = $game->getPlayers();
+        $this->assertCount($playersCount, $players);
 
         $timer = new Timer();
         $timer->start();
-        foreach ($game->getPlayers() as $player) {
+        foreach ($players as $player) {
             $player->attack();
         }
         $game->tick(0);
         $took = $timer->stop();
         $this->assertSame(0, $game->getTickId());
 
-        foreach ($game->getPlayers() as $player) {
+        foreach ($players as $player) {
             $glock = $player->getEquippedItem();
             $this->assertInstanceOf(PistolGlock::class, $glock);
             $this->assertSame(PistolGlock::magazineCapacity - 1, $glock->getAmmo());
         }
-        $this->assertLessThan(150, $took->asMilliseconds()); // TODO do it consistently with 10 players under 10ms :)
+        $this->assertGreaterThanOrEqual($range, PistolGlock::range);
+        $this->assertLessThan(100, $took->asMilliseconds());
     }
 
-    private function createMap(): Map
+    private function createMap(int $depth = 2000): Map
     {
-        return new class extends BoxMap {
+        return new class($depth) extends BoxMap {
             private Box $boundary;
 
-            public function __construct()
+            public function __construct(int $depth)
             {
-                $this->boundary = new Box(new Point(1, 1, 1), 1100, 2000, 2000);
-                for ($i = 100; $i <= 4000; $i += 100) {
-                    $this->addBox(new Box(new Point(10, 1, $i), 10, 400, 100));
-                    $this->addBox(new Box(new Point(1190, 10, $i), 10, 400, 100));
+                $this->boundary = new Box(new Point(1, 1, 1), 1100, 1500, $depth);
+                $this->addBox($this->boundary);
+                for ($i = 100; $i <= $depth; $i += 100) {
+                    $this->addBox(new Box(new Point(10, 1, $i), 10, 1400, 90));
+                    $this->addBox(new Box(new Point(1090, 10, $i), 10, 1400, 90));
                 }
             }
 
@@ -68,6 +83,11 @@ class PerformanceTest extends BaseTestCase
             public function getPlantArea(): Box
             {
                 return $this->boundary;
+            }
+
+            public function getSpawnRotationAttacker(): int
+            {
+                return 0;
             }
 
             public function getSpawnPositionAttacker(): array

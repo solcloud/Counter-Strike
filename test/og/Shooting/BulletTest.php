@@ -41,7 +41,6 @@ class BulletTest extends BaseTestCase
         $hitTarget = $result->getHits()[0];
         $this->assertTrue(($hitTarget instanceof Wall || $hitTarget instanceof Floor), "Angles [{$angleHorizontal},{$angleVertical}]");
         $this->assertGreaterThanOrEqual($gunHeight, $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
-        $this->assertLessThan(sqrt(pow($gunHeight, 2) + pow($gunHeight, 2)), $result->getBullet()->getDistanceTraveled(), "Angles [{$angleHorizontal},{$angleVertical}]");
         if ($angleVertical < 0) {
             $this->assertLessThan($spawn->y + $gunHeight, $result->getBullet()->getPosition()->y, "Angles [{$angleHorizontal},{$angleVertical}]");
         } elseif ($angleVertical === 0) {
@@ -54,11 +53,11 @@ class BulletTest extends BaseTestCase
         }
 
         if (($angleHorizontal > 0 && $angleHorizontal < 90) || $angleHorizontal > 270) {
-            $this->assertGreaterThan($spawn->z, $result->getBullet()->getPosition()->z, "Angles [{$angleHorizontal},{$angleVertical}]");
+            $this->assertGreaterThanOrEqual($spawn->z, $result->getBullet()->getPosition()->z, "Angles [{$angleHorizontal},{$angleVertical}]");
         } elseif ($angleHorizontal === 0) {
             $this->assertSame($spawn->x, $result->getBullet()->getPosition()->x, "Angles [{$angleHorizontal},{$angleVertical}]");
         } else {
-            $this->assertLessThan($spawn->z, $result->getBullet()->getPosition()->z, "Angles [{$angleHorizontal},{$angleVertical}]");
+            $this->assertLessThanOrEqual($spawn->z, $result->getBullet()->getPosition()->z, "Angles [{$angleHorizontal},{$angleVertical}]");
         }
         return $result;
     }

@@ -4,9 +4,13 @@ namespace Test\Shooting;
 
 use cs\Core\GameProperty;
 use cs\Core\Player;
+use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\SoundType;
+use cs\Event\SoundEvent;
 use cs\Weapon\Knife;
+use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolP250;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
@@ -27,6 +31,43 @@ class SimpleShootTest extends BaseTestCase
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
         $this->assertSame(29, $ak->getAmmo());
+    }
+
+    public function testVerticalShooting(): void
+    {
+        $playerCommands = [
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $p->getSight()->lookAt(45, -89),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+            },
+            $this->endGame(),
+        ];
+
+        $game = $this->createNoPauseGame();
+        $hitEvent = null;
+        $game->onEvents(function (array $events) use (&$hitEvent) {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::BULLET_HIT) {
+                    if ($hitEvent) {
+                        $this->fail('Sound more than once?');
+                    }
+                    $hitEvent = $event;
+                }
+            }
+        });
+
+        $this->playPlayer($game, $playerCommands);
+        $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertInstanceOf(SoundEvent::class, $hitEvent);
+        $this->assertSame(SoundType::BULLET_HIT, $hitEvent->type);
+        $this->assertSame(0, $hitEvent->position->y);
+        $this->assertGreaterThanOrEqual(1, $hitEvent->position->x);
+        $this->assertGreaterThanOrEqual(1, $hitEvent->position->z);
+        $this->assertLessThanOrEqual(2, $hitEvent->position->x);
+        $this->assertLessThanOrEqual(2, $hitEvent->position->z);
     }
 
     public function testReloadOneBulletFromAk(): void

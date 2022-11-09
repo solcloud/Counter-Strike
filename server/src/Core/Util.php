@@ -302,9 +302,12 @@ final class Util
         } elseif ($angleVertical === -90) {
             return [0, -$distance, 0];
         } else {
-            [$x, $z] = self::horizontalMovementXZ($angleHorizontal, $distance);
-            $y = (int)round($distance * Util::sine($angleVertical));
-            return [$x, $y, $z];
+            $y = $distance * self::sine($angleVertical);
+            $z = (int)round(sqrt($distance * $distance - $y * $y));
+            $y = (int)round($y);
+
+            [$xNew, $zNew] = Util::rotatePointY($angleHorizontal, 0, $z);
+            return [$xNew, $y, $zNew];
         }
     }
 
