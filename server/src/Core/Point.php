@@ -83,6 +83,14 @@ class Point
         return $this;
     }
 
+    public function set(int $x, int $y, int $z): self
+    {
+        $this->x = $x;
+        $this->y = $y;
+        $this->z = $z;
+        return $this;
+    }
+
     public function __toString(): string
     {
         return "Point({$this->x},{$this->y},{$this->z})";

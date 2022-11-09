@@ -192,7 +192,7 @@ class World
         foreach ($this->dropItems as $key => $dropItem) {
             if (!Collision::cylinderWithCylinder(
                 $dropItem->getPosition(), $dropItem->getBoundingRadius(), $dropItem->getHeight(),
-                $player->getPositionImmutable(), $player->getBoundingRadius(), $player->getHeadHeight()
+                $player->getReferenceToPosition(), $player->getBoundingRadius(), $player->getHeadHeight()
             )) {
                 continue;
             }
@@ -254,7 +254,7 @@ class World
         $candidate = $start->clone();
         for ($distance = $observer->getBoundingRadius(); $distance <= $maximumDistance; $distance++) {
             [$x, $y, $z] = Util::movementXYZ($angleHorizontal, $angleVertical, $distance);
-            $candidate->setX($start->x + $x)->setY($start->y + $y)->setZ($start->z + $z);
+            $candidate->set($start->x + $x, $start->y + $y, $start->z + $z);
             if ($candidate->equals($prevPos)) {
                 continue;
             }
@@ -351,7 +351,7 @@ class World
             return false;
         }
 
-        return Collision::pointWithBox($player->getPositionImmutable(), $this->getMap()->getPlantArea());
+        return Collision::pointWithBox($player->getReferenceToPosition(), $this->getMap()->getPlantArea());
     }
 
     public function canBuy(Player $player): bool
@@ -360,7 +360,7 @@ class World
             return false;
         }
 
-        return Collision::pointWithBox($player->getPositionImmutable(), $this->getMap()->getBuyArea($player->isPlayingOnAttackerSide()));
+        return Collision::pointWithBox($player->getReferenceToPosition(), $this->getMap()->getBuyArea($player->isPlayingOnAttackerSide()));
     }
 
     public function getTickId(): int

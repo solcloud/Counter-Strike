@@ -248,6 +248,9 @@ export class Game {
         const player = this.players[playerId]
         player.get3DObject().getObjectByName('head').add(camera)
         player.get3DObject().visible = false
+        if (this.playerSpectate.isAlive()) {
+            this.playerSpectate.get3DObject().visible = true
+        }
         this.playerSpectate = player
     }
 

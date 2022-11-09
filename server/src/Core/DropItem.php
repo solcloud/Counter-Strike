@@ -29,7 +29,7 @@ class DropItem
         $lastCandidate = $candidate->clone();
         for ($t = $playerRadius; $t <= $distance; $t++) {
             [$x, $y, $z] = Util::movementXYZ($horizontalAngle, $verticalAngle, $t);
-            $candidate->setX($start->x + $x)->setY($start->y + $y)->setZ($start->z + $z);
+            $candidate->set($start->x + $x, $start->y + $y, $start->z + $z);
             if ($candidate->equals($lastCandidate)) {
                 continue;
             }

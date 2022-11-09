@@ -60,7 +60,11 @@ class Collision
             return false;
         }
 
-        return self::pointWithCircle($point->x, $point->z, $cylinderBottomCenter->x, $cylinderBottomCenter->z, $cylinderRadius);
+        return (
+            pow($point->x - $cylinderBottomCenter->x, 2) + pow($point->z - $cylinderBottomCenter->z, 2)
+            <=
+            $cylinderRadius * $cylinderRadius
+        );
     }
 
     public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, Point2D $pointB, int $planeWidthB, int $planeHeightB): bool

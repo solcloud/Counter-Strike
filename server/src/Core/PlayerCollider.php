@@ -56,23 +56,17 @@ class PlayerCollider
         }
     }
 
-    private function maybeIntersect(Bullet $bullet): bool
-    {
-        if (!$this->player->isAlive()) {
-            return false;
-        }
-
-        return Collision::pointWithCylinder(
-            $bullet->getPosition(),
-            $this->player->getPositionImmutable(),
-            $this->player->getBoundingRadius(),
-            $this->player->getHeadHeight()
-        );
-    }
-
     public function tryHitPlayer(Bullet $bullet): ?Hittable
     {
-        if (!$this->maybeIntersect($bullet)) {
+        if (!$this->player->isAlive()) {
+            return null;
+        }
+        if (!Collision::pointWithCylinder(
+            $bullet->getPosition(),
+            $this->player->getReferenceToPosition(),
+            $this->player->getBoundingRadius(),
+            $this->player->getHeadHeight()
+        )) {
             return null;
         }
 
@@ -98,7 +92,7 @@ class PlayerCollider
         }
 
         return Collision::cylinderWithCylinder(
-            $this->player->getPositionImmutable(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
+            $this->player->getReferenceToPosition(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
             $point, $radius, $height
         );
     }

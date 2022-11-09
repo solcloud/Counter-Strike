@@ -32,12 +32,16 @@ final class AttackEvent
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide);
         $result = new AttackResult($bullet);
 
-        $prevPos = new Point();
+        $newPos = $this->origin->clone();
+        $prevPos = $newPos->clone();
         while ($bullet->isActive()) {
-            $newPos = $this->nextPosition($bullet);
+            $bullet->incrementDistance();
+            [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $bullet->getDistanceTraveled());
+            $newPos->set($this->origin->x + $x, $this->origin->y + $y, $this->origin->z + $z);
             if ($newPos->equals($prevPos)) {
                 continue;
             }
+
             $prevPos->setFrom($newPos);
             $bullet->move($newPos);
             $hits = $this->world->calculateHits($bullet);
@@ -73,16 +77,6 @@ final class AttackEvent
         }
 
         GameException::notImplementedYet("No bullet for item: " . get_class($this->item));
-    }
-
-    private function nextPosition(Bullet $bullet): Point
-    {
-        $bullet->incrementDistance();
-
-        [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $bullet->getDistanceTraveled());
-        $target = $this->origin->clone();
-        $target->addPart($x, $y, $z);
-        return $target;
     }
 
     public function getTickId(): int
