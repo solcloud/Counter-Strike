@@ -36,8 +36,7 @@ class Ramp
 
         $point = $stairsGrowingUp ? $lowerLeftPoint->clone() : $lowerLeftPoint->clone()->addY(-$heightSum);
         for ($step = 0; $step < $stepCount; $step++) {
-            // todo use only walls and floors for fewer walls and floors or use box $sides param
-            $this->boxes[] = new Box($point->clone(), $width, $heightSum, $depth);
+            $this->boxes[] = new Box($point->clone(), $width, $heightSum, $depth); // fixme: use smallest amount of just walls and floors instead of box
 
             $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight;
             if ($direction->x <> 0) {
@@ -51,7 +50,7 @@ class Ramp
     /**
      * @return Box[]
      */
-    public function getBoxes(): array
+    public function getBoxes(): array // fixme: migrate to walls and floors
     {
         return $this->boxes;
     }

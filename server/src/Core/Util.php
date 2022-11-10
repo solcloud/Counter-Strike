@@ -258,7 +258,10 @@ final class Util
      */
     public static function horizontalMovementXZ(int $angle, int $distance): array
     {
-        $angle = self::normalizeAngle($angle);
+        $angle = $angle % 360;
+        if ($angle < 0) {
+            $angle = 360 + $angle;
+        }
 
         if ($angle === 0) {
             return [0, $distance];
@@ -326,10 +329,13 @@ final class Util
      */
     public static function rotatePointY(int $angle, int $x, int $z, int $centerX = 0, int $centerZ = 0, bool $clockWise = true): array
     {
-        $newX = $centerX + (int)round(self::cos($angle) * ($x - $centerX) + self::sin($angle) * ($z - $centerZ));
-        $newZ = $centerZ + (int)round(($clockWise ? -1 : 1) * self::sin($angle) * ($x - $centerX) + self::cos($angle) * ($z - $centerZ));
+        $sin = self::sin($angle);
+        $cos = self::cos($angle);
 
-        return [$newX, $newZ];
+        return [
+            $centerX + (int)round($cos * ($x - $centerX) + $sin * ($z - $centerZ)),
+            $centerZ + (int)round(($clockWise ? -1 : 1) * $sin * ($x - $centerX) + $cos * ($z - $centerZ)),
+        ];
     }
 
 }

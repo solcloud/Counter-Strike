@@ -20,7 +20,7 @@
         ]
     },
     "require": {
-        "php": "8.1.*",
+        "php": ">=8.1",
         "ext-sockets": "*",
 
         "clue/socket-raw": "1.6.0",

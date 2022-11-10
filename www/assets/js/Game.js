@@ -121,6 +121,9 @@ export class Game {
                 this.dropFeedback(data.item)
             }
         }
+        if (data.type === SoundType.BOMB_DEFUSED) {
+            this.#bombDefused()
+        }
 
         let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerSpectate.getId())
         if (!soundName) {
@@ -161,7 +164,7 @@ export class Game {
         this.#bombTimerId = bombTimerId
     }
 
-    bombDefused() {
+    #bombDefused() {
         clearInterval(this.#bombTimerId)
     }
 

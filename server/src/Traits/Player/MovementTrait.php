@@ -155,7 +155,7 @@ trait MovementTrait
         $candidate = $target->clone();
         for ($i = 1; $i <= $distanceTarget; $i++) {
             [$x, $z] = Util::horizontalMovementXZ($angle, $i);
-            $candidate->setX($orig->x + $x)->setZ($orig->z + $z); // TODO check or better enforce that candidate is growing only max by 1 from previous target
+            $candidate->setX($orig->x + $x)->setZ($orig->z + $z);
             if ($candidate->equals($target)) {
                 continue;
             }

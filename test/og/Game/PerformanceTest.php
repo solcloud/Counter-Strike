@@ -6,6 +6,7 @@ use cs\Core\Box;
 use cs\Core\GameFactory;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Map\BoxMap;
 use cs\Map\Map;
@@ -24,7 +25,7 @@ class PerformanceTest extends BaseTestCase
         }
     }
 
-    public function test1(): void
+    public function testPlayersRangeShooting(): void
     {
         ////////
         $range = 2000;
@@ -36,7 +37,13 @@ class PerformanceTest extends BaseTestCase
         for ($i = 1; $i <= $playersCount; $i++) {
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
-            $player->getSight()->lookAt(rand(-1, 1), rand(-1, 1));
+            if ($i === 1) {
+                $player->getSight()->lookAt(0, 0);
+            } elseif ($i < ceil($playersCount / 2)) {
+                $player->getSight()->lookAt(-1, -1);
+            } else {
+                $player->getSight()->lookAt(1, 1);
+            }
             $this->assertInstanceOf(PistolGlock::class, $player->getEquippedItem());
         }
         $players = $game->getPlayers();
@@ -57,7 +64,68 @@ class PerformanceTest extends BaseTestCase
             $this->assertSame(PistolGlock::magazineCapacity - 1, $glock->getAmmo());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(100, $took->asMilliseconds());
+        $this->assertLessThan(90, $took->asMilliseconds());
+    }
+
+    public function test3DMovement(): void
+    {
+        $maxDistance = 1000;
+        $coordinates = [];
+
+        $timer = new Timer();
+        $timer->start();
+        for ($distance = 1; $distance <= $maxDistance; $distance++) {
+            $coordinates[] = Util::movementXYZ(42, 42, $distance);
+        }
+        $took = $timer->stop();
+        $this->assertSame([497, 669, 552], $coordinates[$maxDistance - 1]);
+
+        // Check if coordinates grow only by max one unit from previous
+        $prev = [0, 0, 0];
+        foreach ($coordinates as $test) {
+            [$x, $y, $z] = $test;
+            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
+                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
+            }
+            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
+                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
+            }
+            if (false === ($prev[2] === $z || $prev[2] + 1 === $z)) {
+                $this->fail("Z grows more than 1 unit, from '{$prev[0]}' to '{$z}'");
+            }
+            $prev = $test;
+        }
+
+        $this->assertLessThan(820, $took->asMicroseconds());
+    }
+
+    public function test2DMovement(): void
+    {
+        $maxDistance = 1000;
+        $coordinates = [];
+
+        $timer = new Timer();
+        $timer->start();
+        for ($distance = 1; $distance <= $maxDistance; $distance++) {
+            $coordinates[] = Util::horizontalMovementXZ(42, $distance);
+        }
+        $took = $timer->stop();
+        $this->assertSame([669, 743], $coordinates[$maxDistance - 1]);
+
+        // Check if coordinates grow only by max one unit from previous
+        $prev = [0, 0];
+        foreach ($coordinates as $test) {
+            [$x, $y] = $test;
+            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
+                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
+            }
+            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
+                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
+            }
+            $prev = $test;
+        }
+
+        $this->assertLessThan(380, $took->asMicroseconds());
     }
 
     private function createMap(int $depth = 2000): Map
