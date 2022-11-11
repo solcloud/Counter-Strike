@@ -184,7 +184,7 @@ class World
 
     public function addPlayerCollider(PlayerCollider $player): void
     {
-        $this->playersColliders[] = $player;
+        $this->playersColliders[$player->getPlayerId()] = $player;
     }
 
     public function tryPickDropItems(Player $player): void
@@ -286,8 +286,8 @@ class World
         $alreadyHitPlayerIds = $bullet->getPlayerHitIds();
         $alreadyHitPlayerIds[$bullet->getOriginPlayerId()] = true; // cannot shoot self
 
-        foreach ($this->playersColliders as $playerCollider) {
-            if (isset($alreadyHitPlayerIds[$playerCollider->getPlayerId()])) {
+        foreach ($this->playersColliders as $playerId => $playerCollider) {
+            if (isset($alreadyHitPlayerIds[$playerId])) {
                 continue; // player already hit or self
             }
 

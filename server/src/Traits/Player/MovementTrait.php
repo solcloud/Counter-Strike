@@ -148,13 +148,14 @@ trait MovementTrait
                 $angle += -90;
             }
         }
+        $angle = Util::normalizeAngle($angle);
 
         $looseFloor = false;
         $orig = $current->clone();
         $target = $orig->clone();
         $candidate = $target->clone();
         for ($i = 1; $i <= $distanceTarget; $i++) {
-            [$x, $z] = Util::horizontalMovementXZ($angle, $i);
+            [$x, $z] = Util::movementXZ($angle, $i);
             $candidate->setX($orig->x + $x)->setZ($orig->z + $z);
             if ($candidate->equals($target)) {
                 continue;

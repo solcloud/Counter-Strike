@@ -96,7 +96,7 @@ class PerformanceTest extends BaseTestCase
             $prev = $test;
         }
 
-        $this->assertLessThan(820, $took->asMicroseconds());
+        $this->assertLessThan(490, $took->asMicroseconds());
     }
 
     public function test2DMovement(): void
@@ -107,7 +107,7 @@ class PerformanceTest extends BaseTestCase
         $timer = new Timer();
         $timer->start();
         for ($distance = 1; $distance <= $maxDistance; $distance++) {
-            $coordinates[] = Util::horizontalMovementXZ(42, $distance);
+            $coordinates[] = Util::movementXZ(42, $distance);
         }
         $took = $timer->stop();
         $this->assertSame([669, 743], $coordinates[$maxDistance - 1]);
@@ -125,7 +125,7 @@ class PerformanceTest extends BaseTestCase
             $prev = $test;
         }
 
-        $this->assertLessThan(380, $took->asMicroseconds());
+        $this->assertLessThan(310, $took->asMicroseconds());
     }
 
     private function createMap(int $depth = 2000): Map

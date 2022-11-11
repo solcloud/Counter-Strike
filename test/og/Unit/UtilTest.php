@@ -28,15 +28,15 @@ class UtilTest extends BaseTest
     public function testHorizontalMovementXZ(): void
     {
         $hypotenuse = 15;
-        $this->assertSame([0, 15], Util::horizontalMovementXZ(0, $hypotenuse));
-        $this->assertSame([11, 11], Util::horizontalMovementXZ(45, $hypotenuse));
-        $this->assertSame([15, 0], Util::horizontalMovementXZ(90, $hypotenuse));
-        $this->assertSame([11, -11], Util::horizontalMovementXZ(135, $hypotenuse));
-        $this->assertSame([0, -15], Util::horizontalMovementXZ(180, $hypotenuse));
-        $this->assertSame([-11, -11], Util::horizontalMovementXZ(225, $hypotenuse));
-        $this->assertSame([-15, 0], Util::horizontalMovementXZ(270, $hypotenuse));
-        $this->assertSame([-11, 11], Util::horizontalMovementXZ(315, $hypotenuse));
-        $this->assertSame([0, 15], Util::horizontalMovementXZ(359, $hypotenuse));
+        $this->assertSame([0, 15], Util::movementXZ(0, $hypotenuse));
+        $this->assertSame([11, 11], Util::movementXZ(45, $hypotenuse));
+        $this->assertSame([15, 0], Util::movementXZ(90, $hypotenuse));
+        $this->assertSame([11, -11], Util::movementXZ(135, $hypotenuse));
+        $this->assertSame([0, -15], Util::movementXZ(180, $hypotenuse));
+        $this->assertSame([-11, -11], Util::movementXZ(225, $hypotenuse));
+        $this->assertSame([-15, 0], Util::movementXZ(270, $hypotenuse));
+        $this->assertSame([-11, 11], Util::movementXZ(315, $hypotenuse));
+        $this->assertSame([0, 15], Util::movementXZ(359, $hypotenuse));
     }
 
     public function testCubeDiagonalMovement(): void
