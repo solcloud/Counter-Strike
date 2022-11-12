@@ -20,27 +20,31 @@ This is NO violence game so there is no blood or violence visuals.
 
 ## Setup
 
+### Server
+
 Currently, there is no official public server available (as match making service is also WIP), but you can run server locally (or somebody can host it for you).
 
 ```bash
 git clone https://github.com/solcloud/Counter-Strike cs-football
 cd cs-football
-composer install --no-dev
+composer install --no-dev -a
 php cli/server.php 2 # will start server waiting for 2 players to connect
 ```
 
-For connecting using Web Browser you need WebSocket UDP bridge
+### Client
 
-```bash
-php cli/udp-ws-bridge.php 8081 # will start WebSocket listener on localhost:8081
-```
-
-For better performance (no UDP bridge required) download Electron app for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or run locally
+Download executable binary for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or run locally from project source folder.
 
 ```bash
 cd electron/
 npm install
 npm run dev
+```
+
+Or you can connect using Web Browser, but for that you will need WebSocket UDP bridge.
+
+```bash
+php cli/udp-ws-bridge.php 8081 # will start WebSocket listener on localhost:8081
 ```
 
 ### NOT going to implement

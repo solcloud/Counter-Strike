@@ -31,12 +31,13 @@ final class AttackEvent
         $bullet = $this->createBullet();
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide);
         $result = new AttackResult($bullet);
+        $checkDistance = $bullet->getDistanceTraveled();
 
         $newPos = $this->origin->clone();
         $prevPos = $newPos->clone();
         while ($bullet->isActive()) {
-            $bullet->incrementDistance();
-            [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $bullet->getDistanceTraveled());
+            $distance = $bullet->incrementDistance();
+            [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $distance);
             $newPos->set($this->origin->x + $x, $this->origin->y + $y, $this->origin->z + $z);
             if ($newPos->equals($prevPos)) {
                 continue;
@@ -44,6 +45,10 @@ final class AttackEvent
 
             $prevPos->setFrom($newPos);
             $bullet->move($newPos);
+            if ($distance > $checkDistance) {
+                $checkDistance *= 4;
+                $this->world->optimizeBulletHitCheck($bullet, $this->angleHorizontal, $this->angleVertical);
+            }
             $hits = $this->world->calculateHits($bullet);
             if ($hits === []) {
                 continue;

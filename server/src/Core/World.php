@@ -100,15 +100,13 @@ class World
             return new Wall(new Point(-1, -1, -1), $point->z < 0);
         }
 
-        $candidateZ = $point->to2D('xy');
         foreach (($this->walls[self::WALL_Z][$point->z] ?? []) as $wall) {
-            if ($wall->intersect($candidateZ)) {
+            if ($wall->intersect($point)) {
                 return $wall;
             }
         }
-        $candidateX = $point->to2D('zy');
         foreach (($this->walls[self::WALL_X][$point->x] ?? []) as $wall) {
-            if ($wall->intersect($candidateX)) {
+            if ($wall->intersect($point)) {
                 return $wall;
             }
         }
@@ -122,19 +120,18 @@ class World
             throw new GameException("Y value cannot be lower than zero");
         }
 
-        $floors = $this->floors[$point->getY()] ?? [];
+        $floors = $this->floors[$point->y] ?? [];
         if ($floors === []) {
             return null;
         }
-        $candidate = $point->to2D('xz');
         for ($r = 0; $r <= $radius; $r++) {
             foreach ($floors as $floor) {
-                if ($floor->intersect($candidate, $r)) {
+                if ($floor->intersect($point, $r)) {
                     return $floor;
                 }
             }
             if ($r > 3 && $r < $radius) {
-                $r = min($r + 8, $radius - 1);
+                $r = min($r + 9, $radius - 1);
             }
         }
 
@@ -277,18 +274,74 @@ class World
         return false;
     }
 
+    public function optimizeBulletHitCheck(Bullet $bullet, float $angleHorizontal, float $angleVertical): void
+    {
+        $bp = $bullet->getPosition();
+        $skipPlayerIds = $bullet->getPlayerSkipIds();
+        foreach ($this->game->getPlayers() as $playerId => $player) {
+            if (isset($skipPlayerIds[$playerId])) {
+                continue;
+            }
+            if (!$player->isAlive()) {
+                $bullet->addPlayerIdSkip($playerId);
+                continue;
+            }
+
+            $pp = $player->getReferenceToPosition();
+
+            // Vertical Y optimization
+            if ($angleVertical >= 0) {
+                if ($pp->y + $player->getHeadHeight() < $bp->y) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            } else {
+                if ($pp->y >= $bp->y) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            }
+
+            $radius = $player->getBoundingRadius();
+
+            // Horizontal Z optimization
+            if ($angleHorizontal >= 270 || $angleHorizontal <= 90) {
+                if ($pp->z + $radius < $bp->z) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            } else {
+                if ($pp->z - $radius >= $bp->z) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            }
+
+            // Horizontal X optimization
+            if ($angleHorizontal >= 0 && $angleHorizontal <= 180) {
+                if ($pp->x + $radius < $bp->x) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            } else {
+                if ($pp->x - $radius >= $bp->x) {
+                    $bullet->addPlayerIdSkip($playerId);
+                    continue;
+                }
+            }
+        }
+    }
+
     /**
      * @return Hittable[]
      */
     public function calculateHits(Bullet $bullet): array
     {
         $hits = [];
-        $alreadyHitPlayerIds = $bullet->getPlayerHitIds();
-        $alreadyHitPlayerIds[$bullet->getOriginPlayerId()] = true; // cannot shoot self
-
+        $skipPlayerIds = $bullet->getPlayerSkipIds();
         foreach ($this->playersColliders as $playerId => $playerCollider) {
-            if (isset($alreadyHitPlayerIds[$playerId])) {
-                continue; // player already hit or self
+            if (isset($skipPlayerIds[$playerId])) {
+                continue;
             }
 
             $hitBox = $playerCollider->tryHitPlayer($bullet);
@@ -299,7 +352,7 @@ class World
             $hits[] = $hitBox;
             $player = $hitBox->getPlayer();
             if ($player) {
-                $bullet->addPlayerIdHit($player->getId());
+                $bullet->addPlayerIdSkip($player->getId());
                 if ($hitBox->playerWasKilled()) {
                     $this->game->playerAttackKilledEvent($player, $bullet, $hitBox->wasHeadShot());
                 }

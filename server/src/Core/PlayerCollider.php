@@ -58,10 +58,7 @@ class PlayerCollider
 
     public function tryHitPlayer(Bullet $bullet): ?Hittable
     {
-        if (!$this->player->isAlive()) {
-            return null;
-        }
-        if (!Collision::pointWithCylinder(
+        if (false === Collision::pointWithCylinder(
             $bullet->getPosition(),
             $this->player->getReferenceToPosition(),
             $this->player->getBoundingRadius(),
@@ -87,13 +84,12 @@ class PlayerCollider
 
     public function collide(Point $point, int $radius, int $height): bool
     {
-        if (!$this->player->isAlive()) {
-            return false;
-        }
-
-        return Collision::cylinderWithCylinder(
-            $this->player->getReferenceToPosition(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
-            $point, $radius, $height
+        return (
+            $this->player->isAlive() &&
+            Collision::cylinderWithCylinder(
+                $this->player->getReferenceToPosition(), $this->player->getBoundingRadius(), $this->player->getHeadHeight(),
+                $point, $radius, $height
+            )
         );
     }
 

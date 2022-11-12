@@ -1,20 +1,22 @@
 <?php
 
-namespace Test\Game;
+namespace Test\Unit;
 
 use cs\Core\Box;
 use cs\Core\GameFactory;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
+use cs\Core\Wall;
 use cs\Enum\Color;
+use cs\Event\AttackResult;
 use cs\Map\BoxMap;
 use cs\Map\Map;
 use cs\Weapon\PistolGlock;
 use SebastianBergmann\Timer\Timer;
-use Test\BaseTestCase;
+use Test\BaseTest;
 
-class PerformanceTest extends BaseTestCase
+class PerformanceTest extends BaseTest
 {
 
     protected function setUp(): void
@@ -23,6 +25,13 @@ class PerformanceTest extends BaseTestCase
         if (getenv('CI') !== false) {
             $this->markTestSkipped('CI too slow');
         }
+
+        // Warmup autoload cache
+        $game = GameFactory::createDebug();
+        $game->loadMap($this->createMap());
+        $player = new Player(1, Color::GREEN, true);
+        $game->addPlayer($player);
+        $this->assertNotNull($player->attack());
     }
 
     public function testPlayersRangeShooting(): void
@@ -49,10 +58,11 @@ class PerformanceTest extends BaseTestCase
         $players = $game->getPlayers();
         $this->assertCount($playersCount, $players);
 
+        $attackResults = [];
         $timer = new Timer();
         $timer->start();
         foreach ($players as $player) {
-            $player->attack();
+            $attackResults[] = $player->attack();
         }
         $game->tick(0);
         $took = $timer->stop();
@@ -63,13 +73,24 @@ class PerformanceTest extends BaseTestCase
             $this->assertInstanceOf(PistolGlock::class, $glock);
             $this->assertSame(PistolGlock::magazineCapacity - 1, $glock->getAmmo());
         }
+        $this->assertCount($playersCount, $attackResults);
+        foreach ($attackResults as $result) {
+            $this->assertInstanceOf(AttackResult::class, $result);
+            $hits = $result->getHits();
+            $this->assertCount(1, $hits);
+            $wall = $hits[0];
+            $this->assertInstanceOf(Wall::class, $wall);
+            $this->assertSame($range + 1, $wall->getBase());
+            $this->assertGreaterThanOrEqual($range - 50, $result->getBullet()->getDistanceTraveled());
+            $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
+        }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(90, $took->asMilliseconds());
+        $this->assertLessThan(30, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void
     {
-        $maxDistance = 1000;
+        $maxDistance = 100000;
         $coordinates = [];
 
         $timer = new Timer();
@@ -78,7 +99,7 @@ class PerformanceTest extends BaseTestCase
             $coordinates[] = Util::movementXYZ(42, 42, $distance);
         }
         $took = $timer->stop();
-        $this->assertSame([497, 669, 552], $coordinates[$maxDistance - 1]);
+        $this->assertSame([49726, 66913, 55226], $coordinates[$maxDistance - 1]);
 
         // Check if coordinates grow only by max one unit from previous
         $prev = [0, 0, 0];
@@ -96,12 +117,12 @@ class PerformanceTest extends BaseTestCase
             $prev = $test;
         }
 
-        $this->assertLessThan(490, $took->asMicroseconds());
+        $this->assertLessThan(49, $took->asMilliseconds());
     }
 
     public function test2DMovement(): void
     {
-        $maxDistance = 1000;
+        $maxDistance = 100000;
         $coordinates = [];
 
         $timer = new Timer();
@@ -110,7 +131,7 @@ class PerformanceTest extends BaseTestCase
             $coordinates[] = Util::movementXZ(42, $distance);
         }
         $took = $timer->stop();
-        $this->assertSame([669, 743], $coordinates[$maxDistance - 1]);
+        $this->assertSame([66913, 74314], $coordinates[$maxDistance - 1]);
 
         // Check if coordinates grow only by max one unit from previous
         $prev = [0, 0];
@@ -125,7 +146,7 @@ class PerformanceTest extends BaseTestCase
             $prev = $test;
         }
 
-        $this->assertLessThan(310, $took->asMicroseconds());
+        $this->assertLessThan(27, $took->asMilliseconds());
     }
 
     private function createMap(int $depth = 2000): Map

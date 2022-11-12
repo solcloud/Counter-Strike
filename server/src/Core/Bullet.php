@@ -14,7 +14,7 @@ class Bullet
     private int $damage = 1;
     private int $damageArmor = 1;
     /** @var array<int,bool> [playerId => true] */
-    private array $playerHitIds = [];
+    private array $playerSkipIds = [];
 
     public function __construct(private AttackEnable $item, private int $distanceMax = 1)
     {
@@ -31,6 +31,7 @@ class Bullet
     {
         $this->originPlayerId = $playerId;
         $this->originPlayerIsAttacker = $attackerSide;
+        $this->addPlayerIdSkip($playerId);
     }
 
     public function getPosition(): Point
@@ -63,9 +64,9 @@ class Bullet
         $this->position = $point;
     }
 
-    public function incrementDistance(): void
+    public function incrementDistance(): int
     {
-        $this->distanceTraveled++;
+        return ++$this->distanceTraveled;
     }
 
     public function getDistanceTraveled(): int
@@ -96,14 +97,14 @@ class Bullet
     /**
      * @return array<int,bool> [playerId => true]
      */
-    public function getPlayerHitIds(): array
+    public function getPlayerSkipIds(): array
     {
-        return $this->playerHitIds;
+        return $this->playerSkipIds;
     }
 
-    public function addPlayerIdHit(int $playerId): void
+    public function addPlayerIdSkip(int $playerId): void
     {
-        $this->playerHitIds[$playerId] = true;
+        $this->playerSkipIds[$playerId] = true;
     }
 
 }

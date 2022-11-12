@@ -32,9 +32,9 @@ abstract class Plane extends SolidSurface
         return parent::getHitAntiForce($point);
     }
 
-    public function intersect(Point2D $point, int $radius = 0): bool
+    public function intersect(Point $point, int $radius = 0): bool
     {
-        return Collision::circleWithPlane($point, $radius, $this);
+        return Collision::circleWithPlane($point->to2D($this->axis2d), $radius, $this);
     }
 
     public function getPoint2DStart(): Point2D

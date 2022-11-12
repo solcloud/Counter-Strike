@@ -14,7 +14,7 @@
             "@unit --coverage-html www/coverage"
         ],
         "check": [
-            "@composer dumpautoload --optimize",
+            "@composer dumpautoload --optimize --classmap-authoritative",
             "@stan",
             "@test"
         ]
