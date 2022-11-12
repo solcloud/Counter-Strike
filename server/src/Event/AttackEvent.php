@@ -6,7 +6,6 @@ use cs\Core\Bullet;
 use cs\Core\GameException;
 use cs\Core\Item;
 use cs\Core\Point;
-use cs\Core\Util;
 use cs\Core\World;
 use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\Knife;
@@ -18,8 +17,8 @@ final class AttackEvent
     public function __construct(
         private World $world,
         private Point $origin,
-        private int   $angleHorizontal,
-        private int   $angleVertical,
+        private float $angleHorizontal,
+        private float $angleVertical,
         private int   $playerId,
         private bool  $playingOnAttackerSide,
     )
@@ -33,12 +32,20 @@ final class AttackEvent
         $result = new AttackResult($bullet);
         $checkDistance = $bullet->getDistanceTraveled();
 
+        // OPTIMIZATION_1: Precalculate sin/cos
+        $sinV = sin(deg2rad($this->angleVertical));
+        $sinH = sin(deg2rad($this->angleHorizontal));
+        $cosH = cos(deg2rad($this->angleHorizontal));
+
         $newPos = $this->origin->clone();
         $prevPos = $newPos->clone();
         while ($bullet->isActive()) {
             $distance = $bullet->incrementDistance();
-            [$x, $y, $z] = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $distance);
-            $newPos->set($this->origin->x + $x, $this->origin->y + $y, $this->origin->z + $z);
+
+            // OPTIMIZATION_1: Inline Util::movementXYZ() here
+            $y = $distance * $sinV;
+            $z = (int)round(sqrt(pow($distance, 2) - pow($y, 2)));
+            $newPos->set($this->origin->x + ((int)round($sinH * $z)), $this->origin->y + ((int)round($y)), $this->origin->z + ((int)round($cosH * $z)));
             if ($newPos->equals($prevPos)) {
                 continue;
             }

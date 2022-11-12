@@ -94,6 +94,7 @@ abstract class BaseTestCase extends BaseTest
 
     protected function createTestGame(?int $tickMax = null, GameProperty $gameProperty = new GameProperty()): TestGame
     {
+        $gameProperty->randomize_spawn_position = false;
         $game = new TestGame($gameProperty);
         $game->setTickMax($tickMax ?? PHP_INT_MAX);
         $game->loadMap(new TestMap());

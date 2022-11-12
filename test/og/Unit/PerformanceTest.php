@@ -8,10 +8,12 @@ use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Core\Wall;
+use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Event\AttackResult;
 use cs\Map\BoxMap;
 use cs\Map\Map;
+use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\PistolGlock;
 use SebastianBergmann\Timer\Timer;
 use Test\BaseTest;
@@ -85,68 +87,73 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(30, $took->asMilliseconds());
+        $this->assertLessThan(24, $took->asMilliseconds());
+    }
+
+    public function testTwoPlayersRangeShootingEachOther(): void
+    {
+        ////////
+        $range = 4000;
+        ////////
+
+        $game = GameFactory::createDebug();
+        $game->loadMap($this->createMap($range));
+        $game->addPlayer(new Player(1, Color::GREEN, true));
+        $game->addPlayer(new Player(2, Color::BLUE, false));
+        $players = $game->getPlayers();
+        $this->assertCount(2, $players);
+        foreach ($players as $player) {
+            $player->getInventory()->purchase($player, BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        }
+
+        $timer = new Timer();
+        $timer->start();
+        foreach ($players as $player) {
+            $player->attack();
+        }
+        $game->tick(0);
+        $took = $timer->stop();
+
+        foreach ($players as $player) {
+            $pistol = $player->getEquippedItem();
+            $this->assertInstanceOf(AmmoBasedWeapon::class, $pistol);
+            $this->assertSame($pistol::magazineCapacity - 1, $pistol->getAmmo());
+            $this->assertGreaterThanOrEqual($range, $pistol::range);
+        }
+        foreach ($players as $player) {
+            $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
+        }
+        $this->assertLessThan(11, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void
     {
-        $maxDistance = 100000;
         $coordinates = [];
+        $maxDistance = 100000;
 
         $timer = new Timer();
         $timer->start();
         for ($distance = 1; $distance <= $maxDistance; $distance++) {
-            $coordinates[] = Util::movementXYZ(42, 42, $distance);
+            $coordinates = Util::movementXYZ(42, 42, $distance);
         }
         $took = $timer->stop();
-        $this->assertSame([49726, 66913, 55226], $coordinates[$maxDistance - 1]);
-
-        // Check if coordinates grow only by max one unit from previous
-        $prev = [0, 0, 0];
-        foreach ($coordinates as $test) {
-            [$x, $y, $z] = $test;
-            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
-                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
-            }
-            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
-                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
-            }
-            if (false === ($prev[2] === $z || $prev[2] + 1 === $z)) {
-                $this->fail("Z grows more than 1 unit, from '{$prev[0]}' to '{$z}'");
-            }
-            $prev = $test;
-        }
-
+        $this->assertSame([49726, 66913, 55226], $coordinates);
         $this->assertLessThan(49, $took->asMilliseconds());
     }
 
     public function test2DMovement(): void
     {
-        $maxDistance = 100000;
         $coordinates = [];
+        $maxDistance = 100000;
 
         $timer = new Timer();
         $timer->start();
         for ($distance = 1; $distance <= $maxDistance; $distance++) {
-            $coordinates[] = Util::movementXZ(42, $distance);
+            $coordinates = Util::movementXZ(42, $distance);
         }
         $took = $timer->stop();
-        $this->assertSame([66913, 74314], $coordinates[$maxDistance - 1]);
-
-        // Check if coordinates grow only by max one unit from previous
-        $prev = [0, 0];
-        foreach ($coordinates as $test) {
-            [$x, $y] = $test;
-            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
-                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
-            }
-            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
-                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
-            }
-            $prev = $test;
-        }
-
-        $this->assertLessThan(27, $took->asMilliseconds());
+        $this->assertSame([66913, 74314], $coordinates);
+        $this->assertLessThan(25, $took->asMilliseconds());
     }
 
     private function createMap(int $depth = 2000): Map
@@ -154,7 +161,7 @@ class PerformanceTest extends BaseTest
         return new class($depth) extends BoxMap {
             private Box $boundary;
 
-            public function __construct(int $depth)
+            public function __construct(private int $depth)
             {
                 $this->boundary = new Box(new Point(1, 1, 1), 1100, 1500, $depth);
                 $this->addBox($this->boundary);
@@ -179,6 +186,11 @@ class PerformanceTest extends BaseTest
                 return 0;
             }
 
+            public function getSpawnRotationDefender(): int
+            {
+                return 180;
+            }
+
             public function getSpawnPositionAttacker(): array
             {
                 return [
@@ -192,6 +204,13 @@ class PerformanceTest extends BaseTest
                     new Point(800, 1, 50),
                     new Point(900, 1, 50),
                     new Point(1000, 1, 50),
+                ];
+            }
+
+            public function getSpawnPositionDefender(): array
+            {
+                return [
+                    new Point(100, 1, $this->depth - 50),
                 ];
             }
 

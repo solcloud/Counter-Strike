@@ -88,4 +88,43 @@ class UtilTest extends BaseTest
         $this->assertSame(4, Util::distanceFromOrigin(new Point2D(0, 4)));
     }
 
+    public function testMovementXZOnlyGrowByMaxOfOneFromPrevious(): void
+    {
+        $prev = [0, 0];
+        for ($distance = 1; $distance <= 105123; $distance++) {
+            $test = Util::movementXZ(42, $distance);
+
+            [$x, $y] = $test;
+            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
+                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
+            }
+            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
+                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
+            }
+            $prev = $test;
+        }
+        $this->assertSame([70341, 78122], $test);
+    }
+
+    public function testMovementXYZOnlyGrowByMaxOfOneFromPrevious(): void
+    {
+        $prev = [0, 0, 0];
+        for ($distance = 1; $distance <= 105123; $distance++) {
+            $test = Util::movementXYZ(42, 42, $distance);
+
+            [$x, $y, $z] = $test;
+            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
+                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
+            }
+            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
+                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
+            }
+            if (false === ($prev[2] === $z || $prev[2] + 1 === $z)) {
+                $this->fail("Z grows more than 1 unit, from '{$prev[0]}' to '{$z}'");
+            }
+            $prev = $test;
+        }
+        $this->assertSame([52274, 70341, 58056], $test);
+    }
+
 }

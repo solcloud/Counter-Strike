@@ -2,13 +2,8 @@
 
 namespace cs\Core;
 
-use cs\Traits\Util\CosAngle;
-use cs\Traits\Util\SinAngle;
-
 final class Util
 {
-    use CosAngle;
-    use SinAngle;
 
     public static int $TICK_RATE = 20;
 
@@ -23,7 +18,7 @@ final class Util
     /**
      * @return int 0..359
      */
-    public static function normalizeAngle(int $angleDegree): int
+    public static function normalizeAngle(float $angleDegree): int
     {
         $angleDegree = $angleDegree % 360;
         if ($angleDegree < 0) {
@@ -35,26 +30,26 @@ final class Util
     /**
      * @return int[] [x, z]
      */
-    public static function movementXZ(int $angleHorizontal, int $distance): array
+    public static function movementXZ(float $angleHorizontal, int $distance): array
     {
         return [
-            (int)round(self::$sines[$angleHorizontal] * $distance),
-            (int)round(self::$cosines[$angleHorizontal] * $distance),
+            (int)round(sin(deg2rad($angleHorizontal)) * $distance),
+            (int)round(cos(deg2rad($angleHorizontal)) * $distance),
         ];
     }
 
     /**
      * @return int[] [x, y, z]
      */
-    public static function movementXYZ(int $angleHorizontal, int $angleVertical, int $distance): array
+    public static function movementXYZ(float $angleHorizontal, float $angleVertical, int $distance): array
     {
-        $y = $distance * self::$sines[$angleVertical];
+        $y = $distance * sin(deg2rad($angleVertical));
         $z = (int)round(sqrt(pow($distance, 2) - pow($y, 2)));
 
         return [
-            (int)round(self::$sines[$angleHorizontal] * $z),
+            (int)round(sin(deg2rad($angleHorizontal)) * $z),
             (int)round($y),
-            (int)round(self::$cosines[$angleHorizontal] * $z),
+            (int)round(cos(deg2rad($angleHorizontal)) * $z),
         ];
     }
 
@@ -71,10 +66,10 @@ final class Util
     /**
      * @return int[] new [$x, $z]
      */
-    public static function rotatePointY(int $angle, int $x, int $z, int $centerX = 0, int $centerZ = 0, bool $clockWise = true): array
+    public static function rotatePointY(float $angle, int $x, int $z, int $centerX = 0, int $centerZ = 0, bool $clockWise = true): array
     {
-        $sin = self::$sines[$angle];
-        $cos = self::$cosines[$angle];
+        $sin = sin(deg2rad($angle));
+        $cos = cos(deg2rad($angle));
 
         return [
             $centerX + (int)round($cos * ($x - $centerX) + $sin * ($z - $centerZ)),

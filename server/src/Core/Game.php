@@ -166,6 +166,7 @@ class Game
         $player->getInventory()->earnMoney($this->properties->start_money);
         $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
         $player->setPosition($spawnPosition);
+        $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(),  $this->properties->randomize_spawn_position ? 80 : 0));
 
         $this->players[$player->getId()] = $player;
         $this->world->addPlayerCollider(new PlayerCollider($player));

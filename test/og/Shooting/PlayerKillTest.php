@@ -190,10 +190,9 @@ class PlayerKillTest extends BaseTestCase
     public function testPlayerCanDodgeBulletByCrouch(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->getSight()->lookAt(180, 0);
-
         $game = $this->createGame();
         $game->addPlayer($player2);
+        $player2->getSight()->lookAt(180, 0);
         $game->getPlayer(1)->crouch();
 
         for ($i = 1; $i <= Setting::tickCountCrouch(); $i++) {
@@ -212,13 +211,13 @@ class PlayerKillTest extends BaseTestCase
     public function testPlayerCanDodgeBulletByCrouchWithAngleDown(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->getSight()->lookAt(180, -18);
 
         $game = $this->createTestGame();
         $game->addPlayer($player2);
         $game->getPlayer(1)->crouch();
 
         $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(180, -18),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
@@ -238,7 +237,6 @@ class PlayerKillTest extends BaseTestCase
     public function testPlayerVerticalBullet(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->getSight()->lookAt(180, -20);
 
         $game = $this->createTestGame();
         $game->getPlayer(1)->crouch();
@@ -246,6 +244,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition((new Point())->addZ(200));
 
         $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(180, -20),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
@@ -266,7 +265,6 @@ class PlayerKillTest extends BaseTestCase
     public function testPlayerHorizontalVerticalBullet(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->getSight()->lookAt(209, -19);
 
         $game = $this->createTestGame();
         $game->getPlayer(1)->crouch();
@@ -274,6 +272,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition(new Point(100, 0, 200));
 
         $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(209, -19),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
@@ -295,13 +294,13 @@ class PlayerKillTest extends BaseTestCase
     {
         $player2 = new Player(2, Color::GREEN, false);
         $player2->crouch();
-        $player2->getSight()->lookAt(207, 6);
 
         $game = $this->createTestGame();
         $game->addPlayer($player2);
         $player2->setPosition(new Point(100, 0, 200));
 
         $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(207, 6),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),
@@ -323,7 +322,6 @@ class PlayerKillTest extends BaseTestCase
     {
         $player2 = new Player(2, Color::GREEN, false);
         $player2->crouch();
-        $player2->getSight()->lookAt(47, 6);
 
         $game = $this->createTestGame();
         $game->getPlayer(1)->setPosition(new Point(1440, 0, 1457));
@@ -331,6 +329,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition(new Point(989, 0, 1037));
 
         $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->lookAt(47, 6),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),
