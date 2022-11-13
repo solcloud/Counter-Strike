@@ -56,15 +56,11 @@ final class AttackEvent
             $prevPos->setFrom($newPos);
             $bullet->move($newPos);
             if ($distance > $checkDistance) {
-                $checkDistance *= 4;
+                $checkDistance *= 3;
                 $this->world->optimizeBulletHitCheck($bullet, $this->angleHorizontal, $this->angleVertical);
             }
-            $hits = $this->world->calculateHits($bullet);
-            if ($hits === []) {
-                continue;
-            }
 
-            foreach ($hits as $hit) {
+            foreach ($this->world->calculateHits($bullet) as $hit) {
                 $bullet->lowerDamage($hit->getHitAntiForce($newPos));
                 $result->addHit($hit);
                 $this->world->bulletHit($hit, $bullet, $hit->wasHeadShot());

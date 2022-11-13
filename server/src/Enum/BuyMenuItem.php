@@ -18,7 +18,7 @@ enum BuyMenuItem: int
     case PISTOL_GLOCK = 11;
     case KEVLAR_BODY = 12;
     case GRENADE_INCENDIARY = 13;
-    case KNIFE = 14;
+    case DEFUSE_KIT = 14;
 
 
 }

@@ -45,6 +45,7 @@ class BuyMenu
             BuyMenuItem::GRENADE_HE => new Equipment\HighExplosive(),
             BuyMenuItem::GRENADE_MOLOTOV => $this->forAttackerStore ? new Equipment\Molotov() : null,
             BuyMenuItem::GRENADE_INCENDIARY => !$this->forAttackerStore ? new Equipment\Incendiary() : null,
+            BuyMenuItem::DEFUSE_KIT => !$this->forAttackerStore ? new Equipment\DefuseKit() : null,
             BuyMenuItem::KEVLAR_BODY_AND_HEAD => new Equipment\Kevlar(true),
             BuyMenuItem::KEVLAR_BODY => new Equipment\Kevlar(false),
             default => throw new GameException("Unknown buy request for side '{$this->forAttackerStore}' and item '{$buyCandidate->name}'"),

@@ -106,6 +106,9 @@ const BuyMenuItem = {
     PISTOL_P250: 9,
     KEVLAR_BODY_AND_HEAD: 10,
     PISTOL_GLOCK: 11,
+    KEVLAR_BODY: 12,
+    GRENADE_INCENDIARY: 13,
+    DEFUSE_KIT: 14,
 }
 
 // server/src/Enum/InventorySlot.php

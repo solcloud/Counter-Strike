@@ -4,7 +4,7 @@ namespace cs\Core;
 
 abstract class Plane extends SolidSurface
 {
-    private const PLANE_WALL_BANG_EDGE_MARGIN = 14;
+    private const PLANE_WALL_BANG_EDGE_MARGIN = 8;
 
     private Point2D $point2DStart;
     private Point2D $point2DEnd;

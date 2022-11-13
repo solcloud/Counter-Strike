@@ -21,6 +21,11 @@ export class BuyMenu {
             <p class="title">${teamName} Buy Store. Your money balance $ <strong>${money}</strong></p>
             <h3>Equipment</h3>
             <p${money < 1000 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.KEVLAR_BODY_AND_HEAD}" class="hud-action action-buy">Buy Kevlar + Helmet for $ 1,000</a></p>
+            <p${money < 650 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.KEVLAR_BODY}" class="hud-action action-buy">Buy Kevlar for $ 650</a></p>
+            ${isAttacker
+            ? ``
+            : `<p${money < 400 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.DEFUSE_KIT}" class="hud-action action-buy">Buy Defuse Kit for $ 400</a></p>`
+        }
             <h3>Pistols</h3>
         ${isAttacker
             ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.PISTOL_GLOCK}" class="hud-action action-buy">Buy Glock for $ 200</a></p>`

@@ -13,6 +13,7 @@ use cs\Enum\Color;
 use cs\Event\AttackResult;
 use cs\Map\BoxMap;
 use cs\Map\Map;
+use cs\Map\TestMap;
 use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\PistolGlock;
 use SebastianBergmann\Timer\Timer;
@@ -21,19 +22,30 @@ use Test\BaseTest;
 class PerformanceTest extends BaseTest
 {
 
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
+        parent::setUpBeforeClass();
         if (getenv('CI') !== false) {
-            $this->markTestSkipped('CI too slow');
+            self::markTestSkipped('CI too slow');
         }
 
-        // Warmup autoload cache
+        $sum = 0;
+        $timer = new Timer();
+        $timer->start();
+        for ($i = 0; $i < 1231234; $i++) {
+            $sum -= $sum;
+        }
+        $took = $timer->stop();
+        if ($took->asMicroseconds() > 8000) {
+            self::markTestSkipped('Performance test skipped');
+        }
+
+        // Warmup cache
         $game = GameFactory::createDebug();
-        $game->loadMap($this->createMap());
+        $game->loadMap(new TestMap());
         $player = new Player(1, Color::GREEN, true);
         $game->addPlayer($player);
-        $this->assertNotNull($player->attack());
+        self::assertNotNull($player->attack());
     }
 
     public function testPlayersRangeShooting(): void
@@ -87,7 +99,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(24, $took->asMilliseconds());
+        $this->assertLessThan(22, $took->asMilliseconds());
     }
 
     public function testTwoPlayersRangeShootingEachOther(): void
@@ -130,6 +142,7 @@ class PerformanceTest extends BaseTest
     {
         ////////
         $range = 2000;
+        $tickCount = 4;
         $playersCount = 10;
         ////////
 
@@ -146,18 +159,20 @@ class PerformanceTest extends BaseTest
 
         $timer = new Timer();
         $timer->start();
-        foreach ($players as $player) {
-            $player->jump();
-            $player->moveForward();
+        for ($i = 0; $i < $tickCount; $i++) {
+            foreach ($players as $player) {
+                $player->jump();
+                $player->moveForward();
+            }
+            $game->tick($i);
         }
-        $game->tick(0);
         $took = $timer->stop();
-        $this->assertSame(0, $game->getTickId());
+        $this->assertSame($tickCount - 1, $game->getTickId());
 
         foreach ($players as $player) {
             $this->assertGreaterThan(50, $player->getPositionImmutable()->z);
         }
-        $this->assertLessThan(4, $took->asMilliseconds());
+        $this->assertLessThan(10, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void
@@ -172,7 +187,7 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([49726, 66913, 55226], $coordinates);
-        $this->assertLessThan(49, $took->asMilliseconds());
+        $this->assertLessThan(45, $took->asMilliseconds());
     }
 
     public function test2DMovement(): void
@@ -187,7 +202,7 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([66913, 74314], $coordinates);
-        $this->assertLessThan(25, $took->asMilliseconds());
+        $this->assertLessThan(24, $took->asMilliseconds());
     }
 
     private function createMap(int $depth = 2000): Map
