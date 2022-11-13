@@ -7,10 +7,10 @@ function radianToDegree(radian) {
 }
 
 function threeRotationToServer(eulerYXZ) {
-    const horizontal = radianToDegree(eulerYXZ.y)
-    const vertical = radianToDegree(eulerYXZ.x)
+    const horizontal = Math.round(THREE.MathUtils.radToDeg(eulerYXZ.y) * 10) / 10
+    const vertical = Math.round(THREE.MathUtils.radToDeg(eulerYXZ.x) * 10) / 10
 
-    if (horizontal === 0 || horizontal === -0) {
+    if (horizontal === 0) {
         return [0, vertical]
     }
 

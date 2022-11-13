@@ -2,6 +2,7 @@
 
 namespace Test\Inventory;
 
+use cs\Core\Box;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
@@ -169,6 +170,41 @@ class SimpleInventoryTest extends BaseTestCase
         $dropItems = $game->getWorld()->getDropItems();
         $this->assertCount(2, $dropItems);
         $this->assertSame($wall->getBase() + 1, $dropItems[1]->getPosition()->addX(-$dropItems[1]->getBoundingRadius())->x);
+    }
+
+    public function testDropBoxCollision(): void
+    {
+        $game = $this->createNoPauseGame();
+        $player = $game->getPlayer(1);
+        $box = new Box(new Point(-100, 0, $player->getPositionImmutable()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
+        $game->getWorld()->addBox($box);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            $this->endGame(),
+        ]);
+    }
+
+    public function testDropBoxCollisionBuy(): void
+    {
+        $game = $this->createNoPauseGame();
+        $player = $game->getPlayer(1);
+        $box = new Box(new Point(-100, 0, $player->getPositionImmutable()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
+        $game->getWorld()->addBox($box);
+
+        $this->assertSame(800, $player->getMoney());
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::PISTOL_GLOCK)),
+            fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            $this->endGame(),
+        ]);
+        $this->assertCount(1, $game->getWorld()->getDropItems());
+        $this->assertSame(800 - 200, $player->getMoney());
     }
 
     public function testPlayerBuyWeapons(): void

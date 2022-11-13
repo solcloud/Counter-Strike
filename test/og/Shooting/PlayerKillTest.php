@@ -222,7 +222,7 @@ class PlayerKillTest extends BaseTestCase
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
             function (Player $p) {
-                $this->assertSame(-18, $p->getSight()->getRotationVertical());
+                $this->assertSame(-18.0, $p->getSight()->getRotationVertical());
                 $result = $p->attack();
                 $this->assertNotNull($result);
 

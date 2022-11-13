@@ -174,16 +174,4 @@ class RoundTest extends BaseTestCase
         $this->assertSame(2, $game->getScore()->getScoreAttackers());
     }
 
-    public function testSighReset(): void
-    {
-        $player = new Player(2, Color::GREEN, false);
-        $player->getSight()->lookAt(180, 1);
-        $player->roundReset();
-        $this->assertSame(0, $player->getSight()->getRotationHorizontal());
-        $this->assertSame(0, $player->getSight()->getRotationVertical());
-        $player->getSight()->lookAt(179, 12);
-        $this->assertSame(179, $player->getSight()->getRotationHorizontal());
-        $this->assertSame(12, $player->getSight()->getRotationVertical());
-    }
-
 }

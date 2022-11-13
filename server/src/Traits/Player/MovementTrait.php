@@ -160,7 +160,7 @@ trait MovementTrait
             if ($candidate->equals($target)) {
                 continue;
             }
-            if (!$this->canMoveTo($target, $candidate, $angle)) {
+            if (!$this->canMoveTo($target, $candidate, Util::nearbyInt($angle))) {
                 if ($candidate->x <> $orig->x + $x || $candidate->z <> $orig->z + $z) { // if move is possible in one axis at least
                     $target->setFrom($candidate);
                 }

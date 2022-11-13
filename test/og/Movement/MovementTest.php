@@ -281,7 +281,7 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->getSight()->lookHorizontal(-90),
             function (Player $p) use ($origin) {
                 $this->assertPositionSame(new Point($origin->x + Setting::moveDistancePerTick(), $origin->y, $origin->z - Setting::moveDistancePerTick()), $p->getPositionImmutable());
-                $this->assertSame($p->getSight()->getRotationHorizontal(), 270);
+                $this->assertSame($p->getSight()->getRotationHorizontal(), 270.0);
             },
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->getSight()->lookHorizontalOffset(90),

@@ -59,13 +59,21 @@ class TextProtocol extends Protocol
                 if (!is_numeric($parts[1])) {
                     return [];
                 }
-                $command[] = (int)$parts[1];
+                if ($method === 'lookAt') {
+                    $command[] = (float)$parts[1];
+                } else {
+                    $command[] = (int)$parts[1];
+                }
             }
             if (isset($parts[2])) {
                 if (!is_numeric($parts[2])) {
                     return [];
                 }
-                $command[] = (int)$parts[2];
+                if ($method === 'lookAt') {
+                    $command[] = (float)$parts[2];
+                } else {
+                    $command[] = (int)$parts[2];
+                }
             }
 
             if (count($command) !== self::playerControlMethodParamCount[$method] + 1) {

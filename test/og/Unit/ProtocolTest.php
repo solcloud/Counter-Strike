@@ -34,7 +34,7 @@ class ProtocolTest extends BaseTest
                 ['forward'],
                 ['left'],
                 ['equip', 42],
-                ['lookAt', -45, 124],
+                ['lookAt', -45.0, 124.0],
                 ['right'],
             ],
             $protocol->parsePlayerControlCommands(implode(

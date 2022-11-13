@@ -126,6 +126,40 @@ class PerformanceTest extends BaseTest
         $this->assertLessThan(11, $took->asMilliseconds());
     }
 
+    public function testPlayersMoving(): void
+    {
+        ////////
+        $range = 2000;
+        $playersCount = 10;
+        ////////
+
+        $game = GameFactory::createDebug();
+        $game->loadMap($this->createMap($range));
+        for ($i = 1; $i <= $playersCount; $i++) {
+            $player = new Player($i, Color::GREEN, true);
+            $game->addPlayer($player);
+            $player->getSight()->lookAt(rand(-5, 5), -10);
+            $this->assertSame(50, $player->getPositionImmutable()->z);
+        }
+        $players = $game->getPlayers();
+        $this->assertCount($playersCount, $players);
+
+        $timer = new Timer();
+        $timer->start();
+        foreach ($players as $player) {
+            $player->jump();
+            $player->moveForward();
+        }
+        $game->tick(0);
+        $took = $timer->stop();
+        $this->assertSame(0, $game->getTickId());
+
+        foreach ($players as $player) {
+            $this->assertGreaterThan(50, $player->getPositionImmutable()->z);
+        }
+        $this->assertLessThan(4, $took->asMilliseconds());
+    }
+
     public function test3DMovement(): void
     {
         $coordinates = [];

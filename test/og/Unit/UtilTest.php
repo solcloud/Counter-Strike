@@ -16,13 +16,13 @@ class UtilTest extends BaseTest
         $camera = new PlayerCamera();
 
         $camera->lookHorizontal(45 - 90);
-        $this->assertSame(360 - 45, $camera->getRotationHorizontal());
+        $this->assertSame(360.0 - 45, $camera->getRotationHorizontal());
         $camera->lookHorizontal(15 - 90);
-        $this->assertSame(360 - 75, $camera->getRotationHorizontal());
+        $this->assertSame(360.0 - 75, $camera->getRotationHorizontal());
         $camera->lookHorizontal(-90);
-        $this->assertSame(270, $camera->getRotationHorizontal());
+        $this->assertSame(270.0, $camera->getRotationHorizontal());
         $camera->lookHorizontal(-91);
-        $this->assertSame(269, $camera->getRotationHorizontal());
+        $this->assertSame(269.0, $camera->getRotationHorizontal());
     }
 
     public function testHorizontalMovementXZ(): void

@@ -36,6 +36,9 @@ final class AttackEvent
         $sinV = sin(deg2rad($this->angleVertical));
         $sinH = sin(deg2rad($this->angleHorizontal));
         $cosH = cos(deg2rad($this->angleHorizontal));
+        $nearbyInt = function (float $float): int {
+            return (int)($float > 0 ? $float + .5 : $float - .5);
+        };
 
         $newPos = $this->origin->clone();
         $prevPos = $newPos->clone();
@@ -44,8 +47,8 @@ final class AttackEvent
 
             // OPTIMIZATION_1: Inline Util::movementXYZ() here
             $y = $distance * $sinV;
-            $z = (int)round(sqrt(pow($distance, 2) - pow($y, 2)));
-            $newPos->set($this->origin->x + ((int)round($sinH * $z)), $this->origin->y + ((int)round($y)), $this->origin->z + ((int)round($cosH * $z)));
+            $z = $nearbyInt(sqrt(pow($distance, 2) - pow($y, 2)));
+            $newPos->set($this->origin->x + $nearbyInt($sinH * $z), $this->origin->y + $nearbyInt($y), $this->origin->z + $nearbyInt($cosH * $z));
             if ($newPos->equals($prevPos)) {
                 continue;
             }

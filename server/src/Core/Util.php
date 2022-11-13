@@ -16,11 +16,11 @@ final class Util
     }
 
     /**
-     * @return int 0..359
+     * @return float 0..359
      */
-    public static function normalizeAngle(float $angleDegree): int
+    public static function normalizeAngle(float $angleDegree): float
     {
-        $angleDegree = $angleDegree % 360;
+        $angleDegree = fmod($angleDegree, 360);
         if ($angleDegree < 0) {
             $angleDegree = 360 + $angleDegree;
         }
@@ -33,9 +33,14 @@ final class Util
     public static function movementXZ(float $angleHorizontal, int $distance): array
     {
         return [
-            (int)round(sin(deg2rad($angleHorizontal)) * $distance),
-            (int)round(cos(deg2rad($angleHorizontal)) * $distance),
+            self::nearbyInt(sin(deg2rad($angleHorizontal)) * $distance),
+            self::nearbyInt(cos(deg2rad($angleHorizontal)) * $distance),
         ];
+    }
+
+    public static function nearbyInt(float $float): int
+    {
+        return (int)($float > 0 ? $float + .5 : $float - .5);
     }
 
     /**
@@ -44,18 +49,18 @@ final class Util
     public static function movementXYZ(float $angleHorizontal, float $angleVertical, int $distance): array
     {
         $y = $distance * sin(deg2rad($angleVertical));
-        $z = (int)round(sqrt(pow($distance, 2) - pow($y, 2)));
+        $z = self::nearbyInt(sqrt(pow($distance, 2) - pow($y, 2)));
 
         return [
-            (int)round(sin(deg2rad($angleHorizontal)) * $z),
-            (int)round($y),
-            (int)round(cos(deg2rad($angleHorizontal)) * $z),
+            self::nearbyInt(sin(deg2rad($angleHorizontal)) * $z),
+            (int)($y > 0 ? $y + .5 : $y - .5),
+            self::nearbyInt(cos(deg2rad($angleHorizontal)) * $z),
         ];
     }
 
     public static function distanceFromOrigin(Point2D $point): int
     {
-        return (int)round(hypot($point->x, $point->y));
+        return self::nearbyInt(hypot($point->x, $point->y));
     }
 
     public static function distanceSquared(Point $a, Point $b): int
@@ -72,8 +77,8 @@ final class Util
         $cos = cos(deg2rad($angle));
 
         return [
-            $centerX + (int)round($cos * ($x - $centerX) + $sin * ($z - $centerZ)),
-            $centerZ + (int)round(($clockWise ? -1 : 1) * $sin * ($x - $centerX) + $cos * ($z - $centerZ)),
+            $centerX + self::nearbyInt($cos * ($x - $centerX) + $sin * ($z - $centerZ)),
+            $centerZ + self::nearbyInt(($clockWise ? -1 : 1) * $sin * ($x - $centerX) + $cos * ($z - $centerZ)),
         ];
     }
 

@@ -48,14 +48,18 @@ export class PlayerAction {
         this.actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
     }
 
-    attack([x, y]) {
-        this.#states.attack = true
-        this.#states.attackLookAt = `lookAt ${x} ${y}`
+    #rotationToServerLookAt(xy) {
+        return `lookAt ${xy[0]} ${xy[1]}`
     }
 
-    attack2([x, y]) {
+    attack(xy) {
+        this.#states.attack = true
+        this.#states.attackLookAt = this.#rotationToServerLookAt(xy)
+    }
+
+    attack2(xy) {
         this.#states.attack2 = true
-        this.#states.attack2LookAt = `lookAt ${x} ${y}`
+        this.#states.attack2LookAt = this.#rotationToServerLookAt(xy)
     }
 
     equip(slotId) {
@@ -148,13 +152,10 @@ export class PlayerAction {
             action.push('attack')
             this.#states.attack = false
         } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {
-            let rotation = game.getPlayerMeRotation()
-            action.push(`lookAt ${rotation[0]} ${rotation[1]}`)
+            action.push(this.#rotationToServerLookAt(game.getPlayerMeRotation()))
             action.push('attack')
         } else {
-            let horizontal, vertical
-            [horizontal, vertical] = game.getPlayerMeRotation()
-            let lookAt = `lookAt ${horizontal} ${vertical}`
+            let lookAt = this.#rotationToServerLookAt(game.getPlayerMeRotation())
             if (this.#states.lastLookAt !== lookAt) {
                 action.push(lookAt)
                 this.#states.lastLookAt = lookAt

@@ -120,7 +120,7 @@ class Inventory
                 $item = $alreadyHave;
             } else {
                 $this->equip($item->getSlot());
-                $player->dropEquippedItem();
+                $player->dropEquippedItem(false);
             }
         }
 

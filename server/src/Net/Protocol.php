@@ -99,7 +99,7 @@ abstract class Protocol
     public abstract function getRequestMaxSizeBytes(): int;
 
     /**
-     * @return array<int,array<string|int>>
+     * @return array<int,array<string|int|float>>
      */
     public abstract function parsePlayerControlCommands(string $msg): array;
 

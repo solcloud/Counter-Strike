@@ -14,6 +14,10 @@ trait InventoryTrait
 
     public function equip(InventorySlot $slot): void
     {
+        if ($slot === InventorySlot::SLOT_KEVLAR || $slot === InventorySlot::SLOT_KIT) {
+            return;
+        }
+
         $event = $this->inventory->equip($slot);
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
@@ -40,14 +44,20 @@ trait InventoryTrait
         return $this->inventory->getEquipped();
     }
 
-    public function dropEquippedItem(): ?Item
+    public function dropEquippedItem(bool $instantRemove = true): ?Item
     {
-        $item = $this->inventory->removeEquipped();
-        if (!$item) {
+        $item = $this->getEquippedItem();
+        if (!$item->isUserDroppable()) {
             return null;
         }
 
-        $this->world->dropItem($this, $item);
+        if ($instantRemove) {
+            $this->inventory->removeEquipped();
+            $this->world->dropItem($this, $item);
+        } else {
+            $this->world->dropItem($this, $item);
+            $this->inventory->removeEquipped();
+        }
         return $item;
     }
 

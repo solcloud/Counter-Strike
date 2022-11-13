@@ -31,7 +31,7 @@ class SphereHitBox implements HitIntersect
         $center = $player->getPositionImmutable()->add($centerModifier);
         $point = $center->clone()->add($this->relativeCenter);
 
-        if ($angle === 0) {
+        if ($angle === 0.0) {
             return $point;
         }
 

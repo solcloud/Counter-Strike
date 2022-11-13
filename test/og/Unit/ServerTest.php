@@ -63,8 +63,8 @@ class ServerTest extends BaseTest
         $this->assertGreaterThan(0, $moveSpeed);
         $this->assertSame(0, $player->getPositionImmutable()->y);
         $this->assertSame($spawnPos->z + 2 * $moveSpeed, $player->getPositionImmutable()->z);
-        $this->assertSame(45, $player->getSight()->getRotationHorizontal());
-        $this->assertSame(-20, $player->getSight()->getRotationVertical());
+        $this->assertSame(45.0, $player->getSight()->getRotationHorizontal());
+        $this->assertSame(-20.0, $player->getSight()->getRotationVertical());
         $this->assertInstanceOf(Molotov::class, $player->getInventory()->getItems()[InventorySlot::SLOT_GRENADE_MOLOTOV->value]);
         $this->assertLessThan(Setting::playerHeadHeightStand(), $player->getHeadHeight());
     }
