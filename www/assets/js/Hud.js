@@ -20,6 +20,7 @@ export class HUD {
         buyMenu: null,
         canBuyIcon: null,
         canPlantIcon: null,
+        haveDefuseKit: null,
         spectateUi: null,
         equippedItem: null,
         slotModel: null,
@@ -166,6 +167,7 @@ export class HUD {
         this.#elements.score.classList.toggle('hidden', !this.#showAble.showScore);
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
         this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
+        this.#elements.haveDefuseKit.classList.toggle('hidden', (player.slots[Enum.InventorySlot.SLOT_KIT] === undefined));
         this.#elements.spectateUi.classList.toggle('hidden', this.#game.playerMe.getId() === this.#game.playerSpectate.getId());
         if (player.canBuy && this.#showAble.showBuyMenu) {
             this.#game.requestPointerUnLock()
@@ -221,6 +223,7 @@ export class HUD {
                     <div id="mode-spectate" class="hidden" style="padding:12px 4px">Spectating</div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
                     <div data-can-plant class="hidden" style="margin:22px 4px">⇣&nbsp;💣&nbsp;⇣</div>
+                    <div data-have-defuse-kit class="hidden" style="margin:22px 4px;font-size:140%">✂</div>
                 </div>
                 <div class="bottom">
                     <div id="fps-stats"></div>
@@ -270,6 +273,7 @@ export class HUD {
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.canPlantIcon = elementHud.querySelector('[data-can-plant]')
+        this.#elements.haveDefuseKit = elementHud.querySelector('[data-have-defuse-kit]')
         this.#elements.spectateUi = elementHud.querySelector('#mode-spectate')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')

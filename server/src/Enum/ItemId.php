@@ -32,6 +32,7 @@ class ItemId
         Equipment\Smoke::class         => 36,
 
         Equipment\Bomb::class => 50,
+        Equipment\DefuseKit::class => 51,
     ];
 
 }

@@ -124,6 +124,7 @@ const InventorySlot = {
     SLOT_GRENADE_HE: 8,
     SLOT_TASER: 9,
     SLOT_KEVLAR: 10,
+    SLOT_KIT: 11,
 }
 
 // server/src/Enum/ItemId.php

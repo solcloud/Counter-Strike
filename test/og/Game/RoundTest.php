@@ -7,7 +7,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
-use cs\Enum\Color;
+use cs\Enum\SoundType;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
@@ -15,6 +15,7 @@ use cs\Event\PauseStartEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
+use cs\Event\SoundEvent;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
@@ -40,8 +41,9 @@ class RoundTest extends BaseTestCase
 
         $break = false;
         $killEvents = [];
+        $dropEvents = [];
         $game = $this->createNoPauseGame();
-        $game->onEvents(function (array $events) use (&$killEvents, &$break): void {
+        $game->onEvents(function (array $events) use (&$killEvents, &$dropEvents, &$break): void {
             if ($break) {
                 return;
             }
@@ -52,6 +54,9 @@ class RoundTest extends BaseTestCase
             foreach ($events as $event) {
                 if ($event instanceof KillEvent) {
                     $killEvents[] = $event;
+                }
+                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_DROP) {
+                    $dropEvents[] = $event;
                 }
             }
         });
@@ -69,6 +74,12 @@ class RoundTest extends BaseTestCase
         $this->assertFalse($killEvent->wasHeadShot());
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
         $this->assertSame(1, $killEvent->getPlayerCulprit()->getId());
+
+        $this->assertCount(1, $dropEvents);
+        $drop = $dropEvents[0];
+        $this->assertInstanceOf(SoundEvent::class, $drop);
+        $this->assertSame(SoundType::ITEM_DROP, $drop->type);
+        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop->position);
     }
 
     public function testSkippingTicksPlayerSimulation(): void

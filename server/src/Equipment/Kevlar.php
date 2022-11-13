@@ -34,6 +34,11 @@ class Kevlar extends BaseEquipment
         return InventorySlot::SLOT_KEVLAR;
     }
 
+    public function canBeEquipped(): bool
+    {
+        return false;
+    }
+
     public function isUserDroppable(): bool
     {
         return false;

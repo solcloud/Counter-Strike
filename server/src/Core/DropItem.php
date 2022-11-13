@@ -48,8 +48,8 @@ class DropItem
         while (true) {
             $floorCandidate = $world->findFloor($lastCandidate, $this->radius);
             if ($floorCandidate) {
-                $this->position = $lastCandidate;
-                return $lastCandidate;
+                $this->setPosition($lastCandidate);
+                return $lastCandidate->clone();
             }
             $collisionPlayer = $world->isCollisionWithOtherPlayers(-1, $lastCandidate, $this->radius, $this->height);
             if ($collisionPlayer && $collisionPlayer->getInventory()->pickup($item)) {
@@ -57,6 +57,11 @@ class DropItem
             }
             $lastCandidate->addY(-1);
         }
+    }
+
+    public function setPosition(Point $position): void
+    {
+        $this->position = $position;
     }
 
     public function getPosition(): Point

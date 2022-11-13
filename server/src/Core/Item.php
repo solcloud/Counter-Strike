@@ -28,6 +28,11 @@ abstract class Item
         return ($this->equipped);
     }
 
+    public function canBeEquipped(): bool
+    {
+        return true;
+    }
+
     public function reset(): void
     {
         // empty hook
@@ -111,6 +116,10 @@ abstract class Item
 
     public function equip(): ?EquipEvent
     {
+        if (!$this->canBeEquipped()) {
+            return null;
+        }
+
         if ($this->eventEquip === null) {
             $this->eventEquip = new EquipEvent(function () {
                 $this->equipped = true;

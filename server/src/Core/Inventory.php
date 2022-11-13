@@ -127,10 +127,12 @@ class Inventory
         $this->store->buy($item);
         if ($item instanceof Kevlar) {
             $this->armorType = $item->getArmorType();
-            return null;
         }
         $this->items[$item->getSlot()->value] = $item;
-        return $this->equip($item->getSlot());
+        if ($item->canBeEquipped()) {
+            return $this->equip($item->getSlot());
+        }
+        return null;
     }
 
     public function equip(InventorySlot $slot): ?EquipEvent
@@ -178,7 +180,7 @@ class Inventory
     }
 
     /**
-     * @return Item[]
+     * @return Item[] [slotId => Item]
      */
     public function getItems(): array
     {

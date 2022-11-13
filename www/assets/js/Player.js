@@ -12,7 +12,7 @@ export class Player {
         canAttack: null,
         canBuy: null,
         canPlant: null,
-        slots: null,
+        slots: {},
         health: null,
         position: null,
         look: {

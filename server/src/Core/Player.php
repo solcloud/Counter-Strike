@@ -89,6 +89,14 @@ final class Player
     private function onPlayerDied(): void
     {
         $this->armor = 0;
+
+        $items = $this->getInventory()->getItems();
+        $dropPosition = $this->getPositionImmutable();
+        if (isset($items[InventorySlot::SLOT_PRIMARY->value])) {
+            $this->world->addDropItem($items[InventorySlot::SLOT_PRIMARY->value], $dropPosition);
+        } elseif (isset($items[InventorySlot::SLOT_SECONDARY->value])) {
+            $this->world->addDropItem($items[InventorySlot::SLOT_SECONDARY->value], $dropPosition);
+        }
     }
 
     private function addEvent(Event $event, int $eventId): void

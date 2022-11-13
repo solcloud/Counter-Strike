@@ -23,6 +23,11 @@ class DefuseKit extends BaseEquipment
         return InventorySlot::SLOT_KIT;
     }
 
+    public function canBeEquipped(): bool
+    {
+        return false;
+    }
+
     public function isUserDroppable(): bool
     {
         return false;

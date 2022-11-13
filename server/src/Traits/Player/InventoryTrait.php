@@ -54,6 +54,7 @@ trait InventoryTrait
         if ($instantRemove) {
             $this->inventory->removeEquipped();
             $this->world->dropItem($this, $item);
+            $this->world->tryPickDropItems($this);
         } else {
             $this->world->dropItem($this, $item);
             $this->inventory->removeEquipped();
