@@ -28,7 +28,7 @@ $commandPool = [
     'walk',
 ];
 $max = count($commandPool) - 1;
-$i = $sendEveryXTick;
+$i = rand(1, $sendEveryXTick);
 while (true) { // @phpstan-ignore-line
     $response = $socket->read(10241024);
     if (--$i !== 0) {

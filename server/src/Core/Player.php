@@ -97,6 +97,11 @@ final class Player
         } elseif (isset($items[InventorySlot::SLOT_SECONDARY->value])) {
             $this->world->addDropItem($items[InventorySlot::SLOT_SECONDARY->value], $dropPosition);
         }
+        if (isset($items[InventorySlot::SLOT_KIT->value])) {
+            $this->world->addDropItem($items[InventorySlot::SLOT_KIT->value], $dropPosition);
+        } elseif (isset($items[InventorySlot::SLOT_BOMB->value])) {
+            $this->world->addDropItem($items[InventorySlot::SLOT_BOMB->value], $dropPosition);
+        }
     }
 
     private function addEvent(Event $event, int $eventId): void

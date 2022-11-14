@@ -48,4 +48,9 @@ final class SoundEvent extends TickEvent
         ];
     }
 
+    public function getItem(): ?Item
+    {
+        return $this->item;
+    }
+
 }

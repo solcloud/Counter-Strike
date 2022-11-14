@@ -154,6 +154,12 @@ class Inventory
         if ($haveIt && $haveIt->getQuantity() === $haveIt->getMaxQuantity()) {
             return false;
         }
+        if ($item->getSlot() === InventorySlot::SLOT_KIT && $this->store->forAttackerStore) {
+            return false;
+        }
+        if ($item->getSlot() === InventorySlot::SLOT_BOMB && !$this->store->forAttackerStore) {
+            return false;
+        }
 
         if ($haveIt) {
             $haveIt->incrementQuantity();

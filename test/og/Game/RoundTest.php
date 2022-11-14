@@ -8,6 +8,7 @@ use cs\Core\Player;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\SoundType;
+use cs\Equipment\Bomb;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
@@ -16,6 +17,7 @@ use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
 use cs\Event\SoundEvent;
+use cs\Weapon\PistolGlock;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
@@ -75,11 +77,15 @@ class RoundTest extends BaseTestCase
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
         $this->assertSame(1, $killEvent->getPlayerCulprit()->getId());
 
-        $this->assertCount(1, $dropEvents);
-        $drop = $dropEvents[0];
-        $this->assertInstanceOf(SoundEvent::class, $drop);
-        $this->assertSame(SoundType::ITEM_DROP, $drop->type);
-        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop->position);
+        $this->assertCount(2, $dropEvents);
+        $drop1 = $dropEvents[0];
+        $drop2 = $dropEvents[1];
+        $this->assertInstanceOf(SoundEvent::class, $drop1);
+        $this->assertInstanceOf(SoundEvent::class, $drop2);
+        $this->assertInstanceOf(PistolGlock::class, $drop1->getItem());
+        $this->assertInstanceOf(Bomb::class, $drop2->getItem());
+        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop1->position);
+        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop2->position);
     }
 
     public function testSkippingTicksPlayerSimulation(): void

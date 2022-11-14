@@ -17,7 +17,7 @@ class BuyMenu
     /**
      * @param Item[] $alreadyHaveItems
      */
-    public function __construct(private bool $forAttackerStore, array $alreadyHaveItems)
+    public function __construct(public readonly bool $forAttackerStore, array $alreadyHaveItems)
     {
         foreach ($alreadyHaveItems as $item) {
             if ($item->getType() === ItemType::TYPE_GRENADE) {
