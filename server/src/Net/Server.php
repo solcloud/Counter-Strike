@@ -6,7 +6,6 @@ use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\Player;
 use cs\Core\Setting;
-use cs\Core\Util;
 use cs\Enum\Color;
 use cs\Enum\GameOverReason;
 use cs\Event\GameOverEvent;
@@ -45,16 +44,7 @@ class Server
     )
     {
         $this->logger = new NullLogger();
-
-        $tickMs = $this->setting->tickMs;
-        if ($tickMs < 0) {
-            throw new GameException("Negative tickMs given");
-        } elseif ($tickMs === 0) { // tests only
-            $this->tickNanoSeconds = 0;
-        } else {
-            Util::$TICK_RATE = $tickMs;
-            $this->tickNanoSeconds = $tickMs * 1000000;
-        }
+        $this->tickNanoSeconds = $this->setting->tickMs * 1000000;
     }
 
     public function start(): void

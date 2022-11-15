@@ -84,8 +84,14 @@ class RoundTest extends BaseTestCase
         $this->assertInstanceOf(SoundEvent::class, $drop2);
         $this->assertInstanceOf(PistolGlock::class, $drop1->getItem());
         $this->assertInstanceOf(Bomb::class, $drop2->getItem());
-        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop1->position);
-        $this->assertPositionSame($game->getPlayer(1)->getPositionImmutable(), $drop2->position);
+        $pp = $game->getPlayer(1)->getPositionImmutable();
+        $pr = $game->getPlayer(1)->getBoundingRadius();
+        $this->assertSame($pp->y, $drop1->position->y);
+        $this->assertLessThanOrEqual($pr, abs($drop1->position->x - $pp->x));
+        $this->assertLessThanOrEqual($pr, abs($drop1->position->z - $pp->z));
+        $this->assertSame($pp->y, $drop2->position->y);
+        $this->assertLessThanOrEqual($pr, abs($drop2->position->x - $pp->x));
+        $this->assertLessThanOrEqual($pr, abs($drop2->position->z - $pp->z));
     }
 
     public function testSkippingTicksPlayerSimulation(): void

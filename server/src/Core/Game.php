@@ -281,9 +281,6 @@ class Game
         $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
         $bombCarrier = $attackers[rand(0, count($attackers) - 1)];
         $bombCarrier->getInventory()->pickup($this->bomb);
-
-        $sound = new SoundEvent($bombCarrier->getPositionImmutable(), SoundType::ITEM_PICKUP);
-        $this->addSoundEvent($sound->setPlayer($bombCarrier)->setItem($this->bomb));
     }
 
     private function bombReset(): void

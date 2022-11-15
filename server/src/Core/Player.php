@@ -107,7 +107,7 @@ final class Player
         if ($dropCount > 0) {
             $angle = 0;
             $angleOffset = 360 / $dropCount;
-            $distance = ceil($this->getBoundingRadius() / 2);
+            $distance = (int)ceil($this->getBoundingRadius() / 2);
             $pp = $this->getPositionImmutable();
             foreach ($dropItems as $item) {
                 [$x, $z] = Util::rotatePointY($angle, 0, $distance);
