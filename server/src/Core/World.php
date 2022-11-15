@@ -501,7 +501,6 @@ class World
         if ($this->lastBombActionTick + Util::millisecondsToFrames(200) < $this->getTickId()) {
             $bomb->reset();
             $player->stop();
-            $player->crouch();
             $sound = new SoundEvent($player->getPositionImmutable()->addY(10), SoundType::BOMB_PLANTING);
             $this->makeSound($sound->setPlayer($player)->setItem($bomb));
         }
@@ -513,7 +512,6 @@ class World
             $player->equip($player->getInventory()->removeBomb());
             $bomb->setPosition($player->getPositionImmutable());
             $this->game->bombPlanted($player);
-            $player->stand();
 
             $this->bomb = $bomb;
             $this->lastBombActionTick = -1;

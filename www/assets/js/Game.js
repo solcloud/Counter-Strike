@@ -40,18 +40,16 @@ export class Game {
 
         const game = this
         this.players.forEach(function (player) {
-            if (player.getId() === game.playerMe.getId()) {
-                if (game.playerSpectate.getId() !== game.playerMe.getId()) { // reset spectate camera to our player
-                    const camera = game.#world.getCamera()
-                    camera.removeFromParent()
-                    camera.rotation.set(0, 0, 0)
-                    if (game.#pointer) {
-                        game.#pointer.reset()
-                    }
-                    player.get3DObject().getObjectByName('head').add(camera)
-                    game.playerSpectate = game.playerMe
-                    game.requestPointerLock()
+            if (player.getId() === game.playerMe.getId()) { // reset spectate camera to our player
+                const camera = game.#world.getCamera()
+                camera.removeFromParent()
+                camera.rotation.set(0, serverHorizontalRotationToThreeRadian(player.data.look.horizontal), 0)
+                if (game.#pointer) {
+                    game.#pointer.reset()
                 }
+                player.get3DObject().getObjectByName('head').add(camera)
+                game.playerSpectate = game.playerMe
+                game.requestPointerLock()
             } else {
                 player.respawn()
             }
@@ -290,20 +288,17 @@ export class Game {
         this.#stats.begin()
         const game = this
 
+        if (this.playerMe !== null) {
+            state.players.forEach(function (serverState) {
+                let player = game.players[serverState.id]
+                if (player === undefined) {
+                    player = game.createPlayer(serverState)
+                }
+                game.updatePlayerData(player, serverState)
+            })
+        }
         state.events.forEach(function (event) {
             game.eventProcessor.process(event)
-        })
-
-        if (this.#options === false) {
-            return
-        }
-
-        state.players.forEach(function (serverState) {
-            let player = game.players[serverState.id]
-            if (player === undefined) {
-                player = game.createPlayer(serverState)
-            }
-            game.updatePlayerData(player, serverState)
         })
 
         this.#render()

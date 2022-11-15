@@ -31,7 +31,7 @@ trait AttackTrait
         if (!($item instanceof AttackEnable)) {
             return null;
         }
-        if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
+        if ($item instanceof AmmoBasedWeapon && ($item->getAmmo() === 0 || $item->getAmmoReserve() === 0)) {
             $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return null;

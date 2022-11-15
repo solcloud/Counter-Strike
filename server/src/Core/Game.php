@@ -166,7 +166,7 @@ class Game
         $player->getInventory()->earnMoney($this->properties->start_money);
         $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position);
         $player->setPosition($spawnPosition);
-        $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(),  $this->properties->randomize_spawn_position ? 80 : 0));
+        $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position ? 80 : 0));
 
         $this->players[$player->getId()] = $player;
         $this->world->addPlayerCollider(new PlayerCollider($player));
@@ -279,7 +279,11 @@ class Game
 
         /** @var Player[] $attackers */
         $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
-        $attackers[rand(0, count($attackers) - 1)]->getInventory()->pickup($this->bomb);
+        $bombCarrier = $attackers[rand(0, count($attackers) - 1)];
+        $bombCarrier->getInventory()->pickup($this->bomb);
+
+        $sound = new SoundEvent($bombCarrier->getPositionImmutable(), SoundType::ITEM_PICKUP);
+        $this->addSoundEvent($sound->setPlayer($bombCarrier)->setItem($this->bomb));
     }
 
     private function bombReset(): void

@@ -7,6 +7,7 @@ export class Setting {
             radarZoom: 0.9,
             sprayTriggerDeltaMs: 80,
             preferPerformance: false,
+            crosshair: '✛',
         },
         bind: {
             'KeyW': Action.MOVE_FORWARD,
@@ -60,6 +61,10 @@ export class Setting {
 
     shouldPreferPerformance() {
         return this.#setting.base.preferPerformance
+    }
+
+    getCrosshairSymbol() {
+        return this.#setting.base.crosshair
     }
 
 }

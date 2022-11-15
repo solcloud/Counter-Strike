@@ -94,7 +94,7 @@ class PlayerControl
 
     public function lookAt(float $angleHorizontal, float $angleVertical): void
     {
-        $this->player->getSight()->lookAt($angleHorizontal, $angleVertical);
+        $this->player->getSight()->lookAt(round($angleHorizontal, 2), round($angleVertical, 2));
     }
 
     public function attack(): void

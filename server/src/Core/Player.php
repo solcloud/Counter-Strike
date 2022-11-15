@@ -90,17 +90,30 @@ final class Player
     {
         $this->armor = 0;
 
+        $dropItems = [];
         $items = $this->getInventory()->getItems();
-        $dropPosition = $this->getPositionImmutable();
         if (isset($items[InventorySlot::SLOT_PRIMARY->value])) {
-            $this->world->addDropItem($items[InventorySlot::SLOT_PRIMARY->value], $dropPosition);
+            $dropItems[] = $items[InventorySlot::SLOT_PRIMARY->value];
         } elseif (isset($items[InventorySlot::SLOT_SECONDARY->value])) {
-            $this->world->addDropItem($items[InventorySlot::SLOT_SECONDARY->value], $dropPosition);
+            $dropItems[] = $items[InventorySlot::SLOT_SECONDARY->value];
         }
         if (isset($items[InventorySlot::SLOT_KIT->value])) {
-            $this->world->addDropItem($items[InventorySlot::SLOT_KIT->value], $dropPosition);
+            $dropItems[] = $items[InventorySlot::SLOT_KIT->value];
         } elseif (isset($items[InventorySlot::SLOT_BOMB->value])) {
-            $this->world->addDropItem($items[InventorySlot::SLOT_BOMB->value], $dropPosition);
+            $dropItems[] = $items[InventorySlot::SLOT_BOMB->value];
+        }
+
+        $dropCount = count($dropItems);
+        if ($dropCount > 0) {
+            $angle = 0;
+            $angleOffset = 360 / $dropCount;
+            $distance = ceil($this->getBoundingRadius() / 2);
+            $pp = $this->getPositionImmutable();
+            foreach ($dropItems as $item) {
+                [$x, $z] = Util::rotatePointY($angle, 0, $distance);
+                $this->world->addDropItem($item, new Point($pp->x + $x, $pp->y, $pp->z + $z));
+                $angle += $angleOffset;
+            }
         }
     }
 

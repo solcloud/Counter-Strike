@@ -15,6 +15,14 @@ export class SoundRepository {
                 return '387480__cosmicembers__dart-thud-2.wav'
             } else if (item.slot === InventorySlot.SLOT_PRIMARY) {
                 return '513421__pomeroyjoshua__anu-clap-09.wav'
+            } else if (item.slot === InventorySlot.SLOT_KNIFE) {
+                return '240788__f4ngy__knife-hitting-wood.wav'
+            }
+            return '558117__abdrtar__move.mp3'
+        }
+        if (type === SoundType.ITEM_ATTACK2) {
+            if (item.slot === InventorySlot.SLOT_KNIFE) {
+                return '435238__aris621__nasty-knife-stab.wav'
             }
             return '558117__abdrtar__move.mp3'
         }

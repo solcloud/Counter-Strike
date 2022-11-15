@@ -177,6 +177,7 @@ export class HUD {
             this.#game.requestPointerLock()
             this.#elements.buyMenu.innerHTML = ''
             this.#elements.buyMenu.classList.add('hidden');
+            this.#showAble.showBuyMenu = false
         }
 
         this.#elements.money.innerText = player.money
@@ -202,7 +203,7 @@ export class HUD {
         }
 
         elementHud.innerHTML = `
-        <div id="cross">✛</div>
+        <div id="cross">${setting.getCrosshairSymbol()}</div>
         <div id="equipped-item">
             <div style="position:relative">
                 <img data-shot class="hidden" src="./resources/shot.gif">
@@ -262,8 +263,7 @@ export class HUD {
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb</p>
                 </div>
                 <div>
-                    <span data-ammo class="ammo bg">
-                    </span>
+                    <span data-ammo class="ammo bg"></span>
                 </div>
             </div>
         </section>

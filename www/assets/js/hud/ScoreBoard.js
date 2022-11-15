@@ -94,7 +94,7 @@ export class ScoreBoard {
         statRowElement.classList.add('player-dead')
         const deathsElement = statRowElement.querySelector('[data-deaths]')
         let deaths = parseInt(deathsElement.innerText)
-        deathsElement.innerText = `${deaths - 1}`
+        deathsElement.innerText = `${deaths + 1}`
     }
 
     update(scoreData) {

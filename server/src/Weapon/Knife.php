@@ -3,6 +3,7 @@
 namespace cs\Weapon;
 
 use cs\Core\Bullet;
+use cs\Core\Util;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\InventorySlot;
@@ -17,6 +18,7 @@ final class Knife extends BaseWeapon implements AttackEnable
     public const stabMaxDistance = 100;
     public const equipReadyTimeMs = 500;
     private bool $primaryAttack = true;
+    private int $lastAttackTick = 0;
 
     public function getType(): ItemType
     {
@@ -33,24 +35,34 @@ final class Knife extends BaseWeapon implements AttackEnable
         return 'Knife';
     }
 
-    public function attack(AttackEvent $event): ?AttackResult
+    public function canAttack(int $tickId): bool
     {
         if (!$this->equipped) {
+            return false;
+        }
+        return ($this->lastAttackTick === 0 || $this->lastAttackTick + Util::millisecondsToFrames($this->primaryAttack ? 400 : 1000) <= $tickId);
+    }
+
+    public function attack(AttackEvent $event): ?AttackResult
+    {
+        $this->primaryAttack = true;
+        if (!$this->canAttack($event->getTickId())) {
             return null;
         }
 
-        $this->primaryAttack = true;
+        $this->lastAttackTick = $event->getTickId();
         $event->setItem($this);
         return $event->process();
     }
 
     public function attackSecondary(AttackEvent $event): ?AttackResult
     {
-        if (!$this->equipped) {
+        $this->primaryAttack = false;
+        if (!$this->canAttack($event->getTickId())) {
             return null;
         }
 
-        $this->primaryAttack = false;
+        $this->lastAttackTick = $event->getTickId();
         $event->setItem($this);
         return $event->process();
     }

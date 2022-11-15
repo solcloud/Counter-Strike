@@ -104,7 +104,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
 
     public function reload(): ?ReloadEvent
     {
-        if ($this->ammo === static::magazineCapacity || $this->reloading) {
+        if ($this->reloading || $this->ammo === static::magazineCapacity || $this->ammoReserve === 0) {
             return null;
         }
 

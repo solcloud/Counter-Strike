@@ -18,7 +18,7 @@ export class Radar {
     constructor(canvas, mapImage, map, zoom = 0.9) {
         const mapSize = this.#mapSizes[map]
         if (!mapSize) {
-            throw new Error("Uknown size for map: " + map)
+            throw new Error("Unknown size for map: " + map)
         }
 
         this.#image = mapImage
