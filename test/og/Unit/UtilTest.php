@@ -88,6 +88,24 @@ class UtilTest extends BaseTest
         $this->assertSame(4, Util::distanceFromOrigin(new Point2D(0, 4)));
     }
 
+    public function testSmallestDeltaAngle(): void
+    {
+        $this->assertSame(4, Util::smallestDeltaAngle(0, 4));
+        $this->assertSame(-4, Util::smallestDeltaAngle(8, 4));
+        $this->assertSame(-135, Util::smallestDeltaAngle(-45, 180));
+        $this->assertSame(45, Util::smallestDeltaAngle(90, 135));
+        $this->assertSame(-45, Util::smallestDeltaAngle(135, 90));
+        $this->assertSame(-136, Util::smallestDeltaAngle(-45, 179));
+        $this->assertSame(24, Util::smallestDeltaAngle(-46, -22));
+        $this->assertSame(68, Util::smallestDeltaAngle(-46, 22));
+        $this->assertSame(68, Util::smallestDeltaAngle(-46, 22));
+        $this->assertSame(92, Util::smallestDeltaAngle(290, 22));
+        $this->assertSame(136, Util::smallestDeltaAngle(246, 22));
+        $this->assertSame(1, Util::smallestDeltaAngle(720, 1));
+        $this->assertSame(-1, Util::smallestDeltaAngle(1, 720));
+        $this->assertSame(90, Util::smallestDeltaAngle(-46, 44));
+    }
+
     public function testMovementXZOnlyGrowByMaxOfOneFromPrevious(): void
     {
         $prev = [0, 0];

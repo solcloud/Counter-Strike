@@ -19,6 +19,7 @@ export class Game {
     #bombTimerId = null;
     eventProcessor
     score = null
+    bombDropPosition = null
     alivePlayers = [0, 0]
     buyList = []
     players = []
@@ -117,6 +118,9 @@ export class Game {
             this.#world.itemDrop(data.position, data.item)
             if (data.player === this.playerSpectate.getId()) {
                 this.dropFeedback(data.item)
+            }
+            if (data.item.slot === InventorySlot.SLOT_BOMB) {
+                this.bombDropPosition = data.position
             }
         }
         if (data.type === SoundType.BOMB_DEFUSED) {

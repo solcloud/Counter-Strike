@@ -38,6 +38,13 @@ final class Util
         ];
     }
 
+    public static function smallestDeltaAngle(int $start, int $target): int
+    {
+        $a = (($start - $target) % 360 + 360) % 360;
+        $b = (($target - $start) % 360 + 360) % 360;
+        return ($a < $b ? -$a : $b);
+    }
+
     public static function nearbyInt(float $float): int
     {
         return (int)($float > 0 ? $float + .5 : $float - .5);

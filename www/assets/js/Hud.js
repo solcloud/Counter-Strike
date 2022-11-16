@@ -158,7 +158,12 @@ export class HUD {
 
     updateHud(player) {
         if (this.#radar) {
-            this.#radar.update(this.#game.getMyTeamPlayers(), this.#game.playerSpectate.getId(), this.#game.getPlayerSpectateRotation()[0])
+            this.#radar.update(
+                this.#game.getMyTeamPlayers(),
+                this.#game.playerSpectate.getId(),
+                this.#game.getPlayerSpectateRotation()[0],
+                this.#game.playerMe.isAttacker() ? this.#game.bombDropPosition : null
+            )
         }
         if (this.#scoreBoardData !== null) {
             this.#scoreBoard.update(this.#scoreBoardData)

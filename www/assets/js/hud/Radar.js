@@ -1,4 +1,4 @@
-import {Color} from "../Enums.js";
+import {Color, InventorySlot} from "../Enums.js";
 
 export class Radar {
     #image
@@ -41,7 +41,7 @@ export class Radar {
         }
     }
 
-    update(players, idSpectator, spectatorRotationHorizontal) {
+    update(players, idSpectator, spectatorRotationHorizontal, bombPosition) {
         let spectator
         const ctx = this.#ctx
         ctx.resetTransform()
@@ -64,13 +64,23 @@ export class Radar {
             ctx.fillStyle = "#" + Color[player.data.color].toString(16).padStart(6, '0');
 
             ctx.beginPath()
-            ctx.arc(player.data.position.x, -player.data.position.z, 50, 0, 2 * Math.PI)
+            ctx.arc(player.data.position.x, -player.data.position.z, 60, 0, 2 * Math.PI)
             ctx.fill()
 
             ctx.beginPath()
-            ctx.arc(player.data.position.x, -player.data.position.z, 51, 0, 2 * Math.PI)
+            ctx.arc(player.data.position.x, -player.data.position.z, 62, 0, 2 * Math.PI)
             ctx.stroke()
+
+            if (undefined !== player.data.slots[InventorySlot.SLOT_BOMB]) {
+                bombPosition = player.data.position
+            }
         })
+        if (bombPosition) {
+            ctx.beginPath()
+            ctx.fillStyle = "#FF1100";
+            ctx.arc(bombPosition.x + 55, -bombPosition.z + 55, 42, 0, 2 * Math.PI)
+            ctx.fill()
+        }
 
         if (!spectator) {
             return
