@@ -18,6 +18,7 @@ trait MovementTrait
 
     private int $moveX = 0;
     private int $moveZ = 0;
+    private ?int $lastAngle = null;
     private bool $isWalking = false;
 
     public function speedRun(): void
@@ -149,6 +150,24 @@ trait MovementTrait
             }
         }
         $angle = Util::normalizeAngle($angle);
+        $angleInt = Util::nearbyInt($angle);
+        if ($this->lastAngle === null) {
+            $this->lastAngle = $angleInt;
+        }
+        if ($this->isFlying()) {
+            $delta = Util::smallestDeltaAngle($this->lastAngle, $angleInt);
+            if (abs($delta) > 160) {
+                $distanceTarget = (int)ceil($distanceTarget * .1);
+                $angle = $this->lastAngle + ($delta / 4);
+                $angleInt = Util::nearbyInt($angle);
+            } elseif (abs($delta) > 60) {
+                $angle += ($delta / 4);
+                $angleInt = Util::nearbyInt($angle);
+                $this->lastAngle = $angleInt;
+            }
+        } else {
+            $this->lastAngle = $angleInt;
+        }
 
         $looseFloor = false;
         $orig = $current->clone();
@@ -160,7 +179,7 @@ trait MovementTrait
             if ($candidate->equals($target)) {
                 continue;
             }
-            if (!$this->canMoveTo($target, $candidate, Util::nearbyInt($angle))) {
+            if (!$this->canMoveTo($target, $candidate, $angleInt)) {
                 if ($candidate->x <> $orig->x + $x || $candidate->z <> $orig->z + $z) { // if move is possible in one axis at least
                     $target->setFrom($candidate);
                 }
