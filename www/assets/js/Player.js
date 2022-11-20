@@ -7,7 +7,6 @@ export class Player {
             id: null,
             type: null,
             slot: null,
-            name: null,
         },
         canAttack: null,
         canBuy: null,
@@ -29,6 +28,7 @@ export class Player {
         isReloading: null,
     }
     custom = {
+        itemId: null,
         slotId: null,
         slots: null,
     }
@@ -54,6 +54,15 @@ export class Player {
 
     getEquippedSlotId() {
         return this.custom.slotId
+    }
+
+    equipOtherPlayer(item) {
+        this.custom.itemId = item.id
+        this.equip(item.slot)
+    }
+
+    getEquippedOtherPlayerItemId() {
+        return this.custom.itemId
     }
 
     isInventoryChanged(serverState) {

@@ -189,9 +189,9 @@ export class HUD {
         this.#elements.health.innerText = player.health
         this.#elements.armor.innerText = player.armor
         if (player.ammo === null) {
-            this.#elements.ammo.innerText = `${player.item.name}`
+            this.#elements.ammo.innerText = Enum.ItemIdToName[player.item.id]
         } else {
-            this.#elements.ammo.innerText = `${player.item.name} - ${player.ammo} / ${player.ammoReserve}`
+            this.#elements.ammo.innerText = `${Enum.ItemIdToName[player.item.id]} - ${player.ammo} / ${player.ammoReserve}`
         }
 
         let myTeamIndex = this.#game.playerMe.getTeamIndex()
@@ -208,7 +208,7 @@ export class HUD {
         }
 
         elementHud.innerHTML = `
-        <div id="cross">${setting.getCrosshairSymbol()}</div>
+        <div id="cross"></div>
         <div id="equipped-item">
             <div style="position:relative">
                 <img data-shot class="hidden" src="./resources/shot.gif">
@@ -298,6 +298,7 @@ export class HUD {
         this.#elements.aliveOpponentTeam = elementHud.querySelector('.team-opponent-alive')
         this.#elements.time = elementHud.querySelector('#time')
         this.#elements.killFeed = elementHud.querySelector('.kill-feed')
+        elementHud.querySelector('#cross').innerText = setting.getCrosshairSymbol()
 
         const game = this.#game
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)

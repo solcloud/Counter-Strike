@@ -26,11 +26,6 @@ class Bomb extends BaseEquipment
         $this->defuseTickCountMax = Util::millisecondsToFrames($defuseTimeMs);
     }
 
-    public function getName(): string
-    {
-        return 'Bomb';
-    }
-
     public function getType(): ItemType
     {
         return ItemType::TYPE_BOMB;

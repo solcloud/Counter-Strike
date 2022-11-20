@@ -9,6 +9,7 @@ export {
     BuyMenuItem,
     InventorySlot,
     ItemId,
+    ItemIdToName,
     Action,
 }
 
@@ -144,6 +145,24 @@ const ItemId = {
     Molotov: 35,
     Smoke: 36,
     Bomb: 50,
+}
+
+const ItemIdToName = {
+    0: 'Wall',
+    1: 'Knife',
+    2: 'Glock',
+    3: 'P-250',
+    4: 'USP',
+    5: 'AK-47',
+    6: 'M4-A1',
+    30: 'Decoy',
+    31: 'Flashbang',
+    32: 'High explosive',
+    33: 'Incendiary',
+    34: 'Kevlar',
+    35: 'Molotov',
+    36: 'Smoke',
+    50: 'Bomb',
 }
 
 // PlayerAction.js

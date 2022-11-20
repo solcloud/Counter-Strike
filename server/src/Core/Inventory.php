@@ -194,13 +194,13 @@ class Inventory
     }
 
     /**
-     * @return array<int,int> [slotId => itemCount]
+     * @return array<int,array<string,int|string>> [slotId => item]
      */
     public function getFilledSlots(): array
     {
         $slots = [];
         foreach ($this->items as $slotId => $item) {
-            $slots[$slotId] = $item->getQuantity();
+            $slots[$slotId] = $item->toArray();
         }
 
         return $slots;

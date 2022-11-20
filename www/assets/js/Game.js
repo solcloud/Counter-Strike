@@ -25,6 +25,7 @@ export class Game {
     players = []
     playerMe = null
     playerSpectate = null
+    #playerSlotsVisibleModels = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_BOMB, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY]
 
     constructor(world, hud, stats) {
         this.#world = world
@@ -43,7 +44,6 @@ export class Game {
         this.players.forEach(function (player) {
             if (player.getId() === game.playerMe.getId()) { // reset spectate camera to our player
                 const camera = game.#world.getCamera()
-                camera.removeFromParent()
                 camera.rotation.set(0, serverHorizontalRotationToThreeRadian(player.data.look.horizontal), 0)
                 if (game.#pointer) {
                     game.#pointer.reset()
@@ -247,7 +247,6 @@ export class Game {
         }
 
         const camera = this.#world.getCamera()
-        camera.removeFromParent()
         camera.rotation.set(0, degreeToRadian(-90), 0)
 
         const player = this.players[playerId]
@@ -329,11 +328,12 @@ export class Game {
             }
         }
         if (this.playerMe.getId() !== serverState.id) {
-            this.updateOtherPlayersModels(player.get3DObject(), serverState)
+            this.updateOtherPlayersModels(player, serverState)
         }
     }
 
-    updateOtherPlayersModels(playerObject, data) {
+    updateOtherPlayersModels(player, data) {
+        const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
         const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 60), -50) : data.look.vertical
         playerObject.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(rotationVertical)
@@ -342,6 +342,49 @@ export class Game {
         if (body.position.y !== data.heightBody) { // update body height position if changed
             body.position.y = data.heightBody
         }
+
+        if (player.isInventoryChanged(data)) {
+            this.#otherPlayersInventoryChanged(player, data)
+            player.equipOtherPlayer(data.item)
+        }
+    }
+
+    #otherPlayersInventoryChanged(player, data) {
+        const world = this.#world
+        const hand = player.get3DObject().getObjectByName('hand')
+        const belt = player.get3DObject().getObjectByName('belt');
+
+        hand.rotation.y = serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50))
+        const lastHandItemModel = hand.getObjectByName(`item-${player.getEquippedOtherPlayerItemId()}`)
+        if (lastHandItemModel) {
+            belt.getObjectByName(`slot-${player.getEquippedSlotId()}`).add(lastHandItemModel)
+        }
+
+        this.#playerSlotsVisibleModels.forEach(function (slotId) {
+            const item = player.data.slots[slotId]
+            const beltSlot = belt.getObjectByName(`slot-${slotId}`)
+            beltSlot.children.forEach((model) => model.visible = false)
+            if (!item) { // do not have slotID filled
+                return
+            }
+
+            let itemModel = beltSlot.getObjectByName(`item-${item.id}`)
+            if (!itemModel) {
+                itemModel = world.getModelForItem(item)
+                beltSlot.add(itemModel)
+            }
+
+            itemModel.name = `item-${item.id}`
+            itemModel.position.set(0, 0, 0)
+            itemModel.rotation.set(0, 0, 0)
+            itemModel.visible = true
+        })
+
+        const modelInHand = belt.getObjectByName(`slot-${data.item.slot}`).getObjectByName(`item-${data.item.id}`)
+        hand.add(modelInHand)
+        modelInHand.position.set(0, 0, 0)
+        modelInHand.rotation.set(0, 0, 0)
+        modelInHand.visible = true
     }
 
     getMyTeamPlayers() {

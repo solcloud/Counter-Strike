@@ -21,11 +21,6 @@ final class PistolP250 extends AmmoBasedWeapon
     protected int $price = 300;
     protected int $ammo = self::magazineCapacity;
 
-    public function getName(): string
-    {
-        return 'P-250';
-    }
-
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
         return match ($hitBox) {

@@ -53,6 +53,7 @@ foreach ($collider->getHitBoxes() as $box) {
     <meta charset="UTF-8">
     <title>Player model Generator</title>
     <script src="./assets/threejs/three.js"></script>
+    <script src="./assets/js/utils.js"></script>
     <script src="./assets/threejs/orbit-control.js"></script>
 </head>
 <body style="margin:0">
@@ -60,7 +61,7 @@ foreach ($collider->getHitBoxes() as $box) {
     <textarea>Generating...</textarea>
 </div>
 <script>
-    let camera, scene, renderer, controls;
+    let camera, scene, renderer, controls, belt, hand;
     const materialDefault = new THREE.MeshBasicMaterial({color: 0x664b17})
     const materialArm = new THREE.MeshPhongMaterial({color: 0x614a09})
     const materialLeg = new THREE.MeshPhongMaterial({color: 0x124a13})
@@ -106,6 +107,9 @@ foreach ($collider->getHitBoxes() as $box) {
     function object() {
         const json = '<?= json_encode($playerParts, JSON_THROW_ON_ERROR) ?>';
         const data = JSON.parse(json);
+        belt = new THREE.Group()
+        belt.name = 'belt'
+        belt.position.y = -40
         const arms = new THREE.Group()
         arms.name = 'arms'
         const legs = new THREE.Group()
@@ -134,7 +138,46 @@ foreach ($collider->getHitBoxes() as $box) {
             legs.add(createSphere(sphereData, materialLeg))
         })
 
-        body.add(arms)
+        hand = new THREE.Group()
+        hand.name = 'hand'
+        hand.position.x = 22
+        hand.position.y = -12
+        hand.position.z = -30
+        hand.rotateX(degreeToRadian(90))
+        hand.rotateZ(degreeToRadian(-115))
+        arms.add(hand)
+
+        const slot0 = new THREE.Group()
+        slot0.name = 'slot-0'
+        slot0.position.x = -36
+        slot0.position.y = -8
+        slot0.position.z = -2
+        slot0.rotateX(degreeToRadian(-10))
+        slot0.rotateZ(degreeToRadian(100))
+        const slot1 = new THREE.Group()
+        slot1.name = 'slot-1'
+        slot1.position.x = 14
+        slot1.position.y = 22
+        slot1.position.z = 35
+        slot1.rotateX(degreeToRadian(-110))
+        slot1.rotateY(degreeToRadian(90))
+        const slot2 = new THREE.Group()
+        slot2.name = 'slot-2'
+        slot2.position.x = 36
+        slot2.position.y = -6
+        slot2.position.z = -6
+        slot2.rotateX(degreeToRadian(-20))
+        slot2.rotateZ(degreeToRadian(-100))
+        const slot3 = new THREE.Group()
+        slot3.name = 'slot-3'
+        slot3.position.x = -18
+        slot3.position.y = 35
+        slot3.position.z = 14
+        slot3.rotateX(degreeToRadian(70))
+        slot3.rotateY(degreeToRadian(190))
+        belt.add(slot0, slot1, slot2, slot3)
+
+        body.add(arms, belt)
         player.add(head, body, legs)
         scene.add(player)
         renderer.render(scene, camera);
@@ -150,6 +193,15 @@ foreach ($collider->getHitBoxes() as $box) {
         const bb = new THREE.Mesh(new THREE.CylinderGeometry(bbRadius, bbRadius, modelHeight, 16), bbMaterial);
         bb.translateY(bb.geometry.parameters.height / 2)
         scene.add(bb)
+
+        belt.children.forEach(function (slot) {
+            let slotItem = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 30, 8), bbMaterial)
+            slotItem.rotateZ(degreeToRadian(90))
+            slot.add(slotItem)
+        })
+        let handItem = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 30, 8), bbMaterial)
+        handItem.rotateZ(degreeToRadian(90))
+        hand.add(handItem)
     }
 
     function animate() {

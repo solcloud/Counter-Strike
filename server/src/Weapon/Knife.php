@@ -30,11 +30,6 @@ final class Knife extends BaseWeapon implements AttackEnable
         return InventorySlot::SLOT_KNIFE;
     }
 
-    public function getName(): string
-    {
-        return 'Knife';
-    }
-
     public function canAttack(int $tickId): bool
     {
         if (!$this->equipped) {

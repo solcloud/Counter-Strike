@@ -74,11 +74,6 @@ abstract class Item
 
     public abstract function getSlot(): InventorySlot;
 
-    public function getName(): string
-    {
-        return 'Unknown: ' . get_class($this);
-    }
-
     public function getId(): int
     {
         return ItemId::$map[get_class($this)];
@@ -149,7 +144,6 @@ abstract class Item
             'id'   => $this->getId(),
             'type' => $this->getType()->value,
             'slot' => $this->getSlot()->value,
-            'name' => $this->getName(),
         ];
     }
 

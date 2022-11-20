@@ -6,51 +6,88 @@ export class World {
     #renderer;
     #soundListener;
     #playerModel;
-    #bombModel;
     #objectLoader;
     #audioLoader;
+    #gltfLoader;
     #dropItems = [];
     #decals = [];
+    #models = {
+        bomb: null,
+        knife: null,
+        pistol: null,
+        ak: null,
+        m4: null,
+    };
 
     constructor() {
         THREE.Cache.enabled = true
         this.#objectLoader = new THREE.ObjectLoader()
         this.#audioLoader = new THREE.AudioLoader()
+        this.#gltfLoader = new THREE.GLTFLoader()
     }
 
-    async #loadMap(scene, map) {
-        const mapData = await this.#loadJSON(`./resources/map/${map}.json`)
-        scene.add(mapData)
+    #loadMap(scene, map) {
+        // TODO convert maps to glb
+        return new Promise(resolve => {
+            const promises = []
+            promises.push(this.#loadJSON(`./resources/map/${map}.json`).then((data) => scene.add(data)))
+            promises.push(
+                this.#loadJSON(`./resources/map/${map}-extra.json`).then((data) => {
+                    // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
+                    const lightTarget = data.getObjectByName('light-target')
+                    data.traverse(function (object) {
+                        if (object.type !== 'SpotLight') {
+                            return
+                        }
 
-        const mapDataExtra = await this.#loadJSON(`./resources/map/${map}-extra.json`)
-        // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
-        const lightTarget = mapDataExtra.getObjectByName('light-target')
-        mapDataExtra.traverse(function (object) {
-            if (object.type !== 'SpotLight') {
-                return
-            }
-
-            object.target = lightTarget
+                        object.target = lightTarget
+                    })
+                    scene.add(data)
+                })
+            )
+            Promise.all(promises).then(resolve)
         })
-        scene.add(mapDataExtra)
     }
 
     #loadJSON(url) {
-        const loader = this.#objectLoader;
         return new Promise(resolve => {
-            loader.load(url, resolve);
+            this.#objectLoader.load(url, resolve)
         });
     }
 
-    async init(map, setting) {
+    #loadModel(url) {
+        return new Promise(resolve => {
+            this.#gltfLoader.load(url, resolve)
+        });
+    }
+
+    init(map, setting) {
         const scene = new THREE.Scene()
         scene.background = new THREE.Color(0xdadada)
 
-        this.#playerModel = await this.#loadJSON('./resources/model/player.json')
-        this.#bombModel = new THREE.Mesh(new THREE.SphereGeometry(20), new THREE.MeshBasicMaterial({color: 0xFF1111}))
-        this.#bombModel.visible = false
-        scene.add(this.#bombModel)
-        await this.#loadMap(scene, map)
+        const promises = []
+        promises.push(this.#loadJSON('./resources/model/player.json').then((model) => this.#playerModel = model))
+        promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
+            this.#models.bomb = model.scene
+            this.#models.bomb.scale.set(.3, .3, .3)
+        }))
+        promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
+            this.#models.knife = model.scene
+            this.#models.knife.scale.set(-400, 400, 400)
+        }))
+        promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
+            this.#models.pistol = model.scene
+            this.#models.pistol.scale.set(10, 10, 10)
+        }))
+        promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
+            this.#models.ak = model.scene
+            this.#models.ak.scale.set(10, 10, 10)
+        }))
+        promises.push(this.#loadModel('./resources/model/m4.glb').then((model) => {
+            this.#models.m4 = model.scene
+            this.#models.m4.scale.set(10, 10, 10)
+        }))
+        promises.push(this.#loadMap(scene, map))
 
         const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
@@ -63,6 +100,7 @@ export class World {
             glParameters.antialias = true
         }
         const renderer = new THREE.WebGLRenderer(glParameters);
+        //renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.setSize(window.innerWidth, window.innerHeight);
         if (!setting.shouldPreferPerformance()) {
             renderer.shadowMap.enabled = true;
@@ -73,7 +111,6 @@ export class World {
         window.addEventListener('resize', function () {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
@@ -81,7 +118,7 @@ export class World {
         this.#camera = camera
         this.#renderer = renderer
 
-        return renderer.domElement
+        return Promise.all(promises).then(() => renderer.domElement)
     }
 
     createPlayerMe() {
@@ -109,20 +146,51 @@ export class World {
     }
 
     spawnBomb(position) {
-        this.#bombModel.position.set(position.x, position.y, -position.z)
-        this.#bombModel.visible = true
+        this.#scene.add(this.#models.bomb)
+        this.#models.bomb.rotation.set(0, 0, 0)
+        this.#models.bomb.position.set(position.x, position.y, -position.z)
+        this.#models.bomb.visible = true
+    }
+
+    getModelForItem(item) {
+        if (item.slot === Enum.InventorySlot.SLOT_PRIMARY) {
+            return item.id === Enum.ItemId.RifleM4A4 ? this.#models.m4.clone() : this.#models.ak.clone()
+        }
+
+        if (item.slot === Enum.InventorySlot.SLOT_SECONDARY) {
+            return this.#models.pistol.clone()
+        }
+
+        if (item.slot === Enum.InventorySlot.SLOT_KNIFE) {
+            return this.#models.knife.clone()
+        }
+
+        if (item.slot === Enum.InventorySlot.SLOT_BOMB) {
+            return this.#models.bomb
+        }
+
+        console.warn("No model for", item)
+        return new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0xFF0000}))
     }
 
     itemDrop(position, item) {
-        const dropItem = new THREE.Mesh(new THREE.SphereGeometry(30), new THREE.MeshBasicMaterial({color: 0xaecf75}))
+        const dropItem = this.getModelForItem(item)
         dropItem.position.set(position.x, position.y, -position.z)
+        dropItem.visible = true
         dropItem.userData.itemId = item.id
         this.#scene.add(dropItem)
 
-        this.#dropItems.push(dropItem)
+        if (item.id !== Enum.ItemId.Bomb) {
+            this.#dropItems.push(dropItem)
+        }
     }
 
     itemPickup(position, item) {
+        if (item.id === Enum.ItemId.Bomb) {
+            this.#removeBomb()
+            return
+        }
+
         for (let i = 0; i < this.#dropItems.length; i++) {
             const dropItem = this.#dropItems[i]
             if (!dropItem || dropItem.userData.itemId !== item.id) {
@@ -167,12 +235,13 @@ export class World {
     destroyObject(object) {
         object.clear()
         object.removeFromParent()
-        object.geometry.dispose()
-        object.material.dispose()
+        object.geometry && object.geometry.dispose()
+        object.material && object.material.dispose()
+        object = null
     }
 
     #removeBomb() {
-        this.#bombModel.visible = false
+        this.#models.bomb.visible = false
     }
 
     #createPlayer(colorIndex, isOpponent) {
@@ -236,7 +305,7 @@ export class World {
         this.#audioLoader.load('./resources/sound/' + soundName, function (buffer) {
             sound.setBuffer(buffer)
             sound.setRefDistance(refDistance)
-            sound.setVolume(50)
+            sound.setVolume(30)
             sound.setLoop(false)
             sound.play()
             sound.source.addEventListener('ended', function () {
