@@ -353,11 +353,11 @@ class Game
         if ($isHalftime) {
             $this->halfTimeSwapTeams();
             $callback = function () use ($startRoundFreezeTime, $roundEndEvent): void {
-                $this->paused = true;
                 $this->roundReset(true, $roundEndEvent);
                 $this->addEvent($startRoundFreezeTime);
             };
             $event = new PauseStartEvent($this, PauseReason::HALF_TIME, $callback, $this->properties->half_time_freeze_sec * 1000);
+            $this->paused = true;
         } else {
             $event = new RoundEndCoolDownEvent(function () use ($startRoundFreezeTime, $roundEndEvent): void {
                 $this->paused = true;

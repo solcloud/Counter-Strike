@@ -226,7 +226,6 @@ export class World {
     }
 
     reset() {
-        this.#removeBomb()
         this.clearDecals()
         this.#dropItems.forEach((item) => this.destroyObject(item))
         this.#dropItems = []

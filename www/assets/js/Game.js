@@ -9,6 +9,7 @@ export class Game {
     #stats
     #pointer
     #round = 1
+    #roundHalfTime = 2
     #paused = false
     #started = false
     #options = false
@@ -58,6 +59,9 @@ export class Game {
         if (!this.#started) {
             this.#gameStartOrHalfTimeOrEnd()
             this.#started = true
+        }
+        if (this.#roundHalfTime === this.#round + 1) {
+            this.#world.playSound('voice/blanka-last_round_of_half.wav', null, true)
         }
         this.#paused = true
         this.score = score
@@ -147,6 +151,7 @@ export class Game {
     bombPlanted(timeMs, position) {
         const world = this.#world
         world.spawnBomb(position)
+        this.bombDropPosition = position
 
         const bombSecCount = Math.round(timeMs / 1000)
         this.#hud.bombPlanted(bombSecCount)
@@ -188,6 +193,7 @@ export class Game {
 
     gameStart(options) {
         this.#options = options
+        this.#roundHalfTime = Math.floor(options.setting.max_rounds / 2) + 1
         this.#hud.startWarmup(options.warmupSec * 1000)
 
         const playerId = options.playerId
@@ -361,7 +367,7 @@ export class Game {
         }
 
         this.#playerSlotsVisibleModels.forEach(function (slotId) {
-            const item = player.data.slots[slotId]
+            const item = data.slots[slotId]
             const beltSlot = belt.getObjectByName(`slot-${slotId}`)
             beltSlot.children.forEach((model) => model.visible = false)
             if (!item) { // do not have slotID filled
