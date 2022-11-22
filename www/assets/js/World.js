@@ -1,64 +1,20 @@
 import * as Enum from "./Enums.js";
+import {ModelRepository} from "./ModelRepository.js";
 
 export class World {
     #scene;
     #camera;
     #renderer;
     #soundListener;
-    #playerModel;
-    #objectLoader;
     #audioLoader;
-    #gltfLoader;
+    #modelRepository;
     #dropItems = [];
     #decals = [];
-    #models = {
-        bomb: null,
-        knife: null,
-        pistol: null,
-        ak: null,
-        m4: null,
-    };
 
     constructor() {
         THREE.Cache.enabled = true
-        this.#objectLoader = new THREE.ObjectLoader()
         this.#audioLoader = new THREE.AudioLoader()
-        this.#gltfLoader = new THREE.GLTFLoader()
-    }
-
-    #loadMap(scene, map) {
-        // TODO convert maps to glb
-        return new Promise(resolve => {
-            const promises = []
-            promises.push(this.#loadJSON(`./resources/map/${map}.json`).then((data) => scene.add(data)))
-            promises.push(
-                this.#loadJSON(`./resources/map/${map}-extra.json`).then((data) => {
-                    // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
-                    const lightTarget = data.getObjectByName('light-target')
-                    data.traverse(function (object) {
-                        if (object.type !== 'SpotLight') {
-                            return
-                        }
-
-                        object.target = lightTarget
-                    })
-                    scene.add(data)
-                })
-            )
-            Promise.all(promises).then(resolve)
-        })
-    }
-
-    #loadJSON(url) {
-        return new Promise(resolve => {
-            this.#objectLoader.load(url, resolve)
-        });
-    }
-
-    #loadModel(url) {
-        return new Promise(resolve => {
-            this.#gltfLoader.load(url, resolve)
-        });
+        this.#modelRepository = new ModelRepository()
     }
 
     init(map, setting) {
@@ -66,28 +22,8 @@ export class World {
         scene.background = new THREE.Color(0xdadada)
 
         const promises = []
-        promises.push(this.#loadJSON('./resources/model/player.json').then((model) => this.#playerModel = model))
-        promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
-            this.#models.bomb = model.scene
-            this.#models.bomb.scale.set(.3, .3, .3)
-        }))
-        promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
-            this.#models.knife = model.scene
-            this.#models.knife.scale.set(-400, 400, 400)
-        }))
-        promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
-            this.#models.pistol = model.scene
-            this.#models.pistol.scale.set(10, 10, 10)
-        }))
-        promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
-            this.#models.ak = model.scene
-            this.#models.ak.scale.set(10, 10, 10)
-        }))
-        promises.push(this.#loadModel('./resources/model/m4.glb').then((model) => {
-            this.#models.m4 = model.scene
-            this.#models.m4.scale.set(10, 10, 10)
-        }))
-        promises.push(this.#loadMap(scene, map))
+        promises.push(this.#modelRepository.loadAll())
+        promises.push(this.#modelRepository.loadMap(map).then((model) => scene.add(model)))
 
         const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
@@ -146,35 +82,19 @@ export class World {
     }
 
     spawnBomb(position) {
-        this.#scene.add(this.#models.bomb)
-        this.#models.bomb.rotation.set(0, 0, 0)
-        this.#models.bomb.position.set(position.x, position.y, -position.z)
-        this.#models.bomb.visible = true
+        const bomb = this.#modelRepository.getBomb()
+        this.#scene.add(bomb)
+        bomb.rotation.set(0, 0, 0)
+        bomb.position.set(position.x, position.y, -position.z)
+        bomb.visible = true
     }
 
     getModelForItem(item) {
-        if (item.slot === Enum.InventorySlot.SLOT_PRIMARY) {
-            return item.id === Enum.ItemId.RifleM4A4 ? this.#models.m4.clone() : this.#models.ak.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_SECONDARY) {
-            return this.#models.pistol.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_KNIFE) {
-            return this.#models.knife.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_BOMB) {
-            return this.#models.bomb
-        }
-
-        console.warn("No model for", item)
-        return new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0xFF0000}))
+        return this.#modelRepository.getModelForItem(item)
     }
 
     itemDrop(position, item) {
-        const dropItem = this.getModelForItem(item)
+        const dropItem = this.#modelRepository.getModelForItem(item)
         dropItem.position.set(position.x, position.y, -position.z)
         dropItem.visible = true
         dropItem.userData.itemId = item.id
@@ -240,52 +160,25 @@ export class World {
     }
 
     #removeBomb() {
-        this.#models.bomb.visible = false
+        const bomb = this.#modelRepository.getBomb()
+        bomb.visible = false
     }
 
-    #createPlayer(colorIndex, isOpponent) {
+    #createPlayer(colorIndex, isOpponent) { // fixme: create glb player models and remove
         const color = new THREE.Color(Enum.Color[colorIndex])
         const headMaterial = new THREE.MeshPhongMaterial({
             map: new THREE.TextureLoader().load(
                 './resources/face.png'
             )
         })
-        const bodyTexture = new THREE.Texture(
-            this.#generateTexture(
-                Enum.ColorNames[colorIndex],
-                '#' + color.getHexString(),
-                isOpponent ? '#FF6600' : '#75b359',
-                isOpponent ? '#9b190c' : '#399b0c'
-            )
-        );
-        bodyTexture.needsUpdate = true;
 
-        const player = this.#playerModel.clone()
+        const bodyColor = isOpponent ? 0x993d00 : 0x75b359
+        const player = this.#modelRepository.getPlayer().clone()
         player.getObjectByName('head').children[0].material = headMaterial
-        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({map: bodyTexture})
+        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({color: bodyColor})
+        player.getObjectByName('legs').children.forEach((mesh) => mesh.material.color = color)
         player.rotation.reorder("YXZ")
         return player
-    }
-
-    #generateTexture(playerText, playerColor, colorStart, colorEnd, resolution = 200) {
-        const canvas = document.createElement("canvas");
-        canvas.width = resolution;
-        canvas.height = resolution;
-
-        const ctx = canvas.getContext("2d");
-        ctx.rect(0, 0, resolution, resolution);
-        const gradient = ctx.createLinearGradient(0, 0, resolution, resolution);
-        gradient.addColorStop(0, colorStart);
-        gradient.addColorStop(1, colorEnd);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        ctx.fillStyle = playerColor
-        ctx.font = '60px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(playerText, resolution / 2, resolution / 2)
-
-        return canvas;
     }
 
     playSound(soundName, position, inPlayerHead, refDistance = 1) {

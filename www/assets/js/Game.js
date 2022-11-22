@@ -61,7 +61,7 @@ export class Game {
             this.#started = true
         }
         if (this.#roundHalfTime === this.#round + 1) {
-            this.#world.playSound('voice/blanka-last_round_of_half.wav', null, true)
+            this.#world.playSound('voice/blanka-last_round_of_half.mp3', null, true)
         }
         this.#paused = true
         this.score = score
