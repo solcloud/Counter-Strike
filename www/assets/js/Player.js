@@ -27,7 +27,7 @@ export class Player {
         ammoReserve: null,
         isReloading: null,
     }
-    custom = {
+    #custom = {
         itemId: null,
         slotId: null,
         slots: null,
@@ -40,8 +40,8 @@ export class Player {
     }
 
     equip(slotId) {
-        this.custom.slotId = slotId
-        this.custom.slots = JSON.stringify(this.data.slots)
+        this.#custom.slotId = slotId
+        this.#custom.slots = JSON.stringify(this.data.slots)
     }
 
     updateData(serverData) {
@@ -53,20 +53,20 @@ export class Player {
     }
 
     getEquippedSlotId() {
-        return this.custom.slotId
+        return this.#custom.slotId
     }
 
     equipOtherPlayer(item) {
-        this.custom.itemId = item.id
+        this.#custom.itemId = item.id
         this.equip(item.slot)
     }
 
     getEquippedOtherPlayerItemId() {
-        return this.custom.itemId
+        return this.#custom.itemId
     }
 
     isInventoryChanged(serverState) {
-        return (this.getEquippedSlotId() !== serverState.item.slot || this.custom.slots !== JSON.stringify(serverState.slots))
+        return (this.getEquippedSlotId() !== serverState.item.slot || this.#custom.slots !== JSON.stringify(serverState.slots))
     }
 
     getTeamName() {
@@ -106,7 +106,13 @@ export class Player {
 
     respawn() {
         this.data.health = 100
+        this.#custom = {
+            itemId: null,
+            slotId: null,
+            slots: null,
+        }
         this.get3DObject().visible = true
+        this.get3DObject().getObjectByName('figure').visible = true
     }
 
     died() {

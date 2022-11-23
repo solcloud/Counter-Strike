@@ -28,7 +28,13 @@ export class World {
         const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
         const listener = new THREE.AudioListener()
-        camera.add(listener)
+        const povItem = new THREE.Group()
+        povItem.name = 'pov-item'
+        povItem.position.z = -30
+        povItem.position.y = -14
+        povItem.rotateX(degreeToRadian(88))
+        povItem.rotateZ(degreeToRadian(-100))
+        camera.add(listener, povItem)
         this.#soundListener = listener
 
         const glParameters = {}
@@ -59,11 +65,12 @@ export class World {
 
     createPlayerMe() {
         const me = new THREE.Object3D()
-        me.visible = false
         const head = new THREE.Object3D()
         head.name = "head"
         head.add(this.getCamera())
-        me.add(head)
+        const figure = new THREE.Group()
+        figure.name = 'figure'
+        me.add(head, figure)
 
         // TODO spawn into more interesting warmup place, like some credits area, walls with actual map of map, etc.
         //      if client also implement moving and shooting warmup aim arena would be cool (some place with random spawning targets to warmup aim)
@@ -90,14 +97,15 @@ export class World {
     }
 
     getModelForItem(item) {
-        return this.#modelRepository.getModelForItem(item)
+        const model = this.#modelRepository.getModelForItem(item)
+        model.name = `item-${item.id}`
+        return model
     }
 
     itemDrop(position, item) {
-        const dropItem = this.#modelRepository.getModelForItem(item)
+        const dropItem = this.getModelForItem(item)
         dropItem.position.set(position.x, position.y, -position.z)
         dropItem.visible = true
-        dropItem.userData.itemId = item.id
         this.#scene.add(dropItem)
 
         if (item.id !== Enum.ItemId.Bomb) {
@@ -116,7 +124,7 @@ export class World {
 
         for (let i = 0; i < this.#dropItems.length; i++) {
             const dropItem = this.#dropItems[i]
-            if (!dropItem || dropItem.userData.itemId !== item.id) {
+            if (!dropItem || dropItem.name !== `item-${item.id}`) {
                 continue
             }
 

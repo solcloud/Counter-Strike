@@ -22,11 +22,8 @@
     position: absolute;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%);
-}
-
-#hud #equipped-item img[data-slot] {
-    width: 30vw;
+    width: 200px;
+    transform: translateX(-100%);
 }
 
 #hud #equipped-item img[data-shot],

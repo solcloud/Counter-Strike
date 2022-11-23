@@ -48,11 +48,16 @@ class Inventory
         }
 
         unset($this->items[InventorySlot::SLOT_BOMB->value]);
+        $this->updateEquippedSlot();
         $this->store = new BuyMenu($isAttackerSide, $this->items);
     }
 
     private function updateEquippedSlot(): int
     {
+        if (isset($this->items[$this->equippedSlot])) {
+            return $this->equippedSlot;
+        }
+
         if (isset($this->items[$this->lastEquippedSlotId])) {
             $this->equippedSlot = $this->lastEquippedSlotId;
         } else {

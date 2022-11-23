@@ -23,7 +23,6 @@ export class HUD {
         haveDefuseKit: null,
         spectateUi: null,
         equippedItem: null,
-        slotModel: null,
         shotModel: null,
         dropModel: null,
         inventory: null,
@@ -134,7 +133,6 @@ export class HUD {
     }
 
     equip(slotId, availableSlots) {
-        this.#elements.slotModel.src = `./resources/slot_${slotId}.png`
         this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
             node.classList.remove('highlight', 'hidden')
             if (availableSlots[node.dataset.slot] === undefined) {
@@ -213,7 +211,6 @@ export class HUD {
             <div style="position:relative">
                 <img data-shot class="hidden" src="./resources/shot.gif">
                 <img data-drop class="hidden" src="./resources/drop.gif">
-                <img data-slot src="./resources/slot_${Enum.InventorySlot.SLOT_SECONDARY}.png">
             </div>
         </div>
         <div id="scoreboard" class="hidden">
@@ -282,7 +279,6 @@ export class HUD {
         this.#elements.spectateUi = elementHud.querySelector('#mode-spectate')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
-        this.#elements.slotModel = elementHud.querySelector('#equipped-item img[data-slot]')
         this.#elements.shotModel = elementHud.querySelector('#equipped-item img[data-shot]')
         this.#elements.dropModel = elementHud.querySelector('#equipped-item img[data-drop]')
         this.#elements.inventory = elementHud.querySelector('.inventory')

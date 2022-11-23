@@ -240,11 +240,12 @@ export class Game {
 
         const player = this.players[playerId]
         player.get3DObject().getObjectByName('head').add(camera)
-        player.get3DObject().visible = false
+        player.get3DObject().getObjectByName('figure').visible = false
         if (this.playerSpectate.isAlive()) {
-            this.playerSpectate.get3DObject().visible = true
+            this.playerSpectate.get3DObject().getObjectByName('figure').visible = true
         }
         this.playerSpectate = player
+        this.equip(player.getEquippedSlotId())
     }
 
     createPlayer(data) {
@@ -272,6 +273,20 @@ export class Game {
         }
 
         this.playerSpectate.equip(slotId)
+        const item = this.playerSpectate.data.slots[slotId]
+        const povItems = this.#world.getCamera().getObjectByName('pov-item')
+        povItems.children.forEach((mesh) => mesh.visible = false)
+
+        let model = povItems.getObjectByName(`item-${item.id}`)
+        if (!model) {
+            model = this.#world.getModelForItem(item)
+            povItems.add(model)
+        }
+        model.position.set(0, 0, 0)
+        model.rotation.set(0, 0, 0)
+        model.visible = true
+
+        this.playerSpectate.get3DObject().getObjectByName('figure').visible = false
         this.#hud.equip(slotId, this.playerSpectate.data.slots)
         return true
     }
@@ -363,7 +378,6 @@ export class Game {
                 beltSlot.add(itemModel)
             }
 
-            itemModel.name = `item-${item.id}`
             itemModel.position.set(0, 0, 0)
             itemModel.rotation.set(0, 0, 0)
             itemModel.visible = true

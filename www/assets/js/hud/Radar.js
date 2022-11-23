@@ -43,6 +43,7 @@ export class Radar {
 
     update(players, idSpectator, spectatorRotationHorizontal, bombPosition) {
         let spectator
+        let bombHasPlayer = false
         const ctx = this.#ctx
         ctx.resetTransform()
         ctx.drawImage(this.#image, 0, 0, this.#canvas.width, this.#canvas.height)
@@ -72,13 +73,18 @@ export class Radar {
             ctx.stroke()
 
             if (undefined !== player.data.slots[InventorySlot.SLOT_BOMB]) {
+                bombHasPlayer = true
                 bombPosition = player.data.position
             }
         })
         if (bombPosition) {
             ctx.beginPath()
             ctx.fillStyle = "#FF1100";
-            ctx.arc(bombPosition.x + 55, -bombPosition.z + 55, 42, 0, 2 * Math.PI)
+            if (bombHasPlayer) {
+                ctx.arc(bombPosition.x + 55, -bombPosition.z + 55, 42, 0, 2 * Math.PI)
+            } else {
+                ctx.arc(bombPosition.x, -bombPosition.z, 42, 0, 2 * Math.PI)
+            }
             ctx.fill()
         }
 

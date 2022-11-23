@@ -178,7 +178,10 @@ foreach ($collider->getHitBoxes() as $box) {
         belt.add(slot0, slot1, slot2, slot3)
 
         body.add(arms, belt)
-        player.add(head, body, legs)
+        const figure = new THREE.Group()
+        figure.name = 'figure'
+        figure.add(body, legs)
+        player.add(head, figure)
         scene.add(player)
         renderer.render(scene, camera);
         document.querySelector('textarea').innerText = JSON.stringify(player.toJSON())
