@@ -1,8 +1,31 @@
 import {InventorySlot, SoundType} from "./Enums.js";
 
 export class SoundRepository {
+    #alwaysInHeadTypes = [
+        SoundType.BOMB_PLANTED, SoundType.BOMB_DEFUSED,
+    ]
+    #myPlayerTypes = [
+        SoundType.ITEM_RELOAD, SoundType.ITEM_PICKUP, SoundType.ITEM_ATTACK, SoundType.ITEM_ATTACK2, SoundType.ITEM_BUY,
+        SoundType.PLAYER_STEP, SoundType.ATTACK_NO_AMMO,
+        SoundType.BOMB_PLANTING, SoundType.BOMB_DEFUSING,
+    ]
+    #soundPlayer
 
-    getSoundName(type, item, playerId, surface, playerSpectateId) {
+    constructor(soundPlayer) {
+        this.#soundPlayer = soundPlayer
+    }
+
+    play(data, spectatorId) {
+        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface, spectatorId)
+        if (!soundName) {
+            return
+        }
+
+        let inPlayerSpectateHead = (this.#alwaysInHeadTypes.includes(data.type) || (data.player && data.player === spectatorId && this.#myPlayerTypes.includes(data.type)))
+        this.#soundPlayer(soundName, data.position, inPlayerSpectateHead)
+    }
+
+    #getSoundName(type, item, playerId, surface, playerSpectateId) {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
                 return '422990__dkiller2204__sfxrunground1.wav'

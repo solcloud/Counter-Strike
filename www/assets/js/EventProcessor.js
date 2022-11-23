@@ -10,7 +10,7 @@ export class EventProcessor {
     process(event) {
         let callback = this.#callbacks[event.code];
         if (callback === undefined) {
-            console.log("Unknown event callback for event.code " + event.code)
+            console.error("Unknown event callback for event.code " + event.code)
             return false
         }
         callback(event.data)
@@ -21,8 +21,7 @@ export class EventProcessor {
         const eventsCallback = {}
 
         eventsCallback[EventList.unknown] = function (data) {
-            console.log("Common server, fix yourself, event 0 - unknown")
-            console.log(data)
+            console.error("Common server, fix yourself, event 0 - unknown", data)
         }
 
         eventsCallback[EventList.GameOverEvent] = function (data) {
@@ -94,7 +93,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.SoundEvent] = function (data) {
-            game.playSound(data)
+            game.processSound(data)
         }
 
         eventsCallback[EventList.PlantEvent] = function (data) {

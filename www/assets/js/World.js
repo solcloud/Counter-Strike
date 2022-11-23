@@ -17,13 +17,13 @@ export class World {
         this.#modelRepository = new ModelRepository()
     }
 
-    init(map, setting) {
+    init(mapName, setting) {
         const scene = new THREE.Scene()
         scene.background = new THREE.Color(0xdadada)
 
         const promises = []
         promises.push(this.#modelRepository.loadAll())
-        promises.push(this.#modelRepository.loadMap(map).then((model) => scene.add(model)))
+        promises.push(this.#modelRepository.loadMap(mapName).then((model) => scene.add(model)))
 
         const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
         camera.rotation.reorder("YXZ")
@@ -105,9 +105,12 @@ export class World {
         }
     }
 
-    itemPickup(position, item) {
+    itemPickup(position, item, spectatorPickup) {
         if (item.id === Enum.ItemId.Bomb) {
-            this.#removeBomb()
+            if (spectatorPickup) {
+                const bomb = this.#modelRepository.getBomb()
+                bomb.visible = false
+            }
             return
         }
 
@@ -143,6 +146,7 @@ export class World {
 
     clearDecals() {
         this.#decals.forEach((item) => this.destroyObject(item))
+        this.#decals = []
     }
 
     reset() {
@@ -159,11 +163,6 @@ export class World {
         object = null
     }
 
-    #removeBomb() {
-        const bomb = this.#modelRepository.getBomb()
-        bomb.visible = false
-    }
-
     #createPlayer(colorIndex, isOpponent) { // fixme: create glb player models and remove
         const color = new THREE.Color(Enum.Color[colorIndex])
         const headMaterial = new THREE.MeshPhongMaterial({
@@ -172,10 +171,9 @@ export class World {
             )
         })
 
-        const bodyColor = isOpponent ? 0x993d00 : 0x75b359
         const player = this.#modelRepository.getPlayer().clone()
         player.getObjectByName('head').children[0].material = headMaterial
-        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({color: bodyColor})
+        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({color: (isOpponent ? 0x993d00 : 0x75b359)})
         player.getObjectByName('legs').children.forEach((mesh) => mesh.material.color = color)
         player.rotation.reorder("YXZ")
         return player

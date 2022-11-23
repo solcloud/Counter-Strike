@@ -42,6 +42,7 @@ class SphereGroupHitBox implements HitIntersect
 
     /**
      * @return SphereHitBox[]
+     * @codeCoverageIgnore
      */
     public function getParts(): array
     {

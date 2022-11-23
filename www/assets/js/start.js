@@ -11,7 +11,7 @@ let launchGame
 
 ////////////
 
-    const validMaps = ['default', 'aim']
+    const validMaps = ['default']
     let initialized = false
     const world = new World()
     const hud = new HUD()

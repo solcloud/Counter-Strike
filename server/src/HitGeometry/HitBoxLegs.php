@@ -2,7 +2,6 @@
 
 namespace cs\HitGeometry;
 
-use cs\Core\GameException;
 use cs\Core\Point;
 
 class HitBoxLegs extends SphereGroupHitBox
@@ -20,9 +19,6 @@ class HitBoxLegs extends SphereGroupHitBox
     {
         $this->addHitBox($start->addY(14)->clone(), 14);
         $this->addHitBox($start->addX(-4)->addY(20)->addZ(-6)->clone(), 10);
-        if ($start->y > $maxY) {
-            throw new GameException("Legs too high");
-        }
         $this->addHitBox($start->addX(-4)->setY($maxY + 4)->addZ(4)->clone(), 14);
     }
 
@@ -30,9 +26,6 @@ class HitBoxLegs extends SphereGroupHitBox
     {
         $this->addHitBox($start->addY(14)->clone(), 14);
         $this->addHitBox($start->addX(4)->addY(20)->addZ(-6)->clone(), 10);
-        if ($start->y > $maxY) {
-            throw new GameException("Legs too high");
-        }
         $this->addHitBox($start->addX(4)->setY($maxY + 4)->addZ(4)->clone(), 14);
     }
 

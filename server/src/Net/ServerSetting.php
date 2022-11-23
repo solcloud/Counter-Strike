@@ -17,9 +17,7 @@ class ServerSetting
         public readonly int $warmupWaitSec = 60,
     )
     {
-        if ($this->tickMs > 0) {
-            Util::$TICK_RATE = $tickMs;
-        }
+        Util::$TICK_RATE = ($tickMs > 0 ? $tickMs : Util::$TICK_RATE);
         $this->warmupWaitSecRemains = $this->warmupWaitSec;
     }
 

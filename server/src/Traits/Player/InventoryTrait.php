@@ -59,6 +59,7 @@ trait InventoryTrait
             $this->world->dropItem($this, $item);
             $this->inventory->removeEquipped();
         }
+        $this->equip($this->getEquippedItem()->getSlot());
         return $item;
     }
 

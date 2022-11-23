@@ -12,13 +12,13 @@ export class Game {
     #roundHalfTime = 2
     #paused = false
     #started = false
-    #options = false
+    #options = null
     #readyCallback
     #endCallback
     #soundRepository
     #hudDebounceTicks = 1
     #bombTimerId = null;
-    eventProcessor
+    #eventProcessor
     score = null
     bombDropPosition = null
     alivePlayers = [0, 0]
@@ -32,11 +32,12 @@ export class Game {
         this.#world = world
         this.#hud = hud
         this.#stats = stats
-        this.eventProcessor = new EventProcessor(this)
-        this.#soundRepository = new SoundRepository()
+        this.#eventProcessor = new EventProcessor(this)
+        this.#soundRepository = new SoundRepository((...args) => world.playSound(...args))
     }
 
     pause(msg, score, timeMs) {
+        this.#paused = true
         console.log("Pause: " + msg + " for " + timeMs + "ms")
         clearInterval(this.#bombTimerId)
         this.#world.reset()
@@ -63,7 +64,6 @@ export class Game {
         if (this.#roundHalfTime === this.#round + 1) {
             this.#world.playSound('voice/blanka-last_round_of_half.mp3', null, true)
         }
-        this.#paused = true
         this.score = score
         this.#hud.pause(msg, timeMs)
         this.#hud.requestFullScoreBoardUpdate(this.score)
@@ -108,19 +108,20 @@ export class Game {
         this.#world.playSound('538422__rosa-orenes256__referee-whistle-sound.wav', null, true)
     }
 
-    playSound(data) {
-        if (data.type === SoundType.ITEM_ATTACK && data.player === this.playerSpectate.getId()) {
+    processSound(data) {
+        const spectatorId = this.playerSpectate.getId()
+        if (data.type === SoundType.ITEM_ATTACK && data.player === spectatorId) {
             this.attackFeedback(data.item)
         }
         if (data.type === SoundType.ITEM_PICKUP) {
-            this.#world.itemPickup(data.position, data.item)
+            this.#world.itemPickup(data.position, data.item, spectatorId === data.player)
         }
         if (data.type === SoundType.BULLET_HIT && data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
             this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
         }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)
-            if (data.player === this.playerSpectate.getId()) {
+            if (data.player === spectatorId) {
                 this.dropFeedback(data.item)
             }
             if (data.item.slot === InventorySlot.SLOT_BOMB) {
@@ -128,24 +129,10 @@ export class Game {
             }
         }
         if (data.type === SoundType.BOMB_DEFUSED) {
-            this.#bombDefused()
+            clearInterval(this.#bombTimerId)
         }
 
-        let soundName = this.#soundRepository.getSoundName(data.type, data.item, data.player, data.surface, this.playerSpectate.getId())
-        if (!soundName) {
-            return
-        }
-
-        const alwaysInHeadTypes = [
-            SoundType.BOMB_PLANTED, SoundType.BOMB_DEFUSED,
-        ]
-        const myPlayerTypes = [
-            SoundType.ITEM_RELOAD, SoundType.ITEM_PICKUP, SoundType.ITEM_ATTACK, SoundType.ITEM_ATTACK2, SoundType.ITEM_BUY,
-            SoundType.PLAYER_STEP, SoundType.ATTACK_NO_AMMO,
-            SoundType.BOMB_PLANTING, SoundType.BOMB_DEFUSING,
-        ]
-        let inPlayerSpectateHead = (alwaysInHeadTypes.includes(data.type) || (data.player && data.player === this.playerSpectate.getId() && myPlayerTypes.includes(data.type)))
-        this.#world.playSound(soundName, data.position, inPlayerSpectateHead)
+        this.#soundRepository.play(data, spectatorId)
     }
 
     bombPlanted(timeMs, position) {
@@ -169,10 +156,6 @@ export class Game {
             tickSecondsCount++;
         }, 1000)
         this.#bombTimerId = bombTimerId
-    }
-
-    #bombDefused() {
-        clearInterval(this.#bombTimerId)
     }
 
     isPaused() {
@@ -297,7 +280,7 @@ export class Game {
         this.#stats.begin()
         const game = this
 
-        if (this.playerMe !== null) {
+        if (this.#options !== null) {
             state.players.forEach(function (serverState) {
                 let player = game.players[serverState.id]
                 if (player === undefined) {
@@ -307,7 +290,7 @@ export class Game {
             })
         }
         state.events.forEach(function (event) {
-            game.eventProcessor.process(event)
+            game.#eventProcessor.process(event)
         })
 
         this.#render()
@@ -341,7 +324,7 @@ export class Game {
     updateOtherPlayersModels(player, data) {
         const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
-        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 60), -50) : data.look.vertical
+        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 60), -50) : data.look.vertical // cap visual rotation if playerMe is alive to not see broken neck
         playerObject.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(rotationVertical)
 
         const body = playerObject.getObjectByName('body')

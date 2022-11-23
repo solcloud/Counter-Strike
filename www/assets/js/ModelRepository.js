@@ -29,14 +29,14 @@ export class ModelRepository {
         });
     }
 
-    loadMap(map) {
+    loadMap(mapName) {
         // TODO convert json map to single glb
         return new Promise(async resolve => {
             const promises = []
             const mapGroup = new THREE.Group()
-            promises.push(this.#loadJSON(`./resources/map/${map}.json`).then((data) => mapGroup.add(data)))
+            promises.push(this.#loadJSON(`./resources/map/${mapName}.json`).then((data) => mapGroup.add(data)))
             promises.push(
-                this.#loadJSON(`./resources/map/${map}-extra.json`).then((data) => {
+                this.#loadJSON(`./resources/map/${mapName}-extra.json`).then((data) => {
                     // JSON do not support light.target https://github.com/mrdoob/three.js/issues/9508
                     const lightTarget = data.getObjectByName('light-target')
                     data.traverse(function (object) {

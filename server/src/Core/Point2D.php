@@ -9,21 +9,6 @@ class Point2D
     {
     }
 
-    public function getX(): int
-    {
-        return $this->x;
-    }
-
-    public function getY(): int
-    {
-        return $this->y;
-    }
-
-    public function isOrigin(): bool
-    {
-        return ($this->x === 0 && $this->y === 0);
-    }
-
     public function equals(self $point): bool
     {
         return ($this->x === $point->x && $this->y === $point->y);
@@ -75,8 +60,8 @@ class Point2D
     public function toArray(): array
     {
         return [
-            "x" => $this->getX(),
-            "y" => $this->getY(),
+            "x" => $this->x,
+            "y" => $this->y,
         ];
     }
 

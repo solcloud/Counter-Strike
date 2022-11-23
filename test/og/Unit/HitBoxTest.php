@@ -2,8 +2,10 @@
 
 namespace Test\Unit;
 
+use cs\Core\GameException;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Point2D;
 use cs\Enum\Color;
 use cs\HitGeometry\SphereHitBox;
 use Test\BaseTest;
@@ -46,6 +48,27 @@ class HitBoxTest extends BaseTest
             $player->getSight()->lookHorizontal($angle);
             $this->assertPositionSame(new Point($xz[0], $y, $xz[1]), $sphere->calculateWorldCoordinate($player), " Angle: {$angle}");
         }
+    }
+
+    public function testSphereHitBoxInvalidRadius(): void
+    {
+        try {
+            new SphereHitBox(new Point(), 0);
+            $this->fail('Should throw');
+        } catch (GameException $ex) {
+        }
+        try {
+            new SphereHitBox(new Point(), -2);
+            $this->fail('Should throw');
+        } catch (GameException $ex) {
+        }
+
+        // Just grinding code coverage...
+        $point = new Point2D(1,1);
+        $hit = new SphereHitBox(new Point($point->clone()->setY(-1)->addY(1)->setX(0)->x, 0), 2);
+        $point->setFrom(new Point2D());
+        $this->assertTrue($hit->getRelativeCenter()->to2D('xz')->equals($point));
+        $this->assertTrue($hit->getRelativeCenter()->to2D('xy')->equals($point));
     }
 
     public function testSphereWorldPointCenter(): void

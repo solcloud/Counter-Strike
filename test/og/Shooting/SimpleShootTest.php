@@ -120,6 +120,46 @@ class SimpleShootTest extends BaseTestCase
         $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
     }
 
+    public function testCanAttackAfterDrop(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->getPlayer(1)->getInventory()->earnMoney(16000);
+
+        $playerCommands = [
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            $this->waitNTicks(Knife::equipReadyTimeMs) - 1,
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_AK)),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $p->equipPrimaryWeapon(),
+            fn(Player $p) => $this->assertInstanceOf(RifleAk::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNull($p->attack()),
+            $this->waitNTicks(RifleAk::equipReadyTimeMs) - 1,
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertInstanceOf(RifleAk::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNull($p->attack()),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs) - 1,
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->dropEquippedItem()),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNull($p->attack()),
+            $this->waitNTicks(Knife::equipReadyTimeMs) - 1,
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->endGame(),
+        ];
+
+        $this->playPlayer($game, $playerCommands);
+    }
+
     public function testFireRate(): void
     {
         $playerCommands = [

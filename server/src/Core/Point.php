@@ -24,11 +24,6 @@ class Point
         return $this->z;
     }
 
-    public function isOrigin(): bool
-    {
-        return ($this->x === 0 && $this->y === 0 && $this->z === 0);
-    }
-
     public function equals(self $point): bool
     {
         return ($this->x === $point->x && $this->y === $point->y && $this->z === $point->z);

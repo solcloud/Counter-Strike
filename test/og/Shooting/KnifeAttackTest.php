@@ -43,6 +43,7 @@ class KnifeAttackTest extends BaseTestCase
         $game->addPlayer($p2);
         $p2->setPosition($game->getPlayer(1)->getPositionImmutable()->addZ($p2->getBoundingRadius() * 3));
         $this->playPlayer($game, [
+            fn(Player $p) => $p->reload(),
             $this->waitNTicks(Knife::equipReadyTimeMs),
             fn(Player $p) => $p->getSight()->lookAt(0, -30),
             fn(Player $p) => $p->moveForward(),
