@@ -16,24 +16,13 @@ Attackers win round by:
 
 If attackers deploy graffiti bomb before round time ends, then round clock countdown is set to 40 sec and defenders has 30 sec (or 35 sec in case of using defuse kit) to defuse bomb.
 
-This is NO violence game so there is no blood or violence visuals.
+_This is low violence game so there is no red blood or similar violence visuals._
 
 ## Setup
 
-### Server
-
-Currently, there is no official public server available (as match making service is also WIP), but you can run server locally (or somebody can host it for you).
-
-```bash
-git clone https://github.com/solcloud/Counter-Strike cs-football
-cd cs-football
-composer install --no-dev -a
-php cli/server.php 2 # will start server waiting for 2 players to connect
-```
-
 ### Client
 
-Download executable binary for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or run locally from project source folder.
+Download executable binary for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or build latest locally from project source folder.
 
 ```bash
 cd electron/
@@ -41,11 +30,24 @@ npm install
 npm run dev
 ```
 
-Or you can connect using Web Browser, but for that you will need WebSocket UDP bridge.
+Or you can play using modern Web Browser (just open `www/index.html` in your favorite browser), but for that you will also need WebSocket UDP bridge.
 
 ```bash
 php cli/udp-ws-bridge.php 8081 # will start WebSocket listener on localhost:8081
 ```
+
+### Server
+
+Currently, there is no official public server available (as match making service is also WIP), but you can run server locally (or somebody can host it for you).
+
+```bash
+composer install -a --no-dev
+php cli/server.php 2 # will start server waiting for 2 players to connect
+```
+
+## TODO
+
+Actually not so many hard math things. Mostly just polishing. If you know html/css/js/php languages or 3D modeling/texturing you can join project and help us improve project quicker.  
 
 ### NOT going to implement
 - burst fire
