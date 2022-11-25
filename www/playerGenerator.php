@@ -63,9 +63,9 @@ foreach ($collider->getHitBoxes() as $box) {
 <script>
     let camera, scene, renderer, controls, belt, hand;
     const materialDefault = new THREE.MeshBasicMaterial({color: 0x664b17})
-    const materialArm = new THREE.MeshPhongMaterial({color: 0x614a09})
-    const materialLeg = new THREE.MeshPhongMaterial({color: 0x124a13})
-    const materialBody = new THREE.MeshPhongMaterial({color: 0xFF6600})
+    const materialArm = new THREE.MeshStandardMaterial({color: 0x114b3d})
+    const materialLeg = new THREE.MeshStandardMaterial({color: 0x124a13})
+    const materialBody = new THREE.MeshStandardMaterial({color: 0xFF6600})
 
     const playerState = JSON.parse('<?= json_encode($playerState) ?>');
     const headHeight = playerState.heightSight;
