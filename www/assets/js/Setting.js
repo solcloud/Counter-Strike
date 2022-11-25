@@ -8,6 +8,7 @@ export class Setting {
             sprayTriggerDeltaMs: 80,
             preferPerformance: false,
             crosshair: '✛',
+            anisotropic: 16,
         },
         bind: {
             'KeyW': Action.MOVE_FORWARD,
@@ -57,6 +58,13 @@ export class Setting {
 
     getFieldOfView() {
         return this.#setting.base.fov
+    }
+
+    getAnisotropicFiltering() {
+        if (this.shouldPreferPerformance()) {
+            return 1
+        }
+        return this.#setting.base.anisotropic
     }
 
     shouldPreferPerformance() {

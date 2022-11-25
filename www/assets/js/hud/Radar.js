@@ -12,7 +12,6 @@ export class Radar {
     #padding
     #mapSizes = {
         "default": {x: 3440, y: 2560},
-        "aim": {x: 2000, y: 2000},
     }
 
     constructor(canvas, mapImage, map, zoom = 0.9) {

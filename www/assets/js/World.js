@@ -2,17 +2,19 @@ import * as Enum from "./Enums.js";
 import {ModelRepository} from "./ModelRepository.js";
 
 export class World {
-    #scene;
-    #camera;
-    #renderer;
-    #soundListener;
-    #audioLoader;
-    #modelRepository;
-    #dropItems = [];
-    #decals = [];
+    #scene
+    #camera
+    #renderer
+    #soundListener
+    #audioLoader
+    #modelRepository
+    #dropItems = []
+    #decals = []
 
     constructor() {
         THREE.Cache.enabled = true
+        THREE.ColorManagement.legacyMode = false
+
         this.#audioLoader = new THREE.AudioLoader()
         this.#modelRepository = new ModelRepository()
     }
@@ -41,26 +43,42 @@ export class World {
         if (!setting.shouldPreferPerformance()) {
             glParameters.antialias = true
         }
-        const renderer = new THREE.WebGLRenderer(glParameters);
-        //renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        const renderer = new THREE.WebGLRenderer(glParameters)
+        renderer.outputEncoding = THREE.sRGBEncoding
+        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMappingExposure = .8
+        renderer.physicallyCorrectLights = false
+        renderer.setSize(window.innerWidth, window.innerHeight)
         if (!setting.shouldPreferPerformance()) {
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.setPixelRatio(window.devicePixelRatio);
+            new THREE.RGBELoader().load('./resources/texture/orlando_stadium_1k.hdr', function (texture) {
+                texture.mapping = THREE.EquirectangularReflectionMapping
+                texture.toneMapped = true
+                scene.environment = texture
+            })
+            renderer.shadowMap.enabled = true
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap
+            renderer.setPixelRatio(window.devicePixelRatio)
         }
 
         window.addEventListener('resize', function () {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        })
 
         this.#scene = scene
         this.#camera = camera
         this.#renderer = renderer
 
-        return Promise.all(promises).then(() => renderer.domElement)
+        const anisotropy = Math.min(setting.getAnisotropicFiltering(), renderer.capabilities.getMaxAnisotropy())
+        return Promise.all(promises).then(() => {
+            scene.traverse(function (object) {
+                if (object.isMesh && object.material.map) {
+                    object.material.map.anisotropy = anisotropy
+                }
+            })
+            return renderer.domElement
+        })
     }
 
     createPlayerMe() {
@@ -113,12 +131,8 @@ export class World {
         }
     }
 
-    itemPickup(position, item, spectatorPickup) {
+    itemPickup(position, item) {
         if (item.id === Enum.ItemId.Bomb) {
-            if (spectatorPickup) {
-                const bomb = this.#modelRepository.getBomb()
-                bomb.visible = false
-            }
             return
         }
 
@@ -210,15 +224,15 @@ export class World {
                 audioSource.clear()
                 audioSource.removeFromParent()
             })
-        });
+        })
     }
 
     render() {
-        this.#renderer.render(this.#scene, this.#camera);
+        this.#renderer.render(this.#scene, this.#camera)
     }
 
     getCamera() {
-        return this.#camera;
+        return this.#camera
     }
 
 }

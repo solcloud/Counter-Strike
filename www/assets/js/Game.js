@@ -114,7 +114,7 @@ export class Game {
             this.attackFeedback(data.item)
         }
         if (data.type === SoundType.ITEM_PICKUP) {
-            this.#world.itemPickup(data.position, data.item, spectatorId === data.player)
+            this.#world.itemPickup(data.position, data.item)
         }
         if (data.type === SoundType.BULLET_HIT && data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
             this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))

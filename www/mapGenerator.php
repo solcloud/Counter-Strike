@@ -38,13 +38,12 @@ foreach ($map->getBoxes() as $box) {
 <body style="margin:0">
 <div style="position:absolute;<?= $radarMapGenerator ? 'display:none;' : '' ?>">
     <textarea class="map">Generating...</textarea>
-    <textarea class="extra">Generating...</textarea>
 </div>
 <script>
     const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
     let camera, scene, renderer, controls, map, extra;
     const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
-    const material = new THREE.MeshLambertMaterial({color: 0x664b17})
+    const material = new THREE.MeshStandardMaterial({color: 0x664b17})
 
     function init() {
         scene = new THREE.Scene();
@@ -105,7 +104,7 @@ foreach ($map->getBoxes() as $box) {
 
             if (first) {
                 maxHeight = box.height - 1
-                center = new THREE.Group()
+                center = new THREE.Object3D()
                 center.name = "center"
                 center.position.set(box.width / 2, box.height / 2, box.depth / -2)
                 center.visible = false
@@ -126,11 +125,6 @@ foreach ($map->getBoxes() as $box) {
             map.add(mesh)
         })
 
-        const bulb = new THREE.Mesh(new THREE.SphereGeometry(90), new THREE.MeshBasicMaterial({color: 0xFFFFFF}))
-        bulb.position.set(center.position.x, maxHeight + 30, center.position.z)
-        const lightTarget = new THREE.Object3D()
-        lightTarget.name = "light-target"
-        lightTarget.position.set(center.position.x, 0, center.position.z)
         const s1 = new THREE.SpotLight(0xFFFFFF, .6)
         s1.castShadow = true
         s1.shadow.mapSize.width = 2048
@@ -138,23 +132,12 @@ foreach ($map->getBoxes() as $box) {
         s1.shadow.camera.near = 1
         s1.shadow.camera.far = maxHeight * 10
         s1.position.set(center.position.x, maxHeight * 2.5, center.position.z)
-        s1.target = lightTarget
+        s1.target = center
         const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
         const a1 = new THREE.AmbientLight(0xDADADA, .8)
-        extra.add(s1, d1, a1, lightTarget);
-        if (!forRadar) {
-            extra.add(bulb)
-        }
+        extra.add(s1, d1, a1);
 
         scene.add(map, extra)
-    }
-
-    function extraGeometry() {
-        if (<?= (int)($map::class === Map\DefaultMap::class) ?>) {
-            const ramp1 = createRamp()
-            ramp1.position.z = -80.1
-            extra.add(ramp1)
-        }
     }
 
     function spawns() {
@@ -221,7 +204,7 @@ foreach ($map->getBoxes() as $box) {
         area.translateX(box.width / 2)
         area.translateY(box.height / 2)
         area.translateZ(box.depth / -2)
-        extra.add(area);
+        scene.add(area);
     }
 
     function animate() {
@@ -231,7 +214,6 @@ foreach ($map->getBoxes() as $box) {
 
     init()
     object()
-    extraGeometry()
     if (!forRadar) {
         spawns()
         buyAreas()
@@ -239,7 +221,6 @@ foreach ($map->getBoxes() as $box) {
     plants()
     renderer.render(scene, camera);
     document.querySelector('textarea.map').innerText = JSON.stringify(map.toJSON())
-    document.querySelector('textarea.extra').innerText = JSON.stringify(extra.toJSON())
     animate()
 </script>
 </body>
