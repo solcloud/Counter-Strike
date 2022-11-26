@@ -132,8 +132,12 @@ export class World {
         }
     }
 
-    itemPickup(position, item) {
+    itemPickup(position, item, isSpectatorPickup) {
         if (item.id === Enum.ItemId.Bomb) {
+            if (isSpectatorPickup) {
+                const bomb = this.#modelRepository.getBomb()
+                bomb.visible = false
+            }
             return
         }
 
@@ -176,6 +180,10 @@ export class World {
         this.clearDecals()
         this.#dropItems.forEach((item) => this.destroyObject(item))
         this.#dropItems = []
+        const bomb = this.#modelRepository.getBomb()
+        if (bomb.parent && bomb.parent.type === 'Scene') {
+            bomb.visible = false
+        }
     }
 
     destroyObject(object) {

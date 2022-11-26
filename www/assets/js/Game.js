@@ -54,8 +54,10 @@ export class Game {
                 game.playerSpectate = game.playerMe
                 game.requestPointerLock()
             } else {
-                player.respawn()
+                player.get3DObject().visible = true
+                player.get3DObject().getObjectByName('figure').visible = true
             }
+            player.respawn()
         })
         if (!this.#started) {
             this.#gameStartOrHalfTimeOrEnd()
@@ -114,7 +116,7 @@ export class Game {
             this.attackFeedback(data.item)
         }
         if (data.type === SoundType.ITEM_PICKUP) {
-            this.#world.itemPickup(data.position, data.item)
+            this.#world.itemPickup(data.position, data.item, (spectatorId === data.player))
         }
         if (data.type === SoundType.BULLET_HIT && data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
             this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))

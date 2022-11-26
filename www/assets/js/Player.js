@@ -110,8 +110,6 @@ export class Player {
             slotId: null,
             slots: null,
         }
-        this.get3DObject().visible = true
-        this.get3DObject().getObjectByName('figure').visible = true
     }
 
     died() {
