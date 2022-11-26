@@ -142,7 +142,6 @@ abstract class Item
     {
         return [
             'id'   => $this->getId(),
-            'type' => $this->getType()->value,
             'slot' => $this->getSlot()->value,
         ];
     }

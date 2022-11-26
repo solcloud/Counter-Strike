@@ -138,7 +138,7 @@ class Server
     private function receiveClientsCommands(): void
     {
         $playersRequest = [];
-        for ($i = 1; $i <= $this->setting->playersMax * 2; $i++) {
+        for ($i = 1; $i <= ceil($this->setting->playersMax * 1.5); $i++) {
             if (!$this->pollClient($address, $port, $msg)) {
                 continue;
             }

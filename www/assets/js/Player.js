@@ -5,7 +5,6 @@ export class Player {
         money: null,
         item: {
             id: null,
-            type: null,
             slot: null,
         },
         canAttack: null,

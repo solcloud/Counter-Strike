@@ -51,15 +51,22 @@ class ClueSocket implements NetConnector
     {
         $this->setSocketTimeout($blockTimeoutMicroSeconds);
 
-        try {
-            return $this->socket->recvFrom($readMaxBytes, MSG_OOB, $peerAddress);
-        } catch (Exception $ex) {
-            if ($ex->getCode() !== SOCKET_EAGAIN) {
-                throw new NetException($ex->getMessage(), $ex->getCode(), $ex);
+        /** @var \Socket $socket */
+        $socket = $this->socket->getResource();
+        $ret = @socket_recvfrom($socket, $buffer, $readMaxBytes, MSG_OOB, $address, $port);
+        if ($ret === false) {
+            $code = socket_last_error($socket);
+            if ($code !== SOCKET_EWOULDBLOCK) {
+                throw new NetException(socket_strerror($code), $code);
             }
+            return null;
         }
 
-        return null;
+        if (str_contains($address, ':')) {
+            $address = "[{$address}]";
+        }
+        $peerAddress = "{$address}:{$port}";
+        return $buffer;
     }
 
     public function close(): void
