@@ -208,7 +208,7 @@ export class HUD {
         elementHud.innerHTML = `
         <div id="cross"></div>
         <div id="equipped-item">
-            <div style="position:relative">
+            <div>
                 <img data-shot class="hidden" src="./resources/shot.gif">
                 <img data-drop class="hidden" src="./resources/drop.gif">
             </div>

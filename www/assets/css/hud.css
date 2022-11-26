@@ -20,16 +20,22 @@
 
 #hud #equipped-item {
     position: absolute;
-    bottom: 0;
+    top: 50%;
     left: 50%;
-    width: 200px;
-    transform: translateX(-100%);
+    transform: translate(-50%, -50%);
+}
+
+#hud #equipped-item > div {
+    position: relative;
+    left: -10vh;
+    text-align: center;
 }
 
 #hud #equipped-item img[data-shot],
 #hud #equipped-item img[data-drop] {
     position: absolute;
-    bottom: -160px;
+    top: 5vh;
+    height: 20vh;
 }
 
 #hud #cross {
