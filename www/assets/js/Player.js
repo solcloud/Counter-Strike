@@ -27,7 +27,6 @@ export class Player {
         isReloading: null,
     }
     #custom = {
-        itemId: null,
         slotId: null,
         slots: null,
     }
@@ -53,15 +52,6 @@ export class Player {
 
     getEquippedSlotId() {
         return this.#custom.slotId
-    }
-
-    equipOtherPlayer(item) {
-        this.#custom.itemId = item.id
-        this.equip(item.slot)
-    }
-
-    getEquippedOtherPlayerItemId() {
-        return this.#custom.itemId
     }
 
     isInventoryChanged(serverState) {
@@ -105,8 +95,8 @@ export class Player {
 
     respawn() {
         this.data.health = 100
+        this.get3DObject().visible = true
         this.#custom = {
-            itemId: null,
             slotId: null,
             slots: null,
         }

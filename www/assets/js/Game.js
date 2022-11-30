@@ -54,7 +54,6 @@ export class Game {
                 game.playerSpectate = game.playerMe
                 game.requestPointerLock()
             } else {
-                player.get3DObject().visible = true
                 player.get3DObject().getObjectByName('figure').visible = true
             }
             player.respawn()
@@ -288,7 +287,6 @@ export class Game {
         model.rotation.set(0, 0, 0)
         model.visible = true
 
-        this.playerSpectate.get3DObject().getObjectByName('figure').visible = false
         this.#hud.equip(slotId, this.playerSpectate.data.slots)
         return true
     }
@@ -351,7 +349,7 @@ export class Game {
 
         if (player.isInventoryChanged(data)) {
             this.#otherPlayersInventoryChanged(player, data)
-            player.equipOtherPlayer(data.item)
+            player.equip(data.item.slot)
         }
     }
 
@@ -361,9 +359,11 @@ export class Game {
         const belt = player.get3DObject().getObjectByName('belt');
 
         hand.rotation.y = serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50))
-        const lastHandItemModel = hand.getObjectByName(`item-${player.getEquippedOtherPlayerItemId()}`)
-        if (lastHandItemModel) {
-            belt.getObjectByName(`slot-${player.getEquippedSlotId()}`).add(lastHandItemModel)
+        if (hand.children.length === 1) {
+            const lastHandItemModel = hand.children[0]
+            belt.getObjectByName(`slot-${lastHandItemModel.userData.slot}`).add(lastHandItemModel)
+        } else if (hand.children.length > 1) {
+            throw new Error("Too many item in hands?")
         }
 
         this.#playerSlotsVisibleModels.forEach(function (slotId) {
@@ -390,6 +390,7 @@ export class Game {
         modelInHand.position.set(0, 0, 0)
         modelInHand.rotation.set(0, 0, 0)
         modelInHand.visible = true
+        modelInHand.userData.slot = data.item.slot
     }
 
     getMyTeamPlayers() {
