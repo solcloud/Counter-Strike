@@ -37,6 +37,9 @@ trait AttackTrait
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return null;
         }
+        if (!$item->canAttack($this->world->getTickId())) {
+            return null;
+        }
 
         $result = $item->attack($this->createAttackEvent());
         if ($result) {

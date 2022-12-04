@@ -67,6 +67,7 @@ let launchGame
 
         game.onEnd(function (msg) {
             connector.close()
+            hud.showScore()
             alert("Game ended: " + msg)
             window.location.reload()
         })

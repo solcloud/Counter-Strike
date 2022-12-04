@@ -14,7 +14,7 @@ class World
     private const WALL_X = 0;
     private const WALL_Z = 1;
     private const BOMB_RADIUS = 90;
-    private const BOMB_DEFUSE_MAX_DISTANCE = 250;
+    private const BOMB_DEFUSE_MAX_DISTANCE = 300;
 
     private ?Map $map = null;
     /** @var PlayerCollider[] */

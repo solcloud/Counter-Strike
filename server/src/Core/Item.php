@@ -13,6 +13,7 @@ abstract class Item
 {
     public const equipReadyTimeMs = 0;
 
+    private int $id;
     private int $skinId;
     protected bool $equipped = false;
     protected int $price = 9999;
@@ -21,6 +22,7 @@ abstract class Item
     public function __construct(bool $instantlyEquip = false)
     {
         $this->equipped = $instantlyEquip;
+        $this->id = ItemId::$map[get_class($this)];
     }
 
     public function canAttack(int $tickId): bool
@@ -76,7 +78,7 @@ abstract class Item
 
     public function getId(): int
     {
-        return ItemId::$map[get_class($this)];
+        return $this->id;
     }
 
     public function setSkinId(int $skinId): void

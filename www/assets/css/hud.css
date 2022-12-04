@@ -330,7 +330,8 @@
 
 #hud .ammo {
     display: inline;
-    padding: 2px 4px;
+    padding: 4px 8px;
+    color: #ddb9b9;
 }
 
 #hud .kill-feed {

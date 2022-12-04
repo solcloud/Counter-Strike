@@ -9,6 +9,7 @@ on:
       - 'www/'
   pull_request:
     branches: [master]
+    types: [ready_for_review]
     paths-ignore:
       - '**.md'
       - 'cli/'

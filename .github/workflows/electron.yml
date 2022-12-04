@@ -1,8 +1,7 @@
 name: "Electron"
 on:
-  create:
-    tags:
-      - '*'
+  release:
+    types: [created]
 
 jobs:
   electron-build:

@@ -60,6 +60,10 @@ export class HUD {
         this.#showAble.showScore = enabled
     }
 
+    showScore() {
+        this.#elements.score.classList.remove('hidden')
+    }
+
     bombPlanted(detonationTimeSec) {
         this.#resetCountDown()
         this.#elements.time.innerText = '⚠️ 💣'

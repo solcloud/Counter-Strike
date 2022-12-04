@@ -33,7 +33,7 @@ export class Control {
                 game.spectatePlayer(event.buttons === 1)
                 return
             }
-            if (!pointer.isLocked || !game.playerMe.data.canAttack) {
+            if (!pointer.isLocked) {
                 return;
             }
 
@@ -44,7 +44,9 @@ export class Control {
                 if (sprayEnableSlots.includes(game.playerMe.getEquippedSlotId())) {
                     action.sprayingEnable()
                 }
-                action.attack(game.getPlayerMeRotation())
+                if (game.playerMe.data.canAttack) {
+                    action.attack(game.getPlayerMeRotation())
+                }
             }
         })
         document.addEventListener('wheel', (event) => {
