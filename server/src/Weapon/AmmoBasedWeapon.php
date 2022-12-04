@@ -16,23 +16,28 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
 {
     protected int $ammo;
     protected int $ammoReserve;
-    protected bool $reloading = false;
+    protected bool $reloading;
     protected bool $isWeaponPrimary;
     private ?ReloadEvent $eventReload = null;
-    private int $lastAttackTick = 0;
+    private int $lastAttackTick;
+    private int $lastRecoilTick;
+    private int $lastRecoilBulletCount;
     private int $fireRateTicks;
+    private int $recoilResetTicks;
 
     public function __construct(bool $instantlyEquip = false)
     {
         parent::__construct($instantlyEquip);
-        $this->ammoReserve = static::reserveAmmo;
         $this->fireRateTicks = Util::millisecondsToFrames(static::fireRateMs);
+        $this->recoilResetTicks = Util::millisecondsToFrames(static::recoilResetMs);
+        $this->reset();
     }
 
     public function unEquip(): void
     {
         parent::unEquip();
         $this->reloading = false;
+        $this->resetRecoil();
     }
 
     public function reset(): void
@@ -41,6 +46,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->ammoReserve = static::reserveAmmo;
         $this->reloading = false;
         $this->lastAttackTick = 0;
+        $this->resetRecoil();
     }
 
     public function canAttack(int $tickId): bool
@@ -68,7 +74,36 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->lastAttackTick = $event->getTickId();
 
         $event->setItem($this);
+        $this->recoilModifier($event);
         return $event->process();
+    }
+
+    protected function resetRecoil(int $tickId = 0): void
+    {
+        $this->lastRecoilTick = $tickId;
+        $this->lastRecoilBulletCount = 1;
+    }
+
+    private function recoilModifier(AttackEvent $event): void
+    {
+        if ($this->recoilResetTicks === 0) {
+            return;
+        }
+
+        $tickId = $event->getTickId();
+        if ($this->lastRecoilTick === 0 || $this->lastRecoilTick + $this->recoilResetTicks < $tickId) { // recoil is fully reset
+            $this->resetRecoil($tickId);
+        }
+
+        [$offsetHorizontal, $offsetVertical] = static::recoilPattern[$this->lastRecoilBulletCount - 1] ?? [0, 0];
+        if ($this->lastRecoilTick + $this->fireRateTicks >= $tickId) { // maximum (full spraying) recoil
+            $event->applyRecoil($offsetHorizontal, $offsetVertical);
+        } else { // partial recoil
+            $portion = 1 - (min($this->recoilResetTicks, $tickId - $this->lastRecoilTick) / $this->recoilResetTicks);
+            $event->applyRecoil($offsetHorizontal * $portion, $offsetVertical * $portion);
+        }
+        $this->lastRecoilTick = $tickId;
+        $this->lastRecoilBulletCount++;
     }
 
     public function attackSecondary(AttackEvent $event): ?AttackResult

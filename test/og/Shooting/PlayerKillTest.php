@@ -104,6 +104,7 @@ class PlayerKillTest extends BaseTestCase
         $player1->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
         $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
         $player2Position = $player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10);
+        $game->getWorld()->addFloor(new Floor($player2Position->clone()->addX(-10)));
         $player2->setPosition($player2Position);
         $player2->getSight()->lookAt(0, -90);
 
@@ -161,7 +162,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player2->isAlive());
 
         $tickId = $game->getTickId();
-        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
             $game->tick(++$tickId);
         }
         $this->assertNotNull($player2->attack());
@@ -169,7 +170,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player2->isAlive());
         $this->assertSame(1, $game->getRoundNumber());
 
-        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
             $game->tick(++$tickId);
         }
         $this->assertNotNull($player2->attack());
@@ -177,7 +178,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player2->isAlive());
         $this->assertSame(1, $game->getRoundNumber());
 
-        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs); $i++) {
+        for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
             $game->tick(++$tickId);
         }
         $this->assertFalse($game->getScore()->attackersIsWinning());

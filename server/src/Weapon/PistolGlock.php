@@ -16,6 +16,21 @@ final class PistolGlock extends AmmoBasedWeapon
     public const fireRateMs = 150;
     public const damage = 61;
     public const range = 5123;
+    public const recoilResetMs = 300;
+    public const recoilPattern = [
+        [0, 0],
+        [+0.12, +0.19],
+        [+0.13, +0.32],
+        [+0.24, +0.43],
+        [+0.21, +0.64],
+        [+0.24, +0.89],
+        [+0.12, +1.11],
+        [-0.09, +1.25],
+        [-0.12, +1.39],
+        [+0.16, +1.54],
+        [+0.33, +1.85],
+        [-0.68, +2.09],
+    ];
 
     protected bool $isWeaponPrimary = false;
     protected int $price = 200;

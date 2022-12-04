@@ -60,7 +60,7 @@ trait MovementTrait
     {
         $this->position = $newPosition->clone();
         $this->stop();
-        $this->setActiveFloor($this->world->findFloor($this->position));
+        $this->setActiveFloor($this->world->findFloor($this->position, $this->getBoundingRadius()));
     }
 
     public function stop(): void

@@ -13,8 +13,10 @@ abstract class BaseWeapon extends Item
     public const runningSpeed = 0;
     public const reloadTimeMs = 0;
     public const fireRateMs = 0;
+    public const recoilResetMs = 0;
     public const damage = 0;
     public const armorPenetration = 0;
     public const range = 0;
+    public const recoilPattern = [];
 
 }

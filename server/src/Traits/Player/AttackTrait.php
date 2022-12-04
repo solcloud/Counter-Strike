@@ -2,6 +2,7 @@
 
 namespace cs\Traits\Player;
 
+use cs\Enum\ItemType;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
 use cs\Event\AttackEvent;
@@ -76,7 +77,7 @@ trait AttackTrait
         $origin = $this->getPositionImmutable();
         $origin->addY($this->getSightHeight());
 
-        return new AttackEvent(
+        $event = new AttackEvent(
             $this->world,
             $origin,
             $this->getSight()->getRotationHorizontal(),
@@ -84,6 +85,34 @@ trait AttackTrait
             $this->getId(),
             $this->isPlayingOnAttackerSide(),
         );
+
+        $this->applyMovementRecoil($event);
+        return $event;
+    }
+
+    private function applyMovementRecoil(AttackEvent $event): void
+    {
+        $item = $this->getEquippedItem();
+        // fixme: better offsets value calculations for each item and smallest randomness as possible
+
+        if ($this->isFlying()) {
+            $offsetHorizontal = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(15, 25) : rand(10, 11);
+            $offsetVertical = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(8, 16) : rand(6, 12);
+            $event->applyRecoil((rand(0, 1) === 1 ? -1 : 1) * $offsetHorizontal, (rand(0, 1) === 1 ? -1 : 1) * $offsetVertical);
+            return;
+        }
+
+        if ($this->isMoving()) {
+            if ($this->isWalking()) {
+                $offsetHorizontal = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(2, 4) : rand(1, 2);
+                $offsetVertical = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(2, 3) : rand(0, 2);
+                $event->applyRecoil((rand(0, 1) === 1 ? -1 : 1) * $offsetHorizontal, (rand(0, 1) === 1 ? -1 : 1) * $offsetVertical);
+            } elseif ($this->isRunning()) {
+                $offsetHorizontal = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(3, 9) : rand(3, 7);
+                $offsetVertical = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(5, 15) : rand(4, 6);
+                $event->applyRecoil((rand(0, 1) === 1 ? -1 : 1) * $offsetHorizontal, (rand(0, 1) === 1 ? -1 : 1) * $offsetVertical);
+            }
+        }
     }
 
     public function reload(): void

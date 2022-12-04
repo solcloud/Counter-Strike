@@ -17,7 +17,40 @@ final class RifleAk extends AmmoBasedWeapon
     public const fireRateMs = 100;
     public const damage = 36;
     public const armorPenetration = 77;
-    public const range = 250123;
+    public const range = 5123;
+    public const recoilResetMs = 800;
+    public const recoilPattern = [
+        [0,0],
+        [+0.10,+0.19],
+        [-0.01,+0.70],
+        [+0.06,+1.50],
+        [+0.09,+2.36],
+        [-0.23,+3.26],
+        [-0.46,+4.03],
+        [-0.82,+4.54],
+        [-0.36,+4.95],
+        [+0.76,+4.82],
+        [+1.39,+5.06],
+        [+1.03,+5.28],
+        [+1.47,+5.32],
+        [+2.19,+5.07],
+        [+2.26,+5.21],
+        [+1.25,+5.43],
+        [+0.62,+5.57],
+        [+0.24,+5.73],
+        [-0.47,+5.65],
+        [-1.41,+5.42],
+        [-0.90,+5.56],
+        [-1.03,+5.57],
+        [-0.80,+5.73],
+        [-0.56,+5.78],
+        [-1.09,+5.71],
+        [-1.29,+5.85],
+        [-0.72,+5.87],
+        [+0.17,+5.80],
+        [+1.44,+5.22],
+        [+1.83,+5.23],
+    ];
 
     protected bool $isWeaponPrimary = true;
     protected int $price = 2700;

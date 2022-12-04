@@ -90,6 +90,12 @@ final class AttackEvent
         GameException::notImplementedYet("No bullet for item: " . get_class($this->item));
     }
 
+    public function applyRecoil(float $offsetHorizontal, float $offsetVertical): void
+    {
+        $this->angleHorizontal += $offsetHorizontal;
+        $this->angleVertical += $offsetVertical;
+    }
+
     public function getTickId(): int
     {
         return $this->world->getTickId();
