@@ -3,7 +3,6 @@ import {Action, InventorySlot} from "./Enums.js";
 export class PlayerAction {
     #states = {
         attackLookAt: '',
-        attack2LookAt: '',
         lastLookAt: '',
         sprayTriggerStartMs: null,
         moveForward: false,
@@ -57,9 +56,8 @@ export class PlayerAction {
         this.#states.attackLookAt = this.#rotationToServerLookAt(xy)
     }
 
-    attack2(xy) {
+    attack2() {
         this.#states.attack2 = true
-        this.#states.attack2LookAt = this.#rotationToServerLookAt(xy)
     }
 
     equip(slotId) {
@@ -129,6 +127,10 @@ export class PlayerAction {
             action.push('run')
             this.#states.running = false
         }
+        if (this.#states.equip !== false) {
+            action.push('equip ' + this.#states.equip)
+            this.#states.equip = false
+        }
         if (this.#states.reload) {
             action.push('reload')
             this.#states.reload = false
@@ -137,13 +139,8 @@ export class PlayerAction {
             action.push('drop')
             this.#states.drop = false
         }
-        if (this.#states.equip !== false) {
-            action.push('equip ' + this.#states.equip)
-            this.#states.equip = false
-        }
 
         if (this.#states.attack2) {
-            action.push(this.#states.attack2LookAt)
             action.push('attack2')
             this.#states.attack2 = false
         }

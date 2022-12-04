@@ -23,13 +23,13 @@ class Collision
         return (
             pow($pointX - $circleCenterX, 2) + pow($pointY - $circleCenterY, 2)
             <=
-            pow($circleRadius, 2)
+            $circleRadius * $circleRadius
         );
     }
 
     public static function pointWithSphere(Point $point, Point $sphereCenter, int $sphereRadius): bool
     {
-        return Util::distanceSquared($point, $sphereCenter) <= pow($sphereRadius, 2);
+        return Util::distanceSquared($point, $sphereCenter) <= $sphereRadius * $sphereRadius;
     }
 
     public static function cylinderWithCylinder(
@@ -109,7 +109,7 @@ class Collision
         return (
             pow($circleX - $testX, 2) + pow($circleY - $testY, 2)
             <=
-            pow($circleRadius, 2)
+            $circleRadius * $circleRadius
         );
     }
 

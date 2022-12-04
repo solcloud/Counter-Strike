@@ -56,7 +56,7 @@ final class Util
     public static function movementXYZ(float $angleHorizontal, float $angleVertical, int $distance): array
     {
         $y = $distance * sin(deg2rad($angleVertical));
-        $z = self::nearbyInt(sqrt(pow($distance, 2) - pow($y, 2)));
+        $z = self::nearbyInt(sqrt(($distance * $distance) - ($y * $y)));
 
         return [
             self::nearbyInt(sin(deg2rad($angleHorizontal)) * $z),

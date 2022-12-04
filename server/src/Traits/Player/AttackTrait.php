@@ -96,6 +96,9 @@ trait AttackTrait
     private function applyMovementRecoil(AttackEvent $event): void
     {
         $item = $this->getEquippedItem();
+        if (in_array($item->getType(), [ItemType::TYPE_KNIFE, ItemType::TYPE_BOMB, ItemType::TYPE_GRENADE], true)) {
+            return;
+        }
         // fixme: better offsets value calculations for each item and smallest randomness as possible
 
         if ($this->isFlying()) {
@@ -105,10 +108,14 @@ trait AttackTrait
             return;
         }
 
+        if ($this->isCrouching()) {
+            return;
+        }
+
         if ($this->isMoving()) {
             if ($this->isWalking()) {
                 $offsetHorizontal = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(2, 4) : rand(1, 2);
-                $offsetVertical = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(2, 3) : rand(0, 2);
+                $offsetVertical = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(2, 3) : rand(1, 2);
                 $event->applyRecoil((rand(0, 1) === 1 ? -1 : 1) * $offsetHorizontal, (rand(0, 1) === 1 ? -1 : 1) * $offsetVertical);
             } elseif ($this->isRunning()) {
                 $offsetHorizontal = $item->getType() === ItemType::TYPE_WEAPON_PRIMARY ? rand(3, 9) : rand(3, 7);

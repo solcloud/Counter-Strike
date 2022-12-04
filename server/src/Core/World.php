@@ -250,7 +250,7 @@ class World
     public function canBeSeen(Player $observer, Point $targetCenter, int $targetRadius, int $maximumDistance, bool $checkForOtherPlayersAlso = false): bool
     {
         $start = $observer->getPositionImmutable()->addY($observer->getSightHeight());
-        if (Util::distanceSquared($start, $targetCenter) > pow($maximumDistance, 2)) {
+        if (Util::distanceSquared($start, $targetCenter) > $maximumDistance * $maximumDistance) {
             return false;
         }
         $angleVertical = $observer->getSight()->getRotationVertical();
