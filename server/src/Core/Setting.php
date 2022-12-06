@@ -7,10 +7,10 @@ final class Setting
 
     /** @var array<string,int|float> */
     public const defaultConstant = [
-        'moveOneMs'                     => 0.9,
+        'moveOneMs'                     => 0.7,
         'moveWalkOneMs'                 => 0.6,
         'moveCrouchOneMs'               => 0.4,
-        'fallAmountOneMs'               => 2,
+        'fallAmountOneMs'               => 1,
         'crouchDurationMs'              => 250,
         'jumpDurationMs'                => 380,
         'jumpMovementSpeedMultiplier'   => 1.0,
