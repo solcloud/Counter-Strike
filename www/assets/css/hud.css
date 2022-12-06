@@ -40,7 +40,6 @@
 
 #hud #cross {
     position: absolute;
-    color: #d31b1b;
     font-size: 2rem;
     top: 50%;
     left: 50%;
@@ -259,7 +258,7 @@
 #hud .money {
     display: inline;
     padding: .2rem .4rem;
-    color: #9a0438;
+    color: #ff8e8e;
     font-weight: bold;
 }
 

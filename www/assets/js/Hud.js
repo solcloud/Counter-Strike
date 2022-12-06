@@ -298,7 +298,10 @@ export class HUD {
         this.#elements.aliveOpponentTeam = elementHud.querySelector('.team-opponent-alive')
         this.#elements.time = elementHud.querySelector('#time')
         this.#elements.killFeed = elementHud.querySelector('.kill-feed')
-        elementHud.querySelector('#cross').innerText = setting.getCrosshairSymbol()
+
+        const cross = elementHud.querySelector('#cross')
+        cross.innerText = setting.getCrosshairSymbol()
+        cross.style.color = '#' + setting.getCrosshairColor()
 
         const game = this.#game
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)

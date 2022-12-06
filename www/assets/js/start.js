@@ -52,6 +52,7 @@ let launchGame
         const setting = new Setting(settingString)
         const canvas = await world.init(map, setting)
         const pointerLock = new THREE.PointerLockControls(world.getCamera(), document.body)
+        pointerLock.pointerSpeed = setting.getSensitivity()
         hud.createHud(elementHud, map, setting)
         control.init(pointerLock, setting)
         game.setPointer(pointerLock)

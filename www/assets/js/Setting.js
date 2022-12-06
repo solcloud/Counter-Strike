@@ -4,11 +4,15 @@ export class Setting {
     #setting = {
         base: {
             fov: 70,
+            volume: 30,
             radarZoom: 0.9,
+            sensitivity: 1.0,
             sprayTriggerDeltaMs: 80,
-            preferPerformance: false,
             crosshair: '✛',
+            crosshairColor: 'd31b1b',
+            preferPerformance: false,
             anisotropic: 16,
+            exposure: 0.8,
         },
         bind: {
             'KeyW': Action.MOVE_FORWARD,
@@ -49,30 +53,46 @@ export class Setting {
     }
 
     getSprayTriggerDeltaMs() {
-        return this.#setting.base.sprayTriggerDeltaMs
+        return this.#setting.base.sprayTriggerDeltaMs || 80
     }
 
     getRadarZoom() {
-        return this.#setting.base.radarZoom
+        return this.#setting.base.radarZoom || 0.9
     }
 
     getFieldOfView() {
-        return this.#setting.base.fov
+        return this.#setting.base.fov || 70
     }
 
     getAnisotropicFiltering() {
         if (this.shouldPreferPerformance()) {
             return 1
         }
-        return this.#setting.base.anisotropic
+        return this.#setting.base.anisotropic || 16
     }
 
     shouldPreferPerformance() {
-        return this.#setting.base.preferPerformance
+        return this.#setting.base.preferPerformance || false
+    }
+
+    getSensitivity() {
+        return this.#setting.base.sensitivity || 1.0
+    }
+
+    getExposure() {
+        return this.#setting.base.exposure || 0.8
+    }
+
+    getMasterVolume() {
+        return this.#setting.base.volume || 30
     }
 
     getCrosshairSymbol() {
-        return this.#setting.base.crosshair
+        return this.#setting.base.crosshair || '+'
+    }
+
+    getCrosshairColor() {
+        return this.#setting.base.crosshairColor || 'd31b1b'
     }
 
 }

@@ -10,6 +10,7 @@ export class World {
     #modelRepository
     #dropItems = []
     #decals = []
+    volume = 30
 
     constructor() {
         THREE.Cache.enabled = true
@@ -47,7 +48,7 @@ export class World {
         const renderer = new THREE.WebGLRenderer(glParameters)
         renderer.outputEncoding = THREE.sRGBEncoding
         renderer.toneMapping = THREE.ACESFilmicToneMapping
-        renderer.toneMappingExposure = .8
+        renderer.toneMappingExposure = setting.getExposure()
         renderer.physicallyCorrectLights = false
         renderer.setSize(window.innerWidth, window.innerHeight)
         if (!setting.shouldPreferPerformance()) {
@@ -70,6 +71,7 @@ export class World {
         this.#scene = scene
         this.#camera = camera
         this.#renderer = renderer
+        this.volume = setting.getMasterVolume()
 
         const anisotropy = Math.min(setting.getAnisotropicFiltering(), renderer.capabilities.getMaxAnisotropy())
         return Promise.all(promises).then(() => {
@@ -212,6 +214,8 @@ export class World {
 
     playSound(soundName, position, inPlayerHead, refDistance = 1) {
         const sound = new THREE.PositionalAudio(this.#soundListener)
+        sound.setVolume(this.volume)
+        sound.setRefDistance(refDistance)
         const audioSource = new THREE.Object3D()
         audioSource.add(sound)
 
@@ -225,8 +229,6 @@ export class World {
 
         this.#audioLoader.load('./resources/sound/' + soundName, function (buffer) {
             sound.setBuffer(buffer)
-            sound.setRefDistance(refDistance)
-            sound.setVolume(30)
             sound.setLoop(false)
             sound.play()
             sound.source.addEventListener('ended', function () {

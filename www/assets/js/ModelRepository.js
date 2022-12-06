@@ -1,16 +1,9 @@
-import * as Enum from "./Enums.js";
+import {ItemId} from "./Enums.js";
 
 export class ModelRepository {
     #gltfLoader
     #objectLoader
-    #models = {
-        player: null,
-        bomb: null,
-        knife: null,
-        pistol: null,
-        ak: null,
-        m4: null,
-    }
+    #models = {}
 
     constructor() {
         this.#gltfLoader = new THREE.GLTFLoader()
@@ -59,7 +52,7 @@ export class ModelRepository {
     }
 
     getBomb() {
-        return this.#models.bomb
+        return this.#models[ItemId.Bomb]
     }
 
     getPlayer() {
@@ -67,24 +60,17 @@ export class ModelRepository {
     }
 
     getModelForItem(item) {
-        if (item.slot === Enum.InventorySlot.SLOT_PRIMARY) {
-            return item.id === Enum.ItemId.RifleM4A4 ? this.#models.m4.clone() : this.#models.ak.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_SECONDARY) {
-            return this.#models.pistol.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_KNIFE) {
-            return this.#models.knife.clone()
-        }
-
-        if (item.slot === Enum.InventorySlot.SLOT_BOMB) {
+        if (item.id === ItemId.Bomb) {
             return this.getBomb()
         }
 
-        console.warn("No model for", item)
-        return new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0xFF0000}))
+        const model = this.#models[item.id]
+        if (model === undefined) {
+            console.warn("No model for", item)
+            return new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0xFF0000}))
+        }
+
+        return model.clone()
     }
 
     loadAll() {
@@ -93,54 +79,61 @@ export class ModelRepository {
             this.#models.player = model
         }))
         promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
-            this.#models.bomb = model.scene
-            this.#models.bomb.scale.set(.3, .3, .3)
-            this.#models.bomb.traverse(function (object) {
+            model.scene.scale.set(.3, .3, .3)
+            model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
                 }
             })
+
+            this.#models[ItemId.Bomb] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
-            this.#models.knife = model.scene
-            this.#models.knife.scale.set(-400, 400, 400)
-            this.#models.knife.traverse(function (object) {
+            model.scene.scale.set(-400, 400, 400)
+            model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
                 }
             })
+
+            this.#models[ItemId.Knife] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
-            this.#models.pistol = model.scene
-            this.#models.pistol.scale.set(10, 10, 10)
-            this.#models.pistol.traverse(function (object) {
+            model.scene.scale.set(10, 10, 10)
+            model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
                 }
             })
+
+            this.#models[ItemId.PistolUsp] = model.scene
+            this.#models[ItemId.PistolP250] = model.scene
+            this.#models[ItemId.PistolGlock] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
-            this.#models.ak = model.scene
-            this.#models.ak.scale.set(10, 10, 10)
-            this.#models.ak.traverse(function (object) {
+            model.scene.scale.set(10, 10, 10)
+            model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
                 }
             })
+
+            this.#models[ItemId.RifleAk] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/m4.glb').then((model) => {
-            this.#models.m4 = model.scene
-            this.#models.m4.scale.set(10, 10, 10)
-            this.#models.m4.traverse(function (object) {
+            model.scene.scale.set(10, 10, 10)
+            model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
                 }
             })
+
+            this.#models[ItemId.RifleM4A4] = model.scene
         }))
 
         return Promise.all(promises)
