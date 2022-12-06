@@ -6,6 +6,8 @@ export {
     ColorNames,
     RoundEndReasonIcon,
     SoundType,
+    ArmorType,
+    ArmorTypeIcon,
     BuyMenuItem,
     InventorySlot,
     ItemId,
@@ -92,6 +94,20 @@ const SoundType = {
     BOMB_DEFUSING: 14,
     BOMB_DEFUSED: 15,
     ITEM_PICKUP: 16,
+}
+
+// server/src/Enum/ArmorType.php
+const ArmorType = {
+    NONE: 0,
+    BODY: 1,
+    BODY_AND_HEAD: 2,
+}
+
+// server/src/Enum/ArmorType.php
+const ArmorTypeIcon = {
+    0: '♢',
+    1: '🛡️',
+    2: '⛑️',
 }
 
 // server/src/Enum/BuyMenuItem.php

@@ -29,6 +29,7 @@ export class HUD {
         money: null,
         health: null,
         armor: null,
+        armorType: null,
         ammo: null,
         messageTop: null,
         messageBottom: null,
@@ -190,6 +191,7 @@ export class HUD {
         this.#elements.money.innerText = player.money
         this.#elements.health.innerText = player.health
         this.#elements.armor.innerText = player.armor
+        this.#elements.armorType.innerText = Enum.ArmorTypeIcon[player.armorType]
         if (player.ammo === null) {
             this.#elements.ammo.innerText = Enum.ItemIdToName[player.item.id]
         } else {
@@ -239,7 +241,7 @@ export class HUD {
                             ➕ <span data-health>100</span>
                         </div>
                         <div class="hp">
-                            🛡️ <span data-armor>0</span>
+                            <span data-armor-type>♢️</span> <span data-armor>0</span>
                         </div>
                     </div>
                 </div>
@@ -289,6 +291,7 @@ export class HUD {
         this.#elements.money = elementHud.querySelector('[data-money]')
         this.#elements.health = elementHud.querySelector('[data-health]')
         this.#elements.armor = elementHud.querySelector('[data-armor]')
+        this.#elements.armorType = elementHud.querySelector('[data-armor-type]')
         this.#elements.ammo = elementHud.querySelector('[data-ammo]')
         this.#elements.messageTop = elementHud.querySelector('#message-top')
         this.#elements.messageBottom = elementHud.querySelector('#message-bottom')

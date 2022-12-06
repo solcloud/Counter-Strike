@@ -6,7 +6,6 @@ use cs\Enum\InventorySlot;
 use cs\Enum\ItemId;
 use cs\Enum\ItemName;
 use cs\Enum\ItemType;
-use cs\Equipment\Flashbang;
 use cs\Event\EquipEvent;
 
 abstract class Item
@@ -91,20 +90,17 @@ abstract class Item
         return $this->skinId;
     }
 
-    public function getPrice(): int
+    public function getPrice(?self $alreadyHaveItem = null): int
     {
         return $this->price;
     }
 
-    public function canPurchaseMultipleTime(): bool
+    public function canPurchaseMultipleTime(self $newItem): bool
     {
         if ($this->getType() === ItemType::TYPE_WEAPON_PRIMARY) {
             return true;
         }
         if ($this->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
-            return true;
-        }
-        if (($this instanceof Flashbang) && $this->getQuantity() < 2) {
             return true;
         }
 

@@ -102,6 +102,7 @@ class PlayerKillTest extends BaseTestCase
         $player1 = $game->getPlayer(1);
         $player1->getInventory()->earnMoney(1000);
         $player1->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $this->assertSame(100, $player1->getArmorValue());
         $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
         $player2Position = $player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10);
         $game->getWorld()->addFloor(new Floor($player2Position->clone()->addX(-10)));
@@ -109,6 +110,8 @@ class PlayerKillTest extends BaseTestCase
         $player2->getSight()->lookAt(0, -90);
 
         $result = $player2->attack();
+        $this->assertLessThan(100, $player1->getArmorValue());
+        $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
         $this->assertNotNull($result);
         $gun = $player2->getEquippedItem();
         $this->assertInstanceOf(PistolUsp::class, $gun);
@@ -136,6 +139,8 @@ class PlayerKillTest extends BaseTestCase
             $this->endGame(),
         ];
         $player2 = new Player(2, Color::GREEN, false);
+        $this->assertSame(0, $player2->getArmorValue());
+        $this->assertSame(ArmorType::NONE, $player2->getArmorType());
 
         $game = $this->createGame();
         $game->addPlayer($player2);

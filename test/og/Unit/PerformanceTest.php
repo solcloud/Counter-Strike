@@ -134,6 +134,7 @@ class PerformanceTest extends BaseTest
         }
         foreach ($players as $player) {
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
+            $this->assertTrue($player->isAlive());
         }
         $this->assertLessThan(11, $took->asMilliseconds());
     }

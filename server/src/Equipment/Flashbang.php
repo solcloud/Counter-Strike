@@ -2,6 +2,7 @@
 
 namespace cs\Equipment;
 
+use cs\Core\Item;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
@@ -19,6 +20,11 @@ class Flashbang extends BaseEquipment
     public function getSlot(): InventorySlot
     {
         return InventorySlot::SLOT_GRENADE_FLASH;
+    }
+
+    public function canPurchaseMultipleTime(Item $newItem): bool
+    {
+        return ($this->getQuantity() < 2);
     }
 
     public function getQuantity(): int

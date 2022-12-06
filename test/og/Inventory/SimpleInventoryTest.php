@@ -8,6 +8,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Wall;
+use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
@@ -315,6 +316,52 @@ class SimpleInventoryTest extends BaseTestCase
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
         $this->assertSame(RifleAk::magazineCapacity - 1, $ak->getAmmo());
+    }
+
+    public function testKevlarBuy(): void
+    {
+        $playerCommands = [
+            function (Player $p): void {
+                $this->assertSame(2301, $p->getMoney());
+                $this->assertSame(ArmorType::NONE, $p->getArmorType());
+                $this->assertSame(0, $p->getArmorValue());
+            },
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            function (Player $p): void {
+                $this->assertSame(1651, $p->getMoney());
+                $this->assertSame(ArmorType::BODY, $p->getArmorType());
+                $this->assertSame(100, $p->getArmorValue());
+            },
+            fn(Player $p) => $p->lowerArmor(10),
+            function (Player $p): void {
+                $this->assertSame(ArmorType::BODY, $p->getArmorType());
+                $this->assertSame(90, $p->getArmorValue());
+            },
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            function (Player $p): void {
+                $this->assertSame(1001, $p->getMoney());
+                $this->assertSame(ArmorType::BODY, $p->getArmorType());
+                $this->assertSame(100, $p->getArmorValue());
+            },
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD),
+            function (Player $p): void {
+                $this->assertSame(651, $p->getMoney());
+                $this->assertSame(ArmorType::BODY_AND_HEAD, $p->getArmorType());
+                $this->assertSame(100, $p->getArmorValue());
+            },
+            fn(Player $p) => $p->lowerArmor(10),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::KEVLAR_BODY),
+            function (Player $p): void {
+                $this->assertSame(1, $p->getMoney());
+                $this->assertSame(ArmorType::BODY_AND_HEAD, $p->getArmorType());
+                $this->assertSame(100, $p->getArmorValue());
+            },
+        ];
+
+        $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 3 * 650 + 350 + 1]);
     }
 
 }

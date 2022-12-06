@@ -22,6 +22,7 @@ export class Player {
         heightBody: null,
         height: null,
         armor: null,
+        armorType: null,
         ammo: null,
         ammoReserve: null,
         isReloading: null,

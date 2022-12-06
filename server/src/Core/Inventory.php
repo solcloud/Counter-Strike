@@ -20,7 +20,6 @@ class Inventory
     private int $dollars = 0;
     private int $equippedSlot;
     private int $lastEquippedSlotId;
-    private ArmorType $armorType;
     private BuyMenu $store;
 
     public function __construct(bool $isAttackerSide)
@@ -37,7 +36,6 @@ class Inventory
             ];
             $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
-            $this->armorType = ArmorType::NONE;
         } else {
             foreach ($this->items as $item) {
                 $item->reset();
@@ -93,15 +91,13 @@ class Inventory
 
     public function canBuy(Item $item): bool
     {
-        if ($item->getPrice() > $this->dollars) {
+        $alreadyHave = $this->items[$item->getSlot()->value] ?? null;
+        if ($item->getPrice($alreadyHave) > $this->dollars) {
             return false;
         }
 
-        $alreadyHave = $this->items[$item->getSlot()->value] ?? false;
         if ($alreadyHave) {
-            /** @var Item $item */
-            $item = $alreadyHave;
-            if ($item->canPurchaseMultipleTime()) {
+            if ($alreadyHave->canPurchaseMultipleTime($item)) {
                 return true;
             }
             return false;
@@ -117,22 +113,22 @@ class Inventory
             return null;
         }
 
-        $this->dollars -= $item->getPrice();
-        $alreadyHave = $this->items[$item->getSlot()->value] ?? false;
+        $alreadyHave = $this->items[$item->getSlot()->value] ?? null;
+        $this->dollars -= $item->getPrice($alreadyHave);
         if ($alreadyHave) {
             if ($alreadyHave instanceof Flashbang) {
                 $alreadyHave->incrementQuantity();
                 $item = $alreadyHave;
-            } else {
+            } elseif ($alreadyHave instanceof Kevlar && $alreadyHave->getArmorType() === ArmorType::BODY_AND_HEAD) {
+                $alreadyHave->repairArmor();
+                $item = $alreadyHave;
+            } elseif ($item->canBeEquipped()) {
                 $this->equip($item->getSlot());
                 $player->dropEquippedItem(false);
             }
         }
 
         $this->store->buy($item);
-        if ($item instanceof Kevlar) {
-            $this->armorType = $item->getArmorType();
-        }
         $this->items[$item->getSlot()->value] = $item;
         if ($item->canBeEquipped()) {
             return $this->equip($item->getSlot());
@@ -211,9 +207,9 @@ class Inventory
         return $slots;
     }
 
-    public function getArmor(): ArmorType
+    public function getArmor(): ?Kevlar
     {
-        return $this->armorType;
+        return $this->items[InventorySlot::SLOT_KEVLAR->value] ?? null; // @phpstan-ignore-line
     }
 
     public function has(int $slotId): bool

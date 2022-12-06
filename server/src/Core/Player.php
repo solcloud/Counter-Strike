@@ -30,7 +30,6 @@ final class Player
     private array $events = [];
 
     private int $health;
-    private int $armor = 0;
     private int $headHeight; // highest player point
     private bool $isAttacking = false;
 
@@ -88,8 +87,6 @@ final class Player
 
     private function onPlayerDied(): void
     {
-        $this->armor = 0;
-
         $dropItems = [];
         $items = $this->getInventory()->getItems();
         if (isset($items[InventorySlot::SLOT_PRIMARY->value])) {
@@ -192,10 +189,7 @@ final class Player
 
     public function lowerArmor(int $armorDamage): void
     {
-        $this->armor -= abs($armorDamage);
-        if ($this->armor < 0) {
-            $this->armor = 0;
-        }
+        $this->getInventory()->getArmor()?->lowerArmor($armorDamage);
     }
 
     public function lowerHealth(int $healthDamage): void
@@ -219,7 +213,20 @@ final class Player
 
     public function getArmorType(): ArmorType
     {
-        return $this->inventory->getArmor();
+        $kevlar = $this->getInventory()->getArmor();
+        if ($kevlar) {
+            return $kevlar->getArmorType();
+        }
+        return ArmorType::NONE;
+    }
+
+    public function getArmorValue(): int
+    {
+        $kevlar = $this->getInventory()->getArmor();
+        if ($kevlar) {
+            return $kevlar->getArmor();
+        }
+        return 0;
     }
 
     public function hasDefuseKit(): bool
@@ -291,7 +298,8 @@ final class Player
             "heightSight" => $this->getSightHeight(),
             "heightBody"  => $this->getBodyHeight(),
             "height"      => $this->getHeadHeight(),
-            "armor"       => $this->getInventory()->getArmor() === ArmorType::NONE ? 0 : 100, //TODO
+            "armor"       => $this->getArmorValue(),
+            "armorType"   => $this->getArmorType()->value,
             "ammo"        => $ammo,
             "ammoReserve" => $ammoReserve,
             "isReloading" => $reloading,

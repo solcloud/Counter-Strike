@@ -2,16 +2,13 @@
 
 namespace cs\Equipment;
 
+use cs\Core\Item;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
 class DefuseKit extends BaseEquipment
 {
-
-    public function getPrice(): int
-    {
-        return 400;
-    }
+    protected int $price = 400;
 
     public function getType(): ItemType
     {
@@ -33,7 +30,7 @@ class DefuseKit extends BaseEquipment
         return false;
     }
 
-    public function canPurchaseMultipleTime(): bool
+    public function canPurchaseMultipleTime(Item $newItem): bool
     {
         return false;
     }

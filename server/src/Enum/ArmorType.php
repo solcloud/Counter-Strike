@@ -2,12 +2,12 @@
 
 namespace cs\Enum;
 
-enum ArmorType
+enum ArmorType: int
 {
 
-    case BODY;
-    case BODY_AND_HEAD;
-    case NONE;
+    case NONE = 0;
+    case BODY = 1;
+    case BODY_AND_HEAD = 2;
 
     public function hasArmorHead(): bool
     {

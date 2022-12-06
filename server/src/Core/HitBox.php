@@ -2,7 +2,9 @@
 
 namespace cs\Core;
 
+use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
+use cs\Enum\ItemType;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
 use cs\Weapon\Knife;
@@ -71,6 +73,17 @@ class HitBox implements Hittable
         $shootItem = $bullet->getShootItem();
         $healthDamage = $shootItem->getDamageValue($type, $this->player->getArmorType());
         $this->player->lowerHealth($healthDamage);
+        $playerArmorType = $this->player->getArmorType();
+        if ($playerArmorType !== ArmorType::NONE && $type !== HitBoxType::LEG) {
+            $armorDamage = 0;
+            if ($shootItem instanceof Item) {
+                $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
+            }
+            if ($playerArmorType === ArmorType::BODY_AND_HEAD && $type === HitBoxType::HEAD) {
+                $armorDamage += 30;
+            }
+            $this->player->lowerArmor($armorDamage);
+        }
 
         if (!$this->player->isAlive()) {
             $this->playerWasKilled = true;

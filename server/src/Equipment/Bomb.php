@@ -80,24 +80,34 @@ class Bomb extends BaseEquipment
 
         if ($distanceSquared > ($maxDistance * .9)) {
             $player->lowerHealth(4);
+            $player->lowerArmor(4);
         } elseif ($distanceSquared > ($maxDistance * .8)) {
             $player->lowerHealth(7);
+            $player->lowerArmor(7);
         } elseif ($distanceSquared > ($maxDistance * .7)) {
             $player->lowerHealth(12);
+            $player->lowerArmor(12);
         } elseif ($distanceSquared > ($maxDistance * .6)) {
             $player->lowerHealth(26);
+            $player->lowerArmor(26);
         } elseif ($distanceSquared > ($maxDistance * .5)) {
             $player->lowerHealth(49);
+            $player->lowerArmor(49);
         } elseif ($distanceSquared > ($maxDistance * .4)) {
             $player->lowerHealth(61);
+            $player->lowerArmor(61);
         } elseif ($distanceSquared > ($maxDistance * .3)) {
             $player->lowerHealth(74);
+            $player->lowerArmor(74);
         } elseif ($distanceSquared > ($maxDistance * .2)) {
             $player->lowerHealth(84);
+            $player->lowerArmor(84);
         } elseif ($distanceSquared > ($maxDistance * .1)) {
             $player->lowerHealth(92);
+            $player->lowerArmor(92);
         } else {
             $player->lowerHealth(500);
+            $player->lowerArmor(500);
         }
     }
 
