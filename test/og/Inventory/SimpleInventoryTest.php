@@ -34,6 +34,23 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertFalse($knife->isUserDroppable());
     }
 
+    public function testPlayerInventorySlots(): void
+    {
+        $p = new Player(1, Color::GREEN, false);
+        $pistol = $p->getEquippedItem();
+        $p->equipKnife();
+        $knife = $p->getEquippedItem();
+        $this->assertInstanceOf(Knife::class, $knife);
+        $this->assertInstanceOf(PistolUsp::class, $pistol);
+        $expectedSlots = [
+            InventorySlot::SLOT_KNIFE->value     => $knife->toArray(),
+            InventorySlot::SLOT_SECONDARY->value => $pistol->toArray(),
+        ];
+        $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+        $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+        $this->assertSame($expectedSlots, $p->getInventory()->getFilledSlots());
+    }
+
     public function testPlayerCantBuyItemWithoutEnoughMoney(): void
     {
         $playerCommands = [

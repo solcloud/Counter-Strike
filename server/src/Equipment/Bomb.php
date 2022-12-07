@@ -11,19 +11,22 @@ use cs\Enum\ItemType;
 class Bomb extends BaseEquipment
 {
 
-    const MAX_BLAST_DISTANCE = 1000;
-
     private Point $position;
     private int $plantTickCount = 0;
     private int $plantTickCountMax;
     private int $defuseTickCount = 0;
     private int $defuseTickCountMax;
 
-    public function __construct(int $plantTimeMs, int $defuseTimeMs)
+    public function __construct(int $plantTimeMs, int $defuseTimeMs, private int $maxBlastDistance = 1000)
     {
         parent::__construct();
         $this->plantTickCountMax = Util::millisecondsToFrames($plantTimeMs);
         $this->defuseTickCountMax = Util::millisecondsToFrames($defuseTimeMs);
+    }
+
+    public function setMaxBlastDistance(int $maxBlastDistance): void
+    {
+        $this->maxBlastDistance = $maxBlastDistance;
     }
 
     public function getType(): ItemType
@@ -73,7 +76,7 @@ class Bomb extends BaseEquipment
     public function explodeDamageToPlayer(Player $player): void
     {
         $distanceSquared = Util::distanceSquared($player->getPositionImmutable(), $this->position);
-        $maxDistance = self::MAX_BLAST_DISTANCE * self::MAX_BLAST_DISTANCE;
+        $maxDistance = $this->maxBlastDistance * $this->maxBlastDistance;
         if ($distanceSquared > $maxDistance) {
             return;
         }

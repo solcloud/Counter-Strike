@@ -68,22 +68,22 @@ class Kevlar extends BaseEquipment
         return 5;
     }
 
-    public function canPurchaseMultipleTime(Kevlar|Item $newItem): bool
+    public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
-        /** @var self $newItem */
+        /** @var self $newSlotItem */
         if ($this->armor < 100) {
             return true;
         }
-        return ($this->type === ArmorType::BODY && $newItem->type === ArmorType::BODY_AND_HEAD);
+        return ($this->type === ArmorType::BODY && $newSlotItem->type === ArmorType::BODY_AND_HEAD);
     }
 
-    public function getPrice(Kevlar|Item|null $alreadyHaveItem = null): int
+    public function getPrice(?Item $alreadyHaveSlotItem = null): int
     {
-        /** @var ?self $alreadyHaveItem */
-        if ($alreadyHaveItem && $this->type === ArmorType::BODY_AND_HEAD && $alreadyHaveItem->type === ArmorType::BODY && $alreadyHaveItem->armor === 100) {
+        /** @var ?self $alreadyHaveSlotItem */
+        if ($alreadyHaveSlotItem && $this->type === ArmorType::BODY_AND_HEAD && $alreadyHaveSlotItem->type === ArmorType::BODY && $alreadyHaveSlotItem->armor === 100) {
             return 350;
         }
-        if ($alreadyHaveItem && $alreadyHaveItem->type === ArmorType::BODY_AND_HEAD) {
+        if ($alreadyHaveSlotItem && $alreadyHaveSlotItem->type === ArmorType::BODY_AND_HEAD) {
             return 650;
         }
         return $this->bodyPlusHelmet ? 1000 : 650;

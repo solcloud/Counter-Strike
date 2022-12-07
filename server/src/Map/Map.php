@@ -76,6 +76,11 @@ abstract class Map
         return 0;
     }
 
+    public function getBombMaxBlastDistance(): int
+    {
+        return 1000;
+    }
+
     public abstract function getBuyArea(bool $forAttackers): Box;
 
     public abstract function getPlantArea(): Box;

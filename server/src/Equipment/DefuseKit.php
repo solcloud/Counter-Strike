@@ -30,7 +30,7 @@ class DefuseKit extends BaseEquipment
         return false;
     }
 
-    public function canPurchaseMultipleTime(Item $newItem): bool
+    public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
         return false;
     }

@@ -45,8 +45,7 @@ class Inventory
             }
         }
 
-        unset($this->items[InventorySlot::SLOT_BOMB->value]);
-        $this->updateEquippedSlot();
+        $this->removeBomb();
         $this->store = new BuyMenu($isAttackerSide, $this->items);
     }
 
@@ -97,12 +96,8 @@ class Inventory
         }
 
         if ($alreadyHave) {
-            if ($alreadyHave->canPurchaseMultipleTime($item)) {
-                return true;
-            }
-            return false;
+            return ($alreadyHave->canPurchaseMultipleTime($item));
         }
-
         return true;
     }
 
@@ -199,15 +194,10 @@ class Inventory
      */
     public function getFilledSlots(): array
     {
-        $slots = [];
-        foreach ($this->items as $slotId => $item) {
-            $slots[$slotId] = $item->toArray();
-        }
-
-        return $slots;
+        return array_map(fn(Item $item) => $item->toArray(), $this->items);
     }
 
-    public function getArmor(): ?Kevlar
+    public function getKevlar(): ?Kevlar
     {
         return $this->items[InventorySlot::SLOT_KEVLAR->value] ?? null; // @phpstan-ignore-line
     }

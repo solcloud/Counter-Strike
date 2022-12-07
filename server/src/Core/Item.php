@@ -41,13 +41,6 @@ abstract class Item
 
     public function isUserDroppable(): bool
     {
-        if ($this->getType() === ItemType::TYPE_KNIFE) {
-            return false;
-        }
-        if ($this->getType() === ItemType::TYPE_DEFUSE_KIT) {
-            return false;
-        }
-
         return true;
     }
 
@@ -75,7 +68,7 @@ abstract class Item
 
     public abstract function getSlot(): InventorySlot;
 
-    public function getId(): int
+    public final function getId(): int
     {
         return $this->id;
     }
@@ -90,12 +83,12 @@ abstract class Item
         return $this->skinId;
     }
 
-    public function getPrice(?self $alreadyHaveItem = null): int
+    public function getPrice(?self $alreadyHaveSlotItem = null): int
     {
         return $this->price;
     }
 
-    public function canPurchaseMultipleTime(self $newItem): bool
+    public function canPurchaseMultipleTime(self $newSlotItem): bool
     {
         if ($this->getType() === ItemType::TYPE_WEAPON_PRIMARY) {
             return true;
@@ -139,7 +132,7 @@ abstract class Item
     public function toArray(): array
     {
         return [
-            'id'   => $this->getId(),
+            'id'   => $this->id,
             'slot' => $this->getSlot()->value,
         ];
     }

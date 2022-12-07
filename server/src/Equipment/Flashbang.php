@@ -22,7 +22,7 @@ class Flashbang extends BaseEquipment
         return InventorySlot::SLOT_GRENADE_FLASH;
     }
 
-    public function canPurchaseMultipleTime(Item $newItem): bool
+    public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
         return ($this->getQuantity() < 2);
     }

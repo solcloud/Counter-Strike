@@ -5,6 +5,7 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemType;
+use cs\Interface\AttackEnable;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
 use cs\Weapon\Knife;
@@ -65,35 +66,46 @@ class HitBox implements Hittable
 
     public function registerHit(Bullet $bullet): void
     {
-        $type = $this->type;
-        if (($type === HitBoxType::CHEST || $type === HitBoxType::STOMACH) && $this->checkBackStab($bullet)) {
-            $type = HitBoxType::BACK;
+        $hitBoxType = $this->type;
+        if (($hitBoxType === HitBoxType::CHEST || $hitBoxType === HitBoxType::STOMACH) && $this->checkBackStab($bullet)) {
+            $hitBoxType = HitBoxType::BACK;
         }
 
         $shootItem = $bullet->getShootItem();
-        $healthDamage = $shootItem->getDamageValue($type, $this->player->getArmorType());
-        $this->player->lowerHealth($healthDamage);
         $playerArmorType = $this->player->getArmorType();
-        if ($playerArmorType !== ArmorType::NONE && $type !== HitBoxType::LEG) {
-            $armorDamage = 0;
-            if ($shootItem instanceof Item) {
-                $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
-            }
-            if ($playerArmorType === ArmorType::BODY_AND_HEAD && $type === HitBoxType::HEAD) {
-                $armorDamage += 30;
-            }
-            $this->player->lowerArmor($armorDamage);
+        $healthDamage = $shootItem->getDamageValue($hitBoxType, $playerArmorType);
+        $isTeamDamage = ($bullet->isOriginPlayerAttackerSide() === $this->player->isPlayingOnAttackerSide());
+        if ($isTeamDamage) {
+            $healthDamage = (int)ceil($healthDamage / 2);
         }
 
+        $this->player->lowerHealth($healthDamage);
+        $this->player->lowerArmor($this->calculateArmorDamage($shootItem, $playerArmorType, $hitBoxType));
         if (!$this->player->isAlive()) {
             $this->playerWasKilled = true;
-            $this->wasHeadShot = ($type === HitBoxType::HEAD);
-            if ($bullet->isOriginPlayerAttackerSide() === $this->player->isPlayingOnAttackerSide()) {
-                $this->moneyAward = -300; // team kill
-            } else {
-                $this->moneyAward = $shootItem->getKillAward();
-            }
+            $this->wasHeadShot = ($hitBoxType === HitBoxType::HEAD);
+            $this->moneyAward = $isTeamDamage ? -300 : $shootItem->getKillAward();
         }
+    }
+
+    private function calculateArmorDamage(AttackEnable $shootItem, ArmorType $armorType, HitBoxType $hitBoxType): int
+    {
+        if ($armorType === ArmorType::NONE || $hitBoxType === HitBoxType::LEG) {
+            return 0;
+        }
+        if ($hitBoxType === HitBoxType::HEAD && $armorType === ArmorType::BODY) {
+            return 0;
+        }
+
+        $armorDamage = 0;
+        if ($shootItem instanceof Item) {
+            $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
+        }
+        if ($armorType === ArmorType::BODY_AND_HEAD && $hitBoxType === HitBoxType::HEAD) {
+            $armorDamage += 30;
+        }
+
+        return $armorDamage;
     }
 
     public function intersect(Bullet $bullet): bool

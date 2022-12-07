@@ -209,6 +209,7 @@ class Game
 
     public function loadMap(Map $map): void
     {
+        $this->bomb->setMaxBlastDistance($map->getBombMaxBlastDistance());
         $this->world->loadMap($map);
     }
 

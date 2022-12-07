@@ -88,7 +88,7 @@ final class Player
     private function onPlayerDied(): void
     {
         $dropItems = [];
-        $items = $this->getInventory()->getItems();
+        $items = $this->inventory->getItems();
         if (isset($items[InventorySlot::SLOT_PRIMARY->value])) {
             $dropItems[] = $items[InventorySlot::SLOT_PRIMARY->value];
         } elseif (isset($items[InventorySlot::SLOT_SECONDARY->value])) {
@@ -149,12 +149,12 @@ final class Player
 
     public function getBodyHeight(): int
     {
-        return $this->getHeadHeight() - 2 * Setting::playerHeadRadius();
+        return $this->headHeight - 2 * Setting::playerHeadRadius();
     }
 
     public function getSightHeight(): int
     {
-        return $this->getHeadHeight() - Setting::playerHeadRadius();
+        return $this->headHeight - Setting::playerHeadRadius();
     }
 
     public function getSight(): PlayerCamera
@@ -189,7 +189,7 @@ final class Player
 
     public function lowerArmor(int $armorDamage): void
     {
-        $this->getInventory()->getArmor()?->lowerArmor($armorDamage);
+        $this->inventory->getKevlar()?->lowerArmor($armorDamage);
     }
 
     public function lowerHealth(int $healthDamage): void
@@ -213,7 +213,7 @@ final class Player
 
     public function getArmorType(): ArmorType
     {
-        $kevlar = $this->getInventory()->getArmor();
+        $kevlar = $this->inventory->getKevlar();
         if ($kevlar) {
             return $kevlar->getArmorType();
         }
@@ -222,7 +222,7 @@ final class Player
 
     public function getArmorValue(): int
     {
-        $kevlar = $this->getInventory()->getArmor();
+        $kevlar = $this->inventory->getKevlar();
         if ($kevlar) {
             return $kevlar->getArmor();
         }
@@ -275,7 +275,7 @@ final class Player
         $ammo = null;
         $ammoReserve = null;
         $reloading = false;
-        $equippedItem = $this->getInventory()->getEquipped();
+        $equippedItem = $this->inventory->getEquipped();
         if ($equippedItem instanceof AmmoBasedWeapon) {
             $ammo = $equippedItem->getAmmo();
             $ammoReserve = $equippedItem->getAmmoReserve();
@@ -283,18 +283,18 @@ final class Player
         }
 
         return [
-            "id"          => $this->getId(),
-            "color"       => $this->getColor()->value,
-            "money"       => $this->getInventory()->getDollars(),
+            "id"          => $this->id,
+            "color"       => $this->color->value,
+            "money"       => $this->inventory->getDollars(),
             "item"        => $equippedItem->toArray(),
             "canAttack"   => $this->world->canAttack($this),
             "canBuy"      => $this->world->canBuy($this),
             "canPlant"    => $this->world->canPlant($this),
-            "slots"       => $this->getInventory()->getFilledSlots(),
+            "slots"       => $this->inventory->getFilledSlots(),
             "health"      => $this->health,
             "position"    => $this->position->toArray(),
-            "look"        => $this->getSight()->toArray(),
-            "isAttacker"  => $this->isPlayingOnAttackerSide(),
+            "look"        => $this->sight->toArray(),
+            "isAttacker"  => $this->isPlayingOnAttackerSide,
             "heightSight" => $this->getSightHeight(),
             "heightBody"  => $this->getBodyHeight(),
             "height"      => $this->getHeadHeight(),
