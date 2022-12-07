@@ -28,6 +28,7 @@ export class ModelRepository {
                 if (object.isMesh) {
                     if (object.name === 'floor') {
                         object.material.envMapIntensity = .08
+                        object.material.map.magFilter = THREE.NearestFilter
                     }
                     if (object.name !== 'world') {
                         object.castShadow = true

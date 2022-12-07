@@ -339,8 +339,13 @@ export class Game {
     updateOtherPlayersModels(player, data) {
         const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
-        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 60), -50) : data.look.vertical // cap visual rotation if playerMe is alive to not see broken neck
-        playerObject.getObjectByName('head').rotation.x = serverVerticalRotationToThreeRadian(rotationVertical)
+        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 50), -50) : data.look.vertical // cap visual rotation if playerMe is alive to not see broken neck
+        const rotationVerticalThree = serverVerticalRotationToThreeRadian(rotationVertical)
+        playerObject.getObjectByName('head').rotation.x = rotationVerticalThree
+        const hand = playerObject.getObjectByName('hand')
+        if (hand.children.length) {
+            hand.children[0].rotation.y = rotationVerticalThree
+        }
 
         const body = playerObject.getObjectByName('body')
         if (body.position.y !== data.heightBody) { // update body height position if changed
@@ -358,7 +363,6 @@ export class Game {
         const hand = player.get3DObject().getObjectByName('hand')
         const belt = player.get3DObject().getObjectByName('belt');
 
-        hand.rotation.y = serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50))
         if (hand.children.length === 1) {
             const lastHandItemModel = hand.children[0]
             belt.getObjectByName(`slot-${lastHandItemModel.userData.slot}`).add(lastHandItemModel)
