@@ -179,9 +179,9 @@ class World
         throw new GameException("Cannot find free spawn position for '{$side}' player");
     }
 
-    public function addPlayerCollider(PlayerCollider $player): void
+    public function addPlayer(Player $player): void
     {
-        $this->playersColliders[$player->getPlayerId()] = $player;
+        $this->playersColliders[$player->getId()] = new PlayerCollider($player, $this);
     }
 
     public function tryPickDropItems(Player $player): void
@@ -347,6 +347,7 @@ class World
     public function calculateHits(Bullet $bullet): array
     {
         $hits = [];
+        $bp = $bullet->getPosition();
         $skipPlayerIds = $bullet->getPlayerSkipIds();
         foreach ($this->playersColliders as $playerId => $playerCollider) {
             if (isset($skipPlayerIds[$playerId])) {
@@ -368,12 +369,12 @@ class World
             }
         }
 
-        $floor = $this->findFloor($bullet->getPosition());
+        $floor = $this->findFloor($bp);
         if ($floor) {
             $hits[] = $floor;
         }
 
-        $wall = $this->isWallAt($bullet->getPosition());
+        $wall = $this->isWallAt($bp);
         if ($wall) {
             $hits[] = $wall;
         }
@@ -615,6 +616,11 @@ class World
         }
 
         return $this->map;
+    }
+
+    public function getBacktrack(): Backtrack
+    {
+        return $this->game->getBacktrack();
     }
 
 }

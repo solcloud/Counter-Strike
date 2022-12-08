@@ -27,6 +27,8 @@ class GameProperty
     public int $buy_time_sec = 20;
     const ROUND_END_COOL_DOWN_SEC = 'round_end_cool_down_sec';
     public int $round_end_cool_down_sec = 4;
+    const BACKTRACK_HISTORY_TICK_COUNT = 'backtrack_history_tick_count';
+    public int $backtrack_history_tick_count = 0;
     /** @var int[] */
     public array $loss_bonuses = [1400, 1900, 2400, 2900, 3400];
 

@@ -10,6 +10,7 @@ final class AttackResult
     /** @var Hittable[] */
     private array $hits = [];
     private int $moneyAward = 0;
+    private bool $somePlayersWasHit = false;
 
     public function __construct(private Bullet $bullet)
     {
@@ -19,6 +20,9 @@ final class AttackResult
     {
         $this->hits[] = $hit;
         $this->moneyAward += $hit->getMoneyAward();
+        if ($hit->getPlayer() !== null) {
+            $this->somePlayersWasHit = true;
+        }
     }
 
     /**
@@ -37,6 +41,11 @@ final class AttackResult
     public function getMoneyAward(): int
     {
         return $this->moneyAward;
+    }
+
+    public function somePlayersWasHit(): bool
+    {
+        return $this->somePlayersWasHit;
     }
 
 }

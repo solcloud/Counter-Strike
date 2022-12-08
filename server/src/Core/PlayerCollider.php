@@ -13,7 +13,7 @@ class PlayerCollider
     private array $hitBoxes = [];
     private int $playerId;
 
-    public function __construct(private Player $player)
+    public function __construct(private Player $player, private World $world)
     {
         // TODO: create real football player geometry in 3D software - fill it with bunch of rigid body spheres, bake it and export spheres coordinates
         // TODO: crouch, move animation
@@ -58,19 +58,25 @@ class PlayerCollider
 
     public function tryHitPlayer(Bullet $bullet): ?Hittable
     {
-        if (false === Collision::pointWithCylinder(
-            $bullet->getPosition(),
-            $this->player->getReferenceToPosition(),
-            $this->player->getBoundingRadius(),
-            $this->player->getHeadHeight()
-        )) {
-            return null;
-        }
+        $bp = $bullet->getPosition();
+        $backtrack = $this->world->getBacktrack();
+        foreach ($backtrack->getStates() as $state) {
+            $backtrack->apply($state);
 
-        foreach ($this->hitBoxes as $hitBox) {
-            if ($hitBox->intersect($bullet)) {
-                $hitBox->registerHit($bullet);
-                return $hitBox;
+            if (false === Collision::pointWithCylinder(
+                    $bp,
+                    $this->player->getReferenceToPosition(),
+                    $this->player->getBoundingRadius(),
+                    $this->player->getHeadHeight()
+                )) {
+                continue;
+            }
+
+            foreach ($this->hitBoxes as $hitBox) {
+                if ($hitBox->intersect($bullet)) {
+                    $hitBox->registerHit($bullet);
+                    return $hitBox;
+                }
             }
         }
 

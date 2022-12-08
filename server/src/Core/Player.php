@@ -142,6 +142,14 @@ final class Player
         $this->world->playerUse($this);
     }
 
+    /**
+     * @internal
+     */
+    public function setHeadHeight(int $height): void
+    {
+        $this->headHeight = $height;
+    }
+
     public function getHeadHeight(): int
     {
         return $this->headHeight;

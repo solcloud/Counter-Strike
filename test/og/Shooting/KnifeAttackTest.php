@@ -60,6 +60,7 @@ class KnifeAttackTest extends BaseTestCase
                 $this->assertLessThanOrEqual(Knife::stabMaxDistance, $bullet->getDistanceTraveled());
                 $this->assertSame($knife, $bullet->getShootItem());
                 $this->assertSame(Knife::killAward, $attack->getMoneyAward());
+                $this->assertTrue($attack->somePlayersWasHit());
 
                 $hits = $attack->getHits();
                 $this->assertCount(1, $hits);

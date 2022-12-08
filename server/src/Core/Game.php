@@ -27,6 +27,7 @@ class Game
     private World $world;
     private Score $score;
     private GameState $state;
+    private Backtrack $backtrack;
     private GameProperty $properties;
     private ?GameOverEvent $gameOver = null;
     private PauseStartEvent $startRoundFreezeTime;
@@ -57,6 +58,7 @@ class Game
         $this->state = new GameState($this);
         $this->world = new World($this);
         $this->score = new Score($properties->loss_bonuses);
+        $this->backtrack = new Backtrack($this, $properties->backtrack_history_tick_count);
         $this->properties = $properties;
 
         $this->initialize();
@@ -87,6 +89,7 @@ class Game
         }
 
         $alivePlayers = [0, 0];
+        $this->backtrack->startState();
         foreach ($this->players as $player) {
             if (!$player->isAlive()) {
                 continue;
@@ -95,8 +98,10 @@ class Game
             $player->onTick($tickId);
             if ($player->isAlive()) {
                 $alivePlayers[(int)$player->isPlayingOnAttackerSide()]++;
+                $this->backtrack->addStateData($player);
             }
         }
+        $this->backtrack->finishState();
         $this->checkRoundEnd($alivePlayers[0], $alivePlayers[1]);
         $this->processEvents($tickId);
         return null;
@@ -169,7 +174,7 @@ class Game
         $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(), $this->properties->randomize_spawn_position ? 80 : 0));
 
         $this->players[$player->getId()] = $player;
-        $this->world->addPlayerCollider(new PlayerCollider($player));
+        $this->world->addPlayer($player);
         if ($player->isPlayingOnAttackerSide()) {
             $this->playersCountAttackers++;
             if ($this->playersCountAttackers === 1) {
@@ -454,6 +459,11 @@ class Game
     public function getProperties(): GameProperty
     {
         return $this->properties;
+    }
+
+    public function getBacktrack(): Backtrack
+    {
+        return $this->backtrack;
     }
 
     /**

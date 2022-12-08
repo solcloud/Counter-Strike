@@ -136,7 +136,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
             $this->assertTrue($player->isAlive());
         }
-        $this->assertLessThan(11, $took->asMilliseconds());
+        $this->assertLessThan(12, $took->asMilliseconds());
     }
 
     public function testPlayersMoving(): void

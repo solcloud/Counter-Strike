@@ -42,6 +42,7 @@ final class AttackEvent
 
         $newPos = $this->origin->clone();
         $prevPos = $newPos->clone();
+        $this->world->getBacktrack()->saveState();
         while ($bullet->isActive()) {
             $distance = $bullet->incrementDistance();
 
@@ -69,6 +70,7 @@ final class AttackEvent
                 }
             }
         }
+        $this->world->getBacktrack()->restoreState();
         return $result;
     }
 
