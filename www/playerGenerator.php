@@ -18,7 +18,7 @@ $game->loadMap(new TestMap());
 $player = new Player(0, Color::GREEN, true);
 $player->setWorld($game->getWorld());
 $player->setPosition(new Point());
-$collider = new PlayerCollider($player, $game->getWorld());
+$collider = new PlayerCollider($player);
 ////////
 
 if (isset($_GET['crouch'])) {

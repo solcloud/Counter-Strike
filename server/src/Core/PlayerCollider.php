@@ -13,7 +13,7 @@ class PlayerCollider
     private array $hitBoxes = [];
     private int $playerId;
 
-    public function __construct(private Player $player, private World $world)
+    public function __construct(private Player $player)
     {
         // TODO: create real football player geometry in 3D software - fill it with bunch of rigid body spheres, bake it and export spheres coordinates
         // TODO: crouch, move animation
@@ -56,10 +56,9 @@ class PlayerCollider
         }
     }
 
-    public function tryHitPlayer(Bullet $bullet): ?Hittable
+    public function tryHitPlayer(Bullet $bullet, Backtrack $backtrack): ?Hittable
     {
         $bp = $bullet->getPosition();
-        $backtrack = $this->world->getBacktrack();
         foreach ($backtrack->getStates() as $state) {
             $backtrack->apply($state, $this->playerId);
 

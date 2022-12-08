@@ -48,7 +48,7 @@ export class PlayerAction {
     }
 
     #rotationToServerLookAt(xy) {
-        return `lookAt ${xy[0]} ${xy[1]}`
+        return `lookAt ${xy[0].toFixed(2)} ${xy[1].toFixed(2)}`
     }
 
     attack(xy) {

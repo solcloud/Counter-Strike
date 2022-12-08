@@ -181,7 +181,7 @@ class World
 
     public function addPlayer(Player $player): void
     {
-        $this->playersColliders[$player->getId()] = new PlayerCollider($player, $this);
+        $this->playersColliders[$player->getId()] = new PlayerCollider($player);
     }
 
     public function tryPickDropItems(Player $player): void
@@ -354,7 +354,7 @@ class World
                 continue;
             }
 
-            $hitBox = $playerCollider->tryHitPlayer($bullet);
+            $hitBox = $playerCollider->tryHitPlayer($bullet, $this->game->getBacktrack());
             if (!$hitBox) {
                 continue;
             }

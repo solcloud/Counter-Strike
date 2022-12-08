@@ -92,10 +92,6 @@ final class Backtrack
         }
 
         $player = $this->game->getPlayer($playerId);
-        if (!$player->isAlive()) { // not backtracking dead player
-            return;
-        }
-
         $player->setPosition($playerData['a']); // @phpstan-ignore-line
         $player->getSight()->lookAt($playerData['b'], $playerData['c']); // @phpstan-ignore-line
         $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
