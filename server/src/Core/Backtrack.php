@@ -10,7 +10,7 @@ final class Backtrack
     /** @var array<int,array<string,mixed>> */
     private array $newestState = [];
     /** @var array<int,array<int,array<string,mixed>>> */
-    private array $states = [[]];
+    private array $states = [];
 
     public function __construct(private Game $game, private int $numberOfHistoryStates)
     {
@@ -80,26 +80,25 @@ final class Backtrack
         }
     }
 
-    public function apply(int $state): void
+    public function apply(int $state, int $playerId): void
     {
         if ($this->numberOfHistoryStates === 0) {
             return;
         }
 
-        foreach ($this->states[$state] as $playerId => $playerData) {
-            if ($playerData === ($this->states[$state + 1][$playerId] ?? false)) { // if playerData are same as previous state
-                continue;
-            }
-
-            $player = $this->game->getPlayer($playerId);
-            if (!$player->isAlive()) { // not backtracking dead players
-                continue;
-            }
-
-            $player->setPosition($playerData['a']); // @phpstan-ignore-line
-            $player->getSight()->lookAt($playerData['b'], $playerData['c']); // @phpstan-ignore-line
-            $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
+        $playerData = $this->states[$state][$playerId] ?? false;
+        if (false === $playerData) {
+            return;
         }
+
+        $player = $this->game->getPlayer($playerId);
+        if (!$player->isAlive()) { // not backtracking dead player
+            return;
+        }
+
+        $player->setPosition($playerData['a']); // @phpstan-ignore-line
+        $player->getSight()->lookAt($playerData['b'], $playerData['c']); // @phpstan-ignore-line
+        $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
     }
 
     /**

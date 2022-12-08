@@ -61,7 +61,7 @@ class PlayerCollider
         $bp = $bullet->getPosition();
         $backtrack = $this->world->getBacktrack();
         foreach ($backtrack->getStates() as $state) {
-            $backtrack->apply($state);
+            $backtrack->apply($state, $this->playerId);
 
             if (false === Collision::pointWithCylinder(
                     $bp,
