@@ -48,7 +48,7 @@ final class AttackEvent
 
             // OPTIMIZATION_1: Inline Util::movementXYZ() here
             $y = $distance * $sinV;
-            $z = $nearbyInt(sqrt(pow($distance, 2) - pow($y, 2)));
+            $z = $nearbyInt(sqrt(($distance * $distance) - ($y * $y)));
             $newPos->set($this->origin->x + $nearbyInt($sinH * $z), $this->origin->y + $nearbyInt($y), $this->origin->z + $nearbyInt($cosH * $z));
             if ($newPos->equals($prevPos)) {
                 continue;

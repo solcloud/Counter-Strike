@@ -99,13 +99,13 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(22, $took->asMilliseconds());
+        $this->assertLessThan(20, $took->asMilliseconds());
     }
 
     public function testTwoPlayersRangeShootingEachOther(): void
     {
         ////////
-        $range = 4000;
+        $range = 5000;
         ////////
 
         $game = GameFactory::createDebug();
@@ -136,7 +136,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
             $this->assertTrue($player->isAlive());
         }
-        $this->assertLessThan(12, $took->asMilliseconds());
+        $this->assertLessThan(14, $took->asMilliseconds());
     }
 
     public function testPlayersMoving(): void

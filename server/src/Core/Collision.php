@@ -20,8 +20,10 @@ class Collision
 
     public static function pointWithCircle(int $pointX, int $pointY, int $circleCenterX, int $circleCenterY, int $circleRadius): bool
     {
+        $a = $pointX - $circleCenterX;
+        $b = $pointY - $circleCenterY;
         return (
-            pow($pointX - $circleCenterX, 2) + pow($pointY - $circleCenterY, 2)
+            ($a * $a) + ($b * $b)
             <=
             $circleRadius * $circleRadius
         );
@@ -47,10 +49,13 @@ class Collision
             return false;
         }
 
-        return self::pointWithCircle(
-            $cylinderBottomCenterA->x, $cylinderBottomCenterA->z,
-            $cylinderBottomCenterB->x, $cylinderBottomCenterB->z,
-            $cylinderRadiusA + $cylinderRadiusB
+        $a = $cylinderBottomCenterA->x - $cylinderBottomCenterB->x;
+        $b = $cylinderBottomCenterA->z - $cylinderBottomCenterB->z;
+        $r = $cylinderRadiusA + $cylinderRadiusB;
+        return (
+            ($a * $a) + ($b * $b)
+            <=
+            $r * $r
         );
     }
 
@@ -60,8 +65,10 @@ class Collision
             return false;
         }
 
+        $a = $point->x - $cylinderBottomCenter->x;
+        $b = $point->z - $cylinderBottomCenter->z;
         return (
-            pow($point->x - $cylinderBottomCenter->x, 2) + pow($point->z - $cylinderBottomCenter->z, 2)
+            ($a * $a) + ($b * $b)
             <=
             $cylinderRadius * $cylinderRadius
         );
@@ -106,8 +113,10 @@ class Collision
             $testY = $circleY;
         }
 
+        $a = $circleX - $testX;
+        $b = $circleY - $testY;
         return (
-            pow($circleX - $testX, 2) + pow($circleY - $testY, 2)
+            ($a * $a) + ($b * $b)
             <=
             $circleRadius * $circleRadius
         );

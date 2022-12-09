@@ -72,7 +72,10 @@ final class Util
 
     public static function distanceSquared(Point $a, Point $b): int
     {
-        return pow($a->x - $b->x, 2) + pow($a->y - $b->y, 2) + pow($a->z - $b->z, 2);
+        $dx = $a->x - $b->x;
+        $dy = $a->y - $b->y;
+        $dz = $a->z - $b->z;
+        return ($dx * $dx) + ($dy * $dy) + ($dz * $dz);
     }
 
     /**
