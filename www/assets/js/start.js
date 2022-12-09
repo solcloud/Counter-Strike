@@ -2,7 +2,7 @@ import {Game} from "./Game.js";
 import {HUD} from "./Hud.js";
 import {Control} from "./Control.js";
 import {World} from "./World.js";
-import Stats from "./Stats.js";
+import Stats from "../threejs/Stats.js";
 import {Setting} from "./Setting.js";
 import {PlayerAction} from "./PlayerAction.js";
 
