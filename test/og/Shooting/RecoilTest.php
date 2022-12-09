@@ -48,7 +48,7 @@ class RecoilTest extends BaseTestCase
         $player->buyItem(BuyMenuItem::RIFLE_AK);
         $ak = $player->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
-        $pp = $player->getPositionImmutable();
+        $py = $player->getPositionImmutable()->y + $player->getSightHeight();
 
         $bulletsYCoords = [];
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $ak) {
@@ -67,11 +67,11 @@ class RecoilTest extends BaseTestCase
         $this->assertCount($ak::magazineCapacity, $bulletsYCoords);
         $yMatchPlayer = 0;
         foreach ($bulletsYCoords as $y) {
-            if ($y === $pp->y) {
+            if ($y === $py) {
                 $yMatchPlayer++;
             }
         }
-        $this->assertLessThan(floor($ak::magazineCapacity * .6), $yMatchPlayer);
+        $this->assertLessThan(ceil($ak::magazineCapacity * .1), $yMatchPlayer);
     }
 
     public function testPistolMovementRecoil(): void
@@ -81,7 +81,7 @@ class RecoilTest extends BaseTestCase
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);
-        $pp = $player->getPositionImmutable();
+        $py = $player->getPositionImmutable()->y + $player->getSightHeight();
 
         $bulletsYCoords = [];
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {
@@ -100,11 +100,11 @@ class RecoilTest extends BaseTestCase
         $this->assertCount($glock::magazineCapacity, $bulletsYCoords);
         $yMatchPlayer = 0;
         foreach ($bulletsYCoords as $y) {
-            if ($y === $pp->y) {
+            if ($y === $py) {
                 $yMatchPlayer++;
             }
         }
-        $this->assertLessThan(floor($glock::magazineCapacity * .8), $yMatchPlayer);
+        $this->assertLessThan(ceil($glock::magazineCapacity * .3), $yMatchPlayer);
     }
 
 }
