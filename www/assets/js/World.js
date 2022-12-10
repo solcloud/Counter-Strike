@@ -169,8 +169,18 @@ export class World {
             hit.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), degreeToRadian(90))
         }
         hit.position.set(position.x + 0.1, position.y + 0.1, -position.z + 0.1)
+
         this.#scene.add(hit)
         this.#decals.push(hit)
+    }
+
+    bulletPlayerHit(position, wasHeadshot) {
+        const hit = this.#modelRepository.getPlayerHitMesh()
+        hit.material.color.set(wasHeadshot ? 0xFF6600 : 0x5061A4)
+        hit.position.set(position.x, position.y, -position.z)
+
+        this.#scene.add(hit)
+        setTimeout(() => this.destroyObject(hit), 100)
     }
 
     clearDecals() {

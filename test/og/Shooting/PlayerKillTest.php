@@ -122,9 +122,11 @@ class PlayerKillTest extends BaseTestCase
 
         $headShot = $hits[0];
         $this->assertInstanceOf(HitBox::class, $headShot);
+        $this->assertTrue($headShot->wasHeadShot());
         $this->assertSame(HitBoxType::HEAD, $headShot->getType());
         $this->assertInstanceOf(Floor::class, $hits[1]);
 
+        $this->assertTrue($result->somePlayersWasHit());
         $this->assertSame(0, $result->getMoneyAward());
         $this->assertSame(1, $game->getRoundNumber());
         $this->assertTrue($player1->isAlive());
@@ -288,6 +290,7 @@ class PlayerKillTest extends BaseTestCase
                 $this->assertNotNull($result);
 
                 $hits = $result->getHits();
+                $this->assertTrue($result->somePlayersWasHit());
                 $this->assertGreaterThan(0, $result->getMoneyAward());
                 $this->assertCount(2, $hits);
                 $this->assertInstanceOf(HitBox::class, $hits[0]);

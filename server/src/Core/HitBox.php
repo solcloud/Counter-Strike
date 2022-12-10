@@ -81,9 +81,9 @@ class HitBox implements Hittable
 
         $this->player->lowerHealth($healthDamage);
         $this->player->lowerArmor($this->calculateArmorDamage($shootItem, $playerArmorType, $hitBoxType));
+        $this->wasHeadShot = ($hitBoxType === HitBoxType::HEAD);
         if (!$this->player->isAlive()) {
             $this->playerWasKilled = true;
-            $this->wasHeadShot = ($hitBoxType === HitBoxType::HEAD);
             $this->moneyAward = $isTeamDamage ? -300 : $shootItem->getKillAward();
         }
     }

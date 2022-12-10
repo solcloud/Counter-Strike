@@ -3,11 +3,13 @@ import {ItemId} from "./Enums.js";
 export class ModelRepository {
     #gltfLoader
     #objectLoader
+    #textureLoader
     #models = {}
 
     constructor() {
         this.#gltfLoader = new THREE.GLTFLoader()
         this.#objectLoader = new THREE.ObjectLoader()
+        this.#textureLoader = new THREE.TextureLoader()
     }
 
     #loadModel(url) {
@@ -22,13 +24,18 @@ export class ModelRepository {
         });
     }
 
+    #loadTexture(url) {
+        return new Promise(resolve => {
+            this.#textureLoader.load(url, resolve)
+        });
+    }
+
     loadMap(mapName) {
         return this.#loadModel(`./resources/map/${mapName}.glb`).then(async (model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     if (object.name === 'floor') {
                         object.material.envMapIntensity = .08
-                        object.material.map.magFilter = THREE.NearestFilter
                     }
                     if (object.name !== 'world') {
                         object.castShadow = true
@@ -58,6 +65,10 @@ export class ModelRepository {
 
     getPlayer() {
         return this.#models.player
+    }
+
+    getPlayerHitMesh() {
+        return this.#models.playerHitMesh.clone()
     }
 
     getModelForItem(item) {
@@ -135,6 +146,18 @@ export class ModelRepository {
             })
 
             this.#models[ItemId.RifleM4A4] = model.scene
+        }))
+        promises.push(this.#loadTexture('./resources/texture/sphere_glow.png').then((texture) => {
+            const material = new THREE.SpriteMaterial({
+                map: texture,
+                color: 0xFFFFFF,
+                blending: THREE.AdditiveBlending,
+                transparent: true,
+            });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(20, 20, 1);
+
+            this.#models.playerHitMesh = sprite
         }))
 
         return Promise.all(promises)

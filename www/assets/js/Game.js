@@ -117,8 +117,14 @@ export class Game {
         if (data.type === SoundType.ITEM_PICKUP) {
             this.#world.itemPickup(data.position, data.item, (spectatorId === data.player))
         }
-        if (data.type === SoundType.BULLET_HIT && data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
-            this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
+        if (data.type === SoundType.BULLET_HIT) {
+            if (data.player) {
+                this.#world.bulletPlayerHit(data.position, false)
+            } else if (data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
+                this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
+            }
+        } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
+            this.#world.bulletPlayerHit(data.position, true)
         }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)
