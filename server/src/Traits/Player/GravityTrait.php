@@ -34,13 +34,12 @@ trait GravityTrait
         $candidate = $start->clone();
         for ($y = $start->y; $y >= $targetYPosition; $y--) {
             $candidate->setY($y);
-            $floorCandidate = $this->world->findFloor($candidate, $this->getBoundingRadius());
+            $floorCandidate = $this->world->findFloor($candidate, $this->playerBoundingRadius);
+            if (!$floorCandidate) {
+                $floorCandidate = $this->world->findPlayersHeadFloors($candidate, $this->playerBoundingRadius);
+            }
             if ($floorCandidate) {
                 $this->setActiveFloor($floorCandidate);
-                $targetYPosition = $y;
-                break;
-            }
-            if ($this->collisionWithPlayer($candidate, $this->getBoundingRadius())) {
                 $targetYPosition = $y;
                 break;
             }

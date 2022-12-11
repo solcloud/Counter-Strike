@@ -22,18 +22,24 @@ trait JumpTrait
         }
 
         $event = new JumpEvent(function (): void {
-            $this->setActiveFloor(null);
             $targetYPosition = $this->position->y + Setting::jumpDistancePerTick();
             $candidate = $this->position->clone();
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
-                $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->getBoundingRadius());
+                $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->playerBoundingRadius);
                 if ($floorCandidate) {
+                    $targetYPosition = $y - 1;
+                    break;
+                }
+                if ($this->world->isCollisionWithOtherPlayers($this->id, $candidate, $this->playerBoundingRadius, $this->headHeight)) {
                     $targetYPosition = $y - 1;
                     break;
                 }
             }
 
-            $this->position->setY($targetYPosition);
+            if ($this->position->y !== $targetYPosition) {
+                $this->setActiveFloor(null);
+                $this->position->setY($targetYPosition);
+            }
         }, Setting::tickCountJump());
 
         $this->addEvent($event, $this->eventIdJump);

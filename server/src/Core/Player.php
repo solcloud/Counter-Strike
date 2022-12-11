@@ -23,6 +23,7 @@ final class Player
     private Inventory $inventory;
     private World $world;
     private ?Floor $activeFloor = null;
+    private DynamicFloor $headFloor;
     private int $playerBoundingRadius;
     /** @var Event[] */
     private array $eventsCache = [];
@@ -45,12 +46,12 @@ final class Player
         private int   $id,
         private Color $color,
         private bool  $isPlayingOnAttackerSide,
-        Point         $position = new Point(),
     )
     {
         $this->inventory = new Inventory($this->isPlayingOnAttackerSide);
         $this->sight = new PlayerCamera();
-        $this->position = $position;
+        $this->position = new Point();
+        $this->headFloor = new DynamicFloor($this);
         $this->playerBoundingRadius = Setting::playerBoundingRadius();
 
         $this->initialize();
@@ -69,6 +70,10 @@ final class Player
 
     public function onTick(int $tick): void
     {
+        if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $this->position, $this->playerBoundingRadius)) {
+            $this->setActiveFloor(null);
+        }
+
         for ($i = 0; $i <= $this->eventIdOther; $i++) {
             if (!isset($this->events[$i])) {
                 continue;
@@ -253,6 +258,11 @@ final class Player
         $this->getSight()->reset();
         $this->inventory->reset($this->isPlayingOnAttackerSide, !$this->isAlive());
         $this->initialize();
+    }
+
+    public function getHeadFloor(): Floor
+    {
+        return $this->headFloor;
     }
 
     /**

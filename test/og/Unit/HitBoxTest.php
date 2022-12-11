@@ -74,7 +74,7 @@ class HitBoxTest extends BaseTest
     public function testSphereWorldPointCenter(): void
     {
         $sphere = new SphereHitBox(new Point(-45, 12, 32), 38);
-        $player = new Player(1, Color::GREEN, true, new Point(15, -20, 8));
+        $player = new Player(1, Color::GREEN, true);
         $y = -8;
         $data = [
             45  => [6, 62],
@@ -86,7 +86,7 @@ class HitBoxTest extends BaseTest
 
         foreach ($data as $angle => $xz) {
             $player->getSight()->lookHorizontal($angle);
-            $this->assertPositionSame(new Point($xz[0], $y, $xz[1]), $sphere->calculateWorldCoordinate($player), " Angle: {$angle}");
+            $this->assertPositionSame(new Point($xz[0], $y, $xz[1]), $sphere->calculateWorldCoordinate($player,new Point(15, -20, 8)), " Angle: {$angle}");
         }
     }
 

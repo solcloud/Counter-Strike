@@ -58,7 +58,7 @@ trait MovementTrait
 
     public function setPosition(Point $newPosition): void
     {
-        $this->position = $newPosition->clone();
+        $this->position->setFrom($newPosition);
         $this->stop();
         $this->setActiveFloor($this->world->findFloor($this->position, $this->getBoundingRadius()));
     }
@@ -96,7 +96,7 @@ trait MovementTrait
                 return;
             }
 
-            $this->position = $this->processMovement($this->moveX, $this->moveZ, $this->position);
+            $this->position->setFrom($this->processMovement($this->moveX, $this->moveZ, $this->position));
             $this->world->tryPickDropItems($this);
             $this->stop();
         });

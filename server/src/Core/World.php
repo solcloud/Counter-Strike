@@ -114,6 +114,18 @@ class World
         return null;
     }
 
+    public function findPlayersHeadFloors(Point $point, int $radius = 0): ?Floor
+    {
+        foreach ($this->game->getAlivePlayers() as $player) {
+            $floor = $player->getHeadFloor();
+            if ($floor->intersect($point, $radius)) {
+                return $floor;
+            }
+        }
+
+        return null;
+    }
+
     public function findFloor(Point $point, int $radius = 0): ?Floor
     {
         if ($point->y < 0) {
@@ -140,11 +152,10 @@ class World
 
     public function isOnFloor(Floor $floor, Point $position, int $radius): bool
     {
-        if ($floor->getY() !== $position->getY()) {
-            return false;
-        }
-
-        return Collision::circleWithPlane($position->to2D('xz'), $radius, $floor);
+        return (
+            $floor->getY() === $position->y
+            && $floor->intersect($position, $radius)
+        );
     }
 
     public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset): int

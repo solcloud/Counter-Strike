@@ -469,7 +469,7 @@ class Game
     /**
      * @return Player[]
      */
-    private function getAlivePlayers(): array
+    public function getAlivePlayers(): array
     {
         return array_filter($this->players, fn(Player $player) => $player->isAlive());
     }
