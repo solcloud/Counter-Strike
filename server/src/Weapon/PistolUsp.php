@@ -15,7 +15,7 @@ final class PistolUsp extends AmmoBasedWeapon
     public const killAward = 300;
     public const fireRateMs = 170;
     public const damage = 116;
-    public const range = 5123;
+    public const rangeMaxDamage = 2800;
     public const recoilResetMs = 300;
     public const recoilPattern = [
         [0, 0],

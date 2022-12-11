@@ -5,9 +5,9 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemType;
-use cs\Interface\AttackEnable;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
+use cs\Weapon\BaseWeapon;
 use cs\Weapon\Knife;
 
 class HitBox implements Hittable
@@ -71,9 +71,15 @@ class HitBox implements Hittable
             $hitBoxType = HitBoxType::BACK;
         }
 
+        /** @var BaseWeapon $shootItem */
         $shootItem = $bullet->getShootItem();
         $playerArmorType = $this->player->getArmorType();
         $healthDamage = $shootItem->getDamageValue($hitBoxType, $playerArmorType);
+        $bulletDistance = $bullet->getDistanceTraveled();
+        if ($bulletDistance > $shootItem::rangeMaxDamage) {
+            $portion = ($bulletDistance - $shootItem::rangeMaxDamage) / ($shootItem::range + 1 - $shootItem::rangeMaxDamage);
+            $healthDamage = (int)ceil($healthDamage * (1 - max(0.9999, $portion)));
+        }
         $isTeamDamage = ($bullet->isOriginPlayerAttackerSide() === $this->player->isPlayingOnAttackerSide());
         if ($isTeamDamage) {
             $healthDamage = (int)ceil($healthDamage / 2);
@@ -88,7 +94,7 @@ class HitBox implements Hittable
         }
     }
 
-    private function calculateArmorDamage(AttackEnable $shootItem, ArmorType $armorType, HitBoxType $hitBoxType): int
+    private function calculateArmorDamage(BaseWeapon $shootItem, ArmorType $armorType, HitBoxType $hitBoxType): int
     {
         if ($armorType === ArmorType::NONE || $hitBoxType === HitBoxType::LEG) {
             return 0;
@@ -98,9 +104,7 @@ class HitBox implements Hittable
         }
 
         $armorDamage = 0;
-        if ($shootItem instanceof Item) {
-            $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
-        }
+        $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
         if ($armorType === ArmorType::BODY_AND_HEAD && $hitBoxType === HitBoxType::HEAD) {
             $armorDamage += 30;
         }
