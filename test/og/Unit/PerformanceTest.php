@@ -143,7 +143,7 @@ class PerformanceTest extends BaseTest
     {
         ////////
         $range = 2000;
-        $tickCount = 4;
+        $tickCount = 8;
         $playersCount = 10;
         ////////
 
@@ -173,7 +173,7 @@ class PerformanceTest extends BaseTest
         foreach ($players as $player) {
             $this->assertGreaterThan(50, $player->getPositionImmutable()->z);
         }
-        $this->assertLessThan(10, $took->asMilliseconds());
+        $this->assertLessThan(23, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void

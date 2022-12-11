@@ -98,7 +98,7 @@ final class Backtrack
     }
 
     /**
-     * @return int[]
+     * @return non-empty-array<int>
      */
     public function getStates(): array
     {

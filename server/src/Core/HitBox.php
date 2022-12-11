@@ -5,8 +5,10 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemType;
+use cs\Interface\AttackEnable;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
+use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\BaseWeapon;
 use cs\Weapon\Knife;
 
@@ -71,7 +73,7 @@ class HitBox implements Hittable
             $hitBoxType = HitBoxType::BACK;
         }
 
-        /** @var BaseWeapon $shootItem */
+        /** @var AttackEnable&BaseWeapon $shootItem */
         $shootItem = $bullet->getShootItem();
         $playerArmorType = $this->player->getArmorType();
         $healthDamage = $shootItem->getDamageValue($hitBoxType, $playerArmorType);
