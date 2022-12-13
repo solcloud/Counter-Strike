@@ -6,6 +6,7 @@ use cs\Core\Box;
 use cs\Core\GameFactory;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
@@ -39,6 +40,25 @@ class PerformanceTest extends BaseTest
         if ($took->asMicroseconds() > 8000) {
             self::markTestSkipped('Performance test skipped');
         }
+
+        Util::$TICK_RATE = 20;
+        Setting::loadConstants([
+            'moveOneMs'                     => 0.7,
+            'moveWalkOneMs'                 => 0.6,
+            'moveCrouchOneMs'               => 0.4,
+            'fallAmountOneMs'               => 1,
+            'crouchDurationMs'              => 250,
+            'jumpDurationMs'                => 420,
+            'jumpMovementSpeedMultiplier'   => 1.0,
+            'flyingMovementSpeedMultiplier' => 0.8,
+            'playerHeadRadius'              => 30,
+            'playerBoundingRadius'          => 44,
+            'playerJumpHeight'              => 150,
+            'playerHeadHeightStand'         => 190,
+            'playerHeadHeightCrouch'        => 140,
+            'playerObstacleOvercomeHeight'  => 20,
+            'playerFallDamageThreshold'     => 570,
+        ]);
 
         // Warmup cache
         $game = GameFactory::createDebug();
@@ -174,7 +194,7 @@ class PerformanceTest extends BaseTest
             $this->assertGreaterThan(50, $player->getPositionClone()->z);
             $this->assertGreaterThan(200, $player->getPositionClone()->z);
         }
-        $this->assertLessThan(58, $took->asMilliseconds()); // fixme
+        $this->assertLessThan(17, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void
