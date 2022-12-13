@@ -11,8 +11,8 @@ use cs\Map\Map;
 
 class World
 {
-    private const WALL_X = 0;
-    private const WALL_Z = 1;
+    private const WALL_X = 'zy';
+    private const WALL_Z = 'xy';
     private const BOMB_RADIUS = 90;
     private const BOMB_DEFUSE_MAX_DISTANCE = 300;
 
@@ -21,7 +21,7 @@ class World
     private array $playersColliders = [];
     /** @var DropItem[] */
     private array $dropItems = [];
-    /** @var array<int,array<int,Wall[]>> (x|z)BaseCoordinate:Wall[] */
+    /** @var array<string,array<int,Wall[]>> (x|z)BaseCoordinate:Wall[] */
     private array $walls = [];
     /** @var array<int,Floor[]> yCoordinate:Floor[] */
     private array $floors = [];
@@ -82,11 +82,7 @@ class World
 
     public function addWall(Wall $wall): void
     {
-        if ($wall->isWidthOnXAxis()) {
-            $this->walls[self::WALL_Z][$wall->getBase()][] = $wall;
-        } else {
-            $this->walls[self::WALL_X][$wall->getBase()][] = $wall;
-        }
+        $this->walls[$wall->getPlane()][$wall->getBase()][] = $wall;
     }
 
     public function addFloor(Floor $floor): void
@@ -114,7 +110,7 @@ class World
         return null;
     }
 
-    public function findPlayersHeadFloors(Point $point, int $radius = 0): ?Floor
+    public function findPlayersHeadFloor(Point $point, int $radius = 0): ?Floor
     {
         foreach ($this->game->getAlivePlayers() as $player) {
             $floor = $player->getHeadFloor();
@@ -136,18 +132,24 @@ class World
         if ($floors === []) {
             return null;
         }
-        for ($r = 0; $r <= $radius; $r++) {
-            foreach ($floors as $floor) {
-                if ($floor->intersect($point, $r)) {
-                    return $floor;
-                }
+
+        $px = $point->x;
+        $py = $point->z;
+        $targetRadiusSquared = $radius * $radius;
+        $smallestRadiusSquared = $targetRadiusSquared;
+        $targetFloor = null;
+        foreach ($floors as $floor) {
+            $distanceSquared = Collision::circleCenterToPlaneBoundaryDistanceSquared($px, $py, $floor);
+            if ($distanceSquared === $targetRadiusSquared) {
+                return $floor;
             }
-            if ($r > 3 && $r < $radius) {
-                $r = min($r + 9, $radius - 1);
+            if ($distanceSquared < $smallestRadiusSquared) {
+                $smallestRadiusSquared = $distanceSquared;
+                $targetFloor = $floor;
             }
         }
 
-        return null;
+        return $targetFloor;
     }
 
     public function isOnFloor(Floor $floor, Point $position, int $radius): bool
@@ -447,18 +449,15 @@ class World
         $this->game->playerFallDamageKilledEvent($playerDead);
     }
 
-    public function checkXSideWallCollision(Point $center, int $height, int $radius): ?Wall
+    public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        if ($center->x < 0) {
+        if ($bottomCenter->x < 0) {
             return new Wall(new Point(-1, -1, -1), false);
         }
 
-        $candidatePlane = $center->to2D('zy')->addX(-$radius);
+        $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
         $width = 2 * $radius;
-        foreach (($this->walls[self::WALL_X][$center->x] ?? []) as $wall) {
-            if ($wall->getCeiling() === $center->y) {
-                continue;
-            }
+        foreach (($this->walls[self::WALL_X][$bottomCenter->x] ?? []) as $wall) {
             if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
                 return $wall;
             }
@@ -467,24 +466,77 @@ class World
         return null;
     }
 
-    public function checkZSideWallCollision(Point $center, int $height, int $radius): ?Wall
+    public function checkZSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        if ($center->z < 0) {
+        if ($bottomCenter->z < 0) {
             return new Wall(new Point(-1, -1, -1), true);
         }
 
-        $candidatePlane = $center->to2D('xy')->addX(-$radius);
+        $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);
         $width = 2 * $radius;
-        foreach (($this->walls[self::WALL_Z][$center->z] ?? []) as $wall) {
-            if ($wall->getCeiling() === $center->y) {
-                continue;
-            }
+        foreach (($this->walls[self::WALL_Z][$bottomCenter->z] ?? []) as $wall) {
             if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
                 return $wall;
             }
         }
 
         return null;
+    }
+
+    public function findHighestXWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling): int
+    {
+        if ($bottomCenter->x < 0) {
+            return $maxWallCeiling;
+        }
+
+        $width = 2 * $radius;
+        $highestWallCeiling = 0;
+        $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
+        foreach (($this->walls[self::WALL_X][$bottomCenter->x] ?? []) as $wall) {
+            $wallCeiling = $wall->getCeiling();
+            if ($wallCeiling <= $bottomCenter->y) {
+                continue;
+            }
+            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+                continue;
+            }
+            if ($wallCeiling > $maxWallCeiling) {
+                return $maxWallCeiling;
+            }
+            if ($wallCeiling > $highestWallCeiling) {
+                $highestWallCeiling = $wallCeiling;
+            }
+        }
+
+        return $highestWallCeiling;
+    }
+
+    public function findHighestZWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling): int
+    {
+        if ($bottomCenter->z < 0) {
+            return $maxWallCeiling;
+        }
+
+        $width = 2 * $radius;
+        $highestWallCeiling = 0;
+        $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);
+        foreach (($this->walls[self::WALL_Z][$bottomCenter->z] ?? []) as $wall) {
+            $wallCeiling = $wall->getCeiling();
+            if ($wallCeiling <= $bottomCenter->y) {
+                continue;
+            }
+            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+                continue;
+            }
+            if ($wallCeiling > $maxWallCeiling) {
+                return $maxWallCeiling;
+            }
+            if ($wallCeiling > $highestWallCeiling) {
+                $highestWallCeiling = $wallCeiling;
+            }
+        }
+
+        return $highestWallCeiling;
     }
 
     public function bulletHit(Hittable $hit, Bullet $bullet, bool $wasHeadshot): void
@@ -566,12 +618,12 @@ class World
     public function isCollisionWithOtherPlayers(int $playerIdSkip, Point $point, int $radius, int $height): ?Player
     {
         foreach ($this->playersColliders as $collider) {
-            if ($collider->getPlayerId() === $playerIdSkip) {
+            if ($collider->playerId === $playerIdSkip) {
                 continue;
             }
 
             if ($collider->collide($point, $radius, $height)) {
-                return $this->game->getPlayer($collider->getPlayerId());
+                return $this->game->getPlayer($collider->playerId);
             }
         }
 

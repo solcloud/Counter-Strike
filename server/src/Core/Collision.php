@@ -87,6 +87,59 @@ class Collision
         );
     }
 
+    public static function circleWithRect(
+        int $circleCenterX, int $circleCenterY, int $circleRadius,
+        int $rectStartX, int $rectEndX,
+        int $rectStartY, int $rectEndY
+    ): bool
+    {
+        $testX = $circleCenterX;
+        if ($circleCenterX < $rectStartX) {
+            $testX = $rectStartX;
+        } elseif ($circleCenterX > $rectEndX) {
+            $testX = $rectEndX;
+        }
+        $testY = $circleCenterY;
+        if ($circleCenterY < $rectStartY) {
+            $testY = $rectStartY;
+        } elseif ($circleCenterY > $rectEndY) {
+            $testY = $rectEndY;
+        }
+
+        $a = $circleCenterX - $testX;
+        $b = $circleCenterY - $testY;
+        return (
+            ($a * $a) + ($b * $b)
+            <=
+            $circleRadius * $circleRadius
+        );
+    }
+
+    public static function circleCenterToPlaneBoundaryDistanceSquared(int $circleCenterX, int $circleCenterY, Plane $plane): int
+    {
+        $planeStart = $plane->getPoint2DStart();
+        $planeEnd = $plane->getPoint2DEnd();
+
+        if ($circleCenterX < $planeStart->x) {
+            $testX = $planeStart->x;
+        } elseif ($circleCenterX > $planeEnd->x) {
+            $testX = $planeEnd->x;
+        } else {
+            $testX = $circleCenterX;
+        }
+        if ($circleCenterY < $planeStart->y) {
+            $testY = $planeStart->y;
+        } elseif ($circleCenterY > $planeEnd->y) {
+            $testY = $planeEnd->y;
+        } else {
+            $testY = $circleCenterY;
+        }
+
+        $a = $circleCenterX - $testX;
+        $b = $circleCenterY - $testY;
+        return (($a * $a) + ($b * $b));
+    }
+
     public static function circleWithPlane(Point2D $circleCenter, int $circleRadius, Plane $plane): bool
     {
         if ($circleRadius === 0) {

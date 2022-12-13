@@ -11,7 +11,7 @@ class PlayerCollider
 
     /** @var HitBox[] */
     private array $hitBoxes = [];
-    private int $playerId;
+    public readonly int $playerId;
 
     public function __construct(private Player $player)
     {
@@ -80,11 +80,6 @@ class PlayerCollider
         }
 
         return null;
-    }
-
-    public function getPlayerId(): int
-    {
-        return $this->playerId;
     }
 
     public function collide(Point $point, int $radius, int $height): bool

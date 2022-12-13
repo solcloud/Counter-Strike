@@ -5,12 +5,14 @@ namespace Test\World;
 use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameState;
+use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
+use cs\Enum\Color;
 use Test\BaseTestCase;
 
 class WorldTest extends BaseTestCase
@@ -39,7 +41,7 @@ class WorldTest extends BaseTestCase
     public function testStairCaseUp(): void
     {
         $steps = 20;
-        $ramp = new Ramp(new Point(Setting::playerBoundingRadius(), 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Setting::moveDistancePerTick());
+        $ramp = new Ramp(new Point(Setting::playerBoundingRadius() + 10, 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Setting::moveDistancePerTick());
 
         $game = $this->createTestGame($steps);
         $game->getWorld()->addRamp($ramp);
@@ -111,6 +113,36 @@ class WorldTest extends BaseTestCase
         $game->start();
         $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
         $this->assertSame($box->getBase()->z + $box->depthZ - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+    }
+
+    public function testDoubleBoxPenetration(): void
+    {
+        $y = 0;
+        $boxHeight = Setting::playerHeadHeightCrouch() + 2;
+        $scale = (int)ceil(Setting::playerBoundingRadius() * 1.8);
+        $game = $this->createTestGame(50);
+        $world = $game->getWorld();
+        $p1 = $game->getPlayer(1);
+        $p1->setPosition(new Point(6 * $scale, $y, 4 * $scale));
+        $p2 = new Player(2, Color::BLUE, false);
+        $game->addPlayer($p2);
+        $p2->setPosition($p1->getPositionImmutable()->addY($p1->getHeadHeight() + 20));
+        $p1->crouch();
+
+        $world->addBox(new Box(new Point(5 * $scale, $y, 5 * $scale), 3 * $scale, $boxHeight, $scale));
+        $world->addBox(new Box(new Point(6 * $scale, $y + $boxHeight, 5 * $scale), 1 * $scale, $boxHeight, $scale));
+
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->moveForward();
+            if ($state->getTickId() < Setting::tickCountCrouch()) {
+                return;
+            }
+            $state->getPlayer(2)->moveForward();
+        });
+        $game->start();
+        $boxStart = 5 * $scale - 1 - $p1->getBoundingRadius();
+        $this->assertSame($boxStart, $p1->getPositionImmutable()->z);
+        $this->assertSame($boxStart, $p2->getPositionImmutable()->z);
     }
 
 }

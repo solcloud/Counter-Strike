@@ -311,7 +311,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testCanJumpOverWall(): void
     {
         $tickCount = Setting::tickCountJump() * 2;
-        $game = $this->createOneRoundGame($tickCount);
+        $game = $this->createTestGame($tickCount + 2);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();

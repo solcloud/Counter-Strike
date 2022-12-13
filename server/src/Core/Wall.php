@@ -38,9 +38,14 @@ class Wall extends Plane
         return $this->widthOnXAxis;
     }
 
+    public function getFloor(): int
+    {
+        return $this->point2DStart->y;
+    }
+
     public function getCeiling(): int
     {
-        return $this->getEnd()->y;
+        return $this->point2DEnd->y;
     }
 
     public static function fromArray(array $data): self

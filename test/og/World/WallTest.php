@@ -49,7 +49,7 @@ class WallTest extends BaseTestCase
         $this->assertNull($world->checkZSideWallCollision(new Point(18, 32, $z), 1, 2));
         $this->assertNotNull($world->checkZSideWallCollision(new Point(15, 20, $z), 2, 5));
         $this->assertNull($world->checkZSideWallCollision(new Point(18, 9, $z), 1, 22));
-        $this->assertNotNull($world->checkZSideWallCollision(new Point(15, 9, $z), 2, 5));
+        $this->assertNotNull($world->checkZSideWallCollision(new Point(15, 10, $z), 2, 5));
         $this->assertNull($world->checkZSideWallCollision(new Point(0, 0, $z), 10, 22));
         $this->assertNotNull($world->checkZSideWallCollision(new Point(0, 0, $z), 12, 20));
     }
@@ -65,7 +65,7 @@ class WallTest extends BaseTestCase
         $this->assertNull($world->checkXSideWallCollision(new Point($x, 32, 18), 1, 2));
         $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 20, 15), 2, 5));
         $this->assertNull($world->checkXSideWallCollision(new Point($x, 9, 18), 1, 22));
-        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 9, 15), 2, 5));
+        $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 10, 15), 2, 5));
         $this->assertNull($world->checkXSideWallCollision(new Point($x, 0, 0), 10, 22));
         $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 0, 0), 12, 20));
     }
@@ -104,7 +104,7 @@ class WallTest extends BaseTestCase
         $player = $game->getPlayer(1);
 
         $ramp = new Ramp(
-            new Point(0, 0, Setting::playerBoundingRadius()),
+            new Point(0, 0, Setting::playerBoundingRadius() + 1),
             new Point2D(0, 1),
             $numOfBoxes * 3,
             10,

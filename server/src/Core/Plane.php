@@ -6,8 +6,8 @@ abstract class Plane extends SolidSurface
 {
     private const PLANE_WALL_BANG_EDGE_MARGIN = 8;
 
-    private Point2D $point2DStart;
-    private Point2D $point2DEnd;
+    protected Point2D $point2DStart;
+    protected Point2D $point2DEnd;
 
     public function __construct(private Point $start, private Point $end, private string $axis2d)
     {
@@ -34,7 +34,10 @@ abstract class Plane extends SolidSurface
 
     public function intersect(Point $point, int $radius = 0): bool
     {
-        return Collision::circleWithPlane($point->to2D($this->axis2d), $radius, $this);
+        return Collision::circleWithRect(
+            $point->{$this->axis2d[0]}, $point->{$this->axis2d[1]}, $radius,
+            $this->point2DStart->x, $this->point2DEnd->x, $this->point2DStart->y, $this->point2DEnd->y
+        );
     }
 
     public function getPoint2DStart(): Point2D

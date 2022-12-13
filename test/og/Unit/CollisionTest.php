@@ -84,6 +84,12 @@ class CollisionTest extends BaseTest
         ];
         foreach ($circles as $circleCenter) {
             $this->assertFalse(Collision::circleWithPlane($circleCenter, $radius, $floor), "Circle: {$circleCenter} x Floor: {$floor}");
+            $fs = $floor->getPoint2DStart();
+            $fe = $floor->getPoint2DEnd();
+            $this->assertFalse(Collision::circleWithRect(
+                $circleCenter->x, $circleCenter->y, $radius,
+                $fs->x, $fe->x, $fs->y, $fe->y
+            ), "Circle: {$circleCenter} x Floor: {$floor}");
         }
     }
 
@@ -104,6 +110,12 @@ class CollisionTest extends BaseTest
         ];
         foreach ($circles as $circleCenter) {
             $this->assertTrue(Collision::circleWithPlane($circleCenter, $radius, $floor), "Circle: {$circleCenter} x Floor: {$floor}");
+            $fs = $floor->getPoint2DStart();
+            $fe = $floor->getPoint2DEnd();
+            $this->assertTrue(Collision::circleWithRect(
+                $circleCenter->x, $circleCenter->y, $radius,
+                $fs->x, $fe->x, $fs->y, $fe->y
+            ), "Circle: {$circleCenter} x Floor: {$floor}");
         }
     }
 

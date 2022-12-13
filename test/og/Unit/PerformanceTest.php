@@ -136,14 +136,14 @@ class PerformanceTest extends BaseTest
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
             $this->assertTrue($player->isAlive());
         }
-        $this->assertLessThan(14, $took->asMilliseconds());
+        $this->assertLessThan(15, $took->asMilliseconds());
     }
 
     public function testPlayersMoving(): void
     {
         ////////
         $range = 2000;
-        $tickCount = 8;
+        $tickCount = 20;
         $playersCount = 10;
         ////////
 
@@ -152,7 +152,7 @@ class PerformanceTest extends BaseTest
         for ($i = 1; $i <= $playersCount; $i++) {
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
-            $player->getSight()->lookAt(rand(-5, 5), -10);
+            $player->getSight()->lookAt(2, -10);
             $this->assertSame(50, $player->getPositionImmutable()->z);
         }
         $players = $game->getPlayers();
@@ -172,8 +172,9 @@ class PerformanceTest extends BaseTest
 
         foreach ($players as $player) {
             $this->assertGreaterThan(50, $player->getPositionImmutable()->z);
+            $this->assertGreaterThan(200, $player->getPositionImmutable()->z);
         }
-        $this->assertLessThan(23, $took->asMilliseconds());
+        $this->assertLessThan(58, $took->asMilliseconds()); // fixme
     }
 
     public function test3DMovement(): void
@@ -188,7 +189,7 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([49726, 66913, 55226], $coordinates);
-        $this->assertLessThan(45, $took->asMilliseconds());
+        $this->assertLessThan(38, $took->asMilliseconds());
     }
 
     public function test2DMovement(): void
@@ -203,7 +204,7 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([66913, 74314], $coordinates);
-        $this->assertLessThan(24, $took->asMilliseconds());
+        $this->assertLessThan(23, $took->asMilliseconds());
     }
 
     private function createMap(int $depth = 2000): Map

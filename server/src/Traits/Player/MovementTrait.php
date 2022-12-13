@@ -2,12 +2,10 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Floor;
 use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Core\Util;
-use cs\Core\Wall;
 use cs\Enum\ItemType;
 use cs\Enum\SoundType;
 use cs\Event\PlayerMovementEvent;
@@ -18,6 +16,8 @@ trait MovementTrait
 
     private int $moveX = 0;
     private int $moveZ = 0;
+    private int $lastMoveX = 0;
+    private int $lastMoveZ = 0;
     private ?int $lastAngle = null;
     private bool $isWalking = false;
 
@@ -58,13 +58,15 @@ trait MovementTrait
 
     public function setPosition(Point $newPosition): void
     {
-        $this->position->setFrom($newPosition);
         $this->stop();
+        $this->position->setFrom($newPosition);
         $this->setActiveFloor($this->world->findFloor($this->position, $this->getBoundingRadius()));
     }
 
     public function stop(): void
     {
+        $this->lastMoveX = $this->moveX;
+        $this->lastMoveZ = $this->moveZ;
         $this->moveX = 0;
         $this->moveZ = 0;
     }
@@ -132,7 +134,7 @@ trait MovementTrait
     private function processMovement(int $moveX, int $moveZ, Point $current): Point
     {
         $distanceTarget = $this->getMoveSpeed();
-        $angle = $this->getSight()->getRotationHorizontal();
+        $angle = $this->sight->getRotationHorizontal();
 
         if ($moveX <> 0 && $moveZ <> 0) { // diagonal move
             if ($moveZ === 1) {
@@ -141,6 +143,9 @@ trait MovementTrait
                 $angle += $moveX * (45 * 3);
             }
         } else { // single direction move
+            if (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ)) { // counter strafing
+                return $current;
+            }
             if ($moveZ === -1) {
                 $angle += 180;
             } elseif ($moveX === 1) {
@@ -179,8 +184,10 @@ trait MovementTrait
             if ($candidate->equals($target)) {
                 continue;
             }
-            if (!$this->canMoveTo($target, $candidate, $angleInt)) {
-                if ($candidate->x <> $orig->x + $x || $candidate->z <> $orig->z + $z) { // if move is possible in one axis at least
+
+            $canMove = $this->canMoveTo($target, $candidate, $angleInt);
+            if (!$canMove) {
+                if ($canMove === null) { // if move is possible in one axis at least
                     $target->setFrom($candidate);
                 }
                 break;
@@ -206,48 +213,53 @@ trait MovementTrait
         return $target;
     }
 
-    private function canMoveTo(Point $start, Point $candidate, int $angle): bool
+    private function canMoveTo(Point $start, Point $candidate, int $angle): ?bool
     {
-        $radius = $this->getBoundingRadius();
+        $radius = $this->playerBoundingRadius;
         if ($this->collisionWithPlayer($candidate, $radius)) {
             return false;
         }
+        $height = $this->headHeight;
+        $maxWallCeiling = $candidate->y + Setting::playerObstacleOvercomeHeight();
 
-        $xWall = null;
+        $xWallMaxHeight = 0;
         if ($start->x <> $candidate->x) {
             $xGrowing = ($start->x < $candidate->x);
             $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
-            $xWall = $this->world->checkXSideWallCollision($baseX, $this->getHeadHeight(), $radius);
+            $xWallMaxHeight = $this->world->findHighestXWall($baseX, $height, $radius, $maxWallCeiling);
         }
-        $zWall = null;
+        $zWallMaxHeight = 0;
         if ($start->z <> $candidate->z) {
             $zGrowing = ($start->z < $candidate->z);
             $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
-            $zWall = $this->world->checkZSideWallCollision($baseZ, $this->getHeadHeight(), $radius);
+            $zWallMaxHeight = $this->world->findHighestZWall($baseZ, $height, $radius, $maxWallCeiling);
         }
-        if (!$xWall && !$zWall) {
+        if ($xWallMaxHeight === 0 && $zWallMaxHeight === 0) { // no walls
             return true;
         }
 
-        // Try step over ONE low height wall
-        $floor = null;
-        if ($zWall && !$xWall) {
-            $floor = $this->canStepOverWall($zWall, $candidate);
-        } elseif ($xWall && !$zWall) {
-            $floor = $this->canStepOverWall($xWall, $candidate);
-        }
-        if ($floor) {
-            $candidateY = $candidate->clone()->setY($floor->getY());
-            if (!$this->collisionWithPlayer($candidateY, $radius)) {
-                $candidate->setY($floor->getY()); // side effect
-                $this->setActiveFloor($floor);
-                return true;
-            }
+        if ($this->isFlying()) {
+            return false;
         }
 
-        // Tall walls everywhere
-        if ($xWall && $zWall) {
-            return false;
+        // Try step over ONE low height wall
+        if ($xWallMaxHeight === 0 && $zWallMaxHeight <= $maxWallCeiling) {
+            $highestWallCeiling = $zWallMaxHeight;
+        } elseif ($zWallMaxHeight === 0 && $xWallMaxHeight <= $maxWallCeiling) {
+            $highestWallCeiling = $xWallMaxHeight;
+        } else {
+            return false; // Tall walls everywhere
+        }
+        if ($highestWallCeiling !== 0) {
+            $floor = $this->world->findFloor($candidate->clone()->setY($highestWallCeiling), $radius);
+            if ($floor) {
+                $candidateY = $candidate->clone()->setY($floor->getY());
+                if (!$this->collisionWithPlayer($candidateY, $radius)) {
+                    $candidate->setY($floor->getY()); // side effect
+                    $this->setActiveFloor($floor);
+                    return true;
+                }
+            }
         }
 
         // If moving in 90s angles against wall we stop
@@ -256,44 +268,36 @@ trait MovementTrait
         }
 
         // Try to move 1 unit in one axis at least if possible
-        if ($xWall === null) { // Try to move in X axis
+        if ($xWallMaxHeight === 0) { // Try to move in X axis
             $oneSideCandidate = $candidate->clone()->setZ($start->z); // reset to previous Z
             $oneSideCandidate->addX($angle > 180 ? -1 : 1); // try 1 unit in X
             $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
-            $xWall = $this->world->checkXSideWallCollision($oneSideCandidateX, $this->getHeadHeight(), $radius);
+            $xWall = $this->world->checkXSideWallCollision($oneSideCandidateX, $height, $radius);
             if (!$xWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
-                $candidate->setFrom($oneSideCandidate); // side effect for caller
+                $candidate->setFrom($oneSideCandidate); // side effect
+                return null;
             }
             return false;
         }
-        if ($zWall === null) { // Try to move in Z axis
+        if ($zWallMaxHeight === 0) { // Try to move in Z axis
             $oneSideCandidate = $candidate->clone()->setX($start->x); // reset to previous X
             $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1); // try 1 unit in Z
             $oneSideCandidateZ = $oneSideCandidate->clone()->addZ(($angle > 270 || $angle < 90) ? $radius : -$radius);
-            $zWall = $this->world->checkZSideWallCollision($oneSideCandidateZ, $this->getHeadHeight(), $radius);
+            $zWall = $this->world->checkZSideWallCollision($oneSideCandidateZ, $height, $radius);
             if (!$zWall && !$this->collisionWithPlayer($oneSideCandidate, $radius)) {
-                $candidate->setFrom($oneSideCandidate); // side effect for caller
+                $candidate->setFrom($oneSideCandidate); // side effect
+                return null;
             }
             return false;
         }
+
+        return false;
     }
 
     private function collisionWithPlayer(Point $candidate, int $radius): bool
     {
-        return (null !== $this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $radius, $this->getHeadHeight()));
+        return (null !== $this->world->isCollisionWithOtherPlayers($this->id, $candidate, $radius, $this->headHeight));
     }
 
-    private function canStepOverWall(Wall $wall, Point $candidate): ?Floor
-    {
-        if ($this->isFlying()) {
-            return null;
-        }
-
-        if ($wall->getCeiling() <= $candidate->y + Setting::playerObstacleOvercomeHeight()) {
-            return $this->world->findFloor($candidate->clone()->setY($wall->getCeiling()), $this->getBoundingRadius());
-        }
-
-        return null;
-    }
 
 }
