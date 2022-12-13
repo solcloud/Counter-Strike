@@ -18,7 +18,7 @@ trait MovementTrait
     private int $moveZ = 0;
     private int $lastMoveX = 0;
     private int $lastMoveZ = 0;
-    private ?int $lastAngle = null;
+    private ?int $lastAngle = 0;
     private bool $isWalking = false;
 
     public function speedRun(): void
@@ -60,7 +60,7 @@ trait MovementTrait
     {
         $this->stop();
         $this->position->setFrom($newPosition);
-        $this->setActiveFloor($this->world->findFloor($this->position, $this->getBoundingRadius()));
+        $this->setActiveFloor($this->world->findFloor($this->position, $this->playerBoundingRadius));
     }
 
     public function stop(): void
@@ -104,6 +104,31 @@ trait MovementTrait
         });
     }
 
+    private function getMoveAngle(): float
+    {
+        $moveX = $this->moveX;
+        $moveZ = $this->moveZ;
+        $angle = $this->sight->getRotationHorizontal();
+
+        if ($moveX <> 0 && $moveZ <> 0) { // diagonal move
+            if ($moveZ === 1) {
+                $angle += $moveX * 45;
+            } else {
+                $angle += $moveX * (45 * 3);
+            }
+        } else { // single direction move
+            if ($moveZ === -1) {
+                $angle += 180;
+            } elseif ($moveX === 1) {
+                $angle += 90;
+            } elseif ($moveX === -1) {
+                $angle += -90;
+            }
+        }
+
+        return $angle;
+    }
+
     private function getMoveSpeed(): int
     {
         if ($this->isCrouching()) {
@@ -133,46 +158,25 @@ trait MovementTrait
 
     private function processMovement(int $moveX, int $moveZ, Point $current): Point
     {
-        $distanceTarget = $this->getMoveSpeed();
-        $angle = $this->sight->getRotationHorizontal();
+        // If single direction move in opposite direction than previous (counter strafing) we stop
+        if (!($moveX <> 0 && $moveZ <> 0) && (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ))) {
+            return $current;
+        }
 
-        if ($moveX <> 0 && $moveZ <> 0) { // diagonal move
-            if ($moveZ === 1) {
-                $angle += $moveX * 45;
-            } else {
-                $angle += $moveX * (45 * 3);
-            }
-        } else { // single direction move
-            if (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ)) { // counter strafing
+        $distanceTarget = $this->getMoveSpeed();
+        $angle = Util::normalizeAngle($this->getMoveAngle());
+        $angleInt = Util::nearbyInt($angle);
+
+        if ($this->isFlying()) {
+            if ($this->lastAngle === null) {
                 return $current;
             }
-            if ($moveZ === -1) {
-                $angle += 180;
-            } elseif ($moveX === 1) {
-                $angle += 90;
-            } elseif ($moveX === -1) {
-                $angle += -90;
+            if (abs(Util::smallestDeltaAngle($this->lastAngle, $angleInt)) > 160) { // stop if drastically changing direction in air
+                $this->lastAngle = null;
+                return $current;
             }
         }
-        $angle = Util::normalizeAngle($angle);
-        $angleInt = Util::nearbyInt($angle);
-        if ($this->lastAngle === null) {
-            $this->lastAngle = $angleInt;
-        }
-        if ($this->isFlying()) {
-            $delta = Util::smallestDeltaAngle($this->lastAngle, $angleInt);
-            if (abs($delta) > 160) {
-                $distanceTarget = (int)ceil($distanceTarget * .1);
-                $angle = $this->lastAngle + ($delta / 4);
-                $angleInt = Util::nearbyInt($angle);
-            } elseif (abs($delta) > 60) {
-                $angle += ($delta / 4);
-                $angleInt = Util::nearbyInt($angle);
-                $this->lastAngle = $angleInt;
-            }
-        } else {
-            $this->lastAngle = $angleInt;
-        }
+        $this->lastAngle = $angleInt;
 
         $looseFloor = false;
         $orig = $current->clone();

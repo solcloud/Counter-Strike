@@ -12,7 +12,7 @@ final class Setting
         'moveCrouchOneMs'               => 0.4,
         'fallAmountOneMs'               => 1,
         'crouchDurationMs'              => 250,
-        'jumpDurationMs'                => 380,
+        'jumpDurationMs'                => 420,
         'jumpMovementSpeedMultiplier'   => 1.0,
         'flyingMovementSpeedMultiplier' => 0.8,
 
