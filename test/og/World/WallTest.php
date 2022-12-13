@@ -118,7 +118,7 @@ class WallTest extends BaseTestCase
         $game->start();
         $this->assertPositionSame(
             new Point(0, $numOfBoxes * Setting::playerObstacleOvercomeHeight(), $numOfBoxes * Setting::moveDistancePerTick()),
-            $player->getPositionImmutable()
+            $player->getPositionClone()
         );
     }
 
@@ -169,7 +169,7 @@ class WallTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1), $player->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1), $player->getPositionClone());
         $this->assertFalse($player->isAlive());
     }
 
@@ -198,11 +198,11 @@ class WallTest extends BaseTestCase
         $game->onTick(function (GameState $state) use ($numOfBoxes) {
             $state->getPlayer(1)->moveForward();
             if ($state->getTickId() === $numOfBoxes) {
-                $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionImmutable()->y);
+                $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionClone()->y);
             }
         });
         $game->start();
-        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1 - $player->getBoundingRadius()), $player->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, 0, $box->getBase()->z - 1 - $player->getBoundingRadius()), $player->getPositionClone());
         $this->assertFalse($player->isAlive());
     }
 

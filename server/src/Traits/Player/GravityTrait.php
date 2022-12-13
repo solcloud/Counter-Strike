@@ -65,7 +65,7 @@ trait GravityTrait
         $floorHeight = $floor->getY();
         $fallHeight = $this->fallHeight - $floorHeight;
         if ($fallHeight > 3 * Setting::playerObstacleOvercomeHeight()) {
-            $sound = new SoundEvent($this->getPositionImmutable()->setY($floorHeight), SoundType::PLAYER_GROUND_TOUCH);
+            $sound = new SoundEvent($this->getPositionClone()->setY($floorHeight), SoundType::PLAYER_GROUND_TOUCH);
             $this->world->makeSound($sound->setPlayer($this)->setSurface($floor));
         }
 

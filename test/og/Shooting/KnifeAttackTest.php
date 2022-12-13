@@ -41,7 +41,7 @@ class KnifeAttackTest extends BaseTestCase
         $game = $this->createNoPauseGame();
         $p2 = new Player(2, Color::GREEN, false);
         $game->addPlayer($p2);
-        $p2->setPosition($game->getPlayer(1)->getPositionImmutable()->addZ($p2->getBoundingRadius() * 3));
+        $p2->setPosition($game->getPlayer(1)->getPositionClone()->addZ($p2->getBoundingRadius() * 3));
         $this->playPlayer($game, [
             fn(Player $p) => $p->reload(),
             $this->waitNTicks(Knife::equipReadyTimeMs),

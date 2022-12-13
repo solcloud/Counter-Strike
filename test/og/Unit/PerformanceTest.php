@@ -153,7 +153,7 @@ class PerformanceTest extends BaseTest
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
             $player->getSight()->lookAt(2, -10);
-            $this->assertSame(50, $player->getPositionImmutable()->z);
+            $this->assertSame(50, $player->getPositionClone()->z);
         }
         $players = $game->getPlayers();
         $this->assertCount($playersCount, $players);
@@ -171,8 +171,8 @@ class PerformanceTest extends BaseTest
         $this->assertSame($tickCount - 1, $game->getTickId());
 
         foreach ($players as $player) {
-            $this->assertGreaterThan(50, $player->getPositionImmutable()->z);
-            $this->assertGreaterThan(200, $player->getPositionImmutable()->z);
+            $this->assertGreaterThan(50, $player->getPositionClone()->z);
+            $this->assertGreaterThan(200, $player->getPositionClone()->z);
         }
         $this->assertLessThan(58, $took->asMilliseconds()); // fixme
     }

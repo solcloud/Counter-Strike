@@ -50,9 +50,9 @@ class RampTest extends BaseTestCase
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionImmutable()->y);
-        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionImmutable()->z);
-        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionImmutable()->x);
+        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
+        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
     }
 
     public function testDiagonalRampMovement2(): void
@@ -67,9 +67,9 @@ class RampTest extends BaseTestCase
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionImmutable()->y);
-        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionImmutable()->z);
-        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionImmutable()->x);
+        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
+        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
     }
 
     public function testDiagonalRampMovement3(): void
@@ -84,9 +84,9 @@ class RampTest extends BaseTestCase
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionImmutable()->y);
-        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionImmutable()->z);
-        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionImmutable()->x);
+        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
+        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
     }
 
 }

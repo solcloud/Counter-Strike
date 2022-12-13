@@ -70,8 +70,8 @@ class MovementTest extends BaseTestCase
         $this->assertTrue($game->getPlayer(1)->buyItem(BuyMenuItem::RIFLE_AK));
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerSlowMovementWhenFlying(): void
@@ -80,9 +80,9 @@ class MovementTest extends BaseTestCase
         $game->getPlayer(1)->setPosition(new Point(0, Setting::playerHeadHeightStand(), 0));
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerSlowMovementAndLowerHeadWhenCrouching(): void
@@ -98,8 +98,8 @@ class MovementTest extends BaseTestCase
             $this->assertLessThan(Setting::playerHeadHeightStand(), $headHeight);
         });
         $game->start();
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertSame(Setting::moveDistanceCrouchPerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertSame(Setting::moveDistanceCrouchPerTick(), $game->getPlayer(1)->getPositionClone()->z);
         $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
     }
 
@@ -111,9 +111,9 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->moveLeft();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerSlowMovementWhenTouchingWallAngle(): void
@@ -125,9 +125,9 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->moveLeft();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerSlowMovementWhenTouchingWallAngle1(): void
@@ -139,9 +139,9 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->moveRight();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testPlayerMultiJump(): void
@@ -151,13 +151,13 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->jump(),
             fn(Player $p) => $p->jump(),
             function (Player $p) {
-                $this->assertLessThan(Setting::playerHeadHeightStand(), $p->getPositionImmutable()->y);
+                $this->assertLessThan(Setting::playerHeadHeightStand(), $p->getPositionClone()->y);
             },
             fn(Player $p) => $p->jump(),
             $this->waitXTicks(Setting::tickCountJump() * 2),
         ];
         $game = $this->simulateGame($pc);
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
         $this->assertFalse($game->getPlayer(1)->isFlying());
         $this->assertFalse($game->getPlayer(1)->isJumping());
     }
@@ -176,7 +176,7 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->jump();
         });
         $game->start();
-        $this->assertLessThan(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertLessThan(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getPositionClone()->y);
     }
 
     public function testPlayerDiagonalMove(): void
@@ -187,8 +187,8 @@ class MovementTest extends BaseTestCase
             $state->getPlayer(1)->moveRight();
         });
         $game->start();
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testPlayerMouseOrthogonalMovement(): void
@@ -198,26 +198,26 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->setPosition($origin),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) use ($origin) {
-                $this->assertSame($origin->z + Setting::moveDistancePerTick(), $p->getPositionImmutable()->z);
+                $this->assertSame($origin->z + Setting::moveDistancePerTick(), $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->getSight()->lookHorizontal(90),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) use ($origin) {
-                $this->assertSame($origin->x + Setting::moveDistancePerTick(), $p->getPositionImmutable()->x);
+                $this->assertSame($origin->x + Setting::moveDistancePerTick(), $p->getPositionClone()->x);
             },
             fn(Player $p) => $p->getSight()->lookHorizontal(180),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) use ($origin) {
-                $this->assertSame($origin->z, $p->getPositionImmutable()->z);
+                $this->assertSame($origin->z, $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->getSight()->lookHorizontal(270),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) use ($origin) {
-                $this->assertSame($origin->z, $p->getPositionImmutable()->z);
+                $this->assertSame($origin->z, $p->getPositionClone()->z);
             },
         ];
         $game = $this->simulateGame($playerCommands);
-        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerCrouchingStanding(): void
@@ -265,7 +265,7 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->moveForward(),
         ];
         $game = $this->simulateGame($playerCommands);
-        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerMouseOrthogonalMovement2(): void
@@ -280,7 +280,7 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->getSight()->lookHorizontal(-90),
             function (Player $p) use ($origin) {
-                $this->assertPositionSame(new Point($origin->x + Setting::moveDistancePerTick(), $origin->y, $origin->z - Setting::moveDistancePerTick()), $p->getPositionImmutable());
+                $this->assertPositionSame(new Point($origin->x + Setting::moveDistancePerTick(), $origin->y, $origin->z - Setting::moveDistancePerTick()), $p->getPositionClone());
                 $this->assertSame($p->getSight()->getRotationHorizontal(), 270.0);
             },
             fn(Player $p) => $p->moveForward(),
@@ -288,7 +288,7 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->moveForward(),
         ];
         $game = $this->simulateGame($playerCommands);
-        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerMouseOrthogonalMovement3(): void
@@ -305,7 +305,7 @@ class MovementTest extends BaseTestCase
             fn(Player $p) => $p->moveLeft(),
         ];
         $game = $this->simulateGame($playerCommands);
-        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionClone());
     }
 
 }

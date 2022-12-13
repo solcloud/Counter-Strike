@@ -84,7 +84,7 @@ class RoundTest extends BaseTestCase
         $this->assertInstanceOf(SoundEvent::class, $drop2);
         $this->assertInstanceOf(PistolGlock::class, $drop1->getItem());
         $this->assertInstanceOf(Bomb::class, $drop2->getItem());
-        $pp = $game->getPlayer(1)->getPositionImmutable();
+        $pp = $game->getPlayer(1)->getPositionClone();
         $pr = $game->getPlayer(1)->getBoundingRadius();
         $this->assertSame($pp->y, $drop1->position->y);
         $this->assertLessThanOrEqual($pr, abs($drop1->position->x - $pp->x));

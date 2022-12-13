@@ -75,7 +75,7 @@ class Bomb extends BaseEquipment
 
     public function explodeDamageToPlayer(Player $player): void
     {
-        $distanceSquared = Util::distanceSquared($player->getPositionImmutable(), $this->position);
+        $distanceSquared = Util::distanceSquared($player->getPositionClone(), $this->position);
         $maxDistance = $this->maxBlastDistance * $this->maxBlastDistance;
         if ($distanceSquared > $maxDistance) {
             return;

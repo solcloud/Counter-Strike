@@ -28,7 +28,7 @@ class SphereHitBox implements HitIntersect
     public function calculateWorldCoordinate(Player $player, Point $centerModifier = new Point()): Point
     {
         $angle = $player->getSight()->getRotationHorizontal();
-        $center = $player->getPositionImmutable()->add($centerModifier);
+        $center = $player->getPositionClone()->add($centerModifier);
         $point = $center->clone()->add($this->relativeCenter);
 
         if ($angle === 0.0) {

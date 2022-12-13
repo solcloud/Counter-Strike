@@ -44,8 +44,8 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerCollisionWithBoxDoubleMovement(): void
@@ -57,8 +57,8 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->moveLeft();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testPlayerCollisionWithBoxDoubleMovement2(): void
@@ -73,9 +73,9 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->moveRight();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertSame($box->getBase()->z - Setting::playerBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertGreaterThan($ticks, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertSame($box->getBase()->z - Setting::playerBoundingRadius() - 1, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertGreaterThan($ticks, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testPlayerCollisionWithBoxAngle2(): void
@@ -87,8 +87,8 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->moveRight();
         });
         $game->start();
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertGreaterThan(0, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testPlayerDieOnFallDamage(): void
@@ -110,12 +110,12 @@ class WorldCollisionTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertSame(1, $p->getPositionImmutable()->getZ());
+                $this->assertSame(1, $p->getPositionClone()->getZ());
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertSame(1 + Setting::moveDistancePerTick(), $p->getPositionImmutable()->getZ());
+                $this->assertSame(1 + Setting::moveDistancePerTick(), $p->getPositionClone()->getZ());
             },
             fn(Player $p) => $p->moveLeft(),
             fn(Player $p) => $p->moveLeft(),
@@ -137,19 +137,19 @@ class WorldCollisionTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertPositionSame(new Point(0, 0, Setting::moveDistancePerTick()), $p->getPositionImmutable());
+                $this->assertPositionSame(new Point(0, 0, Setting::moveDistancePerTick()), $p->getPositionClone());
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveRight(),
             function (Player $p) {
-                $this->assertPositionSame(new Point(1 * Setting::moveDistancePerTick() - 1, 0, 1 * Setting::moveDistancePerTick()), $p->getPositionImmutable());
+                $this->assertPositionSame(new Point(1 * Setting::moveDistancePerTick() - 1, 0, 1 * Setting::moveDistancePerTick()), $p->getPositionClone());
             },
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveBackward(),
             fn(Player $p) => $p->moveBackward(),
             function (Player $p) {
-                $this->assertSame(Setting::moveDistancePerTick() + 1, $p->getPositionImmutable()->z);
+                $this->assertSame(Setting::moveDistancePerTick() + 1, $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveBackward(),
@@ -175,8 +175,8 @@ class WorldCollisionTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertPositionSame($player2->getPositionImmutable(), $player2Position);
-        $this->assertSame($player2Position->z - 2 * $player2->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertPositionSame($player2->getPositionClone(), $player2Position);
+        $this->assertSame($player2Position->z - 2 * $player2->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testGravity(): void
@@ -187,7 +187,7 @@ class WorldCollisionTest extends BaseTestCase
         $game = $this->createOneRoundGame($ticks);
         $game->getPlayer(1)->setPosition($spawnPosition);
         $this->playPlayer($game, [$ticks]);
-        $this->assertLessThan($startY, $game->getPlayer(1)->getPositionImmutable()->getY());
+        $this->assertLessThan($startY, $game->getPlayer(1)->getPositionClone()->getY());
     }
 
     public function testGravityFloorCatch(): void
@@ -200,7 +200,7 @@ class WorldCollisionTest extends BaseTestCase
         $game->getPlayer(1)->setPosition($spawnPosition);
 
         $game->start();
-        $this->assertPositionSame(new Point(0, $floorYPos, 0), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, $floorYPos, 0), $game->getPlayer(1)->getPositionClone());
     }
 
     public function testGravityFloorCatchThick(): void
@@ -213,7 +213,7 @@ class WorldCollisionTest extends BaseTestCase
         $game->getPlayer(1)->setPosition($spawnPosition);
 
         $game->start();
-        $this->assertPositionSame(new Point($spawnPosition->x, $floorYPos, $spawnPosition->z), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point($spawnPosition->x, $floorYPos, $spawnPosition->z), $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerJump(): void
@@ -222,13 +222,13 @@ class WorldCollisionTest extends BaseTestCase
             function (Player $p): void {
                 $this->assertTrue($p->canJump());
                 $this->assertFalse($p->isJumping());
-                $this->assertSame(0, $p->getPositionImmutable()->y);
+                $this->assertSame(0, $p->getPositionClone()->y);
             },
             fn(Player $p) => $p->jump(),
             function (Player $p): void {
                 $this->assertTrue($p->isJumping());
                 $this->assertFalse($p->canJump());
-                $this->assertGreaterThan(0, $p->getPositionImmutable()->y);
+                $this->assertGreaterThan(0, $p->getPositionClone()->y);
             },
             $this->waitXTicks(Setting::tickCountJump() * 2),
             function (Player $p): void {
@@ -236,7 +236,7 @@ class WorldCollisionTest extends BaseTestCase
             },
         ];
         $game = $this->simulateGame($playerCommands);
-        $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerJumpCeiling(): void
@@ -249,9 +249,9 @@ class WorldCollisionTest extends BaseTestCase
             $this->assertTrue($state->getPlayer(1)->isJumping());
             $this->assertTrue($state->getPlayer(1)->isFlying());
             if ($state->getTickId() > 0) {
-                $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionImmutable()->y);
+                $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionClone()->y);
             }
-            $this->assertLessThan($ceiling->getY(), $state->getPlayer(1)->getPositionImmutable()->y);
+            $this->assertLessThan($ceiling->getY(), $state->getPlayer(1)->getPositionClone()->y);
         });
         $game->start();
     }
@@ -283,9 +283,9 @@ class WorldCollisionTest extends BaseTestCase
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
         $this->assertFalse($game->getPlayer(1)->isFlying());
-        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testCanJumpOnBoxBoundingRadius(): void
@@ -303,9 +303,9 @@ class WorldCollisionTest extends BaseTestCase
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
         $this->assertFalse($game->getPlayer(1)->isFlying());
-        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame($box->heightY, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertLessThan(Setting::moveDistancePerTick() * $tickCount, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() * $tickCount / 2, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testCanJumpOverWall(): void
@@ -317,7 +317,7 @@ class WorldCollisionTest extends BaseTestCase
                 $state->getPlayer(1)->jump();
             }
             if ($state->getTickId() === 1 + Setting::tickCountJump()) {
-                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionClone()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
@@ -326,8 +326,8 @@ class WorldCollisionTest extends BaseTestCase
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
         $this->assertFalse($game->getPlayer(1)->isFlying());
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionClone()->x);
     }
 
     public function testCanJumpOverWallBoundingRadius(): void
@@ -339,7 +339,7 @@ class WorldCollisionTest extends BaseTestCase
                 $state->getPlayer(1)->jump();
             }
             if ($state->getTickId() === 1 + Setting::tickCountJump()) {
-                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionImmutable()->y);
+                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionClone()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
@@ -347,8 +347,8 @@ class WorldCollisionTest extends BaseTestCase
         $game->getWorld()->addBox($box);
         $game->start();
         $this->assertGreaterThan(0, $box->heightY);
-        $this->assertSame(0, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionImmutable()->x);
+        $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertGreaterThan($box->getBase()->x + $box->widthX, $game->getPlayer(1)->getPositionClone()->x);
         $this->assertFalse($game->getPlayer(1)->isFlying());
     }
 
@@ -392,7 +392,7 @@ class WorldCollisionTest extends BaseTestCase
             $game->getWorld()->addFloor($floor);
         }
         $this->playPlayer($game, $playerCommands);
-        $this->assertPositionSame(new Point(0, $floor->getY(), $floor->getStart()->z), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, $floor->getY(), $floor->getStart()->z), $game->getPlayer(1)->getPositionClone());
     }
 
 

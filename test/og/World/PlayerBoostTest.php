@@ -19,10 +19,10 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
 
         $game->start();
-        $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $game->getPlayer(2)->getPositionImmutable());
+        $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $game->getPlayer(2)->getPositionClone());
         $this->assertFalse($player2->isFlying());
         $this->assertTrue($player2->canJump());
     }
@@ -33,9 +33,9 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(Setting::tickCountCrouch() * 5);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addZ(Setting::moveDistancePerTick() * 3));
+        $player2->setPosition($player1->getPositionClone()->addZ(Setting::moveDistancePerTick() * 3));
         $player2->crouch();
-        $boxStartPos = $player2->getPositionImmutable()->addZ(Setting::moveDistancePerTick() * 2);
+        $boxStartPos = $player2->getPositionClone()->addZ(Setting::moveDistancePerTick() * 2);
         $box = new Box(
             $boxStartPos,
             200,
@@ -53,9 +53,9 @@ class PlayerBoostTest extends BaseTestCase
             $player1->jump();
         });
         $game->start();
-        $this->assertPositionSame($boxStartPos, $player2->getPositionImmutable()->addZ($player2->getBoundingRadius() + 1));
-        $this->assertGreaterThanOrEqual($box->heightY, $player1->getPositionImmutable()->y);
-        $this->assertGreaterThan($boxStartPos->z, $player1->getPositionImmutable()->z);
+        $this->assertPositionSame($boxStartPos, $player2->getPositionClone()->addZ($player2->getBoundingRadius() + 1));
+        $this->assertGreaterThanOrEqual($box->heightY, $player1->getPositionClone()->y);
+        $this->assertGreaterThan($boxStartPos->z, $player1->getPositionClone()->z);
     }
 
     public function testPlayerFallDownWhenBoosterMoveAway(): void
@@ -64,10 +64,10 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
 
         $game->start();
-        $p2pos = $game->getPlayer(2)->getPositionImmutable();
+        $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertGreaterThan(0, $p2pos->y);
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
         $this->assertFalse($player2->isFlying());
@@ -77,8 +77,8 @@ class PlayerBoostTest extends BaseTestCase
             $player1->moveForward();
             $game->tick($i);
         }
-        $this->assertPositionSame($p2pos->clone()->setY(0), $player2->getPositionImmutable());
-        $this->assertGreaterThan($p2pos->z, $player1->getPositionImmutable()->z);
+        $this->assertPositionSame($p2pos->clone()->setY(0), $player2->getPositionClone());
+        $this->assertGreaterThan($p2pos->z, $player1->getPositionClone()->z);
     }
 
     public function testPlayerFallDownWhenBoosterCrouchAndGoUpWhenHeJumpAndBoosterStand(): void
@@ -87,10 +87,10 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
 
         $game->start();
-        $p2pos = $game->getPlayer(2)->getPositionImmutable();
+        $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertGreaterThan(0, $p2pos->y);
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightStand());
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
@@ -103,7 +103,7 @@ class PlayerBoostTest extends BaseTestCase
             $game->tick($i);
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightCrouch());
-        $this->assertPositionSame($p2pos->clone()->setY($player1->getHeadHeight() + 1), $player2->getPositionImmutable());
+        $this->assertPositionSame($p2pos->clone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
 
         $player1->stand();
         $player2->jump();
@@ -112,7 +112,7 @@ class PlayerBoostTest extends BaseTestCase
             $game->tick($i);
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightStand());
-        $this->assertPositionSame($player2->getPositionImmutable()->setY($player1->getHeadHeight() + 1), $player2->getPositionImmutable());
+        $this->assertPositionSame($player2->getPositionClone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
     }
 
     public function testPlayerCanMoveAfterStandingOnTopOfOtherPlayer(): void
@@ -121,14 +121,14 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
 
         $game->start();
-        $p2pos = $game->getPlayer(2)->getPositionImmutable();
+        $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
         $player2->moveRight();
         $game->tick($game->getTickId() + 1);
-        $this->assertPositionNotSame($p2pos, $game->getPlayer(2)->getPositionImmutable());
+        $this->assertPositionNotSame($p2pos, $game->getPlayer(2)->getPositionClone());
         $this->assertTrue($player2->canJump());
     }
 
@@ -138,15 +138,15 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGame(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
 
         $game->start();
-        $p2pos = $game->getPlayer(2)->getPositionImmutable();
+        $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
         $player1->jump();
         $game->tick($game->getTickId() + 1);
-        $this->assertSame(0, $player1->getPositionImmutable()->y);
-        $this->assertPositionSame($p2pos, $game->getPlayer(2)->getPositionImmutable());
+        $this->assertSame(0, $player1->getPositionClone()->y);
+        $this->assertPositionSame($p2pos, $game->getPlayer(2)->getPositionClone());
         $this->assertTrue($player2->canJump());
     }
 

@@ -22,12 +22,12 @@ class BacktrackTest extends BaseTestCase
         $property->backtrack_history_tick_count = $backtrackTickCount;
         $game = $this->createTestGame(null, $property);
         $player1 = $game->getPlayer(1);
-        $player1->setPosition($player1->getPositionImmutable()->addX($player1->getBoundingRadius()));
+        $player1->setPosition($player1->getPositionClone()->addX($player1->getBoundingRadius()));
         $player1->getSight()->lookHorizontal(1);
         $player1->equipSecondaryWeapon();
         $game->getWorld()->addWall(
             new Wall(
-                new Point($player1->getBoundingRadius(), 1, $player1->getPositionImmutable()->z + $player1->getBoundingRadius() + 30),
+                new Point($player1->getBoundingRadius(), 1, $player1->getPositionClone()->z + $player1->getBoundingRadius() + 30),
                 true,
                 20
             )
@@ -35,7 +35,7 @@ class BacktrackTest extends BaseTestCase
 
         $player2 = new Player(2, Color::GREEN, false);
         $game->addPlayer($player2);
-        $player2->setPosition($player1->getPositionImmutable()->addZ($player1->getBoundingRadius() + 100));
+        $player2->setPosition($player1->getPositionClone()->addZ($player1->getBoundingRadius() + 100));
 
         $this->assertTrue($player1->isAlive());
         $this->assertTrue($player2->isAlive());

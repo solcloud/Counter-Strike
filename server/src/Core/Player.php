@@ -110,7 +110,7 @@ final class Player
             $angle = 0;
             $angleOffset = 360 / $dropCount;
             $distance = (int)ceil($this->getBoundingRadius() / 2);
-            $pp = $this->getPositionImmutable();
+            $pp = $this->getPositionClone();
             foreach ($dropItems as $item) {
                 [$x, $z] = Util::rotatePointY($angle, 0, $distance);
                 $this->world->addDropItem($item, new Point($pp->x + $x, $pp->y, $pp->z + $z));

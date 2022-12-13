@@ -23,7 +23,7 @@ class BaseTest extends TestCase
 
     public function assertPlayerPosition(Game $game, Point $expectedPosition, int $playerId = 1): void
     {
-        $this->assertPositionSame($expectedPosition, $game->getPlayer($playerId)->getPositionImmutable());
+        $this->assertPositionSame($expectedPosition, $game->getPlayer($playerId)->getPositionClone());
     }
 
 }

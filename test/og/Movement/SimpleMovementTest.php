@@ -38,10 +38,10 @@ class SimpleMovementTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->x);
-        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionImmutable()->z);
-        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->x);
+        $this->assertGreaterThan(Setting::moveDistancePerTick() / 2, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerMovementSpeed(): void
@@ -77,7 +77,7 @@ class SimpleMovementTest extends BaseTestCase
         ]);
 
         $game->start();
-        $this->assertSame(Setting::moveDistanceCrouchPerTick(), $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertSame(Setting::moveDistanceCrouchPerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerMovementWalkSpeed(): void

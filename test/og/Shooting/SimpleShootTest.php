@@ -60,7 +60,7 @@ class SimpleShootTest extends BaseTestCase
         });
 
         $this->playPlayer($game, $playerCommands);
-        $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionClone());
         $this->assertInstanceOf(SoundEvent::class, $hitEvent);
         $this->assertSame(SoundType::BULLET_HIT, $hitEvent->type);
         $this->assertSame(0, $hitEvent->position->y);

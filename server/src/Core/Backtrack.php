@@ -31,7 +31,7 @@ final class Backtrack
         }
 
         $this->newestState[$alivePlayer->getId()] = [
-            'a' => $alivePlayer->getPositionImmutable(),
+            'a' => $alivePlayer->getPositionClone(),
             'b' => $alivePlayer->getSight()->getRotationHorizontal(),
             'c' => $alivePlayer->getSight()->getRotationVertical(),
             'd' => $alivePlayer->getHeadHeight(),
@@ -58,7 +58,7 @@ final class Backtrack
 
         foreach ($this->game->getPlayers() as $player) {
             $this->saveState[$player->getId()] = [
-                'a' => $player->getPositionImmutable(),
+                'a' => $player->getPositionClone(),
                 'b' => $player->getSight()->getRotationHorizontal(),
                 'c' => $player->getSight()->getRotationVertical(),
                 'd' => $player->getHeadHeight(),

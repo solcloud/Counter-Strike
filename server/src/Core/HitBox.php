@@ -58,7 +58,7 @@ class HitBox implements Hittable
             return false;
         }
 
-        $playerPos = $this->player->getPositionImmutable();
+        $playerPos = $this->player->getPositionClone();
         $d1Squared = Util::distanceSquared($playerPos, $bullet->getPosition());
         [$x, $y, $z] = Util::movementXYZ($this->player->getSight()->getRotationHorizontal(), 0, 10);
         $playerPos->addPart($x, $y, $z);

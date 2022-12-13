@@ -48,7 +48,7 @@ class RecoilTest extends BaseTestCase
         $player->buyItem(BuyMenuItem::RIFLE_AK);
         $ak = $player->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
-        $py = $player->getPositionImmutable()->y + $player->getSightHeight();
+        $py = $player->getPositionClone()->y + $player->getSightHeight();
 
         $bulletsYCoords = [];
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $ak) {
@@ -81,7 +81,7 @@ class RecoilTest extends BaseTestCase
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);
-        $py = $player->getPositionImmutable()->y + $player->getSightHeight();
+        $py = $player->getPositionClone()->y + $player->getSightHeight();
 
         $bulletsYCoords = [];
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {

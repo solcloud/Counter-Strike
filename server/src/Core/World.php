@@ -245,7 +245,7 @@ class World
             if ($this->lastBombActionTick + Util::millisecondsToFrames(50) < $this->getTickId()) {
                 $bomb->reset();
                 $player->stop();
-                $sound = new SoundEvent($player->getPositionImmutable()->addY(10), SoundType::BOMB_DEFUSING);
+                $sound = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_DEFUSING);
                 $this->makeSound($sound->setPlayer($player)->setItem($bomb));
             }
             $this->lastBombActionTick = $this->getTickId();
@@ -262,7 +262,7 @@ class World
 
     public function canBeSeen(Player $observer, Point $targetCenter, int $targetRadius, int $maximumDistance, bool $checkForOtherPlayersAlso = false): bool
     {
-        $start = $observer->getPositionImmutable()->addY($observer->getSightHeight());
+        $start = $observer->getPositionClone()->addY($observer->getSightHeight());
         if (Util::distanceSquared($start, $targetCenter) > $maximumDistance * $maximumDistance) {
             return false;
         }
@@ -565,7 +565,7 @@ class World
         if ($this->lastBombActionTick + Util::millisecondsToFrames(200) < $this->getTickId()) {
             $bomb->reset();
             $player->stop();
-            $sound = new SoundEvent($player->getPositionImmutable()->addY(10), SoundType::BOMB_PLANTING);
+            $sound = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_PLANTING);
             $this->makeSound($sound->setPlayer($player)->setItem($bomb));
         }
         $this->lastBombActionTick = $this->getTickId();
@@ -574,7 +574,7 @@ class World
         $planted = $bomb->plant();
         if ($planted) {
             $player->equip($player->getInventory()->removeBomb());
-            $bomb->setPosition($player->getPositionImmutable());
+            $bomb->setPosition($player->getPositionClone());
             $this->game->bombPlanted($player);
 
             $this->bomb = $bomb;

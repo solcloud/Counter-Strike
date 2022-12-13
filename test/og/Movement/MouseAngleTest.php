@@ -19,11 +19,11 @@ class MouseAngleTest extends BaseTestCase
             $moveCallback,
             function (Player $p) use ($angle, $startPos) {
                 if ($angle % 90 === 0) {
-                    $this->assertTrue($startPos->x === $p->getPositionImmutable()->x || $startPos->z === $p->getPositionImmutable()->z);
+                    $this->assertTrue($startPos->x === $p->getPositionClone()->x || $startPos->z === $p->getPositionClone()->z);
                     return;
                 }
-                $this->assertNotSame($startPos->x, $p->getPositionImmutable()->x, "Angle: {$angle}");
-                $this->assertNotSame($startPos->z, $p->getPositionImmutable()->z, "Angle: {$angle}");
+                $this->assertNotSame($startPos->x, $p->getPositionClone()->x, "Angle: {$angle}");
+                $this->assertNotSame($startPos->z, $p->getPositionClone()->z, "Angle: {$angle}");
             },
             $this->endGame(),
         ];
@@ -31,7 +31,7 @@ class MouseAngleTest extends BaseTestCase
         $game = $this->createGame();
         $game->getWorld()->addFloor(new Floor(new Point(), 2 * Setting::moveDistancePerTick(), 2 * Setting::moveDistancePerTick()));
         $this->playPlayer($game, $playerCommands);
-        return $game->getPlayer(1)->getPositionImmutable();
+        return $game->getPlayer(1)->getPositionClone();
     }
 
     private function verifyPosition(Point $endPos, Point $startPos, ?bool $xBigger, ?bool $zBigger, int $angle): void
@@ -151,7 +151,7 @@ class MouseAngleTest extends BaseTestCase
 
         $game = $this->createGame();
         $this->playPlayer($game, $playerCommands);
-        return $game->getPlayer(1)->getPositionImmutable();
+        return $game->getPlayer(1)->getPositionClone();
     }
 
 }

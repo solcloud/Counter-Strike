@@ -48,7 +48,7 @@ class WorldTest extends BaseTestCase
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
 
         $game->start();
-        $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionImmutable()->y);
+        $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionClone()->y);
     }
 
     public function testStairCaseDown(): void
@@ -68,19 +68,19 @@ class WorldTest extends BaseTestCase
         $game = $this->createTestGame($steps);
         $game->getWorld()->addRamp($ramp);
         $player = $game->getPlayer(1);
-        $player->setPosition($player->getPositionImmutable()->addY($startY));
+        $player->setPosition($player->getPositionClone()->addY($startY));
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
 
         $game->start();
-        $this->assertNotSame(0, $player->getPositionImmutable()->y);
-        $this->assertPositionSame(new Point($steps * Setting::moveDistancePerTick(), Setting::playerObstacleOvercomeHeight(), 0), $player->getPositionImmutable());
+        $this->assertNotSame(0, $player->getPositionClone()->y);
+        $this->assertPositionSame(new Point($steps * Setting::moveDistancePerTick(), Setting::playerObstacleOvercomeHeight(), 0), $player->getPositionClone());
     }
 
     public function testWallPenetration(): void
     {
         $game = $this->createTestGame(Setting::tickCountJump());
         $p = $game->getPlayer(1);
-        $box = new Box($p->getPositionImmutable()->clone()->addZ(Setting::moveDistancePerTick()), $p->getBoundingRadius(), 50, $p->getBoundingRadius());
+        $box = new Box($p->getPositionClone()->clone()->addZ(Setting::moveDistancePerTick()), $p->getBoundingRadius(), 50, $p->getBoundingRadius());
         $game->getWorld()->addBox($box);
         $wall = new Wall(new Point(-200, -10, $box->getBase()->z + $box->depthZ), true, 400, 3 * Setting::playerJumpHeight());
         $game->getWorld()->addWall($wall);
@@ -90,15 +90,15 @@ class WorldTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertSame($wall->getBase() - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertSame($wall->getBase() - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testBoxPenetration(): void
     {
         $game = $this->createTestGame(50);
         $p = $game->getPlayer(1);
-        $box = new Box($p->getPositionImmutable()->clone()->addZ(2 * Setting::moveDistancePerTick()), 700, 50, 3 * $p->getBoundingRadius());
+        $box = new Box($p->getPositionClone()->clone()->addZ(2 * Setting::moveDistancePerTick()), 700, 50, 3 * $p->getBoundingRadius());
         $game->getWorld()->addBox($box);
         $depth = $box->getBase()->z + $box->depthZ;
         $wall = new Box(new Point(-100, 0, -$depth), 800, 400, 2 * $depth);
@@ -111,8 +111,8 @@ class WorldTest extends BaseTestCase
         });
 
         $game->start();
-        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionImmutable()->y);
-        $this->assertSame($box->getBase()->z + $box->depthZ - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionImmutable()->z);
+        $this->assertGreaterThanOrEqual($box->heightY, $game->getPlayer(1)->getPositionClone()->y);
+        $this->assertSame($box->getBase()->z + $box->depthZ - $p->getBoundingRadius() - 1, $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testDoubleBoxPenetration(): void
@@ -126,7 +126,7 @@ class WorldTest extends BaseTestCase
         $p1->setPosition(new Point(6 * $scale, $y, 4 * $scale));
         $p2 = new Player(2, Color::BLUE, false);
         $game->addPlayer($p2);
-        $p2->setPosition($p1->getPositionImmutable()->addY($p1->getHeadHeight() + 20));
+        $p2->setPosition($p1->getPositionClone()->addY($p1->getHeadHeight() + 20));
         $p1->crouch();
 
         $world->addBox(new Box(new Point(5 * $scale, $y, 5 * $scale), 3 * $scale, $boxHeight, $scale));
@@ -141,8 +141,8 @@ class WorldTest extends BaseTestCase
         });
         $game->start();
         $boxStart = 5 * $scale - 1 - $p1->getBoundingRadius();
-        $this->assertSame($boxStart, $p1->getPositionImmutable()->z);
-        $this->assertSame($boxStart, $p2->getPositionImmutable()->z);
+        $this->assertSame($boxStart, $p1->getPositionClone()->z);
+        $this->assertSame($boxStart, $p2->getPositionClone()->z);
     }
 
 }

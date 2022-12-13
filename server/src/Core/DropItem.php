@@ -20,7 +20,7 @@ class DropItem
     {
         $playerId = $player->getId();
         $playerRadius = Setting::playerBoundingRadius();
-        $start = $player->getPositionImmutable()->addY($player->getSightHeight());
+        $start = $player->getPositionClone()->addY($player->getSightHeight());
         $horizontalAngle = $player->getSight()->getRotationHorizontal();
         $verticalAngle = $player->getSight()->getRotationVertical();
         $distance = (($player->isMoving() || $player->isJumping()) ? 10 * $playerRadius : 4 * $playerRadius) + $this->radius;

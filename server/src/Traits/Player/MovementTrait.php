@@ -46,7 +46,7 @@ trait MovementTrait
         return !$this->isWalking;
     }
 
-    public function getPositionImmutable(): Point
+    public function getPositionClone(): Point
     {
         return $this->position->clone();
     }

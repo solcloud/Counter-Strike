@@ -254,7 +254,7 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerCulprit, $bullet->getShootItem()->getId(), $headShot));
-        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
@@ -264,14 +264,14 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::SOLID_SURFACE, false));
-        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
     public function playerBombKilledEvent(Player $playerDead): void
     {
         $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::BOMB, false));
-        $sound = new SoundEvent($playerDead->getPositionImmutable(), SoundType::PLAYER_DEAD);
+        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead)->setItem($this->bomb));
     }
 

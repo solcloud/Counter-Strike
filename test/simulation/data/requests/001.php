@@ -9,7 +9,7 @@ return new class extends SimulationTester {
 
     public function onTickEnd(GameState $state, int $tick): void
     {
-        $pp = $state->getPlayer(1)->getPositionImmutable();
+        $pp = $state->getPlayer(1)->getPositionClone();
         if ($pp->y === 0 && $pp->x > 1156 && $pp->x < 1270 && $pp->z < 80) {
             $this->fail("Inside Box, tick: $tick");
         }
@@ -20,7 +20,7 @@ return new class extends SimulationTester {
 
     public function onGameEnd(Game $game): void
     {
-        $this->assertPositionSame(new Point(1488, 0, 45), $game->getPlayer(1)->getPositionImmutable());
+        $this->assertPositionSame(new Point(1488, 0, 45), $game->getPlayer(1)->getPositionClone());
     }
 
 };

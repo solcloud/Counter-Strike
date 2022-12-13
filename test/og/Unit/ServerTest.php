@@ -57,12 +57,12 @@ class ServerTest extends BaseTest
         $responses = $this->runTestServer($game, $clientRequests);
         $player = $game->getPlayer(1);
         $this->assertCount(count($clientRequests) + 1, $responses);
-        $this->assertGreaterThan($spawnPos->x, $player->getPositionImmutable()->x);
-        $this->assertGreaterThan($spawnPos->z, $player->getPositionImmutable()->z);
-        $moveSpeed = ($player->getPositionImmutable()->x - $spawnPos->x);
+        $this->assertGreaterThan($spawnPos->x, $player->getPositionClone()->x);
+        $this->assertGreaterThan($spawnPos->z, $player->getPositionClone()->z);
+        $moveSpeed = ($player->getPositionClone()->x - $spawnPos->x);
         $this->assertGreaterThan(0, $moveSpeed);
-        $this->assertSame(0, $player->getPositionImmutable()->y);
-        $this->assertSame($spawnPos->z + 2 * $moveSpeed, $player->getPositionImmutable()->z);
+        $this->assertSame(0, $player->getPositionClone()->y);
+        $this->assertSame($spawnPos->z + 2 * $moveSpeed, $player->getPositionClone()->z);
         $this->assertSame(45.0, $player->getSight()->getRotationHorizontal());
         $this->assertSame(-20.0, $player->getSight()->getRotationVertical());
         $this->assertInstanceOf(Molotov::class, $player->getInventory()->getItems()[InventorySlot::SLOT_GRENADE_MOLOTOV->value]);

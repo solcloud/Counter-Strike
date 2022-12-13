@@ -72,7 +72,7 @@ trait InventoryTrait
         $equipEvent = $this->inventory->purchase($this, $item);
         if ($equipEvent) {
             $this->addEvent($equipEvent, $this->eventIdPrimary);
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_BUY);
+            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_BUY);
             $this->world->makeSound($sound->setPlayer($this));
             return true;
         }

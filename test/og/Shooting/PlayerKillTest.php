@@ -70,7 +70,7 @@ class PlayerKillTest extends BaseTestCase
         $game->getPlayer(1)->setPosition(new Point(50, 0, 50));
         $game->getWorld()->addWall(new Wall(new Point(35, 1, 80), true, 20));
         $game->addPlayer($player2);
-        $player2->setPosition($player2->getPositionImmutable()->addZ(100));
+        $player2->setPosition($player2->getPositionClone()->addZ(100));
         $this->playPlayer($game, $player2Commands, $player2->getId());
         $this->assertTrue($game->getScore()->isTie());
 
@@ -104,7 +104,7 @@ class PlayerKillTest extends BaseTestCase
         $player1->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
         $this->assertSame(100, $player1->getArmorValue());
         $this->assertSame(ArmorType::BODY_AND_HEAD, $player1->getArmorType());
-        $player2Position = $player1->getPositionImmutable()->addY($player1->getHeadHeight() + 10);
+        $player2Position = $player1->getPositionClone()->addY($player1->getHeadHeight() + 10);
         $game->getWorld()->addFloor(new Floor($player2Position->clone()->addX(-10)));
         $player2->setPosition($player2Position);
         $player2->getSight()->lookAt(0, -90);

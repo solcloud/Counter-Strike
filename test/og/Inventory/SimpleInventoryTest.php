@@ -194,7 +194,7 @@ class SimpleInventoryTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
-        $box = new Box(new Point(-100, 0, $player->getPositionImmutable()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
+        $box = new Box(new Point(-100, 0, $player->getPositionClone()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
         $game->getWorld()->addBox($box);
 
         $this->playPlayer($game, [
@@ -211,7 +211,7 @@ class SimpleInventoryTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
-        $box = new Box(new Point(-100, 0, $player->getPositionImmutable()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
+        $box = new Box(new Point(-100, 0, $player->getPositionClone()->z + $player->getBoundingRadius() + 10), 200, 200, 200);
         $game->getWorld()->addBox($box);
 
         $this->assertSame(800, $player->getMoney());

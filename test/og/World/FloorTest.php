@@ -19,7 +19,7 @@ class FloorTest extends BaseTestCase
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 2, $p->getBoundingRadius()));
 
-        $base = new Point($p->getPositionImmutable()->x - $p->getBoundingRadius() / 2, $floorHeight, 0);
+        $base = new Point($p->getPositionClone()->x - $p->getBoundingRadius() / 2, $floorHeight, 0);
         for ($i = 1; $i <= Setting::moveDistancePerTick() * 2; $i++) {
             $game->getWorld()->addFloor(new Floor($base->clone()->addX(rand(-$p->getBoundingRadius() + 1, $p->getBoundingRadius() - 1)), 100, 2));
             $base->addZ($p->getBoundingRadius());
@@ -27,8 +27,8 @@ class FloorTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertSame($floorHeight, $p->getPositionImmutable()->y);
-        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionImmutable()->z);
+        $this->assertSame($floorHeight, $p->getPositionClone()->y);
+        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionClone()->z);
     }
 
     public function testPlayerCanFallDownThroughFloor(): void
@@ -38,7 +38,7 @@ class FloorTest extends BaseTestCase
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 2, $p->getBoundingRadius()));
 
-        $base = new Point($p->getPositionImmutable()->x, $floorHeight, 0);
+        $base = new Point($p->getPositionClone()->x, $floorHeight, 0);
         for ($i = 1; $i <= Setting::moveDistancePerTick() * 2; $i++) {
             if ($i === 5) {
                 $base->addX($p->getBoundingRadius() + 1);
@@ -49,8 +49,8 @@ class FloorTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertSame(0, $p->getPositionImmutable()->y);
-        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionImmutable()->z);
+        $this->assertSame(0, $p->getPositionClone()->y);
+        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionClone()->z);
     }
 
     public function testPlayerCannotFallDownThroughBoxFloor(): void
@@ -60,7 +60,7 @@ class FloorTest extends BaseTestCase
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 4, $p->getBoundingRadius()));
 
-        $base = new Point(-$p->getPositionImmutable()->x, -$floorHeight, 0);
+        $base = new Point(-$p->getPositionClone()->x, -$floorHeight, 0);
         for ($i = 1; $i <= Setting::moveDistancePerTick() * 2; $i++) {
             $game->getWorld()->addBox(
                 new Box(
@@ -75,8 +75,8 @@ class FloorTest extends BaseTestCase
             $state->getPlayer(1)->moveForward();
         });
         $game->start();
-        $this->assertSame($floorHeight, $p->getPositionImmutable()->y);
-        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionImmutable()->z);
+        $this->assertSame($floorHeight, $p->getPositionClone()->y);
+        $this->assertGreaterThan(Setting::moveDistancePerTick(), $p->getPositionClone()->z);
     }
 
     public function testPlayerBoxTunnel(): void
@@ -98,8 +98,8 @@ class FloorTest extends BaseTestCase
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
         $game->start();
-        $this->assertSame($floorHeight, $p->getPositionImmutable()->y);
-        $this->assertSame(20 * Setting::moveDistancePerTick(), $p->getPositionImmutable()->z);
+        $this->assertSame($floorHeight, $p->getPositionClone()->y);
+        $this->assertSame(20 * Setting::moveDistancePerTick(), $p->getPositionClone()->z);
     }
 
 }

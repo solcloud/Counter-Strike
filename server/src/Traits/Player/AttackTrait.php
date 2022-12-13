@@ -33,7 +33,7 @@ trait AttackTrait
             return null;
         }
         if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
+            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return null;
         }
@@ -43,7 +43,7 @@ trait AttackTrait
 
         $result = $item->attack($this->createAttackEvent());
         if ($result) {
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
@@ -60,7 +60,7 @@ trait AttackTrait
         if ($item instanceof Knife) {
             $result = $item->attackSecondary($this->createAttackEvent());
             if ($result) {
-                $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
+                $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
                 $this->world->makeSound($sound->setPlayer($this)->setItem($item));
                 return $this->processAttackResult($result);
             }
@@ -77,7 +77,7 @@ trait AttackTrait
 
     protected function createAttackEvent(): AttackEvent
     {
-        $origin = $this->getPositionImmutable();
+        $origin = $this->getPositionClone();
         $origin->addY($this->getSightHeight());
 
         $event = new AttackEvent(
@@ -135,7 +135,7 @@ trait AttackTrait
         $event = $item->reload();
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
-            $sound = new SoundEvent($this->getPositionImmutable()->addY($this->getSightHeight()), SoundType::ITEM_RELOAD);
+            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_RELOAD);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
         }
     }
