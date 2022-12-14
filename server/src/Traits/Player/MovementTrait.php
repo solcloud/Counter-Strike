@@ -242,8 +242,10 @@ trait MovementTrait
         if ($xWallMaxHeight === 0 && $zWallMaxHeight === 0) { // no walls
             return true;
         }
-
-        if ($this->isFlying()) {
+        if ($xWallMaxHeight > $maxWallCeiling && $zWallMaxHeight > $maxWallCeiling) { // tall walls everywhere
+            return false;
+        }
+        if ($this->isFlying()) { // wall touch in air is stop
             return false;
         }
 
@@ -266,27 +268,20 @@ trait MovementTrait
             }
         }
 
-        // If moving in 90s angles against wall we stop
-        if ($angle % 90 === 0) {
+        // Try to move 1 unit from start in one axis at least if possible
+        if ($angle % 90 === 0) { // If moving in 90s angles against wall we stop
             return false;
         }
-
-        // Try to move 1 unit in one axis at least if possible
-        if ($xWallMaxHeight === 0) { // Try to move in X axis
-            $oneSideCandidate = $candidate->clone()->setZ($start->z); // reset to previous Z
-            $oneSideCandidate->addX($angle > 180 ? -1 : 1); // try 1 unit in X
-            $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
-            $wallCeiling = $this->findHighestWall($oneSideCandidateX, $height, $radius, $maxWallCeiling, true);
-        } elseif ($zWallMaxHeight === 0) { // Try to move in Z axis
-            $oneSideCandidate = $candidate->clone()->setX($start->x); // reset to previous X
-            $oneSideCandidate->addZ(($angle > 270 || $angle < 90) ? 1 : -1); // try 1 unit in Z
+        // Try to move in X axis
+        $oneSideCandidate = $start->clone()->addX($angle > 180 ? -1 : 1);
+        $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
+        $wallCeiling = $this->findHighestWall($oneSideCandidateX, $height, $radius, $maxWallCeiling, true);
+        if ($wallCeiling > $maxWallCeiling) { // X too tall, try to move in Z axis
+            $oneSideCandidate = $start->clone()->addZ(($angle > 270 || $angle < 90) ? 1 : -1);
             $oneSideCandidateZ = $oneSideCandidate->clone()->addZ(($angle > 270 || $angle < 90) ? $radius : -$radius);
             $wallCeiling = $this->findHighestWall($oneSideCandidateZ, $height, $radius, $maxWallCeiling, false);
-        } else {
-            return false; // walls everywhere
         }
-
-        if ($wallCeiling > $maxWallCeiling) { // tall wall
+        if ($wallCeiling > $maxWallCeiling) { // tall walls everywhere
             return false;
         }
         if ($wallCeiling === 0 && $this->collisionWithPlayer($oneSideCandidate, $radius)) { // no wall but player

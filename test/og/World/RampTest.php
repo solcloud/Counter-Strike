@@ -12,9 +12,9 @@ use Test\TestGame;
 class RampTest extends BaseTestCase
 {
 
-    protected function _createGame(): TestGame
+    protected function _createGame(int $tickMax): TestGame
     {
-        $game = $this->createTestGame(200);
+        $game = $this->createTestGame($tickMax);
         $player = $game->getPlayer(1);
 
         $stepDepth = 33;
@@ -40,7 +40,7 @@ class RampTest extends BaseTestCase
 
     public function testDiagonalRampMovement1(): void
     {
-        $game = $this->_createGame();
+        $game = $this->_createGame(250);
         $player = $game->getPlayer(1);
         $wall = new Wall(new Point(800, 0, 900 - 3), true, 200);
         $game->getWorld()->addWall($wall);
@@ -57,7 +57,7 @@ class RampTest extends BaseTestCase
 
     public function testDiagonalRampMovement2(): void
     {
-        $game = $this->_createGame();
+        $game = $this->_createGame(250);
         $player = $game->getPlayer(1);
         $wall = new Wall(new Point(800, 0, 900 - 2), true, 200);
         $wall1 = new Wall(new Point(1450, 10, 500), false, 800);
@@ -76,7 +76,7 @@ class RampTest extends BaseTestCase
 
     public function testDiagonalRampMovement3(): void
     {
-        $game = $this->_createGame();
+        $game = $this->_createGame(340);
         $player = $game->getPlayer(1);
         $wall = new Wall(new Point(100, 0, 900 - 11), true, 900);
         $game->getWorld()->addWall($wall);
@@ -89,6 +89,30 @@ class RampTest extends BaseTestCase
         $this->assertGreaterThan(500, $player->getPositionClone()->y);
         $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
         $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
+    }
+
+    public function testRampMovementWithWallTouching(): void
+    {
+        $game = $this->createTestGame(250);
+        $player = $game->getPlayer(1);
+        $wall = new Wall(new Point(-200, 0, 250), true, 400);
+        $game->getWorld()->addWall($wall);
+        $game->getWorld()->addRamp(
+            new Ramp($player->getPositionClone()->addZ($player->getBoundingRadius() + 10)->addX(-50),
+                new Point2D(0, 1),
+                20,
+                200
+            )
+        );
+
+        $game->onTick(function () use ($player) {
+            $player->moveLeft();
+            $player->moveForward();
+        });
+        $game->start();
+        $this->assertSame($wall->getStart()->z - $player->getBoundingRadius() - 1, $player->getPositionClone()->z);
+        $this->assertSame(200, $player->getPositionClone()->y);
+        $this->assertSame(0, $player->getPositionClone()->x);
     }
 
 }
