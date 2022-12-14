@@ -2,6 +2,7 @@
 
 namespace Test\Movement;
 
+use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
@@ -46,6 +47,20 @@ class MovementTest extends BaseTestCase
         $this->assertSame($boundingRadius, $game->getPlayer(1)->getBoundingRadius());
         $this->assertGreaterThan(0, $wall->getBase());
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - $boundingRadius - 1));
+    }
+
+    public function testPlayerStopOnBoxBoundingRadius(): void
+    {
+        $game = $this->createTestGame(2);
+        $boundingRadius = $game->getPlayer(1)->getBoundingRadius();
+        $box = new Box(new Point(0, 0, 2 * Setting::moveDistancePerTick() - $boundingRadius), 1, Setting::playerObstacleOvercomeHeight() + 1, 100);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->getWorld()->addBox($box);
+        $game->getWorld()->addFloor(new Floor(new Point(0, Setting::playerObstacleOvercomeHeight(), 2 * Setting::moveDistancePerTick() - $boundingRadius)));
+        $game->start();
+        $this->assertSame($boundingRadius, $game->getPlayer(1)->getBoundingRadius());
+        $this->assertGreaterThan(0, $box->getBase()->z);
+        $this->assertPlayerPosition($game, new Point(0, 0, $box->getBase()->z - $boundingRadius - 1));
     }
 
     public function testPlayerIncrementYBySteppingOnSmallWall(): void

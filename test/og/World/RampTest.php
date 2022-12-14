@@ -42,7 +42,7 @@ class RampTest extends BaseTestCase
     {
         $game = $this->_createGame();
         $player = $game->getPlayer(1);
-        $wall = new Wall(new Point(800, 0, 900 + 1), true, 200);
+        $wall = new Wall(new Point(800, 0, 900 - 3), true, 200);
         $game->getWorld()->addWall($wall);
 
         $game->onTick(function () use ($player) {
@@ -50,7 +50,7 @@ class RampTest extends BaseTestCase
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan(500, $player->getPositionClone()->y);
         $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
         $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
     }
@@ -59,24 +59,26 @@ class RampTest extends BaseTestCase
     {
         $game = $this->_createGame();
         $player = $game->getPlayer(1);
-        $wall = new Wall(new Point(800, 0, 900 + 1), true, 200);
+        $wall = new Wall(new Point(800, 0, 900 - 2), true, 200);
+        $wall1 = new Wall(new Point(1450, 10, 500), false, 800);
         $game->getWorld()->addWall($wall);
+        $game->getWorld()->addWall($wall1);
 
         $player->getSight()->lookAt(61, 12);
         $game->onTick(function () use ($player) {
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan(500, $player->getPositionClone()->y);
         $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
-        $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
+        $this->assertSame($wall1->getStart()->x - $player->getBoundingRadius() - 1, $player->getPositionClone()->x);
     }
 
     public function testDiagonalRampMovement3(): void
     {
         $game = $this->_createGame();
         $player = $game->getPlayer(1);
-        $wall = new Wall(new Point(100, 0, 900 + 1), true, 900);
+        $wall = new Wall(new Point(100, 0, 900 - 11), true, 900);
         $game->getWorld()->addWall($wall);
 
         $player->getSight()->lookAt(41, -11);
@@ -84,7 +86,7 @@ class RampTest extends BaseTestCase
             $player->moveForward();
         });
         $game->start();
-        $this->assertGreaterThan(0, $player->getPositionClone()->y);
+        $this->assertGreaterThan(500, $player->getPositionClone()->y);
         $this->assertGreaterThan($wall->getStart()->z, $player->getPositionClone()->z);
         $this->assertGreaterThan($wall->getStart()->x, $player->getPositionClone()->x);
     }

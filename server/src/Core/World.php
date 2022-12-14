@@ -483,62 +483,6 @@ class World
         return null;
     }
 
-    public function findHighestXWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling): int
-    {
-        if ($bottomCenter->x < 0) {
-            return $maxWallCeiling;
-        }
-
-        $width = 2 * $radius;
-        $highestWallCeiling = 0;
-        $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
-        foreach (($this->walls[self::WALL_X][$bottomCenter->x] ?? []) as $wall) {
-            $wallCeiling = $wall->getCeiling();
-            if ($wallCeiling <= $bottomCenter->y) {
-                continue;
-            }
-            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
-                continue;
-            }
-            if ($wallCeiling > $maxWallCeiling) {
-                return $maxWallCeiling;
-            }
-            if ($wallCeiling > $highestWallCeiling) {
-                $highestWallCeiling = $wallCeiling;
-            }
-        }
-
-        return $highestWallCeiling;
-    }
-
-    public function findHighestZWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling): int
-    {
-        if ($bottomCenter->z < 0) {
-            return $maxWallCeiling;
-        }
-
-        $width = 2 * $radius;
-        $highestWallCeiling = 0;
-        $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);
-        foreach (($this->walls[self::WALL_Z][$bottomCenter->z] ?? []) as $wall) {
-            $wallCeiling = $wall->getCeiling();
-            if ($wallCeiling <= $bottomCenter->y) {
-                continue;
-            }
-            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
-                continue;
-            }
-            if ($wallCeiling > $maxWallCeiling) {
-                return $maxWallCeiling;
-            }
-            if ($wallCeiling > $highestWallCeiling) {
-                $highestWallCeiling = $wallCeiling;
-            }
-        }
-
-        return $highestWallCeiling;
-    }
-
     public function bulletHit(Hittable $hit, Bullet $bullet, bool $wasHeadshot): void
     {
         $soundEvent = new SoundEvent($bullet->getPosition()->clone(), $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT);
@@ -628,6 +572,22 @@ class World
         }
 
         return null;
+    }
+
+    /**
+     * @return Wall[]
+     */
+    public function getXWalls(int $x): array
+    {
+        return ($this->walls[self::WALL_X][$x] ?? []);
+    }
+
+    /**
+     * @return Wall[]
+     */
+    public function getZWalls(int $z): array
+    {
+        return ($this->walls[self::WALL_Z][$z] ?? []);
     }
 
     /**
