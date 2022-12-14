@@ -15,8 +15,8 @@ let launchGame
     let initialized = false
     const world = new World()
     const hud = new HUD()
-    const stats = new Stats();
-    const game = new Game(world, hud, stats);
+    const stats = new Stats()
+    const game = new Game(world, hud, stats)
     const action = new PlayerAction(hud)
     const control = new Control(game, action)
     hud.injectDependency(game)
@@ -55,7 +55,7 @@ let launchGame
         pointerLock.pointerSpeed = setting.getSensitivity()
         hud.createHud(elementHud, map, setting)
         control.init(pointerLock, setting)
-        game.setPointer(pointerLock)
+        game.setDependency(pointerLock, setting.shouldMatchServerFps())
         document.addEventListener("click", function (e) {
             if (e.target.classList.contains('hud-action')) {
                 return
@@ -74,9 +74,17 @@ let launchGame
         })
         game.onReady(function (options) {
             connector.startLoop(control, options.tickMs)
+            if (!setting.shouldMatchServerFps()) {
+                render()
+            }
         })
 
         connector.connect(url.hostname, url.port, loginCode)
+    }
+
+    function render() {
+        world.render()
+        requestAnimationFrame(render)
     }
 
 })()

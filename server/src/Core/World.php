@@ -140,7 +140,7 @@ class World
         $targetFloor = null;
         foreach ($floors as $floor) {
             $distanceSquared = Collision::circleCenterToPlaneBoundaryDistanceSquared($px, $py, $floor);
-            if ($distanceSquared === $targetRadiusSquared) {
+            if ($distanceSquared === $targetRadiusSquared || $distanceSquared === 0) {
                 return $floor;
             }
             if ($distanceSquared < $smallestRadiusSquared) {

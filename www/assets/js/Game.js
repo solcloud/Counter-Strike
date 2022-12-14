@@ -8,6 +8,7 @@ export class Game {
     #hud
     #stats
     #pointer
+    #shouldRenderInsideTick
     #round = 1
     #roundHalfTime = 2
     #paused = false
@@ -314,7 +315,9 @@ export class Game {
             game.#eventProcessor.process(event)
         })
 
-        this.#render()
+        if (this.#shouldRenderInsideTick) {
+            this.#render()
+        }
         this.#stats.end()
     }
 
@@ -416,8 +419,9 @@ export class Game {
         return (!this.meIsAlive())
     }
 
-    setPointer(pointer) {
+    setDependency(pointer, renderWorldInsideTick) {
         this.#pointer = pointer
+        this.#shouldRenderInsideTick = renderWorldInsideTick
     }
 
     getPlayerMeRotation() {

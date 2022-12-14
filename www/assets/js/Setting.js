@@ -11,6 +11,7 @@ export class Setting {
             crosshair: '✛',
             crosshairColor: 'd31b1b',
             preferPerformance: false,
+            matchServerFps: true,
             anisotropic: 16,
             exposure: 0.8,
         },
@@ -53,46 +54,50 @@ export class Setting {
     }
 
     getSprayTriggerDeltaMs() {
-        return this.#setting.base.sprayTriggerDeltaMs || 80
+        return this.#setting.base.sprayTriggerDeltaMs ?? 80
     }
 
     getRadarZoom() {
-        return this.#setting.base.radarZoom || 0.9
+        return this.#setting.base.radarZoom ?? 0.9
     }
 
     getFieldOfView() {
-        return this.#setting.base.fov || 70
+        return this.#setting.base.fov ?? 70
     }
 
     getAnisotropicFiltering() {
         if (this.shouldPreferPerformance()) {
             return 1
         }
-        return this.#setting.base.anisotropic || 16
+        return this.#setting.base.anisotropic ?? 16
     }
 
     shouldPreferPerformance() {
-        return this.#setting.base.preferPerformance || false
+        return this.#setting.base.preferPerformance ?? false
+    }
+
+    shouldMatchServerFps() {
+        return this.#setting.base.matchServerFps ?? true
     }
 
     getSensitivity() {
-        return this.#setting.base.sensitivity || 1.0
+        return this.#setting.base.sensitivity ?? 1.0
     }
 
     getExposure() {
-        return this.#setting.base.exposure || 0.8
+        return this.#setting.base.exposure ?? 0.8
     }
 
     getMasterVolume() {
-        return this.#setting.base.volume || 30
+        return this.#setting.base.volume ?? 30
     }
 
     getCrosshairSymbol() {
-        return this.#setting.base.crosshair || '+'
+        return this.#setting.base.crosshair ?? '+'
     }
 
     getCrosshairColor() {
-        return this.#setting.base.crosshairColor || 'd31b1b'
+        return this.#setting.base.crosshairColor ?? 'd31b1b'
     }
 
 }
