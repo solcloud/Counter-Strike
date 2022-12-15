@@ -19,6 +19,7 @@ let launchGame
     const game = new Game(world, hud, stats)
     const action = new PlayerAction(hud)
     const control = new Control(game, action)
+    let statsLocal
     hud.injectDependency(game)
 
 ////////////
@@ -75,6 +76,9 @@ let launchGame
         game.onReady(function (options) {
             connector.startLoop(control, options.tickMs)
             if (!setting.shouldMatchServerFps()) {
+                statsLocal = new Stats()
+                statsLocal.dom.style.position = 'inherit'
+                elementHud.querySelector('#fps-stats').appendChild(statsLocal.dom)
                 render()
             }
         })
@@ -83,7 +87,9 @@ let launchGame
     }
 
     function render() {
+        statsLocal.begin()
         world.render()
+        statsLocal.end()
         requestAnimationFrame(render)
     }
 

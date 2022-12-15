@@ -315,9 +315,7 @@ export class Game {
             game.#eventProcessor.process(event)
         })
 
-        if (this.#shouldRenderInsideTick) {
-            this.#render()
-        }
+        this.#render()
         this.#stats.end()
     }
 
@@ -454,6 +452,8 @@ export class Game {
             this.#hudDebounceTicks = 4
             this.#hud.updateHud(this.playerSpectate.data)
         }
-        this.#world.render()
+        if (this.#shouldRenderInsideTick) {
+            this.#world.render()
+        }
     }
 }

@@ -115,4 +115,61 @@ class RampTest extends BaseTestCase
         $this->assertSame(0, $player->getPositionClone()->x);
     }
 
+    public function testDiagonal1UnitWallMovement(): void
+    {
+        $unit = 1;
+        $game = $this->createTestGame(200);
+        $player = $game->getPlayer(1);
+        $player->getSight()->lookHorizontal(2);
+
+        for ($i = 0; $i < 200; $i += $unit) {
+            $game->getWorld()->addWall(new Wall(new Point($i + $unit, 0, 250 + $i), false, $unit));
+            $game->getWorld()->addWall(new Wall(new Point($i, 0, 250 + $i), true, $unit));
+        }
+
+        $game->onTick(function () use ($player) {
+            $player->moveForward();
+        });
+        $game->start();
+        $this->assertPositionSame(new Point(204, 0, 363), $player->getPositionClone());
+    }
+
+    public function testDiagonal10UnitWallMovement(): void
+    {
+        $unit = 10;
+        $game = $this->createTestGame(200);
+        $player = $game->getPlayer(1);
+        $player->getSight()->lookHorizontal(2);
+
+        for ($i = 0; $i < 400; $i += $unit) {
+            $game->getWorld()->addWall(new Wall(new Point($i + $unit, 0, 250 + $i), false, $unit));
+            $game->getWorld()->addWall(new Wall(new Point($i, 0, 250 + $i), true, $unit));
+        }
+
+        $game->onTick(function () use ($player) {
+            $player->moveForward();
+        });
+        $game->start();
+        $this->assertPositionSame(new Point(204, 0, 355), $player->getPositionClone());
+    }
+
+    public function testDiagonal101UnitWallMovement(): void
+    {
+        $unit = 101;
+        $game = $this->createTestGame(200);
+        $player = $game->getPlayer(1);
+        $player->getSight()->lookHorizontal(2);
+
+        for ($i = 0; $i < 300; $i += $unit) {
+            $game->getWorld()->addWall(new Wall(new Point($i + $unit, 0, 250 + $i), false, $unit));
+            $game->getWorld()->addWall(new Wall(new Point($i, 0, 250 + $i), true, $unit));
+        }
+
+        $game->onTick(function () use ($player) {
+            $player->moveForward();
+        });
+        $game->start();
+        $this->assertPositionSame(new Point(206, 0, 306), $player->getPositionClone());
+    }
+
 }

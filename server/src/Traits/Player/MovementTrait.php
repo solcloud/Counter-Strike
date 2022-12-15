@@ -225,16 +225,18 @@ trait MovementTrait
             return false;
         }
         $height = $this->headHeight;
+        $xMove = ($start->x !== $candidate->x);
+        $zMove = ($start->z !== $candidate->z);
         $maxWallCeiling = $candidate->y + Setting::playerObstacleOvercomeHeight();
 
         $xWallMaxHeight = 0;
-        if ($start->x <> $candidate->x) {
+        if ($xMove) {
             $xGrowing = ($start->x < $candidate->x);
             $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
             $xWallMaxHeight = $this->findHighestWall($baseX, $height, $radius, $maxWallCeiling, true);
         }
         $zWallMaxHeight = 0;
-        if ($start->z <> $candidate->z) {
+        if ($zMove) {
             $zGrowing = ($start->z < $candidate->z);
             $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
             $zWallMaxHeight = $this->findHighestWall($baseZ, $height, $radius, $maxWallCeiling, false);
@@ -244,6 +246,14 @@ trait MovementTrait
         }
         if ($xWallMaxHeight > $maxWallCeiling && $zWallMaxHeight > $maxWallCeiling) { // tall walls everywhere
             return false;
+        }
+        if ($xMove && $xWallMaxHeight === 0 && $zWallMaxHeight > $maxWallCeiling) { // can move in X direction
+            $candidate->setZ($start->z); // side effect
+            return null;
+        }
+        if ($zMove && $zWallMaxHeight === 0 && $xWallMaxHeight > $maxWallCeiling) { // can move in Z direction
+            $candidate->setX($start->x); // side effect
+            return null;
         }
         if ($this->isFlying()) { // wall touch in air is stop
             return false;

@@ -207,8 +207,8 @@ export class World {
     }
 
     #createPlayer(colorIndex, isOpponent) { // fixme: create glb player models and remove
-        const color = new THREE.Color(Enum.Color[colorIndex])
-        const headMaterial = new THREE.MeshPhongMaterial({
+        const sockMaterial = new THREE.MeshLambertMaterial({color: Enum.Color[colorIndex]})
+        const headMaterial = new THREE.MeshLambertMaterial({
             map: new THREE.TextureLoader().load(
                 './resources/face.png'
             )
@@ -216,8 +216,8 @@ export class World {
 
         const player = this.#modelRepository.getPlayer().clone()
         player.getObjectByName('head').children[0].material = headMaterial
-        player.getObjectByName('body').children[0].material = new THREE.MeshPhongMaterial({color: (isOpponent ? 0x993d00 : 0x75b359)})
-        player.getObjectByName('legs').children.forEach((mesh) => mesh.material.color = color)
+        player.getObjectByName('body').children[0].material = new THREE.MeshLambertMaterial({color: (isOpponent ? 0x993d00 : 0x75b359)})
+        player.getObjectByName('legs').children.forEach((mesh) => mesh.material = sockMaterial)
         player.rotation.reorder("YXZ")
         return player
     }
