@@ -98,6 +98,30 @@ class SimpleInventoryTest extends BaseTestCase
         $game->getPlayer(1)->dropEquippedItem();
     }
 
+    public function testPlayerBuyAndDropAndUseForPickup(): void
+    {
+        $game = $this->createTestGame();
+        $p = $game->getPlayer(1);
+        $p->getInventory()->earnMoney(5000);
+
+        $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_AK));
+        $item = $p->getEquippedItem();
+        $this->assertInstanceOf(RifleAk::class, $item);
+        $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+        $this->assertNotNull($p->dropEquippedItem());
+        $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+        $this->assertNotEmpty($game->getWorld()->getDropItems());
+
+        $p->getSight()->lookVertical(40);
+        $p->use();
+        $this->assertNotEmpty($game->getWorld()->getDropItems());
+
+        $p->getSight()->lookVertical(-40);
+        $p->use();
+        $this->assertSame([], $game->getWorld()->getDropItems());
+        $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+    }
+
     public function testDropAndPickupItem(): void
     {
         $game = $this->createNoPauseGame();

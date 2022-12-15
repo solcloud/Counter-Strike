@@ -15,6 +15,7 @@ class World
     private const WALL_Z = 'xy';
     private const BOMB_RADIUS = 90;
     private const BOMB_DEFUSE_MAX_DISTANCE = 300;
+    private const ITEM_PICK_MAX_DISTANCE = 370;
 
     private ?Map $map = null;
     /** @var PlayerCollider[] */
@@ -256,6 +257,20 @@ class World
                 $this->game->bombDefused($player);
                 $this->lastBombActionTick = -1;
                 $this->lastBombPlayerId = -1;
+            }
+            return;
+        }
+
+        // Drop item pickup
+        foreach ($this->dropItems as $key => $dropItem) {
+            if (!$this->canBeSeen($player, $dropItem->getPosition(), $dropItem->getBoundingRadius(), self::ITEM_PICK_MAX_DISTANCE)) {
+                continue;
+            }
+            if ($player->getInventory()->pickup($dropItem->getItem())) {
+                $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
+                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem()));
+                unset($this->dropItems[$key]);
+                return;
             }
         }
     }
