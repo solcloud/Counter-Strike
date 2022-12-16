@@ -52,7 +52,7 @@ export class World {
         renderer.physicallyCorrectLights = false
         renderer.setSize(window.innerWidth, window.innerHeight)
         if (!setting.shouldPreferPerformance()) {
-            new THREE.RGBELoader().load('./resources/texture/orlando_stadium_1k.hdr', function (texture) {
+            new THREE.RGBELoader().load('./resources/img/orlando_stadium_1k.hdr', function (texture) {
                 texture.mapping = THREE.EquirectangularReflectionMapping
                 texture.toneMapped = true
                 scene.environment = texture

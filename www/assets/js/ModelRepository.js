@@ -147,7 +147,7 @@ export class ModelRepository {
 
             this.#models[ItemId.RifleM4A4] = model.scene
         }))
-        promises.push(this.#loadTexture('./resources/texture/sphere_glow.png').then((texture) => {
+        promises.push(this.#loadTexture('./resources/img/sphere_glow.png').then((texture) => {
             const material = new THREE.SpriteMaterial({
                 map: texture,
                 color: 0xFFFFFF,
