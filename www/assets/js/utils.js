@@ -28,3 +28,7 @@ function serverHorizontalRotationToThreeRadian(angleDegree) {
 function serverVerticalRotationToThreeRadian(angleDegree) {
     return degreeToRadian(angleDegree)
 }
+
+function msToTick(timeMs) {
+    return Math.ceil(timeMs / window._csfGlobal.tickMs)
+}

@@ -9,6 +9,7 @@ export class Game {
     #stats
     #pointer
     #shouldRenderInsideTick
+    #tick = 0
     #round = 1
     #roundHalfTime = 2
     #paused = false
@@ -140,7 +141,7 @@ export class Game {
             clearInterval(this.#bombTimerId)
         }
 
-        this.#soundRepository.play(data, spectatorId)
+        this.#soundRepository.play(data, spectatorId, this.#tick)
     }
 
     bombPlanted(timeMs, position) {
@@ -184,6 +185,7 @@ export class Game {
 
     gameStart(options) {
         this.#options = options
+        window._csfGlobal.tickMs = options.tickMs
         this.#roundHalfTime = Math.floor(options.setting.max_rounds / 2) + 1
         this.#hud.startWarmup(options.warmupSec * 1000)
 
@@ -300,6 +302,7 @@ export class Game {
 
     tick(state) {
         this.#stats.begin()
+        this.#tick++
         const game = this
 
         if (this.#options !== null) {

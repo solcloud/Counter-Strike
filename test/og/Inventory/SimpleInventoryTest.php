@@ -115,6 +115,7 @@ class SimpleInventoryTest extends BaseTestCase
         $p->getSight()->lookVertical(40);
         $p->use();
         $this->assertNotEmpty($game->getWorld()->getDropItems());
+        $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
 
         $p->getSight()->lookVertical(-40);
         $p->use();

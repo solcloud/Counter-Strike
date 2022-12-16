@@ -10,13 +10,14 @@ export class SoundRepository {
         SoundType.BOMB_PLANTING, SoundType.BOMB_DEFUSING,
     ]
     #soundPlayer
+    #lastSpectatorMoveSoundTick = 0
 
     constructor(soundPlayer) {
         this.#soundPlayer = soundPlayer
     }
 
-    play(data, spectatorId) {
-        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface, spectatorId)
+    play(data, spectatorId, tickId) {
+        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface, spectatorId, tickId)
         if (!soundName) {
             return
         }
@@ -25,10 +26,14 @@ export class SoundRepository {
         this.#soundPlayer(soundName, data.position, inPlayerSpectateHead)
     }
 
-    #getSoundName(type, item, playerId, surface, playerSpectateId) {
+    #getSoundName(type, item, playerId, surface, playerSpectateId, tickId) {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
-                return '422990__dkiller2204__sfxrunground1.wav'
+                if (tickId > this.#lastSpectatorMoveSoundTick + msToTick(200)) {
+                    this.#lastSpectatorMoveSoundTick = tickId
+                    return '422990__dkiller2204__sfxrunground1.wav'
+                }
+                return null
             }
             return '221626__moodpie__body-impact.wav'
         }
