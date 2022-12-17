@@ -46,6 +46,21 @@
     transform: translate(-50%, -50%);
 }
 
+#hud #hit-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25vw;
+    height: 25vw;
+    font-size: 6rem;
+    font-weight: bold;
+    color: #d75732;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 #hud section {
     text-shadow: 0px 0px 2px #626262;
     display: flex;

@@ -28,7 +28,7 @@ final class AttackEvent
     public function process(): AttackResult
     {
         $bullet = $this->createBullet();
-        $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide);
+        $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide, $this->origin->clone());
         $result = new AttackResult($bullet);
         $checkDistance = $bullet->getDistanceTraveled();
 

@@ -111,6 +111,27 @@ export class Game {
         this.#world.playSound('538422__rosa-orenes256__referee-whistle-sound.wav', null, true)
     }
 
+    playerHit(playerId, hitPosition, data, wasHeadshot) {
+        if (playerId === this.playerSpectate.getId()) {
+            const anglePlayer = Math.round(this.getPlayerSpectateRotation()[0])
+            const camera = this.#world.getCamera()
+
+            const cameraPosition = new THREE.Vector3()
+            camera.getWorldPosition(cameraPosition)
+
+            const angleHit = radianToDegree(Math.atan2(data.origin.x - cameraPosition.x, data.origin.z - -cameraPosition.z))
+            const delta = smallestDeltaAngle(anglePlayer, angleHit)
+            this.#hud.spectatorHit(
+                (delta < -30 && delta > -150),
+                (delta > 30 && delta < 150),
+                (Math.abs(delta) <= 40),
+                (Math.abs(delta) >= 120),
+            )
+        } else {
+            this.#world.bulletPlayerHit(hitPosition, wasHeadshot)
+        }
+    }
+
     processSound(data) {
         const spectatorId = this.playerSpectate.getId()
         if (data.type === SoundType.ITEM_ATTACK && data.player === spectatorId) {
@@ -121,12 +142,12 @@ export class Game {
         }
         if (data.type === SoundType.BULLET_HIT) {
             if (data.player) {
-                this.#world.bulletPlayerHit(data.position, false)
+                this.playerHit(data.player, data.position, data.extra, false)
             } else if (data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
                 this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
             }
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
-            this.#world.bulletPlayerHit(data.position, true)
+            this.playerHit(data.player, data.position, data.extra, true)
         }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)

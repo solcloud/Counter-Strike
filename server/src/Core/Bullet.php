@@ -7,6 +7,7 @@ use cs\Interface\AttackEnable;
 class Bullet
 {
 
+    private Point $origin;
     private Point $position;
     private int $originPlayerId;
     private bool $originPlayerIsAttacker;
@@ -27,16 +28,22 @@ class Bullet
         $this->damageArmor = $damageArmor;
     }
 
-    public function setOriginPlayer(int $playerId, bool $attackerSide): void
+    public function setOriginPlayer(int $playerId, bool $attackerSide, Point $origin): void
     {
         $this->originPlayerId = $playerId;
         $this->originPlayerIsAttacker = $attackerSide;
+        $this->origin = $origin;
         $this->addPlayerIdSkip($playerId);
     }
 
     public function getPosition(): Point
     {
         return $this->position;
+    }
+
+    public function getOrigin(): Point
+    {
+        return $this->origin;
     }
 
     public function lowerDamage(int $amount): void

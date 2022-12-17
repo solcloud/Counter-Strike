@@ -14,6 +14,8 @@ final class SoundEvent extends TickEvent
     private ?Item $item = null;
     private ?Player $player = null;
     private ?SolidSurface $surface = null;
+    /** @var array<string,mixed> */
+    private array $extra = [];
 
     public function __construct(public readonly Point $position, public readonly SoundType $type)
     {
@@ -37,6 +39,20 @@ final class SoundEvent extends TickEvent
         return $this;
     }
 
+    /**
+     * @param array<string,mixed> $extra
+     */
+    public function setExtra(array $extra): void
+    {
+        $this->extra = $extra;
+    }
+
+    public function addExtra(string $key, mixed $value): self
+    {
+        $this->extra[$key] = $value;
+        return $this;
+    }
+
     public function serialize(): array
     {
         return [
@@ -45,6 +61,7 @@ final class SoundEvent extends TickEvent
             'player'   => $this->player?->getId(),
             'surface'  => $this->surface?->serialize($this->position),
             'type'     => $this->type->value,
+            'extra'     => $this->extra,
         ];
     }
 

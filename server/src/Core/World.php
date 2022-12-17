@@ -509,6 +509,7 @@ class World
         if ($hit instanceof SolidSurface) {
             $soundEvent->setSurface($hit);
         }
+        $soundEvent->addExtra('origin', $bullet->getOrigin()->toArray());
 
         $this->makeSound($soundEvent);
     }

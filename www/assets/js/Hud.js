@@ -3,12 +3,14 @@ import {BuyMenu} from "./hud/BuyMenu.js";
 import {ScoreBoard} from "./hud/ScoreBoard.js";
 import {KillFeed} from "./hud/KillFeed.js";
 import {Radar} from "./hud/Radar.js";
+import {HitFeedback} from "./hud/HitFeedback.js";
 
 export class HUD {
     #game
     #buyMenu = null;
     #scoreBoard = null;
     #killFeed = null;
+    #hitFeedback = null;
     #radar = null;
     #showAble = {
         showScore: false,
@@ -79,6 +81,10 @@ export class HUD {
     updateMyTeamPlayerMoney(playerData, money) {
         const moneyElement = this.#scoreBoard.getPlayerStatRowElement(playerData).querySelector('[data-money]')
         moneyElement.innerText = `${money}`
+    }
+
+    spectatorHit(fromLeft, fromRight, fromFront, fromBack) {
+        this.#hitFeedback.hit(fromLeft, fromRight, fromFront, fromBack)
     }
 
     showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
@@ -213,6 +219,7 @@ export class HUD {
 
         elementHud.innerHTML = `
         <div id="cross"></div>
+        <div id="hit-feedback"></div>
         <div id="equipped-item">
             <div>
                 <img data-shot class="hidden" src="./resources/shot.gif">
@@ -310,6 +317,7 @@ export class HUD {
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)
         this.#scoreBoard = new ScoreBoard(game, this.#elements.scoreDetail)
         this.#killFeed = new KillFeed(this.#scoreBoard, this.#elements.killFeed)
+        this.#hitFeedback = new HitFeedback(elementHud.querySelector('#hit-feedback'))
 
         const self = this
         const radarImage = new Image()

@@ -32,3 +32,9 @@ function serverVerticalRotationToThreeRadian(angleDegree) {
 function msToTick(timeMs) {
     return Math.ceil(timeMs / window._csfGlobal.tickMs)
 }
+
+function smallestDeltaAngle(start, target) {
+    const a = ((start - target) % 360 + 360) % 360;
+    const b = ((target - start) % 360 + 360) % 360;
+    return (a < b ? -a : b);
+}
