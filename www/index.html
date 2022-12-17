@@ -58,13 +58,15 @@
 
     const settingElement = document.getElementById('setting-form')
     if (settingElement) {
+        let userSettingObject
         const userSettings = localStorage.getItem('setting')
         if (userSettings === null || userSettings === '') {
             const setting = new Setting()
-            settingElement.value = JSON.stringify(setting.getSetting(), null, 2)
+            userSettingObject = setting.getSetting()
         } else {
-            settingElement.value = userSettings
+            userSettingObject = JSON.parse(userSettings)
         }
+        settingElement.value = JSON.stringify(userSettingObject, null, 2)
     }
 </script>
 <script>

@@ -1,6 +1,7 @@
 import {Action} from "./Enums.js";
 
 export class Setting {
+    #onUpdate = {}
     #setting = {
         base: {
             fov: 70,
@@ -32,21 +33,39 @@ export class Setting {
             'Digit5': Action.EQUIP_BOMB,
             'KeyB': Action.BUY_MENU,
             'Tab': Action.SCORE_BOARD,
+            'Backquote': Action.GAME_MENU,
         },
     }
 
     constructor(settingString = null) {
         if (settingString) {
-            this.loadSettings(JSON.parse(settingString))
+            this.loadSettings(settingString)
         }
     }
 
-    loadSettings(settingObject) {
-        this.#setting = settingObject
+    loadSettings(json) {
+        this.#setting = JSON.parse(json)
     }
 
     getSetting() {
         return JSON.parse(JSON.stringify(this.#setting))
+    }
+
+    getJson() {
+        return JSON.stringify(this.#setting)
+    }
+
+    addUpdateCallback(key, callback) {
+        this.#onUpdate[key] = callback
+    }
+
+    update(key, value) {
+        const callback = this.#onUpdate[key]
+        if (callback === undefined) {
+            return
+        }
+        callback(value)
+        this.#setting.base[key] = value
     }
 
     getBinds() {

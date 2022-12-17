@@ -52,17 +52,13 @@ let launchGame
 
         const setting = new Setting(settingString)
         const canvas = await world.init(map, setting)
-        const pointerLock = new THREE.PointerLockControls(world.getCamera(), document.body)
+        const pointerLock = new THREE.PointerLockControls(world.getCamera(), canvasParent)
         pointerLock.pointerSpeed = setting.getSensitivity()
+
         hud.createHud(elementHud, map, setting)
-        control.init(pointerLock, setting)
+        control.init(canvasParent, pointerLock, setting)
         game.setDependency(pointerLock, setting.shouldMatchServerFps())
-        document.addEventListener("click", function (e) {
-            if (e.target.classList.contains('hud-action')) {
-                return
-            }
-            game.requestPointerLock()
-        }, {capture: true})
+        canvas.addEventListener("click", () => game.requestPointerLock())
         canvasParent.appendChild(canvas)
         stats.dom.style.position = 'inherit'
         elementHud.querySelector('#fps-stats').appendChild(stats.dom)
@@ -83,6 +79,8 @@ let launchGame
             }
         })
 
+        setting.addUpdateCallback('sensitivity', (newValue) => pointerLock.pointerSpeed = parseFloat(newValue))
+        setting.addUpdateCallback('volume', (newValue) => world.volume = parseFloat(newValue))
         connector.connect(url.hostname, url.port, loginCode)
     }
 

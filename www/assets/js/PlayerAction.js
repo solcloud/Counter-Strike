@@ -44,6 +44,7 @@ export class PlayerAction {
         this.actionCallback[Action.EQUIP_SECONDARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_SECONDARY)
         this.actionCallback[Action.EQUIP_BOMB] = (enabled) => enabled && this.equip(InventorySlot.SLOT_BOMB)
         this.actionCallback[Action.BUY_MENU] = (enabled) => enabled && hud.toggleBuyMenu()
+        this.actionCallback[Action.GAME_MENU] = (enabled) => enabled && hud.toggleGameMenu()
         this.actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
     }
 

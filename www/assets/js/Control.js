@@ -10,21 +10,20 @@ export class Control {
         this.#action = action
     }
 
-    init(pointer, setting) {
+    init(element, pointer, setting) {
         this.#setting = setting
         const self = this
         const action = this.#action
         const game = this.#game
         const sprayEnableSlots = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_BOMB]
 
-        document.addEventListener("mouseup", function (event) {
-            event.preventDefault()
-
+        element.addEventListener("mouseup", function (event) {
+            if (pointer.isLocked) {
+                event.preventDefault()
+            }
             action.sprayingDisable()
         })
-        document.addEventListener("mousedown", function (event) {
-            event.preventDefault()
-
+        element.addEventListener("mousedown", function (event) {
             action.sprayingDisable()
             if (!game.isPlaying() || game.isPaused()) {
                 return
@@ -36,6 +35,7 @@ export class Control {
             if (!pointer.isLocked) {
                 return;
             }
+            event.preventDefault()
 
             if (event.buttons === 2) {
                 action.attack2()
@@ -49,7 +49,7 @@ export class Control {
                 }
             }
         })
-        document.addEventListener('wheel', (event) => {
+        element.addEventListener('wheel', (event) => {
             if (!game.isPlaying() || !game.meIsAlive()) {
                 return
             }
@@ -68,7 +68,7 @@ export class Control {
                 }
             }
         })
-        document.addEventListener('keydown', function (event) {
+        element.addEventListener('keydown', function (event) {
             event.preventDefault()
 
             if (!game.isPlaying() || !game.meIsAlive()) {
@@ -77,7 +77,7 @@ export class Control {
 
             self.#processKeyboardEvent(event, true)
         });
-        document.addEventListener('keyup', function (event) {
+        element.addEventListener('keyup', function (event) {
             event.preventDefault()
 
             if (!(game.isPlaying() && game.meIsAlive())) {

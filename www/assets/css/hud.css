@@ -91,6 +91,7 @@
 }
 
 #hud #scoreboard,
+#hud #game-menu,
 #hud #buy-menu {
     font-size: 16px;
     padding: 1rem;
@@ -106,8 +107,22 @@
     overflow-y: auto;
 }
 
-#hud #buy-menu {
+#hud #buy-menu, #hud #game-menu {
     pointer-events: initial;
+}
+
+#hud #game-menu div[data-setting] > div {
+    margin: 0 2px 12px 2px;
+}
+
+#hud #game-menu div[data-setting] input {
+    display: block;
+    width: 100%;
+    padding: 4px 10px;
+}
+
+#hud #game-menu button {
+    font-size: 1rem;
 }
 
 #hud #buy-menu p.disabled {

@@ -4,22 +4,26 @@ import {ScoreBoard} from "./hud/ScoreBoard.js";
 import {KillFeed} from "./hud/KillFeed.js";
 import {Radar} from "./hud/Radar.js";
 import {HitFeedback} from "./hud/HitFeedback.js";
+import {GameMenu} from "./hud/GameMenu.js";
 
 export class HUD {
     #game
     #buyMenu = null;
     #scoreBoard = null;
+    #gameMenu = null;
     #killFeed = null;
     #hitFeedback = null;
     #radar = null;
     #showAble = {
         showScore: false,
-        showBuyMenu: false
+        showBuyMenu: false,
+        showGameMenu: false,
     }
     #elements = {
         score: null,
         scoreDetail: null,
         buyMenu: null,
+        gameMenu: null,
         canBuyIcon: null,
         canPlantIcon: null,
         haveDefuseKit: null,
@@ -57,6 +61,10 @@ export class HUD {
 
     toggleBuyMenu() {
         this.#showAble.showBuyMenu = !this.#showAble.showBuyMenu
+    }
+
+    toggleGameMenu() {
+        this.#showAble.showGameMenu = !this.#showAble.showGameMenu
     }
 
     toggleScore(enabled) {
@@ -193,6 +201,16 @@ export class HUD {
             this.#elements.buyMenu.classList.add('hidden');
             this.#showAble.showBuyMenu = false
         }
+        if (this.#showAble.showGameMenu) {
+            this.#game.requestPointerUnLock()
+            this.#gameMenu.show()
+            this.#elements.gameMenu.classList.remove('hidden');
+        } else if (!this.#elements.gameMenu.classList.contains('hidden')) {
+            this.#game.requestPointerLock()
+            this.#gameMenu.close()
+            this.#elements.gameMenu.classList.add('hidden');
+            this.#showAble.showGameMenu = false
+        }
 
         this.#elements.money.innerText = player.money
         this.#elements.health.innerText = player.health
@@ -230,6 +248,7 @@ export class HUD {
             <div id="scoreboard-detail"></div>
         </div>
         <div id="buy-menu" class="hidden"></div>
+        <div id="game-menu" class="hidden"></div>
         <section>
             <div class="left">
                 <div class="top">
@@ -286,6 +305,7 @@ export class HUD {
 
         this.#elements.score = elementHud.querySelector('#scoreboard')
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
+        this.#elements.gameMenu = elementHud.querySelector('#game-menu')
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.canPlantIcon = elementHud.querySelector('[data-can-plant]')
         this.#elements.haveDefuseKit = elementHud.querySelector('[data-have-defuse-kit]')
@@ -311,11 +331,13 @@ export class HUD {
 
         const cross = elementHud.querySelector('#cross')
         cross.innerText = setting.getCrosshairSymbol()
-        cross.style.color = '#' + setting.getCrosshairColor()
+        setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = '#' + newValue)
+        setting.update('crosshairColor', setting.getCrosshairColor())
 
         const game = this.#game
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)
         this.#scoreBoard = new ScoreBoard(game, this.#elements.scoreDetail)
+        this.#gameMenu = new GameMenu(this.#elements.gameMenu, setting)
         this.#killFeed = new KillFeed(this.#scoreBoard, this.#elements.killFeed)
         this.#hitFeedback = new HitFeedback(elementHud.querySelector('#hit-feedback'))
 

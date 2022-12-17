@@ -196,6 +196,7 @@ const Action = {
     EQUIP_SECONDARY: 'equip_secondary',
     EQUIP_BOMB: 'equip_bomb',
     BUY_MENU: 'buy_menu',
+    GAME_MENU: 'game_menu',
     SCORE_BOARD: 'score_board',
     DROP: 'drop',
     USE: 'use',
