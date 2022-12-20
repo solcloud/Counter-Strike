@@ -9,7 +9,7 @@ export class ScoreBoard {
         this.#element = scoreBoardElement
     }
 
-    #renderPlayerStats(scoreBoardData, players, statsForOtherTeam) {
+    #renderPlayerStats(scoreBoardData, players, roundNumber, statsForOtherTeam) {
         const self = this
         let playerTable = '';
         scoreBoardData.forEach(function (row) {
@@ -21,6 +21,7 @@ export class ScoreBoard {
                 <td data-money>${statsForOtherTeam ? '' : `${player.money}`}</td>
                 <td data-kills>${row.kills}</td>
                 <td data-deaths>${row.deaths}</td>
+                <td data-adr>${Math.round(row.damage / Math.max(1, roundNumber - 1))}</td>
             </tr>
             `;
         })
@@ -29,10 +30,11 @@ export class ScoreBoard {
             <table class="player-stats ${statsForOtherTeam ? 'team-other' : 'team-my'}">
                 <thead>
                 <tr>
-                    <th style="width:60%">Player name</th>
+                    <th style="width:50%">Player name</th>
                     <th style="width:20%">Money</th>
                     <th style="width:10%">Kills</th>
                     <th style="width:10%">Deaths</th>
+                    <th style="width:10%">ADR</th>
                 </tr>
                 </thead>
                 <tbody data-player-stats>
@@ -99,6 +101,7 @@ export class ScoreBoard {
 
     update(scoreData) {
         const game = this.#game
+        const roundNumber = game.getRoundNumber()
         const meIsAttacker = game.playerMe.isAttacker()
         const myTeamIndex = game.playerMe.getTeamIndex()
         const otherTeamIndex = game.playerMe.getOtherTeamIndex()
@@ -109,7 +112,7 @@ export class ScoreBoard {
                 <tr>
                     <td class="score-my color-me">${scoreData.score[myTeamIndex]}<p>Score ${game.playerMe.getTeamName()}</p></td>
                     <td class="score-players players-my">
-                        ${this.#renderPlayerStats(scoreData.scoreboard[myTeamIndex], game.players, false)}
+                        ${this.#renderPlayerStats(scoreData.scoreboard[myTeamIndex], game.players, roundNumber, false)}
                     </td>
                 </tr>
             </table>
@@ -149,7 +152,7 @@ export class ScoreBoard {
                 <tr>
                     <td class="score-opponent color-opponent">${scoreData.score[otherTeamIndex]}<p>Score ${game.playerMe.getOtherTeamName()}</p></td>
                     <td class="score-players players-opponent">
-                        ${this.#renderPlayerStats(scoreData.scoreboard[otherTeamIndex], game.players, true)}
+                        ${this.#renderPlayerStats(scoreData.scoreboard[otherTeamIndex], game.players, roundNumber, true)}
                     </td>
                 </tr>
             </table>

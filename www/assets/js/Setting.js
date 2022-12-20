@@ -5,12 +5,12 @@ export class Setting {
     #setting = {
         base: {
             fov: 70,
-            volume: 30,
+            volume: 10,
             radarZoom: 0.9,
             sensitivity: 1.0,
             sprayTriggerDeltaMs: 80,
             crosshair: '✛',
-            crosshairColor: 'd31b1b',
+            crosshairColor: '#d31b1b',
             preferPerformance: false,
             matchServerFps: true,
             anisotropic: 16,
@@ -108,7 +108,7 @@ export class Setting {
     }
 
     getMasterVolume() {
-        return this.#setting.base.volume ?? 30
+        return this.#setting.base.volume ?? 10
     }
 
     getCrosshairSymbol() {
@@ -116,7 +116,7 @@ export class Setting {
     }
 
     getCrosshairColor() {
-        return this.#setting.base.crosshairColor ?? 'd31b1b'
+        return this.#setting.base.crosshairColor ?? '#d31b1b'
     }
 
 }

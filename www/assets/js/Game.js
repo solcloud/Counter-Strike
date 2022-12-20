@@ -188,6 +188,10 @@ export class Game {
         this.#bombTimerId = bombTimerId
     }
 
+    getRoundNumber() {
+        return this.#round
+    }
+
     isPaused() {
         return this.#paused
     }

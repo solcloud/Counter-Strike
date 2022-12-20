@@ -33,6 +33,11 @@ abstract class SolidSurface implements Hittable
         return false;
     }
 
+    public function getDamage(): int
+    {
+        return 0;
+    }
+
     public abstract function getPlane(): string;
 
     /**

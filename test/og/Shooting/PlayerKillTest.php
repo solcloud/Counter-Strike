@@ -319,6 +319,7 @@ class PlayerKillTest extends BaseTestCase
                 $this->assertNotNull($result);
 
                 $hits = $result->getHits();
+                $this->assertTrue($result->somePlayersWasHit());
                 $this->assertGreaterThan(0, $result->getMoneyAward());
                 $this->assertCount(2, $hits);
                 $this->assertInstanceOf(HitBox::class, $hits[0]);

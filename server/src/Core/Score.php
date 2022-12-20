@@ -152,7 +152,7 @@ class Score
     {
         $scoreboard = [[],[]];
         foreach ($this->playerStats as $playerId => $playerStat) {
-            $key = sprintf('%d-%d', $playerStat->getKills(), $playerId);
+            $key = sprintf('%d-%d-%d', $playerStat->getKills(), $playerStat->getDamage(), $playerId);
             $scoreboard[(int)$playerStat->isAttacker()][$key] = $playerStat->toArray();
         }
         $teamDefenders = $scoreboard[0];

@@ -7,6 +7,7 @@ class PlayerStat
     private int $kills = 0;
     private int $killsHeadshot = 0;
     private int $deaths = 0;
+    private int $damage = 0;
 
     public function __construct(private Player $player)
     {
@@ -25,6 +26,11 @@ class PlayerStat
         $this->deaths++;
     }
 
+    public function addDamage(int $damage): void
+    {
+        $this->damage += min($damage, 100);
+    }
+
     public function removeKill(): void
     {
         $this->kills--;
@@ -38,6 +44,11 @@ class PlayerStat
     public function getDeaths(): int
     {
         return $this->deaths;
+    }
+
+    public function getDamage(): int
+    {
+        return $this->damage;
     }
 
     public function isAttacker(): bool
@@ -54,6 +65,7 @@ class PlayerStat
             'id'     => $this->player->getId(),
             'kills'  => $this->kills,
             'deaths' => $this->deaths,
+            'damage' => $this->damage,
         ];
     }
 

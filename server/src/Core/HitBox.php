@@ -8,7 +8,6 @@ use cs\Enum\ItemType;
 use cs\Interface\AttackEnable;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
-use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\BaseWeapon;
 use cs\Weapon\Knife;
 
@@ -17,6 +16,7 @@ class HitBox implements Hittable
     private int $moneyAward;
     private bool $playerWasKilled;
     private bool $wasHeadShot;
+    private int $damage;
 
     public function __construct(
         private Player       $player,
@@ -32,6 +32,7 @@ class HitBox implements Hittable
         $this->moneyAward = 0;
         $this->playerWasKilled = false;
         $this->wasHeadShot = false;
+        $this->damage = 0;
     }
 
     public function getHitAntiForce(Point $point): int
@@ -90,6 +91,7 @@ class HitBox implements Hittable
         $this->player->lowerHealth($healthDamage);
         $this->player->lowerArmor($this->calculateArmorDamage($shootItem, $playerArmorType, $hitBoxType));
         $this->wasHeadShot = ($hitBoxType === HitBoxType::HEAD);
+        $this->damage = $isTeamDamage ? 0 : $healthDamage;
         if (!$this->player->isAlive()) {
             $this->playerWasKilled = true;
             $this->moneyAward = $isTeamDamage ? -300 : $shootItem->getKillAward();
@@ -142,6 +144,11 @@ class HitBox implements Hittable
     public function wasHeadShot(): bool
     {
         return $this->wasHeadShot;
+    }
+
+    public function getDamage(): int
+    {
+        return $this->damage;
     }
 
     public function getGeometry(): HitIntersect

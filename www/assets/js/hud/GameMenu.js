@@ -30,7 +30,7 @@ export class GameMenu {
         const setting = this.#setting
         setting.update('sensitivity', parseFloat(this.#element.querySelector('input[name="sensitivity"]').value))
         setting.update('volume', parseFloat(this.#element.querySelector('input[name="volume"]').value))
-        setting.update('crosshairColor', this.#element.querySelector('input[name="crosshair-color"]').value.substring(1))
+        setting.update('crosshairColor', this.#element.querySelector('input[name="crosshair-color"]').value)
 
         const json = setting.getJson()
         setting.loadSettings(json)
@@ -53,7 +53,7 @@ export class GameMenu {
             </div>
             <div>
                 <p>Crosshair color:</p>
-                <p><input name="crosshair-color" type="color" value="#${this.#setting.getCrosshairColor()}"></p>
+                <p><input name="crosshair-color" type="color" value="${this.#setting.getCrosshairColor()}"></p>
             </div>
         `;
     }

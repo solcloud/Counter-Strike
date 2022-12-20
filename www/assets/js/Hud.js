@@ -331,7 +331,7 @@ export class HUD {
 
         const cross = elementHud.querySelector('#cross')
         cross.innerText = setting.getCrosshairSymbol()
-        setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = '#' + newValue)
+        setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = newValue)
         setting.update('crosshairColor', setting.getCrosshairColor())
 
         const game = this.#game

@@ -11,6 +11,7 @@ export class SoundRepository {
     ]
     #soundPlayer
     #lastSpectatorMoveSoundTick = 0
+    #lastOtherPlayerMoveSoundTick = 0
 
     constructor(soundPlayer) {
         this.#soundPlayer = soundPlayer
@@ -35,7 +36,11 @@ export class SoundRepository {
                 }
                 return null
             }
-            return '221626__moodpie__body-impact.wav'
+            if (tickId > this.#lastOtherPlayerMoveSoundTick + msToTick(150)) {
+                this.#lastOtherPlayerMoveSoundTick = tickId
+                return '221626__moodpie__body-impact.wav'
+            }
+            return null
         }
 
         if (type === SoundType.ITEM_ATTACK) {

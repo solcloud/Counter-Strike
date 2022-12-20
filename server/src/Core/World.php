@@ -512,6 +512,7 @@ class World
         $soundEvent->addExtra('origin', $bullet->getOrigin()->toArray());
 
         $this->makeSound($soundEvent);
+        $this->game->getScore()->getPlayerStat($bullet->getOriginPlayerId())->addDamage($hit->getDamage());
     }
 
     public function tryPlantBomb(Player $player): void

@@ -18,4 +18,6 @@ interface Hittable
 
     public function wasHeadShot(): bool;
 
+    public function getDamage(): int;
+
 }
