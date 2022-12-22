@@ -62,7 +62,7 @@ export class HitFeedback {
                 clearInterval(intervalId)
                 this.#intervalId = null
             }
-        }, 200)
+        }, 100)
         this.#intervalId = intervalId
     }
 }

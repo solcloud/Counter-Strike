@@ -4,11 +4,13 @@ use cs\Core\Game;
 use cs\Core\Player;
 use cs\Core\PlayerCollider;
 use cs\Core\Point;
-use cs\Core\Setting;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
+use cs\Enum\InventorySlot;
+use cs\Equipment;
 use cs\HitGeometry\SphereGroupHitBox;
 use cs\Map\TestMap;
+use cs\Weapon;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -17,26 +19,26 @@ $game = new Game();
 $game->loadMap(new TestMap());
 $player = new Player(0, Color::GREEN, true);
 $player->setWorld($game->getWorld());
-$player->setPosition(new Point());
+$player->getSight()->lookHorizontal(22);
 $collider = new PlayerCollider($player);
 ////////
 
-if (isset($_GET['crouch'])) {
-    // TODO crouch, move animation
+if (is_numeric($_GET['crouch'] ?? false)) {
     $player->crouch();
-    for ($tick = 0; $tick <= Setting::tickCountCrouch(); $tick++) {
+    for ($tick = 0; $tick <= intval($_GET['crouch']); $tick++) {
         $player->onTick($tick);
     }
 }
 
-$playerState = $player->serialize();
 $playerParts = [];
 foreach ($collider->getHitBoxes() as $box) {
     $geometry = $box->getGeometry();
     if ($geometry instanceof SphereGroupHitBox) {
-        foreach ($geometry->getParts() as $part) {
+        $modifier = $geometry->getCenterPointModifier();
+        $modifier = $modifier === null ? new Point() : $modifier($player);
+        foreach ($geometry->getParts($player) as $part) {
             $playerParts[$box->getType()->value][] = [
-                "center" => $part->getRelativeCenter()->toArray(),
+                "center" => $part->calculateWorldCoordinate($player, $modifier)->toArray(),
                 "radius" => $part->radius,
             ];
         }
@@ -45,6 +47,14 @@ foreach ($collider->getHitBoxes() as $box) {
 
     throw new Exception("Unknown geometry '" . get_class($geometry) . "' given");
 }
+
+$slots = [
+    InventorySlot::SLOT_KNIFE->value     => (new Weapon\Knife())->toArray(),
+    InventorySlot::SLOT_PRIMARY->value   => (new Weapon\RifleAk())->toArray(),
+    InventorySlot::SLOT_SECONDARY->value => (new Weapon\PistolGlock())->toArray(),
+    InventorySlot::SLOT_BOMB->value      => (new Equipment\Bomb(1, 1))->toArray(),
+    InventorySlot::SLOT_KIT->value       => (new Equipment\DefuseKit())->toArray(),
+];
 
 ?>
 <!Doctype html>
@@ -55,26 +65,39 @@ foreach ($collider->getHitBoxes() as $box) {
     <script src="./assets/threejs/three.js"></script>
     <script src="./assets/js/utils.js"></script>
     <script src="./assets/threejs/orbit-control.js"></script>
+    <script src="./assets/threejs/GLTFLoader.js"></script>
+    <script src="./assets/threejs/SkeletonUtils.js"></script>
 </head>
 <body style="margin:0">
-<div style="position:absolute">
-    <textarea>Generating...</textarea>
-</div>
 <script>
-    let camera, scene, renderer, controls, belt, hand;
-    const materialDefault = new THREE.MeshBasicMaterial({color: 0x664b17})
-    const materialArm = new THREE.MeshStandardMaterial({color: 0x114b3d})
-    const materialLeg = new THREE.MeshStandardMaterial({color: 0x124a13})
-    const materialBody = new THREE.MeshStandardMaterial({color: 0xFF6600})
+    ////
+    // fixme: add gui controls
+    const opacityPlayer = 1.0
+    const opacityHitBoxes = 0.0
+    const opacityBoundingBox = 0.0
+    ////
+</script>
+<script>
+    let camera, scene, renderer, controls;
 
-    const playerState = JSON.parse('<?= json_encode($playerState) ?>');
-    const headHeight = playerState.heightSight;
-    const bodyHeight = playerState.heightBody
-    const modelHeight = playerState.height
+    const materialDefault = new THREE.MeshBasicMaterial({color: 0x664b17, transparent: true, opacity: opacityHitBoxes, depthTest: false})
+    const materialArm = new THREE.MeshBasicMaterial({color: 0x114b3d, transparent: true, opacity: opacityHitBoxes, depthTest: false})
+    const materialBack = new THREE.MeshBasicMaterial({color: 0x320121, transparent: true, opacity: opacityHitBoxes, depthTest: false})
+    const materialLeg = new THREE.MeshBasicMaterial({color: 0x196b1a, transparent: true, opacity: opacityHitBoxes, depthTest: false})
+    const materialBody = new THREE.MeshBasicMaterial({color: 0xFF6600, transparent: true, opacity: opacityHitBoxes, depthTest: false})
+    const bbMaterial = new THREE.MeshBasicMaterial({color: 0x000aa0, transparent: true, opacity: opacityBoundingBox, depthTest: true})
+    const modelHeight = <?= $player->getHeadHeight() ?>
 
     function init() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xdadada);
+
+        scene.add(
+            new THREE.DirectionalLight(0xffeac2, 2.8),
+            new THREE.AmbientLight(0xDADADA, 1.2),
+            new THREE.AmbientLight(0xcecece, 1.1),
+        );
+
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 9999);
         camera.position.y = 180
         camera.position.z = -140
@@ -84,127 +107,22 @@ foreach ($collider->getHitBoxes() as $box) {
         document.body.appendChild(renderer.domElement);
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
-        const gridHelper = new THREE.GridHelper(500, 50);
-        gridHelper.rotateX(THREE.MathUtils.degToRad(90))
-        scene.add(gridHelper);
-        scene.add(new THREE.GridHelper(500, 1));
+        controls.target.set(0, 110, 0)
         controls.update()
-        camera.lookAt(0, 100, 1)
-
-        const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
-        const a1 = new THREE.AmbientLight(0xDADADA, .8)
-        scene.add(d1, a1);
     }
 
     function createSphere(sphere, material) {
         const mesh = new THREE.Mesh(new THREE.SphereGeometry(sphere.radius), material || materialDefault)
-        mesh.castShadow = true
-        mesh.receiveShadow = true
         mesh.position.set(sphere.center.x, sphere.center.y, -1 * sphere.center.z)
         return mesh
-    }
-
-    function object() {
-        const json = '<?= json_encode($playerParts, JSON_THROW_ON_ERROR) ?>';
-        const data = JSON.parse(json);
-        belt = new THREE.Group()
-        belt.name = 'belt'
-        belt.position.y = -40
-        const arms = new THREE.Group()
-        arms.name = 'arms'
-        const legs = new THREE.Group()
-        legs.name = 'legs'
-        const body = new THREE.Group()
-        body.name = 'body'
-        body.userData.height = bodyHeight
-        body.position.y = bodyHeight
-        const head = new THREE.Group()
-        head.name = 'head'
-        head.position.y = headHeight
-        head.rotateY(THREE.MathUtils.degToRad(90));
-        const player = new THREE.Group()
-        player.name = 'player'
-
-        data[<?= HitBoxType::HEAD->value ?>].forEach(function (sphereData) {
-            head.add(createSphere(sphereData))
-        })
-        data[<?= HitBoxType::STOMACH->value ?>].forEach(function (sphereData) {
-            body.add(createSphere(sphereData, materialBody))
-        })
-        data[<?= HitBoxType::CHEST->value ?>].forEach(function (sphereData) {
-            arms.add(createSphere(sphereData, materialArm))
-        })
-        data[<?= HitBoxType::LEG->value ?>].forEach(function (sphereData) {
-            legs.add(createSphere(sphereData, materialLeg))
-        })
-
-        hand = new THREE.Group()
-        hand.name = 'hand'
-        hand.position.x = 22
-        hand.position.y = -12
-        hand.position.z = -30
-        hand.rotateX(degreeToRadian(90))
-        hand.rotateZ(degreeToRadian(-115))
-        arms.add(hand)
-
-        const slot0 = new THREE.Group()
-        slot0.name = 'slot-0'
-        slot0.position.x = -36
-        slot0.position.y = -8
-        slot0.position.z = -2
-        slot0.rotateX(degreeToRadian(-10))
-        slot0.rotateZ(degreeToRadian(100))
-        const slot1 = new THREE.Group()
-        slot1.name = 'slot-1'
-        slot1.position.x = 14
-        slot1.position.y = 22
-        slot1.position.z = 35
-        slot1.rotateX(degreeToRadian(-110))
-        slot1.rotateY(degreeToRadian(90))
-        const slot2 = new THREE.Group()
-        slot2.name = 'slot-2'
-        slot2.position.x = 36
-        slot2.position.y = -6
-        slot2.position.z = -6
-        slot2.rotateX(degreeToRadian(-20))
-        slot2.rotateZ(degreeToRadian(-100))
-        const slot3 = new THREE.Group()
-        slot3.name = 'slot-3'
-        slot3.position.x = -18
-        slot3.position.y = 35
-        slot3.position.z = 14
-        slot3.rotateX(degreeToRadian(70))
-        slot3.rotateY(degreeToRadian(190))
-        belt.add(slot0, slot1, slot2, slot3)
-
-        body.add(arms, belt)
-        const figure = new THREE.Group()
-        figure.name = 'figure'
-        figure.add(body, legs)
-        player.add(head, figure)
-        scene.add(player)
-        renderer.render(scene, camera);
-        document.querySelector('textarea').innerText = JSON.stringify(player.toJSON())
-
-        head.children[0].material = new THREE.MeshBasicMaterial({map: new THREE.TextureLoader().load('./resources/face.png')})
     }
 
     function extra() {
         // Bounding box
         const bbRadius = <?= $player->getBoundingRadius() ?>;
-        const bbMaterial = new THREE.MeshBasicMaterial({color: 0x000aa0, wireframe: true, transparent: true, opacity: 0.1})
         const bb = new THREE.Mesh(new THREE.CylinderGeometry(bbRadius, bbRadius, modelHeight, 16), bbMaterial);
         bb.translateY(bb.geometry.parameters.height / 2)
         scene.add(bb)
-
-        belt.children.forEach(function (slot) {
-            let slotItem = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 30, 8), bbMaterial)
-            slotItem.rotateZ(degreeToRadian(90))
-            slot.add(slotItem)
-        })
-        let handItem = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 30, 8), bbMaterial)
-        handItem.rotateZ(degreeToRadian(90))
-        hand.add(handItem)
     }
 
     function animate() {
@@ -213,9 +131,69 @@ foreach ($collider->getHitBoxes() as $box) {
     }
 
     init()
-    object()
     extra()
     animate()
+</script>
+<script type="module">
+    import {ModelRepository} from "./assets/js/ModelRepository.js";
+
+    const modelRepository = new ModelRepository()
+    await modelRepository.loadAll()
+    const player = modelRepository.getPlayer(1, true)
+    if (opacityPlayer < 1) {
+        player.traverse((o) => {
+            if (!o.material) {
+                return
+            }
+            o.material.depthTest = false
+            o.material.transparent = true
+            o.material.opacity = opacityPlayer
+        })
+    }
+    if (opacityPlayer > 0) {
+        player.rotation.y = serverHorizontalRotationToThreeRadian(<?= $player->getSight()->getRotationHorizontal() ?>)
+        scene.add(player)
+    }
+
+    const mixer = new THREE.AnimationMixer(player)
+    const playerAnimation = modelRepository.getPlayerAnimation()
+    playerAnimation.forEach((clip) => {
+        const action = mixer.clipAction(clip);
+        action.play()
+    })
+    mixer.setTime(<?= $player->getHeadHeight() - 1 ?>)
+
+    if (opacityHitBoxes > 0) {
+        const json = '<?= json_encode($playerParts, JSON_THROW_ON_ERROR) ?>';
+        const data = JSON.parse(json);
+
+        data[<?= HitBoxType::HEAD->value ?>].forEach(function (sphereData) {
+            scene.add(createSphere(sphereData))
+        })
+        data[<?= HitBoxType::BACK->value ?>].forEach(function (sphereData) {
+            scene.add(createSphere(sphereData, materialBack))
+        })
+        data[<?= HitBoxType::STOMACH->value ?>].forEach(function (sphereData) {
+            scene.add(createSphere(sphereData, materialBody))
+        })
+        data[<?= HitBoxType::CHEST->value ?>].forEach(function (sphereData) {
+            scene.add(createSphere(sphereData, materialArm))
+        })
+        data[<?= HitBoxType::LEG->value ?>].forEach(function (sphereData) {
+            scene.add(createSphere(sphereData, materialLeg))
+        })
+    }
+
+    const slotsJson = '<?= json_encode($slots, JSON_THROW_ON_ERROR) ?>';
+    const slots = JSON.parse(slotsJson);
+    const belt = player.getObjectByName('belt')
+    belt.children.forEach(function (slot) {
+        slot.add(modelRepository.getModelForItem(slots[slot.name.replace('slot-', '')]))
+    })
+
+    //let handItem = modelRepository.getModelForItem(slots[<?= InventorySlot::SLOT_PRIMARY->value ?>])
+    let handItem = modelRepository.getModelForItem(slots[<?= array_rand($slots) ?>])
+    player.getObjectByName('hand').add(handItem)
 </script>
 </body>
 </html>

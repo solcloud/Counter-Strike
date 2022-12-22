@@ -28,7 +28,7 @@ export class Game {
     players = []
     playerMe = null
     playerSpectate = null
-    #playerSlotsVisibleModels = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_BOMB, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY]
+    #playerSlotsVisibleModels = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_BOMB, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY, InventorySlot.SLOT_KIT]
 
     constructor(world, hud, stats) {
         this.#world = world
@@ -52,7 +52,7 @@ export class Game {
                 if (game.#pointer) {
                     game.#pointer.reset()
                 }
-                player.get3DObject().getObjectByName('head').add(camera)
+                player.get3DObject().getObjectByName('sight').add(camera)
                 game.playerSpectate = game.playerMe
                 game.requestPointerLock()
             } else {
@@ -274,7 +274,7 @@ export class Game {
         camera.rotation.set(0, degreeToRadian(-90), 0)
 
         const player = this.players[playerId]
-        player.get3DObject().getObjectByName('head').add(camera)
+        player.get3DObject().getObjectByName('sight').add(camera)
         player.get3DObject().getObjectByName('figure').visible = false
         if (this.playerSpectate.isAlive()) {
             this.playerSpectate.get3DObject().getObjectByName('figure').visible = true
@@ -284,10 +284,12 @@ export class Game {
     }
 
     createPlayer(data) {
-        const player = new Player(data, this.#world.spawnPlayer(data.color, this.playerMe.isAttacker() !== data.isAttacker))
         if (this.players[data.id]) {
             throw new Error('Player already exist with id ' + data.id)
         }
+
+        const player = new Player(data)
+        this.#world.spawnPlayer(player, this.playerMe.isAttacker() !== data.isAttacker)
         this.players[data.id] = player
         return player
     }
@@ -348,7 +350,7 @@ export class Game {
     }
 
     updatePlayerData(player, serverState) {
-        player.get3DObject().getObjectByName('head').position.y = serverState.heightSight
+        player.get3DObject().getObjectByName('sight').position.y = serverState.sight
         player.get3DObject().position.set(serverState.position.x, serverState.position.y, -serverState.position.z)
 
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
@@ -358,6 +360,7 @@ export class Game {
             player.updateData(serverState)
         } else {
             player.data.item = serverState.item
+            player.data.sight = serverState.sight
             player.data.isAttacker = serverState.isAttacker
         }
 
@@ -374,19 +377,14 @@ export class Game {
     updateOtherPlayersModels(player, data) {
         const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
-        const rotationVertical = this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 50), -50) : data.look.vertical // cap visual rotation if playerMe is alive to not see broken neck
-        const rotationVerticalThree = serverVerticalRotationToThreeRadian(rotationVertical)
-        playerObject.getObjectByName('head').rotation.x = rotationVerticalThree
+
+        const gunRotationVertical = (this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 50), -50) : data.look.vertical)
         const hand = playerObject.getObjectByName('hand')
         if (hand.children.length) {
-            hand.children[0].rotation.y = rotationVerticalThree
+            hand.children[0].rotation.y = serverVerticalRotationToThreeRadian(gunRotationVertical)
         }
 
-        const body = playerObject.getObjectByName('body')
-        if (body.position.y !== data.heightBody) { // update body height position if changed
-            body.position.y = data.heightBody
-        }
-
+        player.animate()
         if (player.isInventoryChanged(data)) {
             this.#otherPlayersInventoryChanged(player, data)
             player.equip(data.item.slot)

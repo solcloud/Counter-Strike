@@ -40,7 +40,6 @@
 
 #hud #cross {
     position: absolute;
-    font-size: 2rem;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

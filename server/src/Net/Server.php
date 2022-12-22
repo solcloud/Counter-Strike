@@ -223,7 +223,7 @@ class Server
             $this->error("Too many players");
         }
 
-        if ($msg === "login {$this->setting->attackerCode}") { // TODO use protocol interface for this, also each player should have unique code from MM
+        if ($msg === "login {$this->setting->attackerCode}") { // fixme use protocol interface for this, also each player should have unique code from MM
             $attackerSide = true;
         } elseif ($msg === "login {$this->setting->defenderCode}") {
             $attackerSide = false;

@@ -18,17 +18,17 @@ export class Control {
         const sprayEnableSlots = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_BOMB]
 
         element.addEventListener("mouseup", function (event) {
+            action.sprayingDisable()
             if (pointer.isLocked) {
                 event.preventDefault()
             }
-            action.sprayingDisable()
         })
         element.addEventListener("mousedown", function (event) {
             action.sprayingDisable()
             if (!game.isPlaying() || game.isPaused()) {
                 return
             }
-            if (game.meIsSpectating() && (event.buttons === 1 || event.buttons === 2)) {
+            if (game.meIsSpectating()) {
                 game.spectatePlayer(event.buttons === 1)
                 return
             }
@@ -50,8 +50,8 @@ export class Control {
             }
         })
         element.addEventListener('wheel', (event) => {
-            if (!game.isPlaying() || !game.meIsAlive()) {
-                return
+            if (!game.isPlaying() || !pointer.isLocked) {
+                return;
             }
 
             if (event.deltaY > 0) { // wheel down
@@ -71,7 +71,7 @@ export class Control {
         element.addEventListener('keydown', function (event) {
             event.preventDefault()
 
-            if (!game.isPlaying() || !game.meIsAlive()) {
+            if (!game.isPlaying()) {
                 return
             }
 
@@ -80,7 +80,7 @@ export class Control {
         element.addEventListener('keyup', function (event) {
             event.preventDefault()
 
-            if (!(game.isPlaying() && game.meIsAlive())) {
+            if (!game.isPlaying()) {
                 return
             }
 
@@ -99,6 +99,7 @@ export class Control {
         if (this.#game.isPlaying() && this.#game.meIsAlive()) {
             return this.#action.getPlayerAction(this.#game, this.#setting.getSprayTriggerDeltaMs())
         }
+        this.#action.resetStates()
         return ''
     }
 }

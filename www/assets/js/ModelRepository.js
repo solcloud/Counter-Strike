@@ -5,29 +5,24 @@ export class ModelRepository {
     #objectLoader
     #textureLoader
     #models = {}
+    #meshes = {}
+    #textures = {
+        cap: {}
+    }
 
     constructor() {
         this.#gltfLoader = new THREE.GLTFLoader()
         this.#objectLoader = new THREE.ObjectLoader()
         this.#textureLoader = new THREE.TextureLoader()
+
     }
 
     #loadModel(url) {
-        return new Promise(resolve => {
-            this.#gltfLoader.load(url, resolve)
-        });
-    }
-
-    #loadJSON(url) { // TODO migrate to gltf and remove
-        return new Promise(resolve => {
-            this.#objectLoader.load(url, resolve)
-        });
+        return this.#gltfLoader.loadAsync(url)
     }
 
     #loadTexture(url) {
-        return new Promise(resolve => {
-            this.#textureLoader.load(url, resolve)
-        });
+        return this.#textureLoader.loadAsync(url)
     }
 
     loadMap(mapName) {
@@ -63,12 +58,23 @@ export class ModelRepository {
         return this.#models[ItemId.Bomb]
     }
 
-    getPlayer() {
-        return this.#models.player
+    getPlayer(colorIndex, isOpponent) {
+        const clone = THREE.SkeletonUtils.clone(this.#models.player)
+        const player = clone.getObjectByName('player')
+
+        const headWear = player.getObjectByName('Wolf3D_Headwear')
+        headWear.material.map = this.#textures.cap[colorIndex]
+        const outfit = player.getObjectByName('Wolf3D_Outfit_Top')
+        outfit.material.map = isOpponent ? this.#textures.opponent : this.#textures.team
+        return player
+    }
+
+    getPlayerAnimation() {
+        return this.#models.playerAnimation
     }
 
     getPlayerHitMesh() {
-        return this.#models.playerHitMesh.clone()
+        return this.#meshes.playerHitMesh.clone()
     }
 
     getModelForItem(item) {
@@ -87,8 +93,17 @@ export class ModelRepository {
 
     loadAll() {
         const promises = []
-        promises.push(this.#loadJSON('./resources/model/player.json').then((model) => {
-            this.#models.player = model
+        promises.push(this.#loadModel('./resources/model/player.glb').then((model) => {
+            model.scene.traverse(function (object) {
+                object.frustumCulled = false // fixme find out how to recalculate bounding boxes or bake animation
+                if (object.isMesh) {
+                    object.castShadow = true
+                    object.receiveShadow = true
+                }
+            })
+
+            this.#models.player = model.scene.getObjectByName('player')
+            this.#models.playerAnimation = model.animations
         }))
         promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
             model.scene.scale.set(.3, .3, .3)
@@ -147,6 +162,36 @@ export class ModelRepository {
 
             this.#models[ItemId.RifleM4A4] = model.scene
         }))
+        promises.push(this.#loadTexture('./resources/img/player/outfit_0.png').then((texture) => {
+            texture.flipY = false
+            texture.encoding = THREE.sRGBEncoding
+            this.#textures.team = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/outfit_1.png').then((texture) => {
+            texture.flipY = false
+            texture.encoding = THREE.sRGBEncoding
+            this.#textures.opponent = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/cap_1.png').then((texture) => {
+            texture.flipY = false
+            this.#textures.cap[1] = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/cap_2.png').then((texture) => {
+            texture.flipY = false
+            this.#textures.cap[2] = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/cap_3.png').then((texture) => {
+            texture.flipY = false
+            this.#textures.cap[3] = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/cap_4.png').then((texture) => {
+            texture.flipY = false
+            this.#textures.cap[4] = texture
+        }))
+        promises.push(this.#loadTexture('./resources/img/player/cap_5.png').then((texture) => {
+            texture.flipY = false
+            this.#textures.cap[5] = texture
+        }))
         promises.push(this.#loadTexture('./resources/img/sphere_glow.png').then((texture) => {
             const material = new THREE.SpriteMaterial({
                 map: texture,
@@ -157,7 +202,7 @@ export class ModelRepository {
             const sprite = new THREE.Sprite(material);
             sprite.scale.set(20, 20, 1);
 
-            this.#models.playerHitMesh = sprite
+            this.#meshes.playerHitMesh = sprite
         }))
 
         return Promise.all(promises)

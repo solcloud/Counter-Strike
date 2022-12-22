@@ -16,8 +16,8 @@ final class Setting
         'jumpMovementSpeedMultiplier'   => 1.0,
         'flyingMovementSpeedMultiplier' => 0.8,
 
-        'playerHeadRadius'             => 30,
-        'playerBoundingRadius'         => 44,
+        'playerHeadRadius'             => 10,
+        'playerBoundingRadius'         => 60,
         'playerJumpHeight'             => 150,
         'playerHeadHeightStand'        => 190,
         'playerHeadHeightCrouch'       => 140,

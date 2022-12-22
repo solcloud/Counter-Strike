@@ -7,6 +7,7 @@ export class Radar {
     #scaleX
     #scaleY
     #zoom
+    #mapSize
     #mapCenterX
     #mapCenterY
     #padding
@@ -20,6 +21,7 @@ export class Radar {
             throw new Error("Unknown size for map: " + map)
         }
 
+        this.#mapSize = mapSize
         this.#image = mapImage
         this.#canvas = canvas
         this.#ctx = this.#canvas.getContext('2d')
@@ -28,15 +30,19 @@ export class Radar {
         this.#mapCenterY = Math.round(mapSize.y / 2)
         this.#scaleX = Math.round(canvas.width / mapSize.x * 1000) / 1000
         this.#scaleY = Math.round(canvas.height / mapSize.y * 1000) / 1000
+        this.setZoom(zoom)
+    }
+
+    setZoom(zoom) {
         this.#zoom = zoom
 
-        this.#padding = {x: {min: 0, max: mapSize.x}, y: {min: 0, max: mapSize.y}}
-        if (zoom < 1.5) {
+        this.#padding = {x: {min: 0, max: this.#mapSize.x}, y: {min: 0, max: this.#mapSize.y}}
+        if (zoom < 1.4) { // fixme do proportion based valued on some fixed map size like 1000 against actual map size
             const cornerPaddingDivider = 3
-            this.#padding.x.min = Math.ceil(mapSize.x / cornerPaddingDivider)
-            this.#padding.x.max = mapSize.x - this.#padding.x.min
-            this.#padding.y.min = Math.ceil(mapSize.y / cornerPaddingDivider)
-            this.#padding.y.max = mapSize.y - this.#padding.y.min
+            this.#padding.x.min = Math.ceil(this.#mapSize.x / cornerPaddingDivider)
+            this.#padding.x.max = this.#mapSize.x - this.#padding.x.min
+            this.#padding.y.min = Math.ceil(this.#mapSize.y / cornerPaddingDivider)
+            this.#padding.y.max = this.#mapSize.y - this.#padding.y.min
         }
     }
 

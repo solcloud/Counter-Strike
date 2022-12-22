@@ -51,29 +51,9 @@ class HitBox implements Hittable
         return 20;
     }
 
-    private function checkBackStab(Bullet $bullet): bool
-    {
-        // TODO: Add HitBoxBack geometry once there is real player model and remove this function...
-        $item = $bullet->getShootItem();
-        if (!($item instanceof Knife)) {
-            return false;
-        }
-
-        $playerPos = $this->player->getPositionClone();
-        $d1Squared = Util::distanceSquared($playerPos, $bullet->getPosition());
-        [$x, $y, $z] = Util::movementXYZ($this->player->getSight()->getRotationHorizontal(), 0, 10);
-        $playerPos->addPart($x, $y, $z);
-        $d2Squared = Util::distanceSquared($playerPos, $bullet->getPosition());
-        return ($d2Squared > $d1Squared);
-    }
-
     public function registerHit(Bullet $bullet): void
     {
         $hitBoxType = $this->type;
-        if (($hitBoxType === HitBoxType::CHEST || $hitBoxType === HitBoxType::STOMACH) && $this->checkBackStab($bullet)) {
-            $hitBoxType = HitBoxType::BACK;
-        }
-
         /** @var AttackEnable&BaseWeapon $shootItem */
         $shootItem = $bullet->getShootItem();
         $playerArmorType = $this->player->getArmorType();

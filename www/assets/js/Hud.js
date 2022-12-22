@@ -333,11 +333,13 @@ export class HUD {
         cross.innerText = setting.getCrosshairSymbol()
         setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = newValue)
         setting.update('crosshairColor', setting.getCrosshairColor())
+        setting.addUpdateCallback('crosshairSize', (newValue) => cross.style.fontSize = newValue + 'px')
+        setting.update('crosshairSize', setting.getCrosshairSize())
 
         const game = this.#game
         this.#buyMenu = new BuyMenu(this.#elements.buyMenu)
         this.#scoreBoard = new ScoreBoard(game, this.#elements.scoreDetail)
-        this.#gameMenu = new GameMenu(this.#elements.gameMenu, setting)
+        this.#gameMenu = new GameMenu(this.#elements.gameMenu, setting, this)
         this.#killFeed = new KillFeed(this.#scoreBoard, this.#elements.killFeed)
         this.#hitFeedback = new HitFeedback(elementHud.querySelector('#hit-feedback'))
 
@@ -348,6 +350,7 @@ export class HUD {
             radarCanvas.width = this.width
             radarCanvas.height = this.height
             self.#radar = new Radar(radarCanvas, radarImage, map, setting.getRadarZoom())
+            setting.addUpdateCallback('radarZoom', (newValue) => self.#radar.setZoom(newValue))
         }
         radarImage.src = `./resources/map/${map}.png`
 
@@ -356,6 +359,7 @@ export class HUD {
                 return
             }
 
+            e.stopPropagation()
             game.buyList.push(e.target.dataset.buyMenuItemId)
         }, {capture: true})
     }

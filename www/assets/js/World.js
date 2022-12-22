@@ -86,14 +86,14 @@ export class World {
 
     createPlayerMe() {
         const me = new THREE.Object3D()
-        const head = new THREE.Object3D()
-        head.name = "head"
-        head.add(this.getCamera())
+        const sight = new THREE.Object3D()
+        sight.name = 'sight'
+        sight.add(this.getCamera())
         const figure = new THREE.Group()
         figure.name = 'figure'
-        me.add(head, figure)
+        me.add(sight, figure)
 
-        // TODO spawn into more interesting warmup place, like some credits area, walls with actual map of map, etc.
+        // FIXME spawn into more interesting warmup place, like some credits area, walls with actual map of map, etc.
         //      if client also implement moving and shooting warmup aim arena would be cool (some place with random spawning targets to warmup aim)
         me.position.y = 9999
         me.position.z = -9999
@@ -102,11 +102,16 @@ export class World {
         return me
     }
 
-    spawnPlayer(colorIndex, isOpponent) {
-        const newPlayer = this.#createPlayer(colorIndex, isOpponent)
-        this.#scene.add(newPlayer)
+    spawnPlayer(player, isOpponent) {
+        const mesh = this.#modelRepository.getPlayer(player.getColorIndex(), isOpponent)
+        const sight = new THREE.Object3D()
+        sight.name = 'sight'
+        mesh.add(sight)
+        mesh.rotation.reorder("YXZ")
+        this.#scene.add(mesh)
 
-        return newPlayer
+        player.set3DObject(mesh)
+        player.setAnimations(this.#modelRepository.getPlayerAnimation())
     }
 
     spawnBomb(position) {
@@ -204,22 +209,6 @@ export class World {
         object.geometry && object.geometry.dispose()
         object.material && object.material.dispose()
         object = null
-    }
-
-    #createPlayer(colorIndex, isOpponent) { // fixme: create glb player models and remove
-        const sockMaterial = new THREE.MeshLambertMaterial({color: Enum.Color[colorIndex]})
-        const headMaterial = new THREE.MeshLambertMaterial({
-            map: new THREE.TextureLoader().load(
-                './resources/face.png'
-            )
-        })
-
-        const player = this.#modelRepository.getPlayer().clone()
-        player.getObjectByName('head').children[0].material = headMaterial
-        player.getObjectByName('body').children[0].material = new THREE.MeshLambertMaterial({color: (isOpponent ? 0x993d00 : 0x75b359)})
-        player.getObjectByName('legs').children.forEach((mesh) => mesh.material = sockMaterial)
-        player.rotation.reorder("YXZ")
-        return player
     }
 
     playSound(soundName, position, inPlayerHead, refDistance = 1) {

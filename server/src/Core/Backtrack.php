@@ -82,7 +82,7 @@ final class Backtrack
 
     public function apply(int $state, int $playerId): void
     {
-        if ($this->numberOfHistoryStates === 0) {
+        if ($state === 0 || $this->numberOfHistoryStates === 0) {
             return;
         }
 

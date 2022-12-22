@@ -14,6 +14,9 @@ by **Quaternius** from https://www.patreon.com/quaternius downloaded from https:
 #### pistol.glb (Public Domain)
 by **Quaternius** from https://www.patreon.com/quaternius downloaded from https://creazilla.com/nodes/1403688-ultimate-gun-pack-3d-model
 
+#### player.glb (CC4)
+by **ReadyPlayerMe** (1617641541-outfit-m-military) from https://readyplayer.me/
+
 #### bomb.glb (Public Domain)
 by **solcloud**
 

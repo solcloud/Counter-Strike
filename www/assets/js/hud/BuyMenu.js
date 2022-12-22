@@ -41,9 +41,9 @@ export class BuyMenu {
                 ${cannotBuyBodyKevlar ? '' : `<p${money < 650 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.KEVLAR_BODY}" class="hud-action action-buy">Buy Kevlar for ${this.#formatPrice(650)}</a></p>`}
             `
         }
-        ${isAttacker
-            ? ``
-            : `<p${money < 400 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.DEFUSE_KIT}" class="hud-action action-buy">Buy Defuse Kit for ${this.#formatPrice(400)}</a></p>`
+        ${!isAttacker && playerData.slots[Enum.InventorySlot.SLOT_KIT] === undefined
+            ? `<p${money < 400 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.DEFUSE_KIT}" class="hud-action action-buy">Buy Defuse Kit for ${this.#formatPrice(400)}</a></p>`
+            : ``
         }
             <h3>Pistols</h3>
         ${isAttacker

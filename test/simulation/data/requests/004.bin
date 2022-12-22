@@ -27,7 +27,7 @@
 46~1~lookAt 47 4
 48~1~lookAt 47 5
 50~1~lookAt 47 6
-52~1~lookAt 47 6|attack
+52~1~lookAt 47 5|attack
 73~1~stand
 80~1~lookAt 47 4
 81~1~lookAt 47 3

@@ -135,7 +135,7 @@ class PlayerKillTest extends BaseTestCase
     public function testUspKillPlayerInThreeBulletsInChestWithNoKevlar(): void
     {
         $player2Commands = [
-            fn(Player $p) => $p->getSight()->lookAt(180, 0),
+            fn(Player $p) => $p->getSight()->lookAt(180, 18),
             fn(Player $p) => $p->crouch(),
             $this->waitNTicks(max(Setting::tickCountCrouch(), PistolUsp::equipReadyTimeMs)),
             $this->endGame(),
@@ -144,7 +144,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(0, $player2->getArmorValue());
         $this->assertSame(ArmorType::NONE, $player2->getArmorType());
 
-        $game = $this->createGame();
+        $game = $this->createTestGame();
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $this->playPlayer($game, $player2Commands, $player2->getId());
@@ -152,6 +152,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(100, $player1->getHealth());
         $result = $player2->attack();
         $this->assertNotNull($result);
+        $this->assertTrue($result->somePlayersWasHit());
         $gun = $player2->getEquippedItem();
         $this->assertInstanceOf(PistolUsp::class, $gun);
         $this->assertSame(0, $result->getMoneyAward());
@@ -242,7 +243,7 @@ class PlayerKillTest extends BaseTestCase
         ], $player2->getId());
     }
 
-    public function testPlayerVerticalBullet(): void
+    public function testPlayerHeadShotCrouchingPlayer(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
 
@@ -252,7 +253,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition((new Point())->addZ(200));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(180, -20),
+            fn(Player $p) => $p->getSight()->lookAt(180, -18),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
@@ -281,7 +282,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition(new Point(100, 0, 200));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(209, -19),
+            fn(Player $p) => $p->getSight()->lookAt(206, -11),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight()),
@@ -310,7 +311,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition(new Point(100, 0, 200));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(207, 6),
+            fn(Player $p) => $p->getSight()->lookAt(207, 9),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),
@@ -340,7 +341,7 @@ class PlayerKillTest extends BaseTestCase
         $player2->setPosition(new Point(989, 0, 1037));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(47, 6),
+            fn(Player $p) => $p->getSight()->lookAt(47, 5),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
             fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight()),

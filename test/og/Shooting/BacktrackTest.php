@@ -43,6 +43,29 @@ class BacktrackTest extends BaseTestCase
         return $game;
     }
 
+    public function testNoBacktrackKill(): void
+    {
+        $game = $this->_setupGame1(0);
+        $i = 0;
+        $result = null;
+        $game->onTick(function (GameState $state) use ($game, &$i, &$result) {
+            if ($state->getTickId() <= Util::millisecondsToFrames(PistolGlock::equipReadyTimeMs)) {
+                return;
+            }
+
+            if ($i === 0) {
+                $result = $state->getPlayer(1)->attack();
+                $this->assertNotNull($result);
+
+                $this->assertTrue($result->somePlayersWasHit());
+                $this->assertFalse($state->getPlayer(2)->isAlive());
+                $game->quit(GameOverReason::TIE);
+            }
+        });
+        $game->start();
+        $this->assertNotNull($result);
+    }
+
     public function test1BacktrackDisable(): void
     {
         $game = $this->_setupGame1(0);

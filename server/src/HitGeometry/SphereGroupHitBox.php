@@ -11,7 +11,7 @@ use cs\Interface\HitIntersect;
 class SphereGroupHitBox implements HitIntersect
 {
     /** @var SphereHitBox[] */
-    private array $parts;
+    private array $parts = [];
 
     /**
      * @param ?Closure $centerPointModifier function (Player $player): Point {}
@@ -24,7 +24,7 @@ class SphereGroupHitBox implements HitIntersect
     {
         /** @var Point $modifier */
         $modifier = $this->centerPointModifier ? call_user_func($this->centerPointModifier, $player) : new Point();
-        foreach ($this->parts as $part) {
+        foreach ($this->getParts($player) as $part) {
             $center = $part->calculateWorldCoordinate($player, $modifier);
             if (Collision::pointWithSphere($point, $center, $part->radius)) {
                 return true;
@@ -40,11 +40,20 @@ class SphereGroupHitBox implements HitIntersect
         return $this;
     }
 
+    public function createHitBox(Point $relativeCenter, int $radius): SphereHitBox
+    {
+        return new SphereHitBox($relativeCenter, $radius);
+    }
+
+    public function getCenterPointModifier(): ?Closure
+    {
+        return $this->centerPointModifier;
+    }
+
     /**
      * @return SphereHitBox[]
-     * @codeCoverageIgnore
      */
-    public function getParts(): array
+    public function getParts(Player $player): array
     {
         return $this->parts;
     }

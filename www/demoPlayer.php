@@ -157,7 +157,6 @@ $frameIdEnd = null;
         spawnPlayer: function (id, colorIndex, isAttacker) {
             const color = isAttacker ? new THREE.Color(0xff9145) : new THREE.Color(0x43b4fd)
             const radiusHead = <?= Setting::playerHeadRadius() ?>;
-            const sightHeight = <?= Setting::playerHeadHeightStand() - Setting::playerHeadRadius() ?>;
 
             const sight = new THREE.Mesh(
                 new THREE.CylinderGeometry(1, 1, 150, 4),
@@ -171,7 +170,6 @@ $frameIdEnd = null;
             );
             head.name = "head"
             head.rotation.reorder("YXZ")
-            head.position.y = sightHeight
             head.add(sight)
 
             const radiusBody = <?= Setting::playerBoundingRadius() ?>;
@@ -216,7 +214,7 @@ $frameIdEnd = null;
                 }
 
                 console.debug(frameId, playerState.id, playerState.position, playerState.health)
-                player.getObjectByName('head').position.y = playerState.heightSight
+                player.getObjectByName('head').position.y = playerState.sight
                 player.getObjectByName('head').rotation.x = degreeToRadian(playerState.look.vertical - 90)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
                 player.rotation.y = serverHorizontalRotationToThreeRadian(playerState.look.horizontal)

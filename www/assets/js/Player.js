@@ -18,9 +18,7 @@ export class Player {
             vertical: null,
         },
         isAttacker: null,
-        heightSight: null,
-        heightBody: null,
-        height: null,
+        sight: null,
         armor: null,
         armorType: null,
         ammo: null,
@@ -30,12 +28,29 @@ export class Player {
     #custom = {
         slotId: null,
         slots: null,
+        crouchSight: null,
     }
-    threeObject = null
+    #animation = {}
+    #threeObject = null
 
     constructor(serverData, object3D) {
         this.updateData(serverData)
-        this.threeObject = object3D
+        this.#threeObject = object3D
+    }
+
+    set3DObject(object) {
+        this.#threeObject = object
+    }
+
+    setAnimations(animations) {
+        animations.forEach((clip) => {
+            const mixer = new THREE.AnimationMixer(this.#threeObject)
+            const action = mixer.clipAction(clip);
+            if (clip.name === 'crouch') {
+                action.play()
+                this.#animation.crouch = mixer
+            }
+        })
     }
 
     equip(slotId) {
@@ -48,7 +63,14 @@ export class Player {
     }
 
     get3DObject() {
-        return this.threeObject
+        return this.#threeObject
+    }
+
+    animate() {
+        if (this.#animation.crouch && this.data.sight !== this.#custom.crouchSight) {
+            this.#animation.crouch.setTime(this.data.sight + 9)
+            this.#custom.crouchSight = this.data.sight
+        }
     }
 
     getEquippedSlotId() {
@@ -100,6 +122,7 @@ export class Player {
         this.#custom = {
             slotId: null,
             slots: null,
+            crouchSight: null,
         }
     }
 

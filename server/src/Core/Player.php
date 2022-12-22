@@ -160,11 +160,6 @@ final class Player
         return $this->headHeight;
     }
 
-    public function getBodyHeight(): int
-    {
-        return $this->headHeight - 2 * Setting::playerHeadRadius();
-    }
-
     public function getSightHeight(): int
     {
         return $this->headHeight - Setting::playerHeadRadius();
@@ -313,9 +308,7 @@ final class Player
             "position"    => $this->position->toArray(),
             "look"        => $this->sight->toArray(),
             "isAttacker"  => $this->isPlayingOnAttackerSide,
-            "heightSight" => $this->getSightHeight(),
-            "heightBody"  => $this->getBodyHeight(),
-            "height"      => $this->getHeadHeight(),
+            "sight"       => $this->getSightHeight(),
             "armor"       => $this->getArmorValue(),
             "armorType"   => $this->getArmorType()->value,
             "ammo"        => $ammo,

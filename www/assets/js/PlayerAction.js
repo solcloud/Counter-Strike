@@ -1,31 +1,36 @@
 import {Action, InventorySlot} from "./Enums.js";
 
 export class PlayerAction {
-    #states = {
-        attackLookAt: '',
-        lastLookAt: '',
-        sprayTriggerStartMs: null,
-        moveForward: false,
-        moveBackward: false,
-        moveLeft: false,
-        moveRight: false,
-        use: false,
-        jumping: false,
-        crouching: false,
-        standing: false,
-        attack: false,
-        attack2: false,
-        shifting: false,
-        running: false,
-        reload: false,
-        equip: false,
-        drop: false,
-        spraying: false,
-    }
+    #states = {}
     actionCallback = {}
 
     constructor(hud) {
         this.#loadCallbacks(hud)
+        this.resetStates()
+    }
+
+    resetStates() {
+        this.#states = {
+            attackLookAt: '',
+            lastLookAt: '',
+            sprayTriggerStartMs: null,
+            moveForward: false,
+            moveBackward: false,
+            moveLeft: false,
+            moveRight: false,
+            use: false,
+            jumping: false,
+            crouching: false,
+            standing: false,
+            attack: false,
+            attack2: false,
+            shifting: false,
+            running: false,
+            reload: false,
+            equip: false,
+            drop: false,
+            spraying: false,
+        }
     }
 
     #loadCallbacks(hud) {

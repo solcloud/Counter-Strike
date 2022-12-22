@@ -55,7 +55,7 @@
 165~1~lookAt 251 0
 166~1~lookAt 252 0
 167~1~lookAt 253 0
-172~1~lookAt 253 0|attack
+172~1~lookAt 252 0|attack
 173~1~lookAt 255 -1
 174~1~lookAt 265 -2
 175~1~lookAt 272 -2
@@ -67,7 +67,7 @@
 181~1~lookAt 288 0
 182~1~lookAt 289 0
 183~1~lookAt 290 0
-187~1~lookAt 290 0|attack
+187~1~lookAt 291 0|attack
 188~1~lookAt 291 0
 189~1~lookAt 292 0
 190~1~lookAt 299 0
