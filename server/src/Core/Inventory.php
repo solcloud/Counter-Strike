@@ -190,11 +190,15 @@ class Inventory
     }
 
     /**
-     * @return array<int,array<string,int|string>> [slotId => item]
+     * @return array<int,array<string,int>> [slotId => item]
      */
     public function getFilledSlots(): array
     {
-        return array_map(fn(Item $item) => $item->toArray(), $this->items);
+        $output = [];
+        foreach ($this->items as $key => $item) {
+            $output[$key] = $item->toArrayCache;
+        }
+        return $output;
     }
 
     public function getKevlar(): ?Kevlar

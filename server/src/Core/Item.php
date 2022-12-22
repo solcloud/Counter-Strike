@@ -17,11 +17,17 @@ abstract class Item
     protected bool $equipped = false;
     protected int $price = 9999;
     private ?EquipEvent $eventEquip = null;
+    /** @var array<string,int> */
+    public readonly array $toArrayCache;
 
     public function __construct(bool $instantlyEquip = false)
     {
         $this->equipped = $instantlyEquip;
         $this->id = ItemId::$map[get_class($this)];
+        $this->toArrayCache = [
+            'id'   => $this->id,
+            'slot' => $this->getSlot()->value,
+        ];
     }
 
     public function canAttack(int $tickId): bool
@@ -127,14 +133,11 @@ abstract class Item
     }
 
     /**
-     * @return array<string,int|string>
+     * @return array<string,int>
      */
     public function toArray(): array
     {
-        return [
-            'id'   => $this->id,
-            'slot' => $this->getSlot()->value,
-        ];
+        return $this->toArrayCache;
     }
 
 }

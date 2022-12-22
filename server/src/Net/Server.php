@@ -179,15 +179,13 @@ class Server
         };
     }
 
-    private function pollClient(mixed &$clientIp, mixed &$clientPort, mixed &$clientRequest, int $readTimeoutMicroSeconds = 100): bool
+    private function pollClient(?string &$clientIp, ?int &$clientPort, ?string &$clientRequest): bool
     {
-        $peer = '';
-        $clientRequest = $this->net->receive($peer, $readTimeoutMicroSeconds, $this->protocol->getRequestMaxSizeBytes());
+        $clientRequest = $this->net->receive($clientIp, $clientPort, $this->protocol->getRequestMaxSizeBytes());
         if ($clientRequest === null) {
             return false;
         }
 
-        [$clientIp, $clientPort] = explode(':', $peer);
         if (isset($this->blockList[$clientIp])) {
             return false;
         }

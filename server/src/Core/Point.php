@@ -67,7 +67,10 @@ class Point
 
     public function add(Point $other): self
     {
-        return $this->addX($other->x)->addY($other->y)->addZ($other->z);
+        $this->x += $other->x;
+        $this->y += $other->y;
+        $this->z += $other->z;
+        return $this;
     }
 
     public function addPart(int $x, int $y, int $z): self
@@ -122,9 +125,9 @@ class Point
     public function toArray(): array
     {
         return [
-            "x" => $this->getX(),
-            "y" => $this->getY(),
-            "z" => $this->getZ(),
+            'x' => $this->x,
+            'y' => $this->y,
+            'z' => $this->z,
         ];
     }
 

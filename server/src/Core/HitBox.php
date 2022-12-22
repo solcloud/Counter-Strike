@@ -9,7 +9,6 @@ use cs\Interface\AttackEnable;
 use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
 use cs\Weapon\BaseWeapon;
-use cs\Weapon\Knife;
 
 class HitBox implements Hittable
 {

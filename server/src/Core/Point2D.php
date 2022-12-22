@@ -50,8 +50,8 @@ class Point2D
 
     public function setFrom(self $point): void
     {
-        $this->setX($point->x);
-        $this->setY($point->y);
+        $this->x = $point->x;
+        $this->y = $point->y;
     }
 
     /**
@@ -60,8 +60,8 @@ class Point2D
     public function toArray(): array
     {
         return [
-            "x" => $this->x,
-            "y" => $this->y,
+            'x' => $this->x,
+            'y' => $this->y,
         ];
     }
 

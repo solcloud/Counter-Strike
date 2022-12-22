@@ -299,7 +299,7 @@ final class Player
             "id"          => $this->id,
             "color"       => $this->color->value,
             "money"       => $this->inventory->getDollars(),
-            "item"        => $equippedItem->toArray(),
+            "item"        => $equippedItem->toArrayCache,
             "canAttack"   => $this->world->canAttack($this),
             "canBuy"      => $this->world->canBuy($this),
             "canPlant"    => $this->world->canPlant($this),

@@ -119,7 +119,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(20, $took->asMilliseconds());
+        $this->assertLessThan(21, $took->asMilliseconds());
     }
 
     public function testTwoPlayersRangeShootingEachOther(): void
@@ -156,7 +156,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
             $this->assertTrue($player->isAlive());
         }
-        $this->assertLessThan(15, $took->asMilliseconds());
+        $this->assertLessThan(26, $took->asMilliseconds());
     }
 
     public function testPlayersMoving(): void
