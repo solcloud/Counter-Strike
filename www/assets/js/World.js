@@ -33,6 +33,7 @@ export class World {
         const listener = new THREE.AudioListener()
         const povItem = new THREE.Group()
         povItem.name = 'pov-item'
+        povItem.scale.setScalar(.7)
         povItem.position.x = 4
         povItem.position.z = -28
         povItem.position.y = -14

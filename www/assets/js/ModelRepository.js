@@ -47,13 +47,14 @@ export class ModelRepository {
             const sun = new THREE.DirectionalLight(0xffeac2, .9)
             sun.position.set(4000, 4999, -4000)
             sun.castShadow = true
-            sun.shadow.mapSize.width = 512
-            sun.shadow.mapSize.height = 512
-            sun.shadow.camera.far = 20000
-            sun.shadow.camera.left = -20000
-            sun.shadow.camera.right = 20000
-            sun.shadow.camera.top = 20000
-            sun.shadow.camera.bottom = -20000
+            //sun.shadow.bias = .0001
+            sun.shadow.mapSize.width = 4096
+            sun.shadow.mapSize.height = 4096
+            sun.shadow.camera.far = 10000
+            sun.shadow.camera.left = -2000
+            sun.shadow.camera.right = 2000
+            sun.shadow.camera.top = 0
+            sun.shadow.camera.bottom = -3000
             model.scene.add(sun, new THREE.AmbientLight(0xcfe4bb, .4))
             return model.scene
         })
@@ -96,7 +97,7 @@ export class ModelRepository {
         const model = this.#models[item.id]
         if (model === undefined) {
             console.warn("No model for", item)
-            return new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0xFF0000}))
+            return new THREE.Mesh(new THREE.SphereGeometry(8), new THREE.MeshBasicMaterial({color: 0xFF0000}))
         }
 
         return model.clone()
@@ -128,22 +129,20 @@ export class ModelRepository {
             this.#models[ItemId.Bomb] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
-            model.scene.scale.set(-400, 400, 400)
+            model.scene.scale.set(-500, 500, 500)
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
-                    object.receiveShadow = true
                 }
             })
 
             this.#models[ItemId.Knife] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
-            model.scene.scale.set(10, 10, 10)
+            model.scene.scale.set(15, 15, 15)
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
-                    object.receiveShadow = true
                 }
             })
 
@@ -152,11 +151,10 @@ export class ModelRepository {
             this.#models[ItemId.PistolGlock] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
-            model.scene.scale.set(10, 10, 10)
+            model.scene.scale.set(15, 15, 15)
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
-                    object.receiveShadow = true
                 }
             })
 
@@ -167,7 +165,6 @@ export class ModelRepository {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
-                    object.receiveShadow = true
                 }
             })
 
@@ -211,7 +208,7 @@ export class ModelRepository {
                 transparent: true,
             });
             const sprite = new THREE.Sprite(material);
-            sprite.scale.set(20, 20, 1);
+            sprite.scale.set(30, 30, 1);
 
             this.#meshes.playerHitMesh = sprite
         }))

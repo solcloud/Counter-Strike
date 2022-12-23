@@ -144,7 +144,7 @@ export class Game {
             if (data.player) {
                 this.playerHit(data.player, data.position, data.extra, false)
             } else if (data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
-                this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.2 : 0.8))
+                this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.5 : 1.1))
             }
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
             this.playerHit(data.player, data.position, data.extra, true)
