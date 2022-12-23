@@ -30,10 +30,17 @@ npm install
 npm run dev
 ```
 
-Or you can play using modern Web Browser (just open `www/index.html` in your favorite browser), but for that you will also need WebSocket UDP bridge.
+Or you can play using modern Web Browser - just open `www/index.html` in your favorite browser, but for that you will also need WebSocket UDP bridge.
 
 ```bash
 php cli/udp-ws-bridge.php 8081 # will start WebSocket listener on localhost:8081
+```
+
+CORS policy might require web server running.
+
+```bash
+php -S localhost:9000 -t www/
+open http://localhost:9000
 ```
 
 ### Server
@@ -50,13 +57,11 @@ php cli/server.php 2 # will start server waiting for 2 players to connect
 Actually not so many hard math things. Mostly just polishing. If you know html/css/js/php languages or 3D modeling/texturing you can join project and help us improve project quicker.  
 
 ### NOT going to implement
-- burst fire
-- guns with absurd fire rate (M249, Negev, duals, ...)
-- different players model (same hit boxes for all players, only design change)
+- burst fire and guns with absurd fire rate
+- different players model hit boxes (same hit boxes for all players, only visual clothing design change)
 - player breath animation or any player animation beside walking, crouching, jumping and look movement
 - lag compensation - when you lag it is your problem - your disadvantage
 
 ### To Be Decided (maybe)
-- aim punch (probably only headshot and body shot with no kevlar)
+- aim punch (body shot without kevlar and headshot)
 - aim spread
-- gun/util hit boxes (maybe only when dropped)
