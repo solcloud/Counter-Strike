@@ -6,6 +6,11 @@ export class ModelRepository {
     #textureLoader
     #models = {}
     #meshes = {}
+    #materials = {
+        caps: {},
+        outfitTeam: null,
+        outfitOpponent: null,
+    }
     #textures = {
         cap: {}
     }
@@ -63,9 +68,15 @@ export class ModelRepository {
         const player = clone.getObjectByName('player')
 
         const headWear = player.getObjectByName('Wolf3D_Headwear')
-        headWear.material.map = this.#textures.cap[colorIndex]
+        if (this.#materials.caps[colorIndex] === undefined) {
+            const newMaterial = headWear.material.clone()
+            newMaterial.map = this.#textures.cap[colorIndex]
+            this.#materials.caps[colorIndex] = newMaterial
+        }
+        headWear.material = this.#materials.caps[colorIndex]
+
         const outfit = player.getObjectByName('Wolf3D_Outfit_Top')
-        outfit.material.map = isOpponent ? this.#textures.opponent : this.#textures.team
+        outfit.material = isOpponent ? this.#materials.outfitOpponent : this.#materials.outfitTeam
         return player
     }
 
@@ -205,6 +216,15 @@ export class ModelRepository {
             this.#meshes.playerHitMesh = sprite
         }))
 
-        return Promise.all(promises)
+        return Promise.all(promises).then(() => {
+            const outfit = this.#models.player.getObjectByName('Wolf3D_Outfit_Top')
+            const materialTeam = outfit.material.clone()
+            materialTeam.map = this.#textures.team
+            const materialOpponent = outfit.material.clone()
+            materialOpponent.map = this.#textures.opponent
+
+            this.#materials.outfitTeam = materialTeam
+            this.#materials.outfitOpponent = materialOpponent
+        })
     }
 }
