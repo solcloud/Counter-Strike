@@ -44,7 +44,7 @@ class Server
     )
     {
         $this->logger = new NullLogger();
-        $this->tickNanoSeconds = $this->setting->tickMs * 1000000;
+        $this->tickNanoSeconds = $this->setting->tickMs * (int)1E6;
     }
 
     public function start(): void
@@ -92,7 +92,7 @@ class Server
         $this->sendGameStateToClients();
 
         $tickId = 0;
-        $nsLast = hrtime(true);
+        $nextNsGoal = hrtime(true) + $this->tickNanoSeconds;
 
         while (true) {
             $this->receiveClientsCommands();
@@ -105,15 +105,13 @@ class Server
 
             // Sleep time
             $nsCurrent = hrtime(true);
-            $nsDelta = $nsCurrent - $nsLast;
-            if ($nsDelta < $this->tickNanoSeconds) {
-                $sleepTimeNs = $this->tickNanoSeconds - $nsDelta;
-                $nsLast = $nsCurrent + $sleepTimeNs;
-                time_nanosleep(0, $sleepTimeNs);
+            $nsDelta = $nextNsGoal - $nsCurrent;
+            $nextNsGoal += $this->tickNanoSeconds;
+            if ($nsDelta > 1024) {
+                time_nanosleep(0, $nsDelta);
             } else {
                 $this->log('Server lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
                 $this->serverLag++;
-                $nsLast = $nsCurrent;
             }
         }
 
@@ -138,7 +136,7 @@ class Server
     private function receiveClientsCommands(): void
     {
         $playersRequest = [];
-        for ($i = 1; $i <= ceil($this->setting->playersMax * 1.5); $i++) {
+        for ($i = 1; $i <= $this->setting->playersMax * 2; $i++) {
             if (!$this->pollClient($address, $port, $msg)) {
                 continue;
             }
