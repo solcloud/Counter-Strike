@@ -60,4 +60,3 @@ Actually not so many hard math things. Mostly just polishing. If you know html/c
 - aim punch (probably only headshot and body shot with no kevlar)
 - aim spread
 - gun/util hit boxes (maybe only when dropped)
-- backtrack (max only few ticks like 2)

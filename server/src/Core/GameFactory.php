@@ -8,7 +8,7 @@ class GameFactory
     public static function createDefaultCompetitive(): Game
     {
         $properties = new GameProperty();
-        //$properties->backtrack_history_tick_count = 1;
+        $properties->backtrack_history_tick_count = 1;
 
         return new Game($properties);
     }
