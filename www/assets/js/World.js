@@ -41,7 +41,9 @@ export class World {
         camera.add(listener, povItem)
         this.#soundListener = listener
 
-        const glParameters = {}
+        const glParameters = {
+            powerPreference: 'high-performance',
+        }
         if (!setting.shouldPreferPerformance()) {
             glParameters.antialias = true
         }
