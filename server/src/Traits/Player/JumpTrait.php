@@ -17,12 +17,13 @@ trait JumpTrait
             /** @var JumpEvent $event */
             $event = $this->eventsCache[$this->eventIdJump];
             $event->reset();
+            $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();
             $this->addEvent($event, $this->eventIdJump);
             return;
         }
 
-        $event = new JumpEvent(function (): void {
-            $targetYPosition = $this->position->y + Setting::jumpDistancePerTick();
+        $event = new JumpEvent(function (JumpEvent $jumpEvent): void {
+            $targetYPosition = min($jumpEvent->maxYPosition, $this->position->y + Setting::jumpDistancePerTick());
             $candidate = $this->position->clone();
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
                 $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->playerBoundingRadius);
@@ -41,6 +42,7 @@ trait JumpTrait
                 $this->position->setY($targetYPosition);
             }
         }, Setting::tickCountJump());
+        $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();
 
         $this->addEvent($event, $this->eventIdJump);
         $this->eventsCache[$this->eventIdJump] = $event;

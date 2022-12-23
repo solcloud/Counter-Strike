@@ -133,7 +133,7 @@ final class Player
 
     public function isAlive(): bool
     {
-        return ($this->health > 0);
+        return ($this->health !== 0);
     }
 
     public function suicide(): void
