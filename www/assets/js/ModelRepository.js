@@ -44,6 +44,7 @@ export class ModelRepository {
                         object.material.polygonOffsetFactor = -1
                     }
                     object.receiveShadow = true
+                    object.matrixAutoUpdate = false
                 }
             })
 

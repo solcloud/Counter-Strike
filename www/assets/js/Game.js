@@ -132,7 +132,7 @@ export class Game {
             // Update hit position for better audio feedback
             const rotate = rotatePointY(angleHit, 0, 10)
             data.position.x = cameraPosition.x + rotate[0]
-            data.position.y = cameraPosition.y + (Math.sign(data.extra.origin.y - cameraPosition.y) * 2)
+            data.position.y = cameraPosition.y + (Math.sign(data.extra.origin.y - cameraPosition.y) * 3)
             data.position.z = cameraPosition.z + rotate[1]
         } else {
             this.#world.bulletPlayerHit(data.position, wasHeadshot)
@@ -165,7 +165,7 @@ export class Game {
                 this.bombDropPosition = data.position
             }
         }
-        if (data.type === SoundType.BOMB_DEFUSED) {
+        if (data.type === SoundType.BOMB_DEFUSED || data.type === SoundType.BOMB_EXPLODED) {
             clearInterval(this.#bombTimerId)
         }
 
@@ -177,7 +177,7 @@ export class Game {
         world.spawnBomb(position)
         this.bombDropPosition = position
 
-        const bombSecCount = Math.round(timeMs / 1000)
+        const bombSecCount = Math.ceil(timeMs / 1000)
         this.#hud.bombPlanted(bombSecCount)
 
         const tenSecWarningSecCount = Math.round(timeMs / 1000 - 10)
@@ -278,7 +278,7 @@ export class Game {
         }
 
         const camera = this.#world.getCamera()
-        camera.rotation.set(0, degreeToRadian(-90), 0)
+        camera.rotation.set(0, 0, 0)
 
         const player = this.players[playerId]
         player.get3DObject().getObjectByName('sight').add(camera)
@@ -385,10 +385,9 @@ export class Game {
         const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
 
-        const gunRotationVertical = (this.playerMe.isAlive() ? Math.max(Math.min(data.look.vertical, 50), -50) : data.look.vertical)
         const hand = playerObject.getObjectByName('hand')
         if (hand.children.length) {
-            hand.children[0].rotation.y = serverVerticalRotationToThreeRadian(gunRotationVertical)
+            hand.children[0].rotation.y = serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50)) // cap hand item vertical look rotation
         }
 
         player.animate()
@@ -407,7 +406,7 @@ export class Game {
             const lastHandItemModel = hand.children[0]
             belt.getObjectByName(`slot-${lastHandItemModel.userData.slot}`).add(lastHandItemModel)
         } else if (hand.children.length > 1) {
-            throw new Error("Too many item in hands?")
+            throw new Error("Too many items in hands?")
         }
 
         this.#playerSlotsVisibleModels.forEach(function (slotId) {
