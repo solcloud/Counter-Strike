@@ -10,6 +10,7 @@ export class UdpSocketConnector {
     }
 
     close() {
+        clearInterval(this.#sendIntervalId)
         this.#socket.close()
     }
 

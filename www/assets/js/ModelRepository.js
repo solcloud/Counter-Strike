@@ -31,14 +31,17 @@ export class ModelRepository {
     }
 
     loadMap(mapName) {
-        return this.#loadModel(`./resources/map/${mapName}.glb`).then(async (model) => {
+        return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
-                    if (object.name === 'floor') {
-                        object.material.envMapIntensity = .08
-                    }
                     if (object.name !== 'world') {
                         object.castShadow = true
+                    }
+                    if (object.name === 'floor') {
+                        object.material.envMapIntensity = .08
+                        object.castShadow = false
+                        object.material.polygonOffset = true
+                        object.material.polygonOffsetFactor = -1
                     }
                     object.receiveShadow = true
                 }
@@ -147,8 +150,8 @@ export class ModelRepository {
             })
 
             this.#models[ItemId.PistolUsp] = model.scene
-            this.#models[ItemId.PistolP250] = model.scene
-            this.#models[ItemId.PistolGlock] = model.scene
+            this.#models[ItemId.PistolP250] = model.scene // fixme
+            this.#models[ItemId.PistolGlock] = model.scene // fixme
         }))
         promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
             model.scene.scale.set(15, 15, 15)

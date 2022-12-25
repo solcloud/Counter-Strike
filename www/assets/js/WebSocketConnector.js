@@ -8,6 +8,7 @@ export class WebSocketConnector {
     }
 
     close() {
+        clearInterval(this.#sendIntervalId)
         this.#socket.send('CLOSE')
         this.#socket.close()
     }

@@ -12,14 +12,13 @@ let launchGame
 ////////////
 
     const validMaps = ['default']
-    let initialized = false
+    let initialized = false, statsLocal
     const world = new World()
     const hud = new HUD()
     const stats = new Stats()
     const game = new Game(world, hud, stats)
     const action = new PlayerAction(hud)
     const control = new Control(game, action)
-    let statsLocal
     hud.injectDependency(game)
 
 ////////////
@@ -82,6 +81,10 @@ let launchGame
         setting.addUpdateCallback('sensitivity', (newValue) => pointerLock.pointerSpeed = parseFloat(newValue))
         setting.addUpdateCallback('volume', (newValue) => world.volume = parseFloat(newValue))
         connector.connect(url.hostname, url.port, loginCode)
+
+        if (window.nodeApi) {
+            window.addEventListener('beforeunload', () => connector.close());
+        }
     }
 
     function render() {

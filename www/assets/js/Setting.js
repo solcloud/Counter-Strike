@@ -31,6 +31,8 @@ export class Setting {
             'KeyQ': Action.EQUIP_KNIFE,
             'Digit1': Action.EQUIP_PRIMARY,
             'Digit2': Action.EQUIP_SECONDARY,
+            'Digit3': Action.EQUIP_KNIFE,
+            'Digit4': Action.EQUIP_BOMB,
             'Digit5': Action.EQUIP_BOMB,
             'KeyB': Action.BUY_MENU,
             'Tab': Action.SCORE_BOARD,
