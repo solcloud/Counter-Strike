@@ -38,3 +38,13 @@ function smallestDeltaAngle(start, target) {
     const b = ((target - start) % 360 + 360) % 360;
     return (a < b ? -a : b);
 }
+
+function rotatePointY(angle, x, z, centerX = 0, centerZ = 0, clockWise = true) {
+    let sin = Math.sin(degreeToRadian(angle));
+    let cos = Math.cos(degreeToRadian(angle));
+
+    return [
+        centerX + cos * (x - centerX) + sin * (z - centerZ),
+        centerZ + (clockWise ? -1 : 1) * sin * (x - centerX) + cos * (z - centerZ),
+    ];
+}

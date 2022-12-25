@@ -111,15 +111,16 @@ export class Game {
         this.#world.playSound('538422__rosa-orenes256__referee-whistle-sound.wav', null, true)
     }
 
-    playerHit(playerId, hitPosition, data, wasHeadshot) {
-        if (playerId === this.playerSpectate.getId()) {
+    playerHit(data, wasHeadshot) {
+        if (data.player === this.playerSpectate.getId()) {
             const anglePlayer = Math.round(this.getPlayerSpectateRotation()[0])
             const camera = this.#world.getCamera()
 
             const cameraPosition = new THREE.Vector3()
             camera.getWorldPosition(cameraPosition)
+            cameraPosition.z = Math.abs(cameraPosition.z)
 
-            const angleHit = radianToDegree(Math.atan2(data.origin.x - cameraPosition.x, data.origin.z - -cameraPosition.z))
+            const angleHit = radianToDegree(Math.atan2(data.extra.origin.x - cameraPosition.x, data.extra.origin.z - cameraPosition.z))
             const delta = smallestDeltaAngle(anglePlayer, angleHit)
             this.#hud.spectatorHit(
                 (delta < -30 && delta > -150),
@@ -127,8 +128,14 @@ export class Game {
                 (Math.abs(delta) <= 40),
                 (Math.abs(delta) >= 120),
             )
+
+            // Update hit position for better audio feedback
+            const rotate = rotatePointY(angleHit, 0, 10)
+            data.position.x = cameraPosition.x + rotate[0]
+            data.position.y = cameraPosition.y + (Math.sign(data.extra.origin.y - cameraPosition.y) * 2)
+            data.position.z = cameraPosition.z + rotate[1]
         } else {
-            this.#world.bulletPlayerHit(hitPosition, wasHeadshot)
+            this.#world.bulletPlayerHit(data.position, wasHeadshot)
         }
     }
 
@@ -142,12 +149,12 @@ export class Game {
         }
         if (data.type === SoundType.BULLET_HIT) {
             if (data.player) {
-                this.playerHit(data.player, data.position, data.extra, false)
+                this.playerHit(data, false)
             } else if (data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
                 this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.5 : 1.1))
             }
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
-            this.playerHit(data.player, data.position, data.extra, true)
+            this.playerHit(data, true)
         }
         if (data.type === SoundType.ITEM_DROP) {
             this.#world.itemDrop(data.position, data.item)
