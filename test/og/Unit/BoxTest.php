@@ -4,6 +4,7 @@ namespace Test\Unit;
 
 use cs\Core\Box;
 use cs\Core\Floor;
+use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Core\Wall;
 use Test\BaseTest;
@@ -58,6 +59,22 @@ class BoxTest extends BaseTest
         $this->assertPositionSame($point->clone()->addX($width), $rightWall->getStart());
         $pointEnd = $point->clone()->addX($width)->addZ($depth)->addY($height);
         $this->assertPositionSame($pointEnd, $rightWall->getEnd());
+
+        $this->assertSame([
+            'width'  => $width,
+            'height' => $height,
+            'depth'  => $depth,
+            'x'      => $point->x,
+            'y'      => $point->y,
+            'z'      => $point->z,
+        ], $box->toArray());
+    }
+
+    public function testBoxWithoutSideThrow(): void
+    {
+        $this->expectException(GameException::class);
+        $this->expectExceptionMessage('Choose at least one box side');
+        new Box(new Point(), 1,1,1, 0);
     }
 
 }

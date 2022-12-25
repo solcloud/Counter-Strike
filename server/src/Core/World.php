@@ -608,8 +608,9 @@ class World
     }
 
     /**
-     * @return array<int,array<string,mixed>>
      * @internal
+     * @codeCoverageIgnore
+     * @return array<int,array<string,mixed>>
      */
     public function getWalls(): array
     {
@@ -626,8 +627,9 @@ class World
     }
 
     /**
-     * @return array<int,array<string,mixed>>
      * @internal
+     * @codeCoverageIgnore
+     * @return array<int,array<string,mixed>>
      */
     public function getFloors(): array
     {

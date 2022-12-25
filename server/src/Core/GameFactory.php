@@ -5,6 +5,9 @@ namespace cs\Core;
 class GameFactory
 {
 
+    /**
+     * @codeCoverageIgnore
+     */
     public static function createDefaultCompetitive(): Game
     {
         $properties = new GameProperty();

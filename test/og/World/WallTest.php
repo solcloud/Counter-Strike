@@ -70,6 +70,39 @@ class WallTest extends BaseTestCase
         $this->assertNotNull($world->checkXSideWallCollision(new Point($x, 0, 0), 12, 20));
     }
 
+    public function testWallSerialization(): void
+    {
+        $wall = new Wall(new Point(1, 2, 3), true, 10, 20);
+        $this->assertSame([
+            's' => [
+                'x' => 1,
+                'y' => 2,
+                'z' => 3,
+            ],
+            'e' =>[
+                'x' => 11,
+                'y' => 22,
+                'z' => 3,
+            ],
+            'p' => 'xy',
+        ], $wall->toArray());
+
+        $wall = new Wall(new Point(1, 2, 3), false, 10, 20);
+        $this->assertSame([
+            's' => [
+                'x' => 1,
+                'y' => 2,
+                'z' => 3,
+            ],
+            'e' =>[
+                'x' => 1,
+                'y' => 22,
+                'z' => 13,
+            ],
+            'p' => 'zy',
+        ], $wall->toArray());
+    }
+
     public function testRampGenerate(): void
     {
         $stepDepth = 2;

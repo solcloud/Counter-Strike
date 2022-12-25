@@ -33,12 +33,12 @@ final class DynamicFloor extends Floor
 
     public function getHitAntiForce(Point $point): int
     {
-        return $this->hitAntiForce;
+        throw new GameException('Should not be here');
     }
 
     public function getPlane(): string
     {
-        return 'xz';
+        throw new GameException('Should not be here');
     }
 
 }
