@@ -3,27 +3,23 @@ const dgram = window.nodeApi.dgram
 export class UdpSocketConnector {
     #game;
     #socket;
-    #sendIntervalId;
 
     constructor(game) {
         this.#game = game
     }
 
     close() {
-        clearInterval(this.#sendIntervalId)
         this.#socket.close()
     }
 
-    connect(host, port, loginCode) {
+    connect(host, port, loginCode, control) {
         let logged = false;
 
         const socket = dgram.createSocket('udp4');
         this.#socket = socket
 
-        const connector = this
         const game = this.#game
         socket.on('close', function () {
-            clearInterval(connector.#sendIntervalId)
             console.log("UdpSocket closed")
         });
         socket.on('error', function (error) {
@@ -46,20 +42,15 @@ export class UdpSocketConnector {
                 game.end("Message parse error! " + err.message)
                 return
             }
+
             game.tick(state)
+            const response = control.getTickAction()
+            if (response !== '') {
+                socket.send(response)
+            }
         });
 
         socket.connect(port, host)
     }
 
-    startLoop(control, tickMs) {
-        const socket = this.#socket
-
-        this.#sendIntervalId = setInterval(function () {
-            let data = control.getTickAction()
-            if (data !== '') {
-                socket.send(data)
-            }
-        }, tickMs)
-    }
 }

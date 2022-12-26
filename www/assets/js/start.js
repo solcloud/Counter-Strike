@@ -68,8 +68,7 @@ let launchGame
             alert("Game ended: " + msg)
             window.location.reload()
         })
-        game.onReady(function (options) {
-            connector.startLoop(control, options.tickMs)
+        game.onReady(function () {
             if (!setting.shouldMatchServerFps()) {
                 statsLocal = new Stats()
                 statsLocal.dom.style.position = 'inherit'
@@ -80,7 +79,7 @@ let launchGame
 
         setting.addUpdateCallback('sensitivity', (newValue) => pointerLock.pointerSpeed = parseFloat(newValue))
         setting.addUpdateCallback('volume', (newValue) => world.volume = parseFloat(newValue))
-        connector.connect(url.hostname, url.port, loginCode)
+        connector.connect(url.hostname, url.port, loginCode, control)
 
         if (window.nodeApi) {
             window.addEventListener('beforeunload', () => connector.close());

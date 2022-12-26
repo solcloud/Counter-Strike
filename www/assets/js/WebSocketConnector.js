@@ -1,28 +1,24 @@
 export class WebSocketConnector {
     #game;
     #socket;
-    #sendIntervalId;
 
     constructor(game) {
         this.#game = game
     }
 
     close() {
-        clearInterval(this.#sendIntervalId)
         this.#socket.send('CLOSE')
         this.#socket.close()
     }
 
-    connect(host, port, loginCode) {
+    connect(host, port, loginCode, control) {
         let logged = false;
 
         const socket = new WebSocket(`ws://${host}:${port}`);
         this.#socket = socket
 
-        const connector = this
         const game = this.#game
         socket.onclose = function () {
-            clearInterval(connector.#sendIntervalId)
             console.log("WebSocket closed")
         };
         socket.onerror = function (error) {
@@ -45,16 +41,11 @@ export class WebSocketConnector {
                 game.end("Message parse error! " + err.message)
                 return
             }
+
             game.tick(state)
+            socket.send(control.getTickAction())
         };
 
     }
 
-    startLoop(control, tickMs) {
-        const socket = this.#socket
-
-        this.#sendIntervalId = setInterval(function () {
-            socket.send(control.getTickAction())
-        }, tickMs)
-    }
 }
