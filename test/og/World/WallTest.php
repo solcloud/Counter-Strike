@@ -4,6 +4,7 @@ namespace Test\World;
 
 use cs\Core\Box;
 use cs\Core\Game;
+use cs\Core\GameException;
 use cs\Core\GameState;
 use cs\Core\Point;
 use cs\Core\Point2D;
@@ -79,7 +80,7 @@ class WallTest extends BaseTestCase
                 'y' => 2,
                 'z' => 3,
             ],
-            'e' =>[
+            'e' => [
                 'x' => 11,
                 'y' => 22,
                 'z' => 3,
@@ -94,13 +95,28 @@ class WallTest extends BaseTestCase
                 'y' => 2,
                 'z' => 3,
             ],
-            'e' =>[
+            'e' => [
                 'x' => 1,
                 'y' => 22,
                 'z' => 13,
             ],
             'p' => 'zy',
         ], $wall->toArray());
+        $wallClone = Wall::fromArray($wall->toArray());
+        $this->assertSame($wall->getFloor(), $wallClone->getFloor());
+        $this->assertSame($wall->isWidthOnXAxis(), $wallClone->isWidthOnXAxis());
+
+        $wall = new Wall(new Point(1, 2, 3), false, 100, 100);
+        $this->assertSame([
+            'force' => 25123,
+            'plane' => 'zy',
+        ], $wall->serialize(new Point(1, 50, 50)));
+    }
+
+    public function testZeroWallHeight(): void
+    {
+        $this->expectException(GameException::class);
+        new Wall(new Point(), true, 1, 0);
     }
 
     public function testRampGenerate(): void

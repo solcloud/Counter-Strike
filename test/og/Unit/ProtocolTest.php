@@ -99,7 +99,7 @@ class ProtocolTest extends BaseTest
                 'vertical'   => 1.09,
             ],
             'isAttacker'  => true,
-            'sight'       => 180,
+            'sight'       => $player->getSightHeight(),
             'armor'       => 0,
             'armorType'   => 0,
             'ammo'        => 12,

@@ -332,6 +332,10 @@ class Game
 
     public function roundEnd(bool $attackersWins, RoundEndReason $reason): void
     {
+        if ($this->roundEndCoolDown) {
+            return;
+        }
+
         $this->roundEndCoolDown = true;
         $roundEndEvent = new RoundEndEvent($this, $attackersWins, $reason);
         $roundEndEvent->onComplete[] = fn() => $this->endRound($roundEndEvent);
@@ -357,8 +361,8 @@ class Game
 
         $isHalftime = $this->properties->max_rounds > 1 && (((int)floor($this->properties->max_rounds / 2)) + 1 === $this->roundNumber);
         if ($isHalftime) {
-            $this->halfTimeSwapTeams();
             $callback = function () use ($startRoundFreezeTime, $roundEndEvent): void {
+                $this->halfTimeSwapTeams();
                 $this->roundReset(true, $roundEndEvent);
                 $this->addEvent($startRoundFreezeTime);
             };
@@ -444,11 +448,6 @@ class Game
     public function getState(): GameState
     {
         return $this->state;
-    }
-
-    public function getPlayersCount(): int
-    {
-        return count($this->players);
     }
 
     public function getScore(): Score

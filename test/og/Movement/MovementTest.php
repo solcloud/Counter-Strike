@@ -105,6 +105,7 @@ class MovementTest extends BaseTestCase
         $headHeight = Setting::playerHeadHeightStand();
         $game = $this->createTestGame(Setting::tickCountCrouch());
         $game->getPlayer(1)->crouch();
+        $game->getPlayer(1)->speedRun();
         $game->getPlayer(1)->moveForward();
 
         $game->onAfterTick(function (GameState $state) use (&$headHeight) {

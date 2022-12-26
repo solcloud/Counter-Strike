@@ -9,21 +9,6 @@ class Point
     {
     }
 
-    public function getX(): int
-    {
-        return $this->x;
-    }
-
-    public function getY(): int
-    {
-        return $this->y;
-    }
-
-    public function getZ(): int
-    {
-        return $this->z;
-    }
-
     public function equals(self $point): bool
     {
         return ($this->x === $point->x && $this->y === $point->y && $this->z === $point->z);

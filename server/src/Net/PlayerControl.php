@@ -7,6 +7,9 @@ use cs\Core\Player;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 
+/**
+ * @codeCoverageIgnore
+ */
 class PlayerControl
 {
 

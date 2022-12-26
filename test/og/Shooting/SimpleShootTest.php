@@ -23,7 +23,7 @@ class SimpleShootTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             $this->waitNTicks(RifleAk::equipReadyTimeMs),
-            fn(Player $p) => $p->getSight()->lookVertical(-90),
+            fn(Player $p) => $p->getSight()->lookVertical(-91),
             fn(Player $p) => $p->attack(),
         ];
 

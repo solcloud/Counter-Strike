@@ -144,7 +144,7 @@ class Server
             if (isset($this->loggedPlayers["{$address}-{$port}"])) {
                 $playerId = $this->loggedPlayers["{$address}-{$port}"];
                 if (isset($playersRequest[$playerId])) {
-                    $this->log("Player '{$playerId}' sending requests too fast (or server slow), dropping", LogLevel::WARNING);
+                    $this->log("Player '{$playerId}' have queued requests, dropping", LogLevel::WARNING);
                 } else {
                     $playersRequest[$playerId] = 1;
                     if ($this->game->getPlayer($playerId)->isAlive()) {
@@ -165,8 +165,10 @@ class Server
             return;
         }
         if ($this->saveRequestsPath) {
+            // @codeCoverageIgnoreStart
             $data = "{$this->game->getTickId()}~{$playerId}~{$msg}\n";
             file_put_contents($this->saveRequestsPath, $data, FILE_APPEND);
+            // @codeCoverageIgnoreEnd
         }
 
         $this->tickCommands[$playerId] = function (PlayerControl $control) use ($commands): void {
@@ -260,6 +262,9 @@ class Server
         return $this->game->tick($tickId);
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;

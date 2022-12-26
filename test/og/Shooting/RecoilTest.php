@@ -38,6 +38,7 @@ class RecoilTest extends BaseTestCase
 
         $game->start();
         $this->assertSame($ak::magazineCapacity, $bulletCount);
+        $this->assertNull($game->getPlayer(1)->attack());
     }
 
     public function testRifleMovementRecoil(): void
@@ -74,6 +75,40 @@ class RecoilTest extends BaseTestCase
         $this->assertLessThan(ceil($ak::magazineCapacity * .1), $yMatchPlayer);
     }
 
+    public function testPistolMovementJumpRecoil(): void
+    {
+        $game = $this->createNoPauseGame();
+        $player = $game->getPlayer(1);
+        $player->equipSecondaryWeapon();
+        $glock = $player->getEquippedItem();
+        $this->assertInstanceOf(PistolGlock::class, $glock);
+        $py = $player->getPositionClone()->y + $player->getSightHeight();
+
+        $bulletsYCoords = [];
+        $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {
+            $player = $state->getPlayer(1);
+            $player->moveRight();
+            $player->jump();
+            $result = $player->attack();
+            if ($result) {
+                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            }
+            if ($glock->getAmmo() === 0) {
+                $state->getPlayer(1)->suicide();
+            }
+        });
+
+        $game->start();
+        $this->assertCount($glock::magazineCapacity, $bulletsYCoords);
+        $yMatchPlayer = 0;
+        foreach ($bulletsYCoords as $y) {
+            if ($y === $py) {
+                $yMatchPlayer++;
+            }
+        }
+        $this->assertLessThan(ceil($glock::magazineCapacity * .2), $yMatchPlayer);
+    }
+
     public function testPistolMovementRecoil(): void
     {
         $game = $this->createNoPauseGame();
@@ -105,6 +140,40 @@ class RecoilTest extends BaseTestCase
             }
         }
         $this->assertLessThan(ceil($glock::magazineCapacity * .3), $yMatchPlayer);
+    }
+
+    public function testPistolMovementWalkRecoil(): void
+    {
+        $game = $this->createNoPauseGame();
+        $player = $game->getPlayer(1);
+        $player->equipSecondaryWeapon();
+        $glock = $player->getEquippedItem();
+        $this->assertInstanceOf(PistolGlock::class, $glock);
+        $py = $player->getPositionClone()->y + $player->getSightHeight();
+
+        $bulletsYCoords = [];
+        $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {
+            $player = $state->getPlayer(1);
+            $player->moveRight();
+            $player->speedWalk();
+            $result = $player->attack();
+            if ($result) {
+                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            }
+            if ($glock->getAmmo() === 0) {
+                $state->getPlayer(1)->suicide();
+            }
+        });
+
+        $game->start();
+        $this->assertCount($glock::magazineCapacity, $bulletsYCoords);
+        $yMatchPlayer = 0;
+        foreach ($bulletsYCoords as $y) {
+            if ($y === $py) {
+                $yMatchPlayer++;
+            }
+        }
+        $this->assertLessThan(ceil($glock::magazineCapacity * .5), $yMatchPlayer);
     }
 
 }

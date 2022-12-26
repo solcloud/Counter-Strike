@@ -12,7 +12,7 @@ class Floor extends Plane
 
     public function getY(): int
     {
-        return $this->getStart()->getY();
+        return $this->getStart()->y;
     }
 
     public static function fromArray(array $data): self

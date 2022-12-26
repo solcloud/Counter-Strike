@@ -178,6 +178,7 @@ class RoundTest extends BaseTestCase
         $game = $this->createGame([
             GameProperty::MAX_ROUNDS    => $maxRounds,
             GameProperty::ROUND_TIME_MS => 1,
+            GameProperty::HALF_TIME_FREEZE_SEC => 0,
             GameProperty::START_MONEY   => 3000,
         ]);
         $game->setTickMax($maxRounds * 2);

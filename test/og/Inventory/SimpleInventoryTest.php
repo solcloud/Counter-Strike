@@ -67,6 +67,8 @@ class SimpleInventoryTest extends BaseTestCase
         $knife = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(Knife::class, $knife);
         $this->assertFalse($knife->isUserDroppable());
+        $knife->setSkinId(123);
+        $this->assertSame(123, $knife->getSkinId());
     }
 
     public function testPlayerBuyAndDropPrimaryWithEnoughMoney(): void
@@ -148,7 +150,7 @@ class SimpleInventoryTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookVertical(90),
+            fn(Player $p) => $p->getSight()->lookVertical(91),
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolGlock::equipReadyTimeMs),
             fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->dropEquippedItem()),

@@ -31,11 +31,17 @@ final class DynamicFloor extends Floor
         );
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getHitAntiForce(Point $point): int
     {
         throw new GameException('Should not be here');
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function getPlane(): string
     {
         throw new GameException('Should not be here');

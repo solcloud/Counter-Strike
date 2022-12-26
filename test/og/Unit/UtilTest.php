@@ -2,6 +2,8 @@
 
 namespace Test\Unit;
 
+use cs\Core\GameException;
+use cs\Core\GameProperty;
 use cs\Core\PlayerCamera;
 use cs\Core\Point;
 use cs\Core\Point2D;
@@ -74,6 +76,32 @@ class UtilTest extends BaseTest
         $this->assertSame([-39, 39], Util::rotatePointY(10, -45, 32, 0, 0));
         $this->assertSame([-31, 45], Util::rotatePointY(20, -45, 32, 0, 0));
         $this->assertSame([-9, 54], Util::rotatePointY(45, -45, 32, 0, 0));
+    }
+
+    public function testPoint(): void
+    {
+        $point = new Point();
+        $point->addPart(1, 2, 3);
+        $this->assertSame(1, $point->x);
+        $this->assertSame(2, $point->y);
+        $this->assertSame(3, $point->z);
+        $this->assertSame([
+            'x' => 3,
+            'y' => 2,
+        ], $point->to2D('zy')->toArray());
+    }
+
+    public function testGamePropertyUnknownFieldGet(): void
+    {
+        $prop = new GameProperty();
+        $this->expectException(GameException::class);
+        $this->assertSame(123, $prop->not_exists); // @phpstan-ignore-line
+    }
+    public function testGamePropertyUnknownFieldSet(): void
+    {
+        $prop = new GameProperty();
+        $this->expectException(GameException::class);
+        $prop->not_exists = 1; // @phpstan-ignore-line
     }
 
     public function testPointToPointDistance(): void

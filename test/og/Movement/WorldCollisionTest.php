@@ -110,12 +110,12 @@ class WorldCollisionTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertSame(1, $p->getPositionClone()->getZ());
+                $this->assertSame(1, $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->moveRight(),
             fn(Player $p) => $p->moveForward(),
             function (Player $p) {
-                $this->assertSame(1 + Setting::moveDistancePerTick(), $p->getPositionClone()->getZ());
+                $this->assertSame(1 + Setting::moveDistancePerTick(), $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->moveLeft(),
             fn(Player $p) => $p->moveLeft(),
@@ -187,7 +187,7 @@ class WorldCollisionTest extends BaseTestCase
         $game = $this->createOneRoundGame($ticks);
         $game->getPlayer(1)->setPosition($spawnPosition);
         $this->playPlayer($game, [$ticks]);
-        $this->assertLessThan($startY, $game->getPlayer(1)->getPositionClone()->getY());
+        $this->assertLessThan($startY, $game->getPlayer(1)->getPositionClone()->y);
     }
 
     public function testGravityFloorCatch(): void

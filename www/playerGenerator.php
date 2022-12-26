@@ -34,7 +34,7 @@ $playerParts = [];
 foreach ($collider->getHitBoxes() as $box) {
     $geometry = $box->getGeometry();
     if ($geometry instanceof SphereGroupHitBox) {
-        $modifier = $geometry->getCenterPointModifier();
+        $modifier = $geometry->centerPointModifier;
         $modifier = $modifier === null ? new Point() : $modifier($player);
         foreach ($geometry->getParts($player) as $part) {
             $playerParts[$box->getType()->value][] = [

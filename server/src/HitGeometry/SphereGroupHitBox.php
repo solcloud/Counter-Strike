@@ -16,7 +16,7 @@ class SphereGroupHitBox implements HitIntersect
     /**
      * @param ?Closure $centerPointModifier function (Player $player): Point {}
      */
-    public function __construct(private ?Closure $centerPointModifier = null)
+    public function __construct(public readonly ?Closure $centerPointModifier = null)
     {
     }
 
@@ -43,11 +43,6 @@ class SphereGroupHitBox implements HitIntersect
     public function createHitBox(Point $relativeCenter, int $radius): SphereHitBox
     {
         return new SphereHitBox($relativeCenter, $radius);
-    }
-
-    public function getCenterPointModifier(): ?Closure
-    {
-        return $this->centerPointModifier;
     }
 
     /**
