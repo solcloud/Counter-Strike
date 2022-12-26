@@ -32,10 +32,10 @@ export class EventProcessor {
                     msg = "Not all players connected during warmup"
                     break
                 case GameOverReason.ATTACKERS_WINS:
-                    msg = "Attackers wins!"
+                    msg = game.playerMe.isAttacker() ? 'Your team won!' : 'Your team lost!'
                     break
                 case GameOverReason.DEFENDERS_WINS:
-                    msg = "Defenders wins!"
+                    msg = game.playerMe.isAttacker() ? 'Your team lost!' : 'Your team won!'
                     break
                 case GameOverReason.TIE:
                     msg = "Max round reached. Tie!"
