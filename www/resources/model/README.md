@@ -17,6 +17,9 @@ by **Quaternius** from https://www.patreon.com/quaternius downloaded from https:
 #### player.glb (CC4)
 by **ReadyPlayerMe** (1617641541-outfit-m-military) from https://readyplayer.me/
 
+#### kit.glb (Public Domain)
+by friend **šimon**
+
 #### bomb.glb (Public Domain)
 by **solcloud**
 

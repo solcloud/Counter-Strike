@@ -34,11 +34,8 @@ export class World {
         const povItem = new THREE.Group()
         povItem.name = 'pov-item'
         povItem.scale.setScalar(.7)
-        povItem.position.x = 4
-        povItem.position.z = -28
+        povItem.position.z = -12
         povItem.position.y = -14
-        povItem.rotateX(degreeToRadian(88))
-        povItem.rotateZ(degreeToRadian(-100))
         camera.add(listener, povItem)
         this.#soundListener = listener
 

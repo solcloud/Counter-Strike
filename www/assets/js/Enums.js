@@ -161,6 +161,7 @@ const ItemId = {
     Molotov: 35,
     Smoke: 36,
     Bomb: 50,
+    DefuseKit: 51,
 }
 
 const ItemIdToName = {

@@ -65,7 +65,11 @@ export class ModelRepository {
     }
 
     getBomb() {
-        return this.#models[ItemId.Bomb]
+        const bomb = this.#models[ItemId.Bomb]
+        bomb.children.forEach((root) => root.visible = false)
+        bomb.getObjectByName('item').visible = true
+        bomb.position.setScalar(0)
+        return bomb
     }
 
     getPlayer(colorIndex, isOpponent) {
@@ -118,59 +122,87 @@ export class ModelRepository {
                 }
             })
 
+            // fixme inside model
+            const kitSlot = model.scene.getObjectByName('slot-11')
+            kitSlot.position.y -= 11
+            const knifeSlot = model.scene.getObjectByName('slot-0')
+            knifeSlot.position.y += 5.7
+            knifeSlot.position.x += 3.8
+            knifeSlot.position.z += -3.5
+            knifeSlot.rotateY(degreeToRadian(-70))
+            knifeSlot.rotateX(degreeToRadian(-4))
+
             this.#models.player = model.scene.getObjectByName('player')
             this.#models.playerAnimation = model.animations
         }))
         promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
-            model.scene.scale.set(.3, .3, .3)
-            model.scene.traverse(function (object) {
+            model.scene.children.forEach((root) => root.visible = false)
+            const item = model.scene.getObjectByName('item')
+            item.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
-                    object.receiveShadow = true
                 }
             })
+            item.visible = true
 
             this.#models[ItemId.Bomb] = model.scene
         }))
-        promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
-            model.scene.scale.set(-500, 500, 500)
+        promises.push(this.#loadModel('./resources/model/kit.glb').then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                 }
             })
+
+            this.#models[ItemId.DefuseKit] = model.scene
+        }))
+        promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
+            model.scene.children.forEach((root) => root.visible = false)
+            const item = model.scene.getObjectByName('item')
+            item.traverse(function (object) {
+                if (object.isMesh) {
+                    object.castShadow = true
+                }
+            })
+            item.visible = true
 
             this.#models[ItemId.Knife] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
-            model.scene.scale.set(15, 15, 15)
-            model.scene.traverse(function (object) {
+            model.scene.children.forEach((root) => root.visible = false)
+            const item = model.scene.getObjectByName('item')
+            item.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                 }
             })
+            item.visible = true
 
             this.#models[ItemId.PistolUsp] = model.scene
             this.#models[ItemId.PistolP250] = model.scene // fixme
             this.#models[ItemId.PistolGlock] = model.scene // fixme
         }))
         promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
-            model.scene.scale.set(15, 15, 15)
-            model.scene.traverse(function (object) {
+            model.scene.children.forEach((root) => root.visible = false)
+            const item = model.scene.getObjectByName('item')
+            item.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                 }
             })
+            item.visible = true
 
             this.#models[ItemId.RifleAk] = model.scene
         }))
         promises.push(this.#loadModel('./resources/model/m4.glb').then((model) => {
-            model.scene.scale.set(10, 10, 10)
-            model.scene.traverse(function (object) {
+            model.scene.children.forEach((root) => root.visible = false)
+            const item = model.scene.getObjectByName('item')
+            item.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
                 }
             })
+            item.visible = true
 
             this.#models[ItemId.RifleM4A4] = model.scene
         }))

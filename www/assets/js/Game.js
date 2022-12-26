@@ -326,8 +326,8 @@ export class Game {
             model = this.#world.getModelForItem(item)
             povItems.add(model)
         }
-        model.position.set(0, 0, 0)
-        model.rotation.set(0, 0, 0)
+        model.children.forEach((root) => root.visible = false)
+        model.getObjectByName('pov').visible = true
         model.visible = true
 
         this.#hud.equip(slotId, this.playerSpectate.data.slots)
@@ -422,18 +422,17 @@ export class Game {
                 itemModel = world.getModelForItem(item)
                 beltSlot.add(itemModel)
             }
-
-            itemModel.position.set(0, 0, 0)
-            itemModel.rotation.set(0, 0, 0)
+            itemModel.children.forEach((root) => root.visible = false)
+            itemModel.getObjectByName('item').visible = true
             itemModel.visible = true
         })
 
         const modelInHand = belt.getObjectByName(`slot-${data.item.slot}`).getObjectByName(`item-${data.item.id}`)
         hand.add(modelInHand)
-        modelInHand.position.set(0, 0, 0)
-        modelInHand.rotation.set(0, 0, 0)
-        modelInHand.visible = true
         modelInHand.userData.slot = data.item.slot
+        modelInHand.children.forEach((root) => root.visible = false)
+        modelInHand.getObjectByName('item').visible = true
+        modelInHand.visible = true
     }
 
     getMyTeamPlayers() {
