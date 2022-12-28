@@ -46,7 +46,7 @@ export class HUD {
         time: null,
         killFeed: null,
     }
-    #shotAnimationInterval = null;
+    #dropAnimationInterval = null;
     #countDownIntervalId = null;
     #scoreBoardData = null;
 
@@ -161,16 +161,10 @@ export class HUD {
         this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
     }
 
-    showShot(item) {
-        clearTimeout(this.#shotAnimationInterval)
-        this.#elements.shotModel.classList.remove('hidden');
-        this.#shotAnimationInterval = setTimeout(() => this.#elements.shotModel.classList.add('hidden'), 30)
-    }
-
     showDropAnimation(item) {
-        clearTimeout(this.#shotAnimationInterval)
+        clearTimeout(this.#dropAnimationInterval)
         this.#elements.dropModel.classList.remove('hidden');
-        this.#shotAnimationInterval = setTimeout(() => this.#elements.dropModel.classList.add('hidden'), 100)
+        this.#dropAnimationInterval = setTimeout(() => this.#elements.dropModel.classList.add('hidden'), 100)
     }
 
     updateHud(player) {

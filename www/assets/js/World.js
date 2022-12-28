@@ -128,6 +128,25 @@ export class World {
         return model
     }
 
+    itemAttack(player, item, isSpectator) {
+        const sparkFeedbackSlots = [Enum.InventorySlot.SLOT_PRIMARY, Enum.InventorySlot.SLOT_SECONDARY]
+        if (sparkFeedbackSlots.includes(item.slot)) {
+            let spark
+            if (isSpectator) {
+                spark = player.get3DObject().getObjectByName('pov-item')?.getObjectByName(`item-${item.id}`)?.getObjectByName('pov-spark')
+            } else {
+                spark = player.get3DObject().getObjectByName('hand')?.getObjectByName('spark')
+            }
+            if (spark) {
+                const mesh = this.#modelRepository.getPlayerHitMesh()
+                mesh.material.color.set(0xe6ce8c)
+                mesh.scale.setScalar(item.slot === Enum.InventorySlot.SLOT_PRIMARY ? 12 : 8)
+                spark.add(mesh)
+                setTimeout(() => this.destroyObject(mesh), 80)
+            }
+        }
+    }
+
     itemDrop(position, item) {
         const dropItem = this.getModelForItem(item)
         dropItem.position.set(position.x, position.y, -position.z)

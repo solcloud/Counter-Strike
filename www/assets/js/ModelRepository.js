@@ -204,6 +204,10 @@ export class ModelRepository {
             })
             item.visible = true
 
+            // fixme inside model
+            const povSpark = model.scene.getObjectByName('pov-spark')
+            povSpark.position.z = 0
+
             this.#models[ItemId.RifleM4A4] = model.scene
         }))
         promises.push(this.#loadTexture('./resources/img/player/outfit_0.png').then((texture) => {

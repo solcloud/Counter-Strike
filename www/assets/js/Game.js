@@ -141,8 +141,8 @@ export class Game {
 
     processSound(data) {
         const spectatorId = this.playerSpectate.getId()
-        if (data.type === SoundType.ITEM_ATTACK && data.player === spectatorId) {
-            this.attackFeedback(data.item)
+        if (data.type === SoundType.ITEM_ATTACK) {
+            this.#world.itemAttack(this.players[data.player], data.item, (data.player === spectatorId))
         }
         if (data.type === SoundType.ITEM_PICKUP) {
             this.#world.itemPickup(data.position, data.item, (spectatorId === data.player))
@@ -299,12 +299,6 @@ export class Game {
         this.#world.spawnPlayer(player, this.playerMe.isAttacker() !== data.isAttacker)
         this.players[data.id] = player
         return player
-    }
-
-    attackFeedback(item) {
-        if (this.playerSpectate.data.ammo > 0) {
-            this.#hud.showShot(item)
-        }
     }
 
     dropFeedback(item) {
