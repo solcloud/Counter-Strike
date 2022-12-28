@@ -42,8 +42,8 @@ export class WebSocketConnector {
                 return
             }
 
-            game.tick(state)
             socket.send(control.getTickAction())
+            game.tick(state)
         };
 
     }

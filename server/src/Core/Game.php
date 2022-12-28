@@ -399,10 +399,10 @@ class Game
         $this->world->roundReset();
         $randomizeSpawn = $this->properties->randomize_spawn_position;
         foreach ($this->players as $player) {
-            $player->roundReset();
             if (!$firstRound) {
                 $player->getInventory()->earnMoney($this->calculateRoundMoneyAward($roundEndEvent, $player));
             }
+            $player->roundReset();
             $spawnPosition = $this->getWorld()->getPlayerSpawnPosition($player->isPlayingOnAttackerSide(), $randomizeSpawn);
             $player->getSight()->lookHorizontal($this->getWorld()->getPlayerSpawnRotationHorizontal($player->isPlayingOnAttackerSide(), $randomizeSpawn ? 80 : 0));
             $player->setPosition($spawnPosition);

@@ -244,7 +244,7 @@ export class ModelRepository {
                 transparent: true,
             });
             const sprite = new THREE.Sprite(material);
-            sprite.scale.set(30, 30, 1);
+            sprite.scale.set(35, 45, 30);
 
             this.#meshes.playerHitMesh = sprite
         }))

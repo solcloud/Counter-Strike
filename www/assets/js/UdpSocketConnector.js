@@ -43,11 +43,11 @@ export class UdpSocketConnector {
                 return
             }
 
-            game.tick(state)
             const response = control.getTickAction()
             if (response !== '') {
                 socket.send(response)
             }
+            game.tick(state)
         });
 
         socket.connect(port, host)
