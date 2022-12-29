@@ -22,8 +22,10 @@ class HitBoxChest extends SphereGroupHitBox
 
     private function createChestLeft(): void
     {
+        $this->addHitBox(new Point(-12, -50, -1), 5);
+        $this->addHitBox(new Point(-12, -42, -1), 5);
         $this->addHitBox(new Point(-13, -46, 5), 6);
-        $this->addHitBox(new Point(-4, -45, 7), 6);
+        $this->addHitBox(new Point(-4, -43, 7), 6);
         $this->addHitBox(new Point(-13, -41, 3), 6);
         $this->addHitBox(new Point(-5, -37, 2), 6);
         $this->addHitBox(new Point(-15, -35, -1), 6);
@@ -35,8 +37,10 @@ class HitBoxChest extends SphereGroupHitBox
 
     private function createChestRight(): void
     {
+        $this->addHitBox(new Point(12, -50, -1), 5);
+        $this->addHitBox(new Point(12, -42, -1), 5);
         $this->addHitBox(new Point(13, -46, 5), 6);
-        $this->addHitBox(new Point(4, -45, 7), 6);
+        $this->addHitBox(new Point(4, -43, 7), 6);
         $this->addHitBox(new Point(13, -41, 3), 6);
         $this->addHitBox(new Point(5, -37, 2), 6);
         $this->addHitBox(new Point(15, -35, -1), 6);

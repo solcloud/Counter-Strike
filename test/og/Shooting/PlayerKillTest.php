@@ -138,7 +138,7 @@ class PlayerKillTest extends BaseTestCase
     public function testUspKillPlayerInThreeBulletsInChestWithNoKevlar(): void
     {
         $player2Commands = [
-            fn(Player $p) => $p->getSight()->lookAt(180, 18),
+            fn(Player $p) => $p->getSight()->lookAt(180, 19),
             fn(Player $p) => $p->crouch(),
             $this->waitNTicks(max(Setting::tickCountCrouch(), PistolUsp::equipReadyTimeMs)),
             $this->endGame(),
