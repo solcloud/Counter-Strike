@@ -34,7 +34,7 @@ class PlayerCollider
 
     public function tryHitPlayer(Bullet $bullet, Backtrack $backtrack): ?Hittable
     {
-        $bp = $bullet->getPosition();
+        $bp = $bullet->position;
         foreach ($backtrack->getStates() as $state) {
             $backtrack->apply($state, $this->playerId);
 
@@ -48,7 +48,7 @@ class PlayerCollider
             }
 
             foreach ($this->hitBoxes as $hitBox) {
-                if ($hitBox->intersect($bullet)) {
+                if ($hitBox->intersect($bp)) {
                     $hitBox->registerHit($bullet);
                     return $hitBox;
                 }

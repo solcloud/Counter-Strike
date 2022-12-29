@@ -8,7 +8,7 @@ class Bullet
 {
 
     private Point $origin;
-    private Point $position;
+    public Point $position;
     private int $originPlayerId;
     private bool $originPlayerIsAttacker;
     private int $distanceTraveled;

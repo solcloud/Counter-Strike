@@ -95,9 +95,9 @@ class HitBox implements Hittable
         return $armorDamage;
     }
 
-    public function intersect(Bullet $bullet): bool
+    public function intersect(Point $point): bool
     {
-        return $this->geometry->intersect($this->player, $bullet->getPosition());
+        return $this->geometry->intersect($this->player, $point);
     }
 
     public function getPlayer(): Player

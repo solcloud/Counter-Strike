@@ -110,7 +110,7 @@ final class Backtrack
             $states[] = $i;
         }
         if ($states === []) {
-            $states[] = 0;
+            return [0];
         }
         return $states;
     }
