@@ -12,7 +12,7 @@ final class Backtrack
     /** @var array<int,array<int,array<string,mixed>>> */
     private array $states = [];
 
-    public function __construct(private Game $game, private int $numberOfHistoryStates)
+    public function __construct(private Game $game, public readonly int $numberOfHistoryStates)
     {
         if ($numberOfHistoryStates < 0) {
             throw new GameException("Variable '{$numberOfHistoryStates}' needs to be bigger or equal zero");

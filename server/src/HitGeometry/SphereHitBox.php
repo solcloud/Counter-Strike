@@ -31,10 +31,6 @@ class SphereHitBox implements HitIntersect
         $center = $player->getPositionClone()->add($centerModifier);
         $point = $center->clone()->add($this->relativeCenter);
 
-        if ($angle === 0.0) {
-            return $point;
-        }
-
         [$x, $z] = Util::rotatePointY($angle, $point->x, $point->z, $center->x, $center->z);
         return $point->setX($x)->setZ($z);
     }

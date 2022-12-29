@@ -56,10 +56,10 @@ class Game
     {
         $this->bomb = new Bomb($properties->bomb_plant_time_ms, $properties->bomb_defuse_time_ms);
         $this->state = new GameState($this);
-        $this->world = new World($this);
         $this->score = new Score($properties->loss_bonuses);
         $this->backtrack = new Backtrack($this, $properties->backtrack_history_tick_count);
         $this->properties = $properties;
+        $this->world = new World($this);
 
         $this->initialize();
     }

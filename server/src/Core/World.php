@@ -33,9 +33,12 @@ class World
     private Bomb $bomb;
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
+    private int $playerPotentialDistanceSquared;
 
     public function __construct(private Game $game)
     {
+        $this->playerPotentialDistanceSquared = ($game->getBacktrack()->numberOfHistoryStates + 2) * pow(Setting::moveDistancePerTick(), 2)
+            + pow(Setting::playerBoundingRadius(), 2); // fixme: more tests to know if it is reliable heuristic value
     }
 
     public function roundReset(): void
@@ -302,10 +305,17 @@ class World
         return false;
     }
 
-    public function optimizeBulletHitCheck(Bullet $bullet, float $angleHorizontal, float $angleVertical): void
+    public function optimizeBulletHitCheck(Bullet $bullet): void
     {
-        $bp = $bullet->getPosition();
         $skipPlayerIds = $bullet->getPlayerSkipIds();
+        if (count($this->playersColliders) === count($skipPlayerIds)) {
+            return;
+        }
+
+        $test = new Point();
+        $bo = $bullet->getOrigin();
+        $bp = $bullet->getPosition();
+        $headCrouch = Setting::playerHeadHeightCrouch();
         foreach ($this->game->getPlayers() as $playerId => $player) {
             if (isset($skipPlayerIds[$playerId])) {
                 continue;
@@ -315,47 +325,14 @@ class World
                 continue;
             }
 
-            $pp = $player->getReferenceToPosition();
-
-            // Vertical Y optimization
-            if ($angleVertical >= 0) {
-                if ($pp->y + $player->getHeadHeight() < $bp->y) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
-            } else {
-                if ($pp->y >= $bp->y) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
+            $test->setFrom($player->getReferenceToPosition());
+            $distanceSquared = Util::distanceSquared($test->addY($headCrouch), $bp);
+            if ($distanceSquared < $this->playerPotentialDistanceSquared) { // to close to reliably decide
+                continue;
             }
-
-            $radius = $player->getBoundingRadius();
-
-            // Horizontal Z optimization
-            if ($angleHorizontal >= 270 || $angleHorizontal <= 90) {
-                if ($pp->z + $radius < $bp->z) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
-            } else {
-                if ($pp->z - $radius >= $bp->z) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
-            }
-
-            // Horizontal X optimization
-            if ($angleHorizontal >= 0 && $angleHorizontal <= 180) {
-                if ($pp->x + $radius < $bp->x) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
-            } else {
-                if ($pp->x - $radius >= $bp->x) {
-                    $bullet->addPlayerIdSkip($playerId);
-                    continue;
-                }
+            if ($distanceSquared - $this->playerPotentialDistanceSquared > Util::distanceSquared($test, $bo)) {
+                $bullet->addPlayerIdSkip($playerId); // distance is bigger than bullet origin so hit should not be possible
+                continue;
             }
         }
     }
@@ -599,9 +576,9 @@ class World
     }
 
     /**
+     * @return array<int,array<string,mixed>>
      * @internal
      * @codeCoverageIgnore
-     * @return array<int,array<string,mixed>>
      */
     public function getWalls(): array
     {
@@ -618,9 +595,9 @@ class World
     }
 
     /**
+     * @return array<int,array<string,mixed>>
      * @internal
      * @codeCoverageIgnore
-     * @return array<int,array<string,mixed>>
      */
     public function getFloors(): array
     {
