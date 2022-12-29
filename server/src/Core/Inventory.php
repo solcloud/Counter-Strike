@@ -11,6 +11,7 @@ use cs\Event\EquipEvent;
 use cs\Weapon\Knife;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolUsp;
+use cs\Weapon\RifleAk;
 
 class Inventory
 {
@@ -34,7 +35,6 @@ class Inventory
                 InventorySlot::SLOT_KNIFE->value     => new Knife(),
                 InventorySlot::SLOT_SECONDARY->value => ($isAttackerSide ? new PistolGlock(true) : new PistolUsp(true)),
             ];
-            $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
         } else {
             foreach ($this->items as $item) {
@@ -44,6 +44,14 @@ class Inventory
                 $this->items[InventorySlot::SLOT_SECONDARY->value] = ($isAttackerSide ? new PistolGlock(true) : new PistolUsp(true));
             }
         }
+        if (!isset($this->items[InventorySlot::SLOT_PRIMARY->value])) {
+            $this->items[InventorySlot::SLOT_PRIMARY->value] = new RifleAk(true);
+            $this->equippedSlot = InventorySlot::SLOT_PRIMARY->value;
+        }
+        if (!isset($this->items[InventorySlot::SLOT_KEVLAR->value])) {
+            $this->items[InventorySlot::SLOT_KEVLAR->value] = new Kevlar(true);
+        }
+        $this->getKevlar()->repairArmor();
 
         $this->removeBomb();
         $this->store = new BuyMenu($isAttackerSide, $this->items);
