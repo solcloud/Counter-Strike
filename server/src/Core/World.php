@@ -227,15 +227,6 @@ class World
         }
     }
 
-    public function addDropItem(Item $item, Point $position): void
-    {
-        $dropItem = new DropItem($item);
-        $dropItem->setPosition($position);
-        $this->dropItems[] = $dropItem;
-        $sound = new SoundEvent($position, SoundType::ITEM_DROP);
-        $this->makeSound($sound->setItem($item));
-    }
-
     public function playerUse(Player $player): void
     {
         // Bomb defusing

@@ -252,6 +252,28 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertSame(800 - 200, $player->getMoney());
     }
 
+    public function testDropItemWhenDiedMidAir(): void
+    {
+        $property = $this->createNoPauseGameProperty(5);
+        $property->round_end_cool_down_sec = 2;
+        $game = $this->createTestGame(null, $property);
+        $game->getPlayer(1)->setPosition(new Point(100, 200, 100));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $this->assertTrue($p->isAlive()),
+            fn(Player $p) => $this->assertEmpty($game->getWorld()->getDropItems()),
+            fn(Player $p) => $p->suicide(),
+            fn(Player $p) => $this->assertGreaterThan(0, $p->getPositionClone()->y),
+            fn(Player $p) => $this->assertFalse($p->isAlive()),
+            fn(Player $p) => $this->assertNotEmpty($game->getWorld()->getDropItems()),
+            $this->endGame(),
+        ]);
+        $this->assertCount(2, $game->getWorld()->getDropItems());
+        foreach ($game->getWorld()->getDropItems() as $item) {
+            $this->assertSame(0, $item->getPosition()->y);
+        }
+    }
+
     public function testPlayerBuyWeapons(): void
     {
         $startMoney = 10901;

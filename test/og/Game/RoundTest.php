@@ -86,10 +86,11 @@ class RoundTest extends BaseTestCase
         $this->assertInstanceOf(Bomb::class, $drop2->getItem());
         $pp = $game->getPlayer(1)->getPositionClone();
         $pr = $game->getPlayer(1)->getBoundingRadius();
-        $this->assertSame($pp->y, $drop1->position->y);
+        $this->assertGreaterThan(0, $pp->y);
+        $this->assertSame(0, $drop1->position->y);
         $this->assertLessThanOrEqual($pr, abs($drop1->position->x - $pp->x));
         $this->assertLessThanOrEqual($pr, abs($drop1->position->z - $pp->z));
-        $this->assertSame($pp->y, $drop2->position->y);
+        $this->assertSame(0, $drop2->position->y);
         $this->assertLessThanOrEqual($pr, abs($drop2->position->x - $pp->x));
         $this->assertLessThanOrEqual($pr, abs($drop2->position->z - $pp->z));
     }
@@ -176,10 +177,10 @@ class RoundTest extends BaseTestCase
     {
         $maxRounds = 5;
         $game = $this->createGame([
-            GameProperty::MAX_ROUNDS    => $maxRounds,
-            GameProperty::ROUND_TIME_MS => 1,
+            GameProperty::MAX_ROUNDS           => $maxRounds,
+            GameProperty::ROUND_TIME_MS        => 1,
             GameProperty::HALF_TIME_FREEZE_SEC => 0,
-            GameProperty::START_MONEY   => 3000,
+            GameProperty::START_MONEY          => 3000,
         ]);
         $game->setTickMax($maxRounds * 2);
 
