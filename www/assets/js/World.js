@@ -140,9 +140,9 @@ export class World {
             if (spark) {
                 const mesh = this.#modelRepository.getPlayerHitMesh()
                 mesh.material.color.set(0xe6ce8c)
-                mesh.scale.setScalar(item.slot === Enum.InventorySlot.SLOT_PRIMARY ? 12 : 8)
+                mesh.scale.setScalar((item.slot === Enum.InventorySlot.SLOT_PRIMARY ? 12 : 8) * (isSpectator ? 0.85 : 1))
                 spark.add(mesh)
-                setTimeout(() => this.destroyObject(mesh), 80)
+                setTimeout(() => this.destroyObject(mesh), isSpectator ? 40 : 70)
             }
         }
     }

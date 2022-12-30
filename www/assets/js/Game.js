@@ -398,6 +398,7 @@ export class Game {
 
         if (hand.children.length === 1) {
             const lastHandItemModel = hand.children[0]
+            lastHandItemModel.rotation.set(0, 0, 0)
             belt.getObjectByName(`slot-${lastHandItemModel.userData.slot}`).add(lastHandItemModel)
         } else if (hand.children.length > 1) {
             throw new Error("Too many items in hands?")

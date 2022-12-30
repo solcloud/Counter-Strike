@@ -53,6 +53,8 @@ composer install -a --no-dev
 php cli/server.php 2 # will start server waiting for 2 players to connect
 ```
 
+Enabling PHP's JIT compilation should give performance boost so we recommend that.
+
 ## TODO
 
 Actually not so many hard math things. Mostly just polishing. If you know html/css/js/php languages or 3D modeling/texturing you can join project and help us improve project quicker.  
