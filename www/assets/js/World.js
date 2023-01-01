@@ -139,6 +139,7 @@ export class World {
             }
             if (spark) {
                 const mesh = this.#modelRepository.getPlayerHitMesh()
+                mesh.material = mesh.material.clone()
                 mesh.material.color.set(0xe6ce8c)
                 mesh.scale.setScalar((item.slot === Enum.InventorySlot.SLOT_PRIMARY ? 12 : 8) * (isSpectator ? 0.85 : 1))
                 spark.add(mesh)
@@ -200,7 +201,8 @@ export class World {
 
     bulletPlayerHit(position, wasHeadshot) {
         const hit = this.#modelRepository.getPlayerHitMesh()
-        hit.material.color.set(wasHeadshot ? 0xFF6600 : 0x5061A4)
+        hit.material = hit.material.clone()
+        hit.material.color.set(wasHeadshot ? 0x11784b : 0x5061A4)
         hit.position.set(position.x, position.y, -position.z)
 
         this.#scene.add(hit)
