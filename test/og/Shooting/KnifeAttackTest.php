@@ -5,7 +5,6 @@ namespace Test\Shooting;
 use cs\Core\HitBox;
 use cs\Core\Player;
 use cs\Enum\Color;
-use cs\Enum\HitBoxType;
 use cs\Event\AttackResult;
 use cs\Weapon\Knife;
 use Test\BaseTestCase;

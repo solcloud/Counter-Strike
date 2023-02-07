@@ -97,6 +97,7 @@ class UtilTest extends BaseTest
         $this->expectException(GameException::class);
         $this->assertSame(123, $prop->not_exists); // @phpstan-ignore-line
     }
+
     public function testGamePropertyUnknownFieldSet(): void
     {
         $prop = new GameProperty();

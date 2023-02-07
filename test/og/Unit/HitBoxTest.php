@@ -64,7 +64,7 @@ class HitBoxTest extends BaseTest
         }
 
         // Just grinding code coverage...
-        $point = new Point2D(1,1);
+        $point = new Point2D(1, 1);
         $hit = new SphereHitBox(new Point($point->clone()->setY(-1)->addY(1)->setX(0)->x, 0), 2);
         $point->setFrom(new Point2D());
         $this->assertTrue($hit->getRelativeCenter()->to2D('xz')->equals($point));
@@ -86,7 +86,7 @@ class HitBoxTest extends BaseTest
 
         foreach ($data as $angle => $xz) {
             $player->getSight()->lookHorizontal($angle);
-            $this->assertPositionSame(new Point($xz[0], $y, $xz[1]), $sphere->calculateWorldCoordinate($player,new Point(15, -20, 8)), " Angle: {$angle}");
+            $this->assertPositionSame(new Point($xz[0], $y, $xz[1]), $sphere->calculateWorldCoordinate($player, new Point(15, -20, 8)), " Angle: {$angle}");
         }
     }
 

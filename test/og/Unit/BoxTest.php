@@ -74,7 +74,7 @@ class BoxTest extends BaseTest
     {
         $this->expectException(GameException::class);
         $this->expectExceptionMessage('Choose at least one box side');
-        new Box(new Point(), 1,1,1, 0);
+        new Box(new Point(), 1, 1, 1, 0);
     }
 
 }

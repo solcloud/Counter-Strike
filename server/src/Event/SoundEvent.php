@@ -61,7 +61,7 @@ final class SoundEvent extends TickEvent
             'player'   => $this->player?->getId(),
             'surface'  => $this->surface?->serialize($this->position),
             'type'     => $this->type->value,
-            'extra'     => $this->extra,
+            'extra'    => $this->extra,
         ];
     }
 

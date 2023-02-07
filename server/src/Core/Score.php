@@ -150,7 +150,7 @@ class Score
      */
     public function toArray(): array
     {
-        $scoreboard = [[],[]];
+        $scoreboard = [[], []];
         foreach ($this->playerStats as $playerId => $playerStat) {
             $key = sprintf('%d-%d-%d', $playerStat->getKills(), $playerStat->getDamage(), $playerId);
             $scoreboard[(int)$playerStat->isAttacker()][$key] = $playerStat->toArray();
