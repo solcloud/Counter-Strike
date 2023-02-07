@@ -55,7 +55,7 @@ class BombTest extends BaseTestCase
         $this->assertSame(RoundEndReason::BOMB_EXPLODED, $roundEndEvent->reason);
         $this->assertSame(
             Util::millisecondsToFrames($properties->bomb_plant_time_ms) + Util::millisecondsToFrames($properties->bomb_explode_time_ms),
-            $game->getTickId() - 4
+            $game->getTickId() - 3
         );
     }
 

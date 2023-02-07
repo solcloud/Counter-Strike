@@ -5,7 +5,7 @@ namespace cs\Core;
 class Floor extends Plane
 {
 
-    public function __construct(Point $start, int $width = 1, int $depth = 1)
+    public function __construct(Point $start, public readonly int $width = 1, public readonly int $depth = 1)
     {
         parent::__construct($start, new Point($start->x + $width, $start->y, $start->z + $depth), 'xz');
     }

@@ -34,7 +34,7 @@ trait GravityTrait
         $candidate = $start->clone();
         for ($y = $start->y; $y >= $targetYPosition; $y--) {
             $candidate->y = $y;
-            $floorCandidate = $this->world->findFloor($candidate, $this->playerBoundingRadius);
+            $floorCandidate = $this->world->findFloorSquare($candidate, $this->playerBoundingRadius);
             if (!$floorCandidate) {
                 $floorCandidate = $this->world->findPlayersHeadFloor($candidate, $this->playerBoundingRadius);
             }

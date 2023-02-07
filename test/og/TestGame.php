@@ -30,6 +30,7 @@ class TestGame extends Game
             $this->gameStates[0] = json_decode($protocol->serializeGameState($this));
         }
         for ($tickId = 0; $tickId < $this->tickMax; $tickId++) {
+            $this->tick = $tickId;
             if ($this->onTickCallback) {
                 call_user_func($this->onTickCallback, $this->getState());
             }

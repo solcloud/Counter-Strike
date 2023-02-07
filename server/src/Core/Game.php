@@ -39,7 +39,7 @@ class Game
     /** @var Event[] */
     private array $tickEvents = [];
 
-    private int $tick = 0;
+    protected int $tick = 0;
     private int $eventId = 0;
     private int $roundNumber = 1;
     private int $roundStartTickId = 0;

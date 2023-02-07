@@ -14,6 +14,13 @@ class Point2D
         return ($this->x === $point->x && $this->y === $point->y);
     }
 
+    public function add(int $xAmount, int $yAmount): self
+    {
+        $this->x += $xAmount;
+        $this->y += $yAmount;
+        return $this;
+    }
+
     public function addX(int $amount): self
     {
         $this->x += $amount;

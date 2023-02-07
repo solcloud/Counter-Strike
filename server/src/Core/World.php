@@ -126,6 +126,26 @@ class World
         return null;
     }
 
+    public function findFloorSquare(Point $point, int $radius): ?Floor
+    {
+        if ($point->y < 0) {
+            throw new GameException("Y value cannot be lower than zero");
+        }
+        $floors = $this->floors[$point->y] ?? [];
+        if ($floors === []) {
+            return null;
+        }
+
+        $distance = 2 * $radius;
+        $candidate = $point->to2D('xz')->add(-$radius, -$radius);
+        foreach ($floors as $floor) {
+            if (Collision::planeWithPlane($candidate, $distance, $distance, $floor->getPoint2DStart(), $floor->width, $floor->depth)) {
+                return $floor;
+            }
+        }
+        return null;
+    }
+
     public function findFloor(Point $point, int $radius = 0): ?Floor
     {
         if ($point->y < 0) {
