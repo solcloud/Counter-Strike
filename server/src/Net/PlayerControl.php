@@ -95,9 +95,9 @@ class PlayerControl
         $this->player->buyItem($item);
     }
 
-    public function lookAt(float $angleHorizontal, float $angleVertical): void
+    public function look(float $angleHorizontal, float $angleVertical): void
     {
-        $this->player->getSight()->lookAt(round($angleHorizontal, 2), round($angleVertical, 2));
+        $this->player->getSight()->look(round($angleHorizontal, 2), round($angleVertical, 2));
     }
 
     public function attack(): void

@@ -1,19 +1,19 @@
 61~1~equip 0
-62~1~forward|lookAt 79 -7
+62~1~forward|look 79 -7
 63~1~forward
-64~1~forward|lookAt 80 -7
-65~1~forward|lookAt 81 -7
+64~1~forward|look 80 -7
+65~1~forward|look 81 -7
 66~1~forward
-67~1~forward|lookAt 82 -7
-68~1~forward|lookAt 83 -7
+67~1~forward|look 82 -7
+68~1~forward|look 83 -7
 69~1~forward
 70~1~forward
-71~1~forward|lookAt 84 -7
+71~1~forward|look 84 -7
 72~1~forward
 73~1~forward
 74~1~forward
 75~1~forward
-76~1~forward|lookAt 85 -7
+76~1~forward|look 85 -7
 77~1~forward
 78~1~forward
 79~1~forward
@@ -27,11 +27,11 @@
 87~1~forward
 88~1~forward
 89~1~forward
-90~1~forward|lookAt 86 -7
+90~1~forward|look 86 -7
 91~1~forward
 92~1~forward
 93~1~forward
-94~1~forward|lookAt 87 -7
+94~1~forward|look 87 -7
 95~1~forward
 96~1~forward
 97~1~forward
@@ -63,14 +63,14 @@
 123~1~forward
 124~1~forward
 125~1~forward
-126~1~forward|lookAt 88 -7
+126~1~forward|look 88 -7
 127~1~forward
 128~1~forward
 129~1~forward
 130~1~forward
 131~1~forward
 132~1~forward
-133~1~forward|lookAt 88 -8
+133~1~forward|look 88 -8
 134~1~forward
 135~1~forward
 136~1~forward
@@ -93,7 +93,7 @@
 154~1~forward
 155~1~forward
 156~1~forward
-157~1~forward|lookAt 88 -7
+157~1~forward|look 88 -7
 158~1~forward
 159~1~forward
 160~1~forward
@@ -101,7 +101,7 @@
 162~1~forward
 163~1~forward
 164~1~forward
-165~1~forward|lookAt 88 -6
+165~1~forward|look 88 -6
 166~1~forward
 167~1~forward
 168~1~forward

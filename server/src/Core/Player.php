@@ -110,7 +110,7 @@ final class Player
             $angle = 0;
             $angleOffset = 360 / $dropCount;
             foreach ($dropItems as $item) {
-                $this->sight->lookAt($angle, -78);
+                $this->sight->look($angle, -78);
                 $this->world->dropItem($this, $item);
                 $angle += $angleOffset;
             }

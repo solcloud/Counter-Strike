@@ -35,13 +35,13 @@ class ProtocolTest extends BaseTest
                 ['forward'],
                 ['left'],
                 ['equip', 42],
-                ['lookAt', -45.0, 124.0],
+                ['look', -45.0, 124.0],
                 ['right'],
             ],
             $protocol->parsePlayerControlCommands(implode(
                     $protocol::separator,
                     [
-                        "forward", "left", "equip 42", "lookAt -45 124", "right",
+                        "forward", "left", "equip 42", "look -45 124", "right",
                     ]
                 )
             )
@@ -50,8 +50,8 @@ class ProtocolTest extends BaseTest
         $this->assertSame([], $protocol->parsePlayerControlCommands("invalidMethod"));
         $this->assertSame([], $protocol->parsePlayerControlCommands(" move"));
         $this->assertSame([], $protocol->parsePlayerControlCommands("equip knife"));
-        $this->assertSame([], $protocol->parsePlayerControlCommands("lookAt 1 one"));
-        $this->assertSame([], $protocol->parsePlayerControlCommands("lookAt 1"));
+        $this->assertSame([], $protocol->parsePlayerControlCommands("look 1 one"));
+        $this->assertSame([], $protocol->parsePlayerControlCommands("look 1"));
     }
 
     public function testSerialization(): void
@@ -60,7 +60,7 @@ class ProtocolTest extends BaseTest
         $game = new Game(new GameProperty());
         $game->loadMap(new TestMap());
         $game->addPlayer($player);
-        $player->getSight()->lookAt(12.45, 1.09);
+        $player->getSight()->look(12.45, 1.09);
         $protocol = new Protocol\TextProtocol();
 
         $playerSerializedExpected = [

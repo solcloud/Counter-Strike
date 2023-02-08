@@ -52,7 +52,7 @@ class ServerTest extends BaseTest
             'forward',
             'right',
             'forward',
-            "lookAt 45 -20|crouch|buy " . BuyMenuItem::GRENADE_MOLOTOV->value,
+            "look 45 -20|crouch|buy " . BuyMenuItem::GRENADE_MOLOTOV->value,
         ];
         $responses = $this->runTestServer($game, $clientRequests);
         $player = $game->getPlayer(1);

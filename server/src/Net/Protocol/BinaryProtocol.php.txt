@@ -28,7 +28,7 @@ class BinaryProtocol extends Protocol
         'equip'  => [self::UINT_8],
         'jump'   => [],
         'move'   => [self::UINT_8],
-        'lookAt' => [self::UINT_16, self::UINT_16],
+        'look'   => [self::UINT_16, self::UINT_16],
     ];
     /** @var array<string,int> */
     public const paramLengthBytes = [

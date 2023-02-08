@@ -38,7 +38,7 @@ class SimpleShootTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolGlock::equipReadyTimeMs),
-            fn(Player $p) => $p->getSight()->lookAt(45, -89),
+            fn(Player $p) => $p->getSight()->look(45, -89),
             function (Player $p) {
                 $result = $p->attack();
                 $this->assertNotNull($result);

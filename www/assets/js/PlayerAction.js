@@ -11,8 +11,8 @@ export class PlayerAction {
 
     resetStates() {
         this.#states = {
-            attackLookAt: '',
-            lastLookAt: '',
+            attacklook: '',
+            lastlook: '',
             sprayTriggerStartMs: null,
             moveForward: false,
             moveBackward: false,
@@ -53,13 +53,13 @@ export class PlayerAction {
         this.actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
     }
 
-    #rotationToServerLookAt(xy) {
-        return `lookAt ${xy[0].toFixed(2)} ${xy[1].toFixed(2)}`
+    #rotationToServerlook(xy) {
+        return `look ${xy[0].toFixed(2)} ${xy[1].toFixed(2)}`
     }
 
     attack(xy) {
         this.#states.attack = true
-        this.#states.attackLookAt = this.#rotationToServerLookAt(xy)
+        this.#states.attacklook = this.#rotationToServerlook(xy)
     }
 
     attack2() {
@@ -151,17 +151,17 @@ export class PlayerAction {
             this.#states.attack2 = false
         }
         if (this.#states.attack) {
-            action.push(this.#states.attackLookAt)
+            action.push(this.#states.attacklook)
             action.push('attack')
             this.#states.attack = false
         } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {
-            action.push(this.#rotationToServerLookAt(game.getPlayerMeRotation()))
+            action.push(this.#rotationToServerlook(game.getPlayerMeRotation()))
             action.push('attack')
         } else {
-            let lookAt = this.#rotationToServerLookAt(game.getPlayerMeRotation())
-            if (this.#states.lastLookAt !== lookAt) {
-                action.push(lookAt)
-                this.#states.lastLookAt = lookAt
+            let look = this.#rotationToServerlook(game.getPlayerMeRotation())
+            if (this.#states.lastlook !== look) {
+                action.push(look)
+                this.#states.lastlook = look
             }
         }
 

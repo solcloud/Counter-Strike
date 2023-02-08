@@ -173,7 +173,7 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(220, -15),
+            fn(Player $p) => $p->getSight()->look(220, -15),
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolUsp::equipReadyTimeMs),
             fn(Player $p) => $this->assertInstanceOf(PistolUsp::class, $p->dropEquippedItem()),
@@ -200,7 +200,7 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
 
         $this->playPlayer($game, [
-            fn(Player $p) => $p->getSight()->lookAt(220, -15),
+            fn(Player $p) => $p->getSight()->look(220, -15),
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolUsp::equipReadyTimeMs),
             fn(Player $p) => $this->assertInstanceOf(PistolUsp::class, $p->dropEquippedItem()),

@@ -75,7 +75,7 @@ final class Backtrack
         foreach ($this->saveState as $playerId => $playerData) {
             $player = $this->game->getPlayer($playerId);
             $player->setPosition($playerData['a']); // @phpstan-ignore-line
-            $player->getSight()->lookAt($playerData['b'], $playerData['c']); // @phpstan-ignore-line
+            $player->getSight()->look($playerData['b'], $playerData['c']); // @phpstan-ignore-line
             $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
         }
     }
@@ -93,7 +93,7 @@ final class Backtrack
 
         $player = $this->game->getPlayer($playerId);
         $player->setPosition($playerData['a']); // @phpstan-ignore-line
-        $player->getSight()->lookAt($playerData['b'], $playerData['c']); // @phpstan-ignore-line
+        $player->getSight()->look($playerData['b'], $playerData['c']); // @phpstan-ignore-line
         $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
     }
 

@@ -69,7 +69,7 @@ class BombTest extends BaseTestCase
         $game = $this->createTestGame(null, $properties);
         $defender = new Player(2, Color::BLUE, false);
         $game->addPlayer($defender);
-        $defender->getSight()->lookAt(180, -90);
+        $defender->getSight()->look(180, -90);
 
         $roundEndEvent = null;
         $game->onTick(function (GameState $state) {

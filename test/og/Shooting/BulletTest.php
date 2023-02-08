@@ -23,7 +23,7 @@ class BulletTest extends BaseTestCase
         $playerCommands = [
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             fn(Player $p) => $p->setPosition($spawn),
-            fn(Player $p) => $p->getSight()->lookAt($angleHorizontal, $angleVertical),
+            fn(Player $p) => $p->getSight()->look($angleHorizontal, $angleVertical),
             $this->waitNTicks(RifleAk::equipReadyTimeMs) - 2,
             $this->endGame(),
         ];

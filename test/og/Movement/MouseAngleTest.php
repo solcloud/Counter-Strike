@@ -133,7 +133,7 @@ class MouseAngleTest extends BaseTestCase
     {
         $playerCommands = [
             fn(Player $p) => $p->setPosition(new Point(100, 0, 100)),
-            fn(Player $p) => $p->getSight()->lookAt($angleHorizontal, rand(-90, 90)),
+            fn(Player $p) => $p->getSight()->look($angleHorizontal, rand(-90, 90)),
             function (Player $p) use ($xPlus, $zPlus) {
                 if ($xPlus) {
                     $p->moveRight();

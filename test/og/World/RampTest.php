@@ -64,7 +64,7 @@ class RampTest extends BaseTestCase
         $game->getWorld()->addWall($wall);
         $game->getWorld()->addWall($wall1);
 
-        $player->getSight()->lookAt(61, 12);
+        $player->getSight()->look(61, 12);
         $game->onTick(function () use ($player) {
             $player->moveForward();
         });
@@ -81,7 +81,7 @@ class RampTest extends BaseTestCase
         $wall = new Wall(new Point(100, 0, 900 - 11), true, 900);
         $game->getWorld()->addWall($wall);
 
-        $player->getSight()->lookAt(41, -11);
+        $player->getSight()->look(41, -11);
         $game->onTick(function () use ($player) {
             $player->moveForward();
         });

@@ -12,7 +12,7 @@ class PlayerCamera
         $this->rotationVertical = $this->rotationHorizontal = 0.0;
     }
 
-    public function lookAt(float $angleHorizontal, float $angleVertical): void
+    public function look(float $angleHorizontal, float $angleVertical): void
     {
         $this->lookHorizontal($angleHorizontal);
         $this->lookVertical($angleVertical);

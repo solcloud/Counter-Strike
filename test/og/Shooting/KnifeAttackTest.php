@@ -44,7 +44,7 @@ class KnifeAttackTest extends BaseTestCase
         $this->playPlayer($game, [
             fn(Player $p) => $p->reload(),
             $this->waitNTicks(Knife::equipReadyTimeMs),
-            fn(Player $p) => $p->getSight()->lookAt(0, -30),
+            fn(Player $p) => $p->getSight()->look(0, -30),
             fn(Player $p) => $p->moveForward(),
             function () use ($game) {
                 $knife = $game->getPlayer(1)->getEquippedItem();

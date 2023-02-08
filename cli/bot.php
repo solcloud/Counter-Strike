@@ -21,7 +21,7 @@ $commandPool = [
     'forward',
     'jump',
     'left',
-    fn() => sprintf('lookAt %d %d', rand(0, 359), rand(-45, 45)),
+    fn() => sprintf('look %d %d', rand(0, 359), rand(-45, 45)),
     'right',
     'run',
     'stand',

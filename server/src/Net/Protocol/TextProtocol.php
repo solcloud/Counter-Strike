@@ -59,7 +59,7 @@ class TextProtocol extends Protocol
                 if (!is_numeric($parts[1])) {
                     return [];
                 }
-                if ($method === 'lookAt') {
+                if ($method === 'look') {
                     $command[] = (float)$parts[1];
                 } else {
                     $command[] = (int)$parts[1];
@@ -69,7 +69,7 @@ class TextProtocol extends Protocol
                 if (!is_numeric($parts[2])) {
                     return [];
                 }
-                if ($method === 'lookAt') {
+                if ($method === 'look') {
                     $command[] = (float)$parts[2];
                 } else {
                     $command[] = (int)$parts[2];

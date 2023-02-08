@@ -81,11 +81,11 @@ class PerformanceTest extends BaseTest
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
             if ($i === 1) {
-                $player->getSight()->lookAt(0, 0);
+                $player->getSight()->look(0, 0);
             } elseif ($i < ceil($playersCount / 2)) {
-                $player->getSight()->lookAt(-1, -1);
+                $player->getSight()->look(-1, -1);
             } else {
-                $player->getSight()->lookAt(1, 1);
+                $player->getSight()->look(1, 1);
             }
             $this->assertInstanceOf(PistolGlock::class, $player->getEquippedItem());
         }
@@ -172,7 +172,7 @@ class PerformanceTest extends BaseTest
         for ($i = 1; $i <= $playersCount; $i++) {
             $player = new Player($i, Color::GREEN, true);
             $game->addPlayer($player);
-            $player->getSight()->lookAt(2, -10);
+            $player->getSight()->look(2, -10);
             $this->assertSame(50, $player->getPositionClone()->z);
         }
         $players = $game->getPlayers();

@@ -1,84 +1,84 @@
-69~1~lookAt 237.39 -65.36
+69~1~look 237.39 -65.36
 70~1~forward|right
-71~1~forward|right|lookAt 237.39 -65.94
+71~1~forward|right|look 237.39 -65.94
 72~1~forward|right
-73~1~forward|right|jump|lookAt 237.04 -66.97
-74~1~forward|right|lookAt 236.81 -67.65
-76~1~forward|right|lookAt 236.70 -68.00
+73~1~forward|right|jump|look 237.04 -66.97
+74~1~forward|right|look 236.81 -67.65
+76~1~forward|right|look 236.70 -68.00
 77~1~forward|right
 78~1~forward|right
-79~1~forward|right|lookAt 234.06 -70.86
-81~1~forward|right|lookAt 233.15 -71.89
-83~1~forward|right|lookAt 229.48 -75.33
-84~1~forward|right|lookAt 228.22 -76.48
+79~1~forward|right|look 234.06 -70.86
+81~1~forward|right|look 233.15 -71.89
+83~1~forward|right|look 229.48 -75.33
+84~1~forward|right|look 228.22 -76.48
 85~1~forward|right
-86~1~forward|right|lookAt 226.04 -78.54
-87~1~forward|right|lookAt 223.29 -81.06
-89~1~forward|right|lookAt 222.38 -81.86
+86~1~forward|right|look 226.04 -78.54
+87~1~forward|right|look 223.29 -81.06
+89~1~forward|right|look 222.38 -81.86
 90~1~forward|right
-91~1~forward|right|lookAt 219.97 -83.93
-93~1~forward|right|lookAt 219.05 -84.50
-94~1~forward|right|lookAt 217.22 -85.87
+91~1~forward|right|look 219.97 -83.93
+93~1~forward|right|look 219.05 -84.50
+94~1~forward|right|look 217.22 -85.87
 95~1~forward|right
-97~1~forward|right|lookAt 215.96 -86.56
-98~1~forward|right|lookAt 215.50 -86.79
-99~1~forward|right|lookAt 215.27 -87.02
-101~1~forward|right|lookAt 215.04 -87.14
-103~1~forward|right|lookAt 214.58 -87.48
+97~1~forward|right|look 215.96 -86.56
+98~1~forward|right|look 215.50 -86.79
+99~1~forward|right|look 215.27 -87.02
+101~1~forward|right|look 215.04 -87.14
+103~1~forward|right|look 214.58 -87.48
 104~1~forward|right
 105~1~forward|right
 106~1~forward|right
 107~1~forward|right
 109~1~forward|right
 110~1~forward|right
-111~1~forward|right|lookAt 214.58 -87.25
-113~1~forward|right|lookAt 214.70 -87.02
-114~1~forward|right|lookAt 215.16 -85.87
+111~1~forward|right|look 214.58 -87.25
+113~1~forward|right|look 214.70 -87.02
+114~1~forward|right|look 215.16 -85.87
 115~1~forward|right
-116~1~forward|right|lookAt 215.73 -85.07
+116~1~forward|right|look 215.73 -85.07
 117~1~forward|right
-118~1~forward|right|lookAt 216.07 -84.61
-119~1~forward|right|lookAt 216.30 -84.50
-121~1~forward|right|lookAt 216.42 -84.39
+118~1~forward|right|look 216.07 -84.61
+119~1~forward|right|look 216.30 -84.50
+121~1~forward|right|look 216.42 -84.39
 122~1~forward|right
-123~1~forward|right|lookAt 216.99 -83.93
-125~1~forward|right|lookAt 217.22 -83.81
-126~1~forward|right|lookAt 217.91 -83.35
+123~1~forward|right|look 216.99 -83.93
+125~1~forward|right|look 217.22 -83.81
+126~1~forward|right|look 217.91 -83.35
 127~1~forward|right
-128~1~forward|right|lookAt 218.82 -82.55
+128~1~forward|right|look 218.82 -82.55
 129~1~forward|right
 130~1~forward
 131~1~forward
-132~1~forward|lookAt 220.20 -81.52
+132~1~forward|look 220.20 -81.52
 133~1~forward
-134~1~forward|lookAt 220.43 -81.29
-135~1~forward|lookAt 220.54 -81.18
-137~1~forward|lookAt 220.66 -81.18
+134~1~forward|look 220.43 -81.29
+135~1~forward|look 220.54 -81.18
+137~1~forward|look 220.66 -81.18
 138~1~forward
-139~1~forward|lookAt 221.23 -80.83
-141~1~forward|lookAt 221.46 -80.72
-142~1~forward|lookAt 222.38 -79.57
-144~1~forward|lookAt 222.72 -79.00
+139~1~forward|look 221.23 -80.83
+141~1~forward|look 221.46 -80.72
+142~1~forward|look 222.38 -79.57
+144~1~forward|look 222.72 -79.00
 145~1~forward
 146~1~forward
-147~1~forward|lookAt 225.13 -75.22
-149~1~forward|lookAt 226.04 -73.38
-151~1~forward|lookAt 228.45 -67.65
+147~1~forward|look 225.13 -75.22
+149~1~forward|look 226.04 -73.38
+151~1~forward|look 228.45 -67.65
 153~1~forward
 154~1~forward
-155~1~forward|lookAt 229.71 -59.75
+155~1~forward|look 229.71 -59.75
 156~1~forward
-157~1~forward|lookAt 229.71 -58.72
+157~1~forward|look 229.71 -58.72
 158~1~forward
-159~1~forward|lookAt 229.82 -55.39
-161~1~forward|lookAt 229.82 -54.71
-162~1~forward|lookAt 229.82 -52.99
+159~1~forward|look 229.82 -55.39
+161~1~forward|look 229.82 -54.71
+162~1~forward|look 229.82 -52.99
 163~1~forward
-165~1~forward|lookAt 229.59 -51.38
+165~1~forward|look 229.59 -51.38
 166~1~forward
-167~1~forward|lookAt 229.25 -50.35
-169~1~forward|lookAt 229.14 -50.12
-171~1~forward|lookAt 229.14 -50.01
+167~1~forward|look 229.25 -50.35
+169~1~forward|look 229.14 -50.12
+171~1~forward|look 229.14 -50.01
 173~1~forward
 174~1~forward
 175~1~forward
