@@ -178,6 +178,22 @@ class MovementTest extends BaseTestCase
         $this->assertFalse($game->getPlayer(1)->isJumping());
     }
 
+    public function testPlayerCornerFloorCatch(): void
+    {
+        $game = $this->createTestGame(20);
+        $p = $game->getPlayer(1);
+        $p->setPosition(new Point(100, 700, 100));
+        $radius = $p->getBoundingRadius();
+        $this->assertGreaterThan(0, $radius);
+        $game->getWorld()->addFloor(new Floor(new Point(100 + $radius, 100, 100 + $radius), 1, 1));
+        $game->start();
+
+        $this->assertNotSame(0, $p->getPositionClone()->y);
+        $this->assertSame(100, $p->getPositionClone()->y);
+        $this->assertTrue($p->isAlive());
+        $this->assertLessThan(100, $p->getHealth());
+    }
+
     public function testPlayerFlyingNextRoundBugEventsReset(): void
     {
         $game = $this->createGame([
