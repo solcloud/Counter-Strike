@@ -34,6 +34,15 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertFalse($knife->isUserDroppable());
     }
 
+    public function testPlayerInventoryEquipUnEquipAble(): void
+    {
+        $game = $this->createTestGame();
+        $this->assertInstanceOf(Knife::class, $game->getPlayer(1)->getEquippedItem());
+        $game->getPlayer(1)->equip(InventorySlot::SLOT_KIT);
+        $game->getPlayer(1)->equip(InventorySlot::SLOT_TASER);
+        $this->assertInstanceOf(Knife::class, $game->getPlayer(1)->getEquippedItem());
+    }
+
     public function testPlayerInventorySlots(): void
     {
         $p = new Player(1, Color::GREEN, false);
@@ -272,6 +281,21 @@ class SimpleInventoryTest extends BaseTestCase
         foreach ($game->getWorld()->getDropItems() as $item) {
             $this->assertSame(0, $item->getPosition()->y);
         }
+    }
+
+    public function testPlayerCannotBuyAfterPauseAndBuyTime(): void
+    {
+        $property = new GameProperty();
+        $property->freeze_time_sec = 0;
+        $property->buy_time_sec = 0;
+        $property->start_money = 16000;
+        $game = $this->createTestGame(6, $property);
+        $this->playPlayer($game, [
+            $this->waitXTicks(2),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
+            $this->endGame(),
+        ]);
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
     }
 
     public function testPlayerBuyWeapons(): void

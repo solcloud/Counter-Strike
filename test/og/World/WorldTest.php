@@ -13,6 +13,7 @@ use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
 use cs\Enum\Color;
+use cs\Map\TestMap;
 use Test\BaseTestCase;
 
 class WorldTest extends BaseTestCase
@@ -36,6 +37,43 @@ class WorldTest extends BaseTestCase
         $this->assertNotNull($world->findFloor(new Point(11, 1, 0), 2));
         $this->assertNotNull($world->findFloor(new Point(12, 1, 0), 2));
         $this->assertNull($world->findFloor(new Point(15, 1, 0), 3));
+    }
+
+    public function testCanBeSeen(): void
+    {
+        $game = $this->createGame();
+        $player = $game->getPlayer(1);
+        $this->assertFalse($game->getWorld()->canBeSeen($player, new Point(999, 999, 999), 10, 200));
+        $this->assertFalse($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(-20), 10, 999)
+        );
+        $this->assertTrue($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(20), 10, 999)
+        );
+        $this->assertTrue($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100)
+        );
+        $this->assertFalse($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(101), 10, 100)
+        );
+
+        $game->getWorld()->addWall(new Wall((new Point())->addPart(-20, -20, 20), true, 200));
+        $this->assertFalse($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100)
+        );
+
+        $game->loadMap(new TestMap());
+        $this->assertTrue($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100)
+        );
+        $game->addPlayer(new Player(2, Color::YELLOW, false));
+        $game->getPlayer(2)->setPosition($player->getPositionClone()->addZ(10));
+        $this->assertTrue($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100, false)
+        );
+        $this->assertFalse($game->getWorld()->canBeSeen(
+            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100, true)
+        );
     }
 
     public function testStairCaseUp(): void

@@ -11,6 +11,7 @@ use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\Color;
 use Test\BaseTestCase;
 
 class MovementTest extends BaseTestCase
@@ -34,6 +35,58 @@ class MovementTest extends BaseTestCase
         $game->start();
         $this->assertGreaterThan(0, $wall->getBase());
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - 1));
+    }
+
+    public function testPlayerStopOnWallsDiagonalSmallAngle(): void
+    {
+        $game = $this->createTestGame(60);
+        $p = $game->getPlayer(1);
+        $br = $p->getBoundingRadius();
+        $p->getSight()->lookHorizontal(1);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+
+        $wallFront = new Wall(new Point(0, 0, $br + Setting::moveDistancePerTick() - 4), true, 300);
+        $wallRight = new Wall(new Point($br + Setting::moveDistancePerTick(), 0, 0), false, 300);
+        $game->getWorld()->addWall($wallFront);
+        $game->getWorld()->addWall($wallRight);
+
+        $game->start();
+        $this->assertPlayerPosition($game, new Point($wallRight->getBase() - $br - 1, 0, $wallFront->getBase() - $br - 1));
+    }
+
+    public function testPlayerStopOnSmallWallsDiagonalNoFloorToStep(): void
+    {
+        $game = $this->createTestGame(60);
+        $p = $game->getPlayer(1);
+        $br = $p->getBoundingRadius();
+        $p->getSight()->lookHorizontal(1);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+
+        $wallFront = new Wall(new Point(0, 0, $br + Setting::moveDistancePerTick() - 4), true, 300);
+        $wallRight = new Wall(new Point($br + Setting::moveDistancePerTick(), 0, 0), false, 300, 2);
+        $game->getWorld()->addWall($wallFront);
+        $game->getWorld()->addWall($wallRight);
+
+        $game->start();
+        $this->assertPlayerPosition($game, new Point($wallRight->getBase() - $br - 1, 0, $wallFront->getBase() - $br - 1));
+    }
+
+    public function testPlayerStopOnOtherPlayerDiagonalSmallAngle(): void
+    {
+        $game = $this->createTestGame(60);
+        $p = $game->getPlayer(1);
+        $br = $p->getBoundingRadius();
+        $p->getSight()->lookHorizontal(1);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+
+        $p2 = new Player(2, Color::BLUE, false);
+        $game->addPlayer($p2);
+        $p2->setPosition(new Point(3 * $br, 0, 2 * $br - 1));
+        $wallFront = new Wall(new Point(0, 0, $br + Setting::moveDistancePerTick() - 4), true, 300);
+        $game->getWorld()->addWall($wallFront);
+
+        $game->start();
+        $this->assertPlayerPosition($game, new Point(54, 0, 45));
     }
 
     public function testPlayerStopOnWallBoundingRadius(): void
@@ -176,6 +229,29 @@ class MovementTest extends BaseTestCase
         $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
         $this->assertFalse($game->getPlayer(1)->isFlying());
         $this->assertFalse($game->getPlayer(1)->isJumping());
+    }
+
+    public function testPlayerStopWhenRotatingFastWhileJumping(): void
+    {
+        $game = $this->simulateGame([
+            function (Player $p) {
+                $p->getSight()->lookHorizontal(0);
+                $p->moveForward();
+                $p->jump();
+            },
+            function (Player $p) {
+                $p->moveForward();
+                $p->getSight()->lookHorizontal(161);
+            },
+            function (Player $p) {
+                $p->moveForward();
+                $p->getSight()->lookHorizontal(0);
+            },
+            function (Player $p) {
+                $p->moveForward();
+            },
+        ]);
+        $this->assertSame(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
     public function testPlayerCornerFloorCatch(): void

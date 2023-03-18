@@ -71,6 +71,8 @@ class PlayerCollider
 
     /**
      * @return HitBox[]
+     * @interal
+     * @codeCoverageIgnore
      */
     public function getHitBoxes(): array
     {

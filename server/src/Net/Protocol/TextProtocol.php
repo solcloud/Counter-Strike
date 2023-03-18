@@ -59,7 +59,7 @@ class TextProtocol extends Protocol
                 if (!is_numeric($parts[1])) {
                     return [];
                 }
-                if ($method === 'look') {
+                if ((self::methodParamFloat[$method][1] ?? false)) {
                     $command[] = (float)$parts[1];
                 } else {
                     $command[] = (int)$parts[1];
@@ -69,10 +69,10 @@ class TextProtocol extends Protocol
                 if (!is_numeric($parts[2])) {
                     return [];
                 }
-                if ($method === 'look') {
+                if ((self::methodParamFloat[$method][2] ?? false)) {
                     $command[] = (float)$parts[2];
                 } else {
-                    $command[] = (int)$parts[2];
+                    $command[] = (int)$parts[2]; // @codeCoverageIgnore
                 }
             }
 

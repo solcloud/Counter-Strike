@@ -3,10 +3,12 @@
 namespace Test\Shooting;
 
 use cs\Core\GameProperty;
+use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\GameOverReason;
 use cs\Enum\SoundType;
 use cs\Event\SoundEvent;
 use cs\Weapon\Knife;
@@ -31,6 +33,45 @@ class SimpleShootTest extends BaseTestCase
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
         $this->assertSame(29, $ak->getAmmo());
+    }
+
+    public function testEmptyClipSoundEvent(): void
+    {
+        $noAmmoTickId = null;
+        $game = $this->createTestGame();
+        $game->getPlayer(1)->equipSecondaryWeapon();
+
+        $game->onTick(function (GameState $state) use ($game, &$noAmmoTickId): void {
+            if ($noAmmoTickId === -1) {
+                $game->quit(GameOverReason::TIE);
+                return;
+            }
+            $p = $state->getPlayer(1);
+            if (!$p->isAlive()) {
+                return;
+            }
+
+            $p->attack();
+            $glock = $p->getEquippedItem();
+            assert($glock instanceof PistolGlock, get_class($glock));
+            if ($glock->getAmmo() === 0) {
+                $noAmmoTickId = $state->getTickId();
+            }
+        });
+        $game->onEvents(function (array $events) use (&$noAmmoTickId): void {
+            foreach ($events as $event) {
+                if (!($event instanceof SoundEvent)) {
+                    continue;
+                }
+
+                if ($event->type === SoundType::ATTACK_NO_AMMO && $noAmmoTickId > 0) {
+                    $noAmmoTickId = -1;
+                }
+            }
+        });
+
+        $game->start();
+        $this->assertSame(-1, $noAmmoTickId);
     }
 
     public function testVerticalShooting(): void

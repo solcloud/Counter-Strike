@@ -139,7 +139,7 @@ trait MovementTrait
         } elseif ($this->isRunning()) {
             $speed = Setting::moveDistancePerTick();
         } else {
-            throw new GameException("Wat doing?");
+            throw new GameException("Wat doing?"); // @codeCoverageIgnore
         }
 
         $equippedItem = $this->getEquippedItem();

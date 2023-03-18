@@ -39,14 +39,6 @@ final class SoundEvent extends TickEvent
         return $this;
     }
 
-    /**
-     * @param array<string,mixed> $extra
-     */
-    public function setExtra(array $extra): void
-    {
-        $this->extra = $extra;
-    }
-
     public function addExtra(string $key, mixed $value): self
     {
         $this->extra[$key] = $value;

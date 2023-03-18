@@ -31,6 +31,11 @@ class KnifeAttackTest extends BaseTestCase
                 $this->assertSame(0, $attack->getMoneyAward());
                 $this->assertCount(0, $attack->getHits());
             },
+            function () use ($game) {
+                $knife = $game->getPlayer(1)->getEquippedItem();
+                $this->assertFalse($knife->canAttack($game->getTickId()));
+                $this->assertNull($game->getPlayer(1)->attack());
+            },
             $this->endGame(),
         ]);
     }

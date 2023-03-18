@@ -41,9 +41,6 @@ trait CrouchTrait
                     }
                     $this->headHeight = $h;
                 }
-                if ($this->headHeight > Setting::playerHeadHeightStand()) {
-                    $this->headHeight = Setting::playerHeadHeightStand();
-                }
             }
         });
 

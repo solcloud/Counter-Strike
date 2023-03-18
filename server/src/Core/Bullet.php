@@ -81,11 +81,6 @@ class Bullet
         return $this->distanceTraveled;
     }
 
-    public function getDistanceMax(): int
-    {
-        return $this->distanceMax;
-    }
-
     public function getOriginPlayerId(): int
     {
         return $this->originPlayerId;

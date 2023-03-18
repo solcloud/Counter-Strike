@@ -135,10 +135,12 @@ class CollisionTest extends BaseTest
         foreach ($points as $point) {
             $this->assertTrue(Collision::pointWithCylinder($point, $cylinderBottom, $radius, $height), "Point: {$point}");
         }
+
     }
 
     public function testPointWithCylinderFalse(): void
     {
+        $this->assertFalse(Collision::cylinderWithCylinder(new Point(132, 3, 88), 44, 190, new Point(55, -10, 45), 44, 190));
         $cylinderBottom = new Point(3, -1, 0);
         $radius = 3;
         $height = 6;

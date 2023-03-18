@@ -38,6 +38,12 @@ class RampTest extends BaseTestCase
         return $game;
     }
 
+    public function testInvalidDirection(): void
+    {
+        $this->expectExceptionMessage('Invalid direction given');
+        new Ramp(new Point(), new Point2D(1, 1), 1, 1);
+    }
+
     public function testDiagonalRampMovement1(): void
     {
         $game = $this->_createGame(250);

@@ -89,7 +89,7 @@ final class AttackEvent
             return $this->item->createBullet();
         }
 
-        GameException::notImplementedYet("No bullet for item: " . get_class($this->item));
+        GameException::notImplementedYet("No bullet for item: " . get_class($this->item)); // @codeCoverageIgnore
     }
 
     public function applyRecoil(float $offsetHorizontal, float $offsetVertical): void

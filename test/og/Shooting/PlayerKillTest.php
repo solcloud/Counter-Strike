@@ -14,7 +14,9 @@ use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
+use cs\Enum\ItemId;
 use cs\Event\KillEvent;
+use cs\Weapon\Knife;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
 use cs\Weapon\RifleM4A4;
@@ -376,6 +378,7 @@ class PlayerKillTest extends BaseTestCase
                 if ($event instanceof KillEvent) {
                     $killEventsCount++;
                     $this->assertTrue($event->wasHeadShot());
+                    $this->assertSame(ItemId::$map[PistolUsp::class], $event->getAttackItemId());
                 }
             }
         });

@@ -7,6 +7,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\Color;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
 use cs\Event\GameOverEvent;
@@ -73,6 +74,12 @@ class RoundTest extends BaseTestCase
         $this->assertCount(1, $killEvents);
         $killEvent = $killEvents[0];
         $this->assertInstanceOf(KillEvent::class, $killEvent);
+        $this->assertSame([
+            'playerDead'    => $killEvent->getPlayerDead()->getId(),
+            'playerCulprit' => $killEvent->getPlayerCulprit()->getId(),
+            'itemId'        => $killEvent->getAttackItemId(),
+            'headshot'      => $killEvent->wasHeadShot(),
+        ], $killEvent->serialize());
         $this->assertFalse($killEvent->wasHeadShot());
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
         $this->assertSame(1, $killEvent->getPlayerCulprit()->getId());
@@ -110,6 +117,14 @@ class RoundTest extends BaseTestCase
         $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
         $this->assertSame(12, $game->getTickId());
         $this->assertTrue($called);
+    }
+
+    public function testNoSpawnPosition(): void
+    {
+        $game = $this->createTestGame();
+        $player = new Player(2, Color::YELLOW, true);
+        $this->expectExceptionMessage("Cannot find free spawn position for 'attacker' player");
+        $game->addPlayer($player);
     }
 
     public function testFreezeTime(): void

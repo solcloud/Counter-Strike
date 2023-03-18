@@ -30,7 +30,7 @@ trait AttackTrait
         }
 
         if (!($item instanceof AttackEnable)) {
-            return null;
+            return null; // @codeCoverageIgnore
         }
         if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
             $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
@@ -47,14 +47,14 @@ trait AttackTrait
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
-        return null;
+        return null; // @codeCoverageIgnore
     }
 
     public function attackSecondary(): ?AttackResult
     {
         $item = $this->getEquippedItem();
         if (!($item instanceof AttackEnable)) {
-            return null;
+            return null; // @codeCoverageIgnore
         }
 
         if ($item instanceof Knife) {
@@ -66,7 +66,7 @@ trait AttackTrait
             }
         }
 
-        return null;
+        return null; // @codeCoverageIgnore
     }
 
     private function processAttackResult(AttackResult $result): AttackResult

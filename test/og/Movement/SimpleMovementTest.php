@@ -57,7 +57,7 @@ class SimpleMovementTest extends BaseTestCase
 
     public function testPlayerCrouch(): void
     {
-        $game = $this->createOneRoundGame(Setting::tickCountCrouch());
+        $game = $this->createOneRoundGame(Setting::tickCountCrouch() + 4);
         $game->onTick(function (GameState $state): void {
             $state->getPlayer(1)->crouch();
         });

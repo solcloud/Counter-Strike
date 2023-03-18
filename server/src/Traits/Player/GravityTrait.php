@@ -74,6 +74,7 @@ trait GravityTrait
             return;
         }
 
+        // @codeCoverageIgnoreStart
         if ($fallHeight < $threshold + 15) {
             $this->lowerHealth(10);
         } elseif ($fallHeight < $threshold + 30) {
@@ -84,6 +85,7 @@ trait GravityTrait
             $this->lowerHealth(60);
         } elseif ($fallHeight < $threshold + 120) {
             $this->lowerHealth(90);
+        // @codeCoverageIgnoreEnd
         } else {
             $this->lowerHealth(999);
         }

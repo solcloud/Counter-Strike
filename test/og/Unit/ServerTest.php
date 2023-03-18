@@ -7,8 +7,10 @@ use cs\Core\GameException;
 use cs\Core\GameFactory;
 use cs\Core\Setting;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\GameOverReason;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Molotov;
+use cs\Event\GameOverEvent;
 use cs\Map\TestMap;
 use cs\Net\ProtocolWriter;
 use cs\Net\Server;
@@ -39,6 +41,18 @@ class ServerTest extends BaseTest
         return $testNet->getResponses();
     }
 
+    public function testServerNoPlayersConnected(): void
+    {
+        $game = GameFactory::createDebug();
+        $setting = new ServerSetting(1, 0, 'a', 'd', false, 0);
+        $testNet = new TestConnector(['']);
+        $server = new Server($game, $setting, $testNet);
+        $server->start();
+        $gameOver = $game->tick($game->getTickId() + 1);
+        $this->assertInstanceOf(GameOverEvent::class, $gameOver);
+        $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED, $gameOver->reason);
+    }
+
     public function testServer(): void
     {
         $game = GameFactory::createDebug();
@@ -67,6 +81,23 @@ class ServerTest extends BaseTest
         $this->assertSame(-20.0, $player->getSight()->getRotationVertical());
         $this->assertInstanceOf(Molotov::class, $player->getInventory()->getItems()[InventorySlot::SLOT_GRENADE_MOLOTOV->value]);
         $this->assertLessThan(Setting::playerHeadHeightStand(), $player->getHeadHeight());
+    }
+
+    public function testLoginDefender(): void
+    {
+        $game = GameFactory::createDebug();
+        $map = new TestMap();
+        $game->loadMap($map);
+        $spawnPos = $map->getSpawnPositionDefender()[0];
+
+        $clientRequests = [
+            'login dcode',
+            'invalid',
+        ];
+        $responses = $this->runTestServer($game, $clientRequests);
+        $player = $game->getPlayer(1);
+        $this->assertCount(count($clientRequests) + 1, $responses);
+        $this->assertPositionSame($spawnPos, $player->getPositionClone());
     }
 
 }

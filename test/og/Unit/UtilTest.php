@@ -13,6 +13,12 @@ use Test\BaseTest;
 class UtilTest extends BaseTest
 {
 
+    public function testNegativeTime(): void
+    {
+        $this->expectExceptionMessage('Negative time given');
+        Util::millisecondsToFrames(-1);
+    }
+
     public function testPlayerCameraAngles(): void
     {
         $camera = new PlayerCamera();

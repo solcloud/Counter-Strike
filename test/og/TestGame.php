@@ -4,6 +4,7 @@ namespace Test;
 
 use Closure;
 use cs\Core\Game;
+use cs\Core\Setting;
 use cs\Net\Protocol\TextProtocol;
 
 /**
@@ -81,6 +82,11 @@ class TestGame extends Game
         file_put_contents(
             $path,
             json_encode([
+                'player' => [
+                    'head'   => Setting::playerHeadRadius(),
+                    'body'   => Setting::playerBoundingRadius(),
+                    'height' => Setting::playerHeadHeightStand(),
+                ],
                 'states' => $this->gameStates,
                 'floors' => $this->getWorld()->getFloors(),
                 'walls'  => $this->getWorld()->getWalls(),

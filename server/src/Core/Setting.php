@@ -193,6 +193,7 @@ final class Setting
 
     /**
      * @return array<string,int|float>
+     * @codeCoverageIgnore
      */
     public static function getDataArray(): array
     {

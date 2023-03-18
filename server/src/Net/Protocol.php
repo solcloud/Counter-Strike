@@ -50,6 +50,14 @@ abstract class Protocol
         'walk'     => 0,
     ];
 
+    /** @var array<string,array<int,bool>> [methodName => [paramNumber => true]] */
+    public const methodParamFloat = [
+        'look' => [
+            1 => true,
+            2 => true,
+        ],
+    ];
+
     /** @var array<string,int> [methodName => methodNumber] */
     public const playerMethodByName = [
         'attack'   => 0,

@@ -642,7 +642,7 @@ class World
     public function getMap(): Map
     {
         if (null === $this->map) {
-            throw new GameException("No map is loaded!");
+            throw new GameException("No map is loaded!"); // @codeCoverageIgnore
         }
 
         return $this->map;

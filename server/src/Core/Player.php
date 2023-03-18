@@ -178,11 +178,6 @@ final class Player
         $this->world = $world;
     }
 
-    public function getColor(): Color
-    {
-        return $this->color;
-    }
-
     public function isPlayingOnAttackerSide(): bool
     {
         return $this->isPlayingOnAttackerSide;
@@ -272,9 +267,9 @@ final class Player
     public function toArray(): array
     {
         return [
-            'id'         => $this->getId(),
-            'color'      => $this->getColor()->value,
-            'isAttacker' => $this->isPlayingOnAttackerSide(),
+            'id'         => $this->id,
+            'color'      => $this->color->value,
+            'isAttacker' => $this->isPlayingOnAttackerSide,
         ];
     }
 

@@ -4,6 +4,7 @@ namespace Test\Shooting;
 
 use cs\Core\GameState;
 use cs\Core\Player;
+use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
@@ -50,7 +51,17 @@ class BombTest extends BaseTestCase
         $this->assertFalse($game->getPlayer(1)->isAlive());
         $this->assertLessThan(Util::millisecondsToFrames($properties->round_time_ms), $game->getTickId());
         $this->assertInstanceOf(RoundEndEvent::class, $roundEndEvent);
+        $this->assertSame([
+            'roundNumber'    => $roundEndEvent->roundNumberEnded,
+            'newRoundNumber' => $roundEndEvent->roundNumberEnded + 1,
+            'attackersWins'  => $roundEndEvent->attackersWins,
+            'score'          => $game->getScore()->toArray(),
+        ], $roundEndEvent->serialize());
         $this->assertInstanceOf(PlantEvent::class, $plantEvent);
+        $this->assertSame([
+            'timeMs'   => 1000,
+            'position' => (new Point())->toArray(),
+        ], $plantEvent->serialize());
         $this->assertSame(1, $plantCount);
         $this->assertSame(RoundEndReason::BOMB_EXPLODED, $roundEndEvent->reason);
         $this->assertSame(

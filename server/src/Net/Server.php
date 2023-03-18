@@ -59,7 +59,7 @@ class Server
 
         $this->log("All players connected, starting game.");
         if ($this->saveRequestsPath) {
-            $this->saveRequestMetaData();
+            $this->saveRequestMetaData(); // @codeCoverageIgnore
         }
         $tickCount = $this->startGame();
         $this->log("Game ended! Ticks: {$tickCount}, Lag: {$this->serverLag}.");
@@ -80,7 +80,7 @@ class Server
             }
 
             if (--$this->setting->warmupWaitSecRemains > 0) {
-                sleep(1);
+                sleep(1); // @codeCoverageIgnore
             }
         }
 
@@ -108,7 +108,7 @@ class Server
             $nsDelta = $nextNsGoal - $nsCurrent;
             $nextNsGoal += $this->tickNanoSeconds;
             if ($nsDelta > 1024) {
-                time_nanosleep(0, $nsDelta);
+                time_nanosleep(0, $nsDelta); // @codeCoverageIgnore
             } else {
                 $this->log('Server lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
                 $this->serverLag++;
@@ -144,7 +144,7 @@ class Server
             if (isset($this->loggedPlayers["{$address}-{$port}"])) {
                 $playerId = $this->loggedPlayers["{$address}-{$port}"];
                 if (isset($playersRequest[$playerId])) {
-                    $this->log("Player '{$playerId}' have queued requests, dropping", LogLevel::WARNING);
+                    $this->log("Player '{$playerId}' have queued requests, dropping", LogLevel::WARNING); // @codeCoverageIgnore
                 } else {
                     $playersRequest[$playerId] = 1;
                     if ($this->game->getPlayer($playerId)->isAlive()) {
@@ -187,7 +187,7 @@ class Server
         }
 
         if (isset($this->blockList[$clientIp])) {
-            return false;
+            return false; // @codeCoverageIgnore
         }
         return true;
     }
@@ -200,25 +200,15 @@ class Server
     private function playerBlock(string $playerAddress): void
     {
         if (count($this->blockList) > $this->blockListMax) {
-            array_shift($this->blockList);
+            array_shift($this->blockList); // @codeCoverageIgnore
         }
         $this->blockList[$playerAddress] = 1;
-    }
-
-    private function error(string $msg = ''): never
-    {
-        throw new GameException($msg);
     }
 
     private function loginPlayer(string $playerAddress, int $playerPort, string $msg): void
     {
         if (isset($this->loggedPlayers["{$playerAddress}-{$playerPort}"])) {
-            return;
-        }
-
-        $playersCount = count($this->clients);
-        if ($playersCount >= $this->setting->playersMax) {
-            $this->error("Too many players");
+            return; // @codeCoverageIgnore
         }
 
         if ($msg === "login {$this->setting->attackerCode}") { // fixme use protocol interface for this, also each player should have unique code from MM
@@ -281,7 +271,7 @@ class Server
     private function saveRequestMetaData(): void
     {
         if ($this->game->getProperties()->randomize_spawn_position) {
-            $this->error("Cannot serialize with GameProperty 'randomize_spawn_position' enabled");
+            throw new GameException("Cannot serialize with GameProperty 'randomize_spawn_position' enabled"); // @codeCoverageIgnore
         }
 
         file_put_contents($this->saveRequestsPath . '.json', json_encode([

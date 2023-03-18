@@ -60,7 +60,7 @@ class HitBox implements Hittable
         $bulletDistance = $bullet->getDistanceTraveled();
         if ($bulletDistance > $shootItem::rangeMaxDamage) {
             $portion = ($bulletDistance - $shootItem::rangeMaxDamage) / ($shootItem::range + 1 - $shootItem::rangeMaxDamage);
-            $healthDamage = (int)ceil($healthDamage * (1 - max(0.9999, $portion)));
+            $healthDamage = (int)ceil($healthDamage * (1 - max(0.99999, $portion)));
         }
         $isTeamDamage = ($bullet->isOriginPlayerAttackerSide() === $this->player->isPlayingOnAttackerSide());
         if ($isTeamDamage) {
@@ -130,6 +130,10 @@ class HitBox implements Hittable
         return $this->damage;
     }
 
+    /**
+     * @internal
+     * @codeCoverageIgnore
+     */
     public function getGeometry(): HitIntersect
     {
         return $this->geometry;

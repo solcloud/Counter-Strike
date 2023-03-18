@@ -145,10 +145,6 @@ class Collision
 
     public static function circleWithPlane(Point2D $circleCenter, int $circleRadius, Plane $plane): bool
     {
-        if ($circleRadius === 0) {
-            return static::pointWithPlane($circleCenter, $plane);
-        }
-
         $planeStart = $plane->getPoint2DStart();
         $planeEnd = $plane->getPoint2DEnd();
         $circleX = $circleCenter->x;

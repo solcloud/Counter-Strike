@@ -1,6 +1,5 @@
 <?php
 
-use cs\Core\Setting;
 use cs\Event\EventList;
 use cs\Event\KillEvent;
 
@@ -156,7 +155,7 @@ $frameIdEnd = null;
         players: [],
         spawnPlayer: function (id, colorIndex, isAttacker) {
             const color = isAttacker ? new THREE.Color(0xff9145) : new THREE.Color(0x43b4fd)
-            const radiusHead = <?= Setting::playerHeadRadius() ?>;
+            const radiusHead = <?= $data['player']['head'] ?>;
 
             const sight = new THREE.Mesh(
                 new THREE.CylinderGeometry(1, 1, 150, 4),
@@ -172,8 +171,8 @@ $frameIdEnd = null;
             head.rotation.reorder("YXZ")
             head.add(sight)
 
-            const radiusBody = <?= Setting::playerBoundingRadius() ?>;
-            const heightBody = <?= Setting::playerHeadHeightStand() ?>;
+            const radiusBody = <?= $data['player']['body'] ?>;
+            const heightBody = <?= $data['player']['height'] ?>;
             const body = new THREE.Mesh(
                 new THREE.CylinderGeometry(radiusBody, radiusBody, heightBody, 16),
                 new THREE.MeshBasicMaterial({color, transparent: true, opacity: .4})
@@ -188,7 +187,7 @@ $frameIdEnd = null;
             body0.translateY(body0.geometry.parameters.height / 2)
 
             const boundingRadius = new THREE.Mesh(
-                new THREE.CircleGeometry(<?= Setting::playerBoundingRadius() ?>, 16),
+                new THREE.CircleGeometry(radiusBody, 16),
                 new THREE.MeshBasicMaterial({color, side: THREE.DoubleSide})
             );
             boundingRadius.rotateX(degreeToRadian(90))
