@@ -6,6 +6,7 @@ use cs\Enum\ArmorType;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
 use cs\Event\Event;
+use cs\Event\TimeoutEvent;
 use cs\Traits\Player as PlayerTrait;
 use cs\Weapon\AmmoBasedWeapon;
 
@@ -38,9 +39,10 @@ final class Player
     private int $eventIdPrimary = 0;
     private int $eventIdJump = 1;
     private int $eventIdCrouch = 2;
-    private int $eventIdMovement = 3;
-    private int $eventIdGravity = 4;
-    private int $eventIdOther = 5; // last
+    private int $eventIdShotSlowdown = 3;
+    private int $eventIdMovement = 4;
+    private int $eventIdGravity = 5;
+    private int $eventIdOther = 6; // last
 
     public function __construct(
         private int   $id,
@@ -195,6 +197,7 @@ final class Player
 
     public function lowerHealth(int $healthDamage): void
     {
+        $this->addEvent(new TimeoutEvent(null, 70), $this->eventIdShotSlowdown);
         $this->health -= abs($healthDamage);
         if ($this->health <= 0) {
             $this->health = 0;

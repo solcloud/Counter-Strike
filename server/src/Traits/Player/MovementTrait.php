@@ -153,6 +153,9 @@ trait MovementTrait
         } elseif ($this->isFlying()) {
             $speed *= Setting::flyingMovementSpeedMultiplier();
         }
+        if (isset($this->events[$this->eventIdShotSlowdown])) {
+            $speed *= .4;
+        }
 
         return (int)ceil($speed);
     }

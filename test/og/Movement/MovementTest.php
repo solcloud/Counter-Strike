@@ -142,6 +142,27 @@ class MovementTest extends BaseTestCase
         $this->assertLessThan(Setting::moveDistancePerTick(), $game->getPlayer(1)->getPositionClone()->z);
     }
 
+    public function testPlayerSlowMovementWhenShot(): void
+    {
+        $tickMax = 5;
+        $game = $this->createTestGame($tickMax);
+        $p2 = new Player(2, Color::YELLOW, false);
+        $game->addPlayer($p2);
+        $p2->getSight()->look(180, -10);
+        $p2->setPosition($p2->getPositionClone()->addZ(Setting::moveDistancePerTick() * 10));
+        $game->onTick(function (GameState $state) {
+            $state->getPlayer(1)->moveForward();
+            if ($state->getTickId() === 2) {
+                $this->assertNotNull($state->getPlayer(2)->attack());
+                $this->assertLessThan(100, $state->getPlayer(1)->getHealth());
+                $this->assertTrue($state->getPlayer(1)->isAlive());
+            }
+        });
+        $game->start();
+        $this->assertGreaterThan(Setting::moveDistancePerTick() * 3, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan(Setting::moveDistancePerTick() * $tickMax, $game->getPlayer(1)->getPositionClone()->z);
+    }
+
     public function testPlayerSlowMovementWhenFlying(): void
     {
         $game = $this->createOneRoundGame();
