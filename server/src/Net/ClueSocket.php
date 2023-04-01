@@ -18,8 +18,7 @@ class ClueSocket implements NetConnector
     public function __construct(string $bindAddress)
     {
         try {
-            $factory = new Factory();
-            $this->socket = $factory->createServer($bindAddress);
+            $this->socket = (new Factory())->createServer($bindAddress);
             $this->resource = $this->socket->getResource(); // @phpstan-ignore-line
         } catch (Exception $ex) {
             throw new NetException($ex->getMessage(), $ex->getCode(), $ex);

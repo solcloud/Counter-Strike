@@ -42,7 +42,7 @@ final class Player
     private int $eventIdShotSlowdown = 3;
     private int $eventIdMovement = 4;
     private int $eventIdGravity = 5;
-    private int $eventIdOther = 6; // last
+    private int $eventIdLast = 6; // last
 
     public function __construct(
         private int   $id,
@@ -76,7 +76,7 @@ final class Player
             $this->setActiveFloor(null);
         }
 
-        for ($i = 0; $i <= $this->eventIdOther; $i++) {
+        for ($i = 0; $i <= $this->eventIdLast; $i++) {
             if (!isset($this->events[$i])) {
                 continue;
             }
@@ -292,24 +292,24 @@ final class Player
         }
 
         return [
-            "id"          => $this->id,
-            "color"       => $this->color->value,
-            "money"       => $this->inventory->getDollars(),
-            "item"        => $equippedItem->toArrayCache,
-            "canAttack"   => $this->world->canAttack($this),
-            "canBuy"      => $this->world->canBuy($this),
-            "canPlant"    => $this->world->canPlant($this),
-            "slots"       => $this->inventory->getFilledSlots(),
-            "health"      => $this->health,
-            "position"    => $this->position->toArray(),
-            "look"        => $this->sight->toArray(),
-            "isAttacker"  => $this->isPlayingOnAttackerSide,
-            "sight"       => $this->getSightHeight(),
-            "armor"       => $this->getArmorValue(),
-            "armorType"   => $this->getArmorType()->value,
-            "ammo"        => $ammo,
-            "ammoReserve" => $ammoReserve,
-            "isReloading" => $reloading,
+            'id'          => $this->id,
+            'color'       => $this->color->value,
+            'money'       => $this->inventory->getDollars(),
+            'item'        => $equippedItem->toArrayCache,
+            'canAttack'   => $this->world->canAttack($this),
+            'canBuy'      => $this->world->canBuy($this),
+            'canPlant'    => $this->world->canPlant($this),
+            'slots'       => $this->inventory->getFilledSlots(),
+            'health'      => $this->health,
+            'position'    => $this->position->toArray(),
+            'look'        => $this->sight->toArray(),
+            'isAttacker'  => $this->isPlayingOnAttackerSide,
+            'sight'       => $this->getSightHeight(),
+            'armor'       => $this->getArmorValue(),
+            'armorType'   => $this->getArmorType()->value,
+            'ammo'        => $ammo,
+            'ammoReserve' => $ammoReserve,
+            'isReloading' => $reloading,
         ];
     }
 

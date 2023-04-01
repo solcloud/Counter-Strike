@@ -19,7 +19,7 @@ final class RifleM4A4 extends AmmoBasedWeapon
     public const armorPenetration = 67;
     public const recoilResetMs = 310;
     public const recoilPattern = [
-        [0, 0], // fixme
+        [0, 0], // fixme better pattern
         [+0.09, +0.17],
         [-0.02, +0.72],
         [+0.04, +1.53],

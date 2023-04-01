@@ -33,7 +33,6 @@ foreach ($map->getBoxes() as $box) {
     <meta charset="UTF-8">
     <title>Map Generator</title>
     <script src="./assets/threejs/three.js"></script>
-    <script src="./assets/threejs/orbit-control.js"></script>
 </head>
 <body style="margin:0">
 <div style="position:absolute;<?= $radarMapGenerator ? 'display:none;' : '' ?>">

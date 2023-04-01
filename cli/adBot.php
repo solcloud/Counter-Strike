@@ -10,8 +10,7 @@ $port = (int)($argv[2] ?? 8080);
 $address = "udp://localhost:$port";
 /////
 
-$factory = new Factory();
-$socket = $factory->createClient($address, 4);
+$socket = (new Factory())->createClient($address, 4);
 $socket->write('login ' . $loginCode);
 
 $bool = true;

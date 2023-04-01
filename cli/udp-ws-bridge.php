@@ -8,11 +8,10 @@ require __DIR__ . '/../vendor/autoload.php';
 ///
 $portWs = (int)($argv[1] ?? 8081);
 $portUdp = (int)($argv[2] ?? 8080);
+$addressUdp = "udp://localhost:{$portUdp}";
 ///
 
-$addressUdp = "udp://localhost:{$portUdp}";
 $udp = (new Factory())->createClient($addressUdp, 4);
-
 $ws = new Server([
     'filter'        => ['text'],
     'fragment_size' => '8192',

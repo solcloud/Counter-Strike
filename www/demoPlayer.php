@@ -1,18 +1,17 @@
 <?php
 
+require __DIR__ . '/../vendor/autoload.php';
+
 use cs\Event\EventList;
 use cs\Event\KillEvent;
 
-if (getenv('DEVTOKEN') !== 'dev') {
-    exit;
-}
-require __DIR__ . '/../vendor/autoload.php';
 ////////
 $data = @file_get_contents('/tmp/cs.demo.json');
 ////////
 
 if ($data === false) {
-    throw new Exception("No data found");
+    echo "No data found";
+    return;
 }
 $data = json_decode($data, true);
 $frameIdStart = null;
@@ -54,7 +53,6 @@ $frameIdEnd = null;
         }
     </style>
     <script src="./assets/threejs/three.js"></script>
-    <script src="./assets/threejs/orbit-control.js"></script>
     <script src="./assets/js/utils.js"></script>
 </head>
 <body>

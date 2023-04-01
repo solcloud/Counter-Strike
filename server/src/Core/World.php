@@ -38,7 +38,7 @@ class World
     public function __construct(private Game $game)
     {
         $this->playerPotentialDistanceSquared = ($game->getBacktrack()->numberOfHistoryStates + 2) * pow(Setting::moveDistancePerTick(), 2)
-            + pow(Setting::playerBoundingRadius(), 2); // fixme: more tests to know if it is reliable heuristic value
+            + pow(Setting::playerBoundingRadius(), 2); // fixme: more tests to know if it is reliable heuristic value, also test with further backtrack
     }
 
     public function roundReset(): void

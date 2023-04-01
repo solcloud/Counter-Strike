@@ -83,12 +83,12 @@ class Box
     public function toArray(): array
     {
         return [
-            "width"  => $this->widthX,
-            "height" => $this->heightY,
-            "depth"  => $this->depthZ,
-            "x"      => $this->lowerLeftPoint->x,
-            "y"      => $this->lowerLeftPoint->y,
-            "z"      => $this->lowerLeftPoint->z,
+            'width'  => $this->widthX,
+            'height' => $this->heightY,
+            'depth'  => $this->depthZ,
+            'x'      => $this->lowerLeftPoint->x,
+            'y'      => $this->lowerLeftPoint->y,
+            'z'      => $this->lowerLeftPoint->z,
         ];
     }
 

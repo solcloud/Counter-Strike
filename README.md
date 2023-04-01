@@ -45,7 +45,7 @@ open http://localhost:9000
 
 ### Server
 
-Currently, there is no official public server available (as match making service is also WIP), but you can run server locally (or somebody can host it for you).
+Currently, there is no official public server available (as match making service is also WIP), but you can run server yourself (or somebody can host it for you).
 
 ```bash
 composer install -a --no-dev

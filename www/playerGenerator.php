@@ -64,9 +64,6 @@ $slots = [
     <title>Player model Generator</title>
     <script src="./assets/threejs/three.js"></script>
     <script src="./assets/js/utils.js"></script>
-    <script src="./assets/threejs/orbit-control.js"></script>
-    <script src="./assets/threejs/GLTFLoader.js"></script>
-    <script src="./assets/threejs/SkeletonUtils.js"></script>
 </head>
 <body style="margin:0">
 <script>

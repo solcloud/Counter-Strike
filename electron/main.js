@@ -4,8 +4,8 @@ const path = require('path')
 app.whenReady().then(() => {
     const win = new BrowserWindow({
         autoHideMenuBar: true,
-        width: 800,
-        height: 600,
+        width: 1200,
+        height: 900,
         webPreferences: {
             devTools: false,
             nodeIntegration: false,

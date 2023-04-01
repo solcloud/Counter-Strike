@@ -56,8 +56,8 @@ class PlayerCamera
     public function toArray()
     {
         return [
-            "horizontal" => $this->getRotationHorizontal(),
-            "vertical"   => $this->getRotationVertical(),
+            'horizontal' => $this->getRotationHorizontal(),
+            'vertical'   => $this->getRotationVertical(),
         ];
     }
 

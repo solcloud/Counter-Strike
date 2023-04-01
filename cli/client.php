@@ -11,8 +11,7 @@ $command = ($argv[3] ?? '');
 $address = "udp://localhost:$port";
 /////
 
-$factory = new Factory();
-$socket = $factory->createClient($address, 4);
+$socket = (new Factory())->createClient($address, 4);
 
 $socket->write('login ' . $loginCode);
 if ($command === 'afk') {
