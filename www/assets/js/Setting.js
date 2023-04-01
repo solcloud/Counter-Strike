@@ -13,7 +13,7 @@ export class Setting {
             crosshairColor: '#d31b1b',
             crosshairSize: 40,
             preferPerformance: false,
-            matchServerFps: true,
+            matchServerFps: false,
             anisotropic: 16,
             exposure: 0.8,
         },
@@ -99,7 +99,7 @@ export class Setting {
     }
 
     shouldMatchServerFps() {
-        return this.#setting.base.matchServerFps ?? true
+        return this.#setting.base.matchServerFps ?? false
     }
 
     getSensitivity() {
