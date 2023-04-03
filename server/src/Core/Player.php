@@ -76,7 +76,7 @@ final class Player
             $this->setActiveFloor(null);
         }
 
-        for ($i = 0; $i <= $this->eventIdLast; $i++) {
+        for ($i = 0; $i < $this->eventIdLast; $i++) {
             if (!isset($this->events[$i])) {
                 continue;
             }
