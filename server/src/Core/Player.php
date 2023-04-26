@@ -33,6 +33,7 @@ final class Player
 
     private int $health;
     private int $headHeight; // highest player point
+    private int $velocity;
     private bool $isAttacking = false;
 
     // Event IDs, sequence - ascending order priority
@@ -55,6 +56,7 @@ final class Player
         $this->position = new Point();
         $this->headFloor = new DynamicFloor($this);
         $this->playerBoundingRadius = Setting::playerBoundingRadius();
+        $this->velocity = Setting::playerVelocity();
 
         $this->initialize();
     }
@@ -153,6 +155,14 @@ final class Player
     public function setHeadHeight(int $height): void
     {
         $this->headHeight = $height;
+    }
+
+    /**
+     * @interal
+     */
+    public function setVelocity(int $velocity): void
+    {
+        $this->velocity = $velocity;
     }
 
     public function getHeadHeight(): int

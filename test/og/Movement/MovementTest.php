@@ -308,6 +308,23 @@ class MovementTest extends BaseTestCase
         $this->assertLessThan(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getPositionClone()->y);
     }
 
+    public function testPlayerVelocity(): void
+    {
+        $maxTick = 4;
+        $constantDistance = $maxTick * Setting::moveDistancePerTick();
+        $game = $this->createTestGame($maxTick);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->start();
+        $this->assertSame($constantDistance, $game->getPlayer(1)->getPositionClone()->z);
+
+        $game = $this->createTestGame($maxTick);
+        $game->getPlayer(1)->setVelocity(10);
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->start();
+        $this->assertGreaterThan(1, $game->getPlayer(1)->getPositionClone()->z);
+        $this->assertLessThan($constantDistance, $game->getPlayer(1)->getPositionClone()->z);
+    }
+
     public function testPlayerDiagonalMove(): void
     {
         $game = $this->createOneRoundGame();

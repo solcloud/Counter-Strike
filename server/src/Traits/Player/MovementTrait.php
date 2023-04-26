@@ -21,6 +21,7 @@ trait MovementTrait
     private int $lastMoveZ = 0;
     private ?int $lastAngle = 0;
     private bool $isWalking = false;
+    private int $velocityPermil = 0;
 
     public function speedRun(): void
     {
@@ -96,13 +97,27 @@ trait MovementTrait
     {
         return new PlayerMovementEvent(function (): void {
             if (!$this->isMoving()) {
+                $this->velocityPermil = 0;
                 return;
             }
 
+            $this->updateVelocity();
             $this->position->setFrom($this->processMovement($this->moveX, $this->moveZ, $this->position));
             $this->world->tryPickDropItems($this);
             $this->stop();
         });
+    }
+
+    private function updateVelocity(): void {
+        if ($this->velocityPermil === 1000) {
+            return;
+        }
+        if ($this->velocity === 0) {
+            $this->velocityPermil = 1000;
+            return;
+        }
+
+        $this->velocityPermil = min(1000, $this->velocityPermil + $this->velocity);
     }
 
     private function getMoveAngle(): float
@@ -157,13 +172,14 @@ trait MovementTrait
             $speed *= .4;
         }
 
-        return (int)ceil($speed);
+        return (int)ceil($speed * $this->velocityPermil / 1000);
     }
 
     private function processMovement(int $moveX, int $moveZ, Point $current): Point
     {
         // If single direction move in opposite direction than previous (counter strafing) we stop
         if (!($moveX <> 0 && $moveZ <> 0) && (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ))) {
+            $this->velocityPermil = 0;
             return $current;
         }
 

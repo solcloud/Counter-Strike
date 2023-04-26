@@ -51,6 +51,7 @@ final class Setting
     private static function fixBackwardCompatible(array &$constants): void
     {
         // BC code
+        $constants['playerVelocity'] = ($constants['playerVelocity'] ?? 0);
         foreach (self::defaultConstant as $key => $defaultValue) {
             if (isset($constants[$key])) {
                 continue;
@@ -164,6 +165,11 @@ final class Setting
     public static function playerBoundingRadius(): int
     {
         return self::$data['playerBoundingRadius']; // @phpstan-ignore-line
+    }
+
+    public static function playerVelocity(): int
+    {
+        return self::$data['playerVelocity'] ?? ((int)ceil(Util::$TICK_RATE * 1.7)); // @phpstan-ignore-line
     }
 
     public static function playerJumpHeight(): int
