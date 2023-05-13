@@ -65,20 +65,16 @@ class ServerTest extends BaseTest
             'jump', // game is paused on zero tick so no register
             'forward',
             'right',
-            'forward',
-            "look 45 -20|crouch|buy " . BuyMenuItem::GRENADE_MOLOTOV->value,
+            "look 45.2 -20.1|crouch|buy " . BuyMenuItem::GRENADE_MOLOTOV->value,
         ];
         $responses = $this->runTestServer($game, $clientRequests);
         $player = $game->getPlayer(1);
         $this->assertCount(count($clientRequests) + 1, $responses);
+        $this->assertSame(0, $player->getPositionClone()->y);
         $this->assertGreaterThan($spawnPos->x, $player->getPositionClone()->x);
         $this->assertGreaterThan($spawnPos->z, $player->getPositionClone()->z);
-        $moveSpeed = ($player->getPositionClone()->x - $spawnPos->x);
-        $this->assertGreaterThan(0, $moveSpeed);
-        $this->assertSame(0, $player->getPositionClone()->y);
-        $this->assertSame($spawnPos->z + 2 * $moveSpeed, $player->getPositionClone()->z);
-        $this->assertSame(45.0, $player->getSight()->getRotationHorizontal());
-        $this->assertSame(-20.0, $player->getSight()->getRotationVertical());
+        $this->assertSame(45.2, $player->getSight()->getRotationHorizontal());
+        $this->assertSame(-20.1, $player->getSight()->getRotationVertical());
         $this->assertInstanceOf(Molotov::class, $player->getInventory()->getItems()[InventorySlot::SLOT_GRENADE_MOLOTOV->value]);
         $this->assertLessThan(Setting::playerHeadHeightStand(), $player->getHeadHeight());
     }

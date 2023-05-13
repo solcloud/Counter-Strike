@@ -6,6 +6,7 @@ use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
 use cs\Event\SoundEvent;
+use cs\Event\ThrowEvent;
 use cs\Interface\Hittable;
 use cs\Map\Map;
 
@@ -403,6 +404,11 @@ class World
         $this->game->addSoundEvent($soundEvent);
     }
 
+    public function throw(ThrowEvent $event): void
+    {
+        $this->game->addThrowEvent($event);
+    }
+
     public function canAttack(Player $player): bool
     {
         if ($this->game->isPaused()) {
@@ -584,6 +590,9 @@ class World
      */
     public function getXWalls(int $x): array
     {
+        if ($x < 0) {
+            return [new Wall(new Point($x, -1, -1), true, 99999, 99999)];
+        }
         return ($this->walls[self::WALL_X][$x] ?? []);
     }
 
@@ -592,6 +601,9 @@ class World
      */
     public function getZWalls(int $z): array
     {
+        if ($z < 0) {
+            return [new Wall(new Point(-1, -1, $z), false, 99999, 99999)];
+        }
         return ($this->walls[self::WALL_Z][$z] ?? []);
     }
 
@@ -628,6 +640,14 @@ class World
             }
         }
         return $output;
+    }
+
+    /**
+     * @return Floor[]
+     */
+    public function getYFloors(int $y): array
+    {
+        return ($this->floors[$y] ?? []);
     }
 
     /**

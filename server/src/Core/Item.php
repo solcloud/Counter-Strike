@@ -65,6 +65,11 @@ abstract class Item
         return 1;
     }
 
+    public function decrementQuantity(): void
+    {
+        // empty hook
+    }
+
     public function incrementQuantity(): void
     {
         // empty hook

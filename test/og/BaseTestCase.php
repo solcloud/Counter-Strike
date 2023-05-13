@@ -26,6 +26,7 @@ abstract class BaseTestCase extends BaseTest
         'fallAmountOneMs'              => 6,
         'crouchDurationMs'             => 40,
         'jumpDurationMs'               => 50,
+        'throwSpeed'                   => 20,
         // NOTE: Better to use even numbers for player const
         'playerVelocity'               => 0,
         'playerHeadRadius'             => 10,

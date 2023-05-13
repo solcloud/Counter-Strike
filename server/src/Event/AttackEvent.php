@@ -4,28 +4,29 @@ namespace cs\Event;
 
 use cs\Core\Bullet;
 use cs\Core\GameException;
-use cs\Core\Item;
 use cs\Core\Point;
 use cs\Core\World;
+use cs\Interface\Attackable;
+use cs\Interface\AttackEnable;
 use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\Knife;
 
-final class AttackEvent
+final class AttackEvent implements Attackable
 {
-    private Item $item;
 
     public function __construct(
-        private World $world,
-        private Point $origin,
-        private float $angleHorizontal,
-        private float $angleVertical,
-        private int   $playerId,
-        private bool  $playingOnAttackerSide,
+        private World        $world,
+        private Point        $origin,
+        private AttackEnable $item,
+        private float        $angleHorizontal,
+        private float        $angleVertical,
+        private int          $playerId,
+        private bool         $playingOnAttackerSide,
     )
     {
     }
 
-    public function process(): AttackResult
+    public function fire(): AttackResult
     {
         $bullet = $this->createBullet();
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide, $this->origin->clone());
@@ -72,11 +73,6 @@ final class AttackEvent
         }
         $this->world->getBacktrack()->restoreState();
         return $result;
-    }
-
-    public function setItem(Item $item): void
-    {
-        $this->item = $item;
     }
 
     private function createBullet(): Bullet

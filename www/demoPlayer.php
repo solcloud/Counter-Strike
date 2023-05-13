@@ -2,8 +2,11 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
+use cs\Enum\SoundType;
 use cs\Event\EventList;
 use cs\Event\KillEvent;
+use cs\Event\SoundEvent;
+use cs\Event\ThrowEvent;
 
 ////////
 $data = @file_get_contents('/tmp/cs.demo.json');
@@ -103,7 +106,11 @@ $frameIdEnd = null;
             this.gl.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(this.gl.domElement);
 
-            this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
+            this.scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.8
+            })))
             const lastObject = this.fillWorld(floors, walls)
             this.camera.lookAt(lastObject)
             new THREE.OrbitControls(this.camera, this.gl.domElement);
@@ -111,8 +118,20 @@ $frameIdEnd = null;
         fillWorld: function (floors, walls) {
             let lastMesh
             const scene = this.scene
-            const materialFloor = new THREE.MeshBasicMaterial({color: 0xFF0000, wireframe: true, transparent: true, opacity: 0.4, side: THREE.DoubleSide})
-            const materialWall = new THREE.MeshBasicMaterial({color: 0x0000FF, wireframe: true, transparent: true, opacity: 0.3, side: THREE.DoubleSide})
+            const materialFloor = new THREE.MeshBasicMaterial({
+                color: 0xFF0000,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.4,
+                side: THREE.DoubleSide
+            })
+            const materialWall = new THREE.MeshBasicMaterial({
+                color: 0x0000FF,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3,
+                side: THREE.DoubleSide
+            })
             floors.forEach(function (floor) {
                 const mesh = new THREE.Mesh(
                     new THREE.PlaneGeometry(floor.e.x - floor.s.x, floor.e.z - floor.s.z, 4, 4),
@@ -196,11 +215,45 @@ $frameIdEnd = null;
             this.scene.add(player)
             return player
         },
+        showTrajectory: false,
+        throwables: [],
+        createBall: function (radius) {
+            const ball = new THREE.Mesh(new THREE.SphereGeometry(radius), new THREE.MeshBasicMaterial({
+                color: 0xAA6611,
+                transparent: true,
+                opacity: 0.9
+            }))
+            this.scene.add(ball)
+            return ball
+        },
         renderFrame: function (frameId, state) {
             const self = this
             state.events.forEach(function (event) {
                 if (event.code === <?= EventList::map[KillEvent::class] ?>) {
                     console.log("KillEvent - frame: " + frameId, event.data)
+                }
+                if (event.code === <?= EventList::map[ThrowEvent::class] ?>) {
+                    const radius = event.data.radius
+                    if (self.showTrajectory) {
+                        self.throwables[event.data.id] = radius
+                        return
+                    }
+
+                    if (self.throwables[event.data.id] === undefined) {
+                        const ball = self.createBall(radius)
+                        ball.position.set(event.data.position.x, event.data.position.y, -event.data.position.z)
+                        self.throwables[event.data.id] = ball
+                    }
+                }
+                if (event.code === <?= EventList::map[SoundEvent::class] ?> &&
+                    ([<?= SoundType::GRENADE_LAND->value ?>, <?= SoundType::GRENADE_BOUNCE->value ?>, <?= SoundType::GRENADE_AIR->value ?>].includes(event.data.type))
+                ) {
+                    const ball = self.showTrajectory ? self.createBall(self.throwables[event.data.extra.id]) : self.throwables[event.data.extra.id]
+                    ball.visible = true
+                    ball.position.set(event.data.position.x, event.data.position.y, -event.data.position.z)
+                    if (!self.showTrajectory && event.data.type === <?= SoundType::GRENADE_LAND->value ?>) {
+                        setTimeout(() => ball.visible = false, 2000)
+                    }
                 }
             })
             state.players.forEach(function (playerState) {

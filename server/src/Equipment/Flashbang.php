@@ -6,16 +6,11 @@ use cs\Core\Item;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 
-class Flashbang extends BaseEquipment
+class Flashbang extends Grenade
 {
 
     private int $quantity = 1;
     protected int $price = 200;
-
-    public function getType(): ItemType
-    {
-        return ItemType::TYPE_GRENADE;
-    }
 
     public function getSlot(): InventorySlot
     {
@@ -40,6 +35,11 @@ class Flashbang extends BaseEquipment
     public function getMaxBuyCount(): int
     {
         return 2;
+    }
+
+    public function decrementQuantity(): void
+    {
+        $this->quantity--;
     }
 
     public function incrementQuantity(): void

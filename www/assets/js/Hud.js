@@ -287,6 +287,11 @@ export class HUD {
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_SMOKE}">Smoke</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_FLASH}">Flash</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_HE}">HighExplosive</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_MOLOTOV}">Molotov</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_DECOY}">Decoy</p>
                 </div>
                 <div>
                     <span data-ammo class="ammo bg"></span>

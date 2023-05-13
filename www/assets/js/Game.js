@@ -21,6 +21,7 @@ export class Game {
     #hudDebounceTicks = 1
     #bombTimerId = null;
     #eventProcessor
+    #throwables = [];
     score = null
     bombDropPosition = null
     alivePlayers = [0, 0]
@@ -168,8 +169,25 @@ export class Game {
         if (data.type === SoundType.BOMB_DEFUSED || data.type === SoundType.BOMB_EXPLODED) {
             clearInterval(this.#bombTimerId)
         }
+        if (data.type === SoundType.GRENADE_AIR || data.type === SoundType.GRENADE_BOUNCE || data.type === SoundType.GRENADE_LAND) {
+            const grenade = this.#throwables[data.extra.id];
+            grenade.position.set(data.position.x, data.position.y, -data.position.z)
+        }
+        if (data.type === SoundType.GRENADE_LAND) {
+            setTimeout(() => this.removeGrenade(data.extra.id), 1000) // todo responsive volumetric smokes, flashes, fire etc.
+        }
 
         this.#soundRepository.play(data, spectatorId, this.#tick)
+    }
+
+    spawnGrenade(item, id) {
+        this.#throwables[id] = this.#world.spawnGrenade(item)
+    }
+
+    removeGrenade(id) {
+        const grenade = this.#throwables[id]
+        this.#world.destroyObject(grenade)
+        delete this.#throwables[id]
     }
 
     bombPlanted(timeMs, position) {

@@ -12,16 +12,19 @@ use cs\Event\SoundEvent;
 trait InventoryTrait
 {
 
-    public function equip(InventorySlot $slot): void
+    public function equip(InventorySlot $slot): bool
     {
         if ($slot === InventorySlot::SLOT_KEVLAR || $slot === InventorySlot::SLOT_KIT) {
-            return;
+            return false;
         }
 
         $event = $this->inventory->equip($slot);
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
+            return true;
         }
+
+        return false;
     }
 
     public function equipKnife(): void

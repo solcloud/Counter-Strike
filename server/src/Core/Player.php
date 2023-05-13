@@ -158,7 +158,7 @@ final class Player
     }
 
     /**
-     * @interal
+     * @internal
      */
     public function setVelocity(int $velocity): void
     {

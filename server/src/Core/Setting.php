@@ -15,6 +15,7 @@ final class Setting
         'jumpDurationMs'                => 420,
         'jumpMovementSpeedMultiplier'   => 1.0,
         'flyingMovementSpeedMultiplier' => 0.8,
+        'throwSpeed'                    => 40,
 
         'playerHeadRadius'             => 10,
         'playerBoundingRadius'         => 60,
@@ -155,6 +156,11 @@ final class Setting
             self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"] = (self::$data["weaponSecondarySpeedMultiplier-{$itemId}"] ?? 0.8);
         }
         return self::$cacheFloat["getWeaponSecondarySpeedMultiplier-{$itemId}"];
+    }
+
+    public static function throwSpeed(): int
+    {
+        return self::$data['throwSpeed']; // @phpstan-ignore-line
     }
 
     public static function playerHeadRadius(): int

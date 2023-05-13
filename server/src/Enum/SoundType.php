@@ -22,5 +22,8 @@ enum SoundType: int
     case BOMB_DEFUSING = 14;
     case BOMB_DEFUSED = 15;
     case ITEM_PICKUP = 16;
+    case GRENADE_LAND = 17;
+    case GRENADE_BOUNCE = 18;
+    case GRENADE_AIR = 19;
 
 }

@@ -91,6 +91,26 @@ class Point
         $this->z = $point->z;
     }
 
+    /**
+     * @param int[] $xyz
+     */
+    public function setFromArray(array $xyz): void
+    {
+        $this->x = $xyz[0];
+        $this->y = $xyz[1];
+        $this->z = $xyz[2];
+    }
+
+    /**
+     * @param int[] $xyz
+     */
+    public function addFromArray(array $xyz): void
+    {
+        $this->x += $xyz[0];
+        $this->y += $xyz[1];
+        $this->z += $xyz[2];
+    }
+
     public function to2D(string $XYaxis): Point2D
     {
         return new Point2D($this->{$XYaxis[0]}, $this->{$XYaxis[1]});

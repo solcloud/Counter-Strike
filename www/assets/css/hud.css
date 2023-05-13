@@ -140,6 +140,17 @@
     padding: 12px 20px;
 }
 
+#hud #buy-menu .menu-grenades::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+#hud #buy-menu .menu-grenades > p {
+    float: left;
+    padding: 0px 12px;
+}
+
 #hud #buy-menu a {
     color: #43b4fd;
     cursor: pointer;

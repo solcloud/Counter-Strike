@@ -82,6 +82,131 @@ class UtilTest extends BaseTest
         $this->assertSame([-39, 39], Util::rotatePointY(10, -45, 32, 0, 0));
         $this->assertSame([-31, 45], Util::rotatePointY(20, -45, 32, 0, 0));
         $this->assertSame([-9, 54], Util::rotatePointY(45, -45, 32, 0, 0));
+
+        $this->assertSame([10, -2], Util::rotatePointY(63, 6, 8, 0, 0));
+        $this->assertSame([5, -9], Util::rotatePointY(116, 6, 8, 0, 0));
+        $this->assertSame([6, 8], Util::rotatePointY(-3, 6, 8, 0, 0));
+        $this->assertSame([3, 10], Util::rotatePointY(-22, 6, 8, 0, 0));
+        $this->assertSame([-4, 9], Util::rotatePointY(-63, 6, 8, 0, 0));
+        $this->assertSame([5, 9], Util::rotatePointY(351, 6, 8, 0, 0));
+        $this->assertSame([7, 7], Util::rotatePointY(-351, 6, 8, 0, 0));
+
+        $this->assertSame([-2, 2], Util::rotatePointY(0, -2, 2, 2, 3));
+        $this->assertSame([-2, 4], Util::rotatePointY(22, -2, 2, 2, 3));
+        $this->assertSame([3, 7], Util::rotatePointY(123, -2, 2, 2, 3));
+        $this->assertSame([4, 7], Util::rotatePointY(132, -2, 2, 2, 3));
+        $this->assertSame([1, -1], Util::rotatePointY(298, -2, 2, 2, 3));
+        $this->assertSame([-1, 6], Util::rotatePointY(-298, -2, 2, 2, 3));
+        $this->assertSame([-2, 1], Util::rotatePointY(-14, -2, 2, 2, 3));
+    }
+
+    public function testRotatePointX(): void
+    {
+        $data = [
+            0  => [20, 10],
+            4  => [20, 11],
+            76 => [5, 29],
+            90 => [0, 30],
+        ];
+
+        foreach ($data as $angle => $xz) {
+            $this->assertSame($xz, Util::rotatePointX($angle, 20, 10, 0, 10), "Angle: {$angle}");
+        }
+
+        $this->assertSame([0, 20], Util::rotatePointX(90, 20, 0));
+        $this->assertSame([-2, -9], Util::rotatePointX(198, 5, 8));
+        $this->assertSame([2, 9], Util::rotatePointX(22, 5, 8));
+        $this->assertSame([2, 9], Util::rotatePointX(22, 5, 8));
+        $this->assertSame([9, -2], Util::rotatePointX(287, 5, 8));
+        $this->assertSame([4, 9], Util::rotatePointX(9, 5, 8));
+        $this->assertSame([9, 4], Util::rotatePointX(-33, 5, 8, 0, 0));
+        $this->assertSame([1, 9], Util::rotatePointX(-333, 5, 8, 0, 0));
+
+        $this->assertSame([-2, 2], Util::rotatePointX(0, -2, 2, 2, 3));
+        $this->assertSame([-1, 1], Util::rotatePointX(22, -2, 2, 2, 3));
+        $this->assertSame([5, 0], Util::rotatePointX(123, -2, 2, 2, 3));
+        $this->assertSame([5, 1], Util::rotatePointX(132, -2, 2, 2, 3));
+        $this->assertSame([-1, 6], Util::rotatePointX(298, -2, 2, 2, 3));
+        $this->assertSame([1, -1], Util::rotatePointX(-298, -2, 2, 2, 3));
+        $this->assertSame([-2, 3], Util::rotatePointX(-14, -2, 2, 2, 3));
+    }
+
+    public function testRotatePointZ(): void
+    {
+        $data = [
+            0   => [6, 5],
+            6   => [6, 4],
+            112 => [2, -7],
+            254 => [-6, 4],
+            322 => [2, 8],
+        ];
+
+        foreach ($data as $angle => $xz) {
+            $this->assertSame($xz, Util::rotatePointZ($angle, 6, 5), "Angle: {$angle}");
+        }
+
+        $this->assertSame([8, 0], Util::rotatePointY(-322, 6, 5, 0, 0));
+        $this->assertSame([8, 0], Util::rotatePointZ(-322, 6, 5, 0, 0));
+        $this->assertSame([1, 8], Util::rotatePointY(-45, 6, 5, 0, 0));
+        $this->assertSame([1, 8], Util::rotatePointZ(-45, 6, 5, 0, 0));
+
+        $this->assertSame([-1, 16], Util::rotatePointZ(45, -12, 10, 0, 0));
+        $this->assertSame([-15, 5], Util::rotatePointZ(-22, -12, 10, 0, 0));
+        $this->assertSame([-7, 14], Util::rotatePointZ(22, -12, 10, 0, 0));
+
+        $this->assertSame([-1, -2], Util::rotatePointZ(0, -1, -2, 3, 2));
+        $this->assertSame([-2, 0], Util::rotatePointZ(22, -1, -2, 3, 2));
+        $this->assertSame([2, 8], Util::rotatePointZ(123, -1, -2, 3, 2));
+        $this->assertSame([3, 8], Util::rotatePointZ(132, -1, -2, 3, 2));
+        $this->assertSame([5, -3], Util::rotatePointZ(298, -1, -2, 3, 2));
+        $this->assertSame([-2, 4], Util::rotatePointZ(-298, -1, -2, 3, 2));
+        $this->assertSame([0, -3], Util::rotatePointZ(-14, -1, -2, 3, 2));
+    }
+
+    public function testWorldAngle(): void
+    {
+        $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(10, 0, 0)));
+        $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(0, 0, 10)));
+        $this->assertSame([45.0, 0.0], Util::worldAngle(new Point(5, 0, 5)));
+        [$h, $v] = Util::worldAngle(new Point(5, 9999, 5));
+        $this->assertSame(45.0, $h);
+        $this->assertGreaterThan(89, $v);
+        $this->assertLessThan(90, $v);
+        [$h, $v] = Util::worldAngle(new Point(5, 2, 5));
+        $this->assertSame(45.0, $h);
+        $this->assertGreaterThan(21, $v);
+        $this->assertLessThan(22, $v);
+        [$h, $v] = Util::worldAngle(new Point(22, 1, 22));
+        $this->assertSame(45.0, $h);
+        $this->assertLessThan(3, $v);
+        [$h, $v] = Util::worldAngle(new Point(-2, -999, 2));
+        $this->assertSame(360 - 45.0, $h);
+        $this->assertLessThan(-89, $v);
+        $this->assertGreaterThan(-90, $v);
+        [$h, $v] = Util::worldAngle(new Point(-1, -4, -222));
+        $this->assertLessThan(181, $h);
+        $this->assertGreaterThanOrEqual(180, $h);
+        $this->assertLessThan(-75, $v);
+        $this->assertGreaterThanOrEqual(-76, $v);
+        [$h, $v] = Util::worldAngle(new Point(-2, -4, -222));
+        $this->assertLessThan(181, $h);
+        $this->assertGreaterThanOrEqual(180, $h);
+        $this->assertLessThan(-63, $v);
+        $this->assertGreaterThanOrEqual(-64, $v);
+
+        $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
+        $this->assertSame([0.0, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
+    }
+
+    public function testLerp(): void
+    {
+        $this->assertSame(1, Util::lerpInt(1, 9, 0));
+        $this->assertSame(4, Util::lerpInt(1, 9, 0.35));
+        $this->assertSame(5, Util::lerpInt(1, 9, 0.5));
+        $this->assertSame(9, Util::lerpInt(1, 9, 1));
+        $this->assertSame(17, Util::lerpInt(1, 9, 2));
+        $this->assertPositionSame(new Point(50, 70, 80), Util::lerpPoint(new Point(), new Point(100, 140, 160), .5));
+        $this->assertPositionSame(new Point(10, 14, 22), Util::lerpPoint(new Point(2, 7, 9), new Point(11, 15, 23), .9));
     }
 
     public function testPoint(): void

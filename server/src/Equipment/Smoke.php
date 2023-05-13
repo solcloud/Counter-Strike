@@ -3,22 +3,15 @@
 namespace cs\Equipment;
 
 use cs\Enum\InventorySlot;
-use cs\Enum\ItemType;
 
-class Smoke extends BaseEquipment
+class Smoke extends Grenade
 {
 
     protected int $price = 300;
-
-    public function getType(): ItemType
-    {
-        return ItemType::TYPE_GRENADE;
-    }
 
     public function getSlot(): InventorySlot
     {
         return InventorySlot::SLOT_GRENADE_SMOKE;
     }
-
 
 }

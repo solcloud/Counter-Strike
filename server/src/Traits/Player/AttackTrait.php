@@ -2,12 +2,16 @@
 
 namespace cs\Traits\Player;
 
+use cs\Core\Setting;
 use cs\Enum\ItemType;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Equipment\Grenade;
 use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
 use cs\Event\SoundEvent;
+use cs\Event\ThrowEvent;
+use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
 use cs\Weapon\AmmoBasedWeapon;
@@ -41,7 +45,7 @@ trait AttackTrait
             return null;
         }
 
-        $result = $item->attack($this->createAttackEvent());
+        $result = $item->attack($this->createAttackEvent($item));
         if ($result) {
             $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
@@ -57,8 +61,8 @@ trait AttackTrait
             return null; // @codeCoverageIgnore
         }
 
-        if ($item instanceof Knife) {
-            $result = $item->attackSecondary($this->createAttackEvent());
+        if ($item instanceof Knife || $item instanceof Grenade) {
+            $result = $item->attackSecondary($this->createAttackEvent($item));
             if ($result) {
                 $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
                 $this->world->makeSound($sound->setPlayer($this)->setItem($item));
@@ -75,14 +79,41 @@ trait AttackTrait
         return $result;
     }
 
-    protected function createAttackEvent(): AttackEvent
+    private function getThrowSpeed(): int
+    {
+        $base = Setting::throwSpeed();
+        if ($this->isMoving() && $this->isRunning()) {
+            $base *= 1.2;
+        }
+        if ($this->isJumping()) {
+            $base *= 1.1;
+        }
+        return (int)ceil($base);
+    }
+
+    protected function createAttackEvent(AttackEnable $item): Attackable
     {
         $origin = $this->getPositionClone();
         $origin->addY($this->getSightHeight());
 
+        if ($item instanceof Grenade) {
+            $event = new ThrowEvent(
+                $this,
+                $this->world,
+                $origin,
+                $item,
+                $this->getSight()->getRotationHorizontal(),
+                $this->getSight()->getRotationVertical(),
+                $item->getBoundingRadius(),
+                $this->getThrowSpeed(),
+            );
+            $this->world->throw($event);
+            return $event;
+        }
         $event = new AttackEvent(
             $this->world,
             $origin,
+            $item,
             $this->getSight()->getRotationHorizontal(),
             $this->getSight()->getRotationVertical(),
             $this->getId(),

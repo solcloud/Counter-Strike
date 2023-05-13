@@ -122,6 +122,12 @@ export class World {
         bomb.visible = true
     }
 
+    spawnGrenade(item) {
+        const grenade = this.getModelForItem(item)
+        this.#scene.add(grenade)
+        return grenade
+    }
+
     getModelForItem(item) {
         const model = this.#modelRepository.getModelForItem(item)
         model.name = `item-${item.id}`

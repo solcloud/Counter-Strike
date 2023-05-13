@@ -18,6 +18,7 @@ use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
 use cs\Event\SoundEvent;
+use cs\Event\ThrowEvent;
 use cs\Map\Map;
 
 class Game
@@ -239,6 +240,11 @@ class Game
     }
 
     public function addSoundEvent(SoundEvent $event): void
+    {
+        $this->addEvent($event);
+    }
+
+    public function addThrowEvent(ThrowEvent $event): void
     {
         $this->addEvent($event);
     }

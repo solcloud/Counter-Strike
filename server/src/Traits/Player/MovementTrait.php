@@ -21,7 +21,7 @@ trait MovementTrait
     private int $lastMoveZ = 0;
     private ?int $lastAngle = 0;
     private bool $isWalking = false;
-    private int $velocityPermil = 0;
+    private int $velocityPermil;
 
     public function speedRun(): void
     {
@@ -95,6 +95,7 @@ trait MovementTrait
 
     protected function createMovementEvent(): PlayerMovementEvent
     {
+        $this->velocityPermil = 0;
         return new PlayerMovementEvent(function (): void {
             if (!$this->isMoving()) {
                 $this->velocityPermil = 0;

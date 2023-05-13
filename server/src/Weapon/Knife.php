@@ -10,6 +10,7 @@ use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
 use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
+use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
 
 final class Knife extends BaseWeapon implements AttackEnable
@@ -43,7 +44,7 @@ final class Knife extends BaseWeapon implements AttackEnable
         return ($this->lastAttackTick === 0 || $this->lastAttackTick + Util::millisecondsToFrames($this->primaryAttack ? 400 : 1000) <= $tickId);
     }
 
-    public function attack(AttackEvent $event): ?AttackResult
+    public function attack(Attackable $event): ?AttackResult
     {
         $this->primaryAttack = true;
         if (!$this->canAttack($event->getTickId())) {
@@ -51,11 +52,10 @@ final class Knife extends BaseWeapon implements AttackEnable
         }
 
         $this->lastAttackTick = $event->getTickId();
-        $event->setItem($this);
-        return $event->process();
+        return $event->fire();
     }
 
-    public function attackSecondary(AttackEvent $event): ?AttackResult
+    public function attackSecondary(Attackable $event): ?AttackResult
     {
         $this->primaryAttack = false;
         if (!$this->canAttack($event->getTickId())) {
@@ -63,8 +63,7 @@ final class Knife extends BaseWeapon implements AttackEnable
         }
 
         $this->lastAttackTick = $event->getTickId();
-        $event->setItem($this);
-        return $event->process();
+        return $event->fire();
     }
 
     public function createBullet(): Bullet

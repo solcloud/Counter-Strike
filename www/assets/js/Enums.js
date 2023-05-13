@@ -28,6 +28,7 @@ const EventList = {
     KillEvent: 8,
     SoundEvent: 9,
     PlantEvent: 10,
+    ThrowEvent: 11,
 }
 
 // server/src/Enum/GameOverReason.php
@@ -94,6 +95,9 @@ const SoundType = {
     BOMB_DEFUSING: 14,
     BOMB_DEFUSED: 15,
     ITEM_PICKUP: 16,
+    GRENADE_LAND: 17,
+    GRENADE_BOUNCE: 18,
+    GRENADE_AIR: 19,
 }
 
 // server/src/Enum/ArmorType.php
@@ -196,6 +200,11 @@ const Action = {
     EQUIP_PRIMARY: 'equip_primary',
     EQUIP_SECONDARY: 'equip_secondary',
     EQUIP_BOMB: 'equip_bomb',
+    EQUIP_SMOKE: 'equip_smoke',
+    EQUIP_FLASH: 'equip_flash',
+    EQUIP_HE: 'equip_he',
+    EQUIP_MOLOTOV: 'equip_molotov',
+    EQUIP_DECOY: 'equip_decoy',
     BUY_MENU: 'buy_menu',
     GAME_MENU: 'game_menu',
     SCORE_BOARD: 'score_board',

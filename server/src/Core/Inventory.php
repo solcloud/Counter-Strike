@@ -81,10 +81,14 @@ class Inventory
         }
 
         $item = $this->items[$this->equippedSlot];
-        unset($this->items[$this->equippedSlot]);
-        $this->updateEquippedSlot();
+        if ($item->getQuantity() === 1) {
+            unset($this->items[$this->equippedSlot]);
+            $this->updateEquippedSlot();
+            $item->unEquip();
+        } else {
+            $item->decrementQuantity();
+        }
 
-        $item->unEquip();
         return $item;
     }
 

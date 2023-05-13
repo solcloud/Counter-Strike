@@ -9,6 +9,7 @@ use cs\Enum\ItemType;
 use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
 use cs\Event\ReloadEvent;
+use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
 
@@ -61,7 +62,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         return ($this->lastAttackTick === 0 || $this->lastAttackTick + $this->fireRateTicks <= $tickId);
     }
 
-    public final function attack(AttackEvent $event): ?AttackResult
+    public final function attack(Attackable $event): ?AttackResult
     {
         if ($this->ammo === 0) {
             return null;
@@ -70,9 +71,8 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->ammo--;
         $this->lastAttackTick = $event->getTickId();
 
-        $event->setItem($this);
         $this->recoilModifier($event);
-        return $event->process();
+        return $event->fire();
     }
 
     protected function resetRecoil(int $tickId = 0): void
@@ -81,7 +81,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->lastRecoilBulletCount = 1;
     }
 
-    private function recoilModifier(AttackEvent $event): void
+    private function recoilModifier(Attackable $event): void
     {
         if ($this->recoilResetTicks === 0) {
             return;
@@ -103,7 +103,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->lastRecoilBulletCount++;
     }
 
-    public function attackSecondary(AttackEvent $event): ?AttackResult
+    public function attackSecondary(Attackable $event): ?AttackResult
     {
         return null;
     }
