@@ -10,6 +10,7 @@ use cs\Core\World;
 class BallCollider
 {
 
+    /** TODO REMOVE planes */
     private const PLANE_Y_DOWN = 0;
     private const PLANE_Y_UP = 1;
     private const PLANE_Z_FAR = 2;
@@ -26,143 +27,168 @@ class BallCollider
     ];
 
     /** @var array<int,array<int,array<int,int>>> */
-    private array $hits = [];
-    /** @var array<int,int[]> */
-    private array $lastPositions = [];
-    private int $backtrackCount = 0;
+    private array $hits = []; // todo remove or use just for resolution angle tests
     private bool $yGrowing;
+    private Point $origin;
     private ?Point $lastExtremePosition = null;
-    private ?Point $lastResolution = null;
+    private Point $lastValidPosition;
+    private readonly Point $firstHit;
+    private readonly Point $resolutionPoint;
+    private float $resolutionAngleHorizontal;
+    private float $resolutionAngleVertical;
 
     public function __construct(
         protected World     $world,
-        private Point       $origin,
+        Point               $origin,
         public readonly int $radius,
     )
     {
         if ($this->radius <= 0) {
             throw new GameException("Radius needs to be bigger than zero");
         }
+
+        $this->origin = $origin->clone();
+        $this->lastValidPosition = $origin->clone();
+        $this->firstHit = new Point();
+        $this->resolutionPoint = new Point();
     }
 
-    /**
-     * @return null|array{0: Point, 1: ?float, 2: ?float}
-     */
-    public function resolveCollision(Point $point): ?array
+    public function hasCollision(Point $point, float $angleHorizontal, float $angleVertical): bool
     {
-        array_unshift($this->lastPositions, [$point->x, $point->y, $point->z]);
-
-        // fixme players collision, molotov-smoke collision
-        if ($this->world->findFloor($point)) {
-            return $this->getResolution();
-        }
-        if ($this->world->isWallAt($point)) {
-            return $this->getResolution();
+        if ($point->y < 0 || $point->x < 0 || $point->z < 0) {
+            throw new GameException("Point '{$point}' cannot be lower than zero! Invalid angle resolution somewhere...");
         }
 
         if ($this->lastExtremePosition === null) {
             $yGrowing = ($point->y <=> $this->origin->y);
             if ($yGrowing !== 0) {
                 $this->yGrowing = ($yGrowing === 1);
-                $this->lastExtremePosition = $this->origin->clone();
-            }
-        } else {
-            if ($this->yGrowing && $point->y < $this->lastExtremePosition->y) {
-                $this->lastExtremePosition->setFrom($point);
-                $this->yGrowing = false;
-            } elseif (!$this->yGrowing && $point->y > $this->lastExtremePosition->y) {
-                $this->lastExtremePosition->setFrom($point);
-                $this->yGrowing = true;
+                $this->lastExtremePosition = $point->clone();
             }
         }
 
-        return null;
-    }
-
-    /**
-     * @return array{0: Point, 1: ?float, 2: ?float}
-     */
-    private function getResolution(): array
-    {
         $this->hits = [];
-        $this->backtrackCount = 0;
         $firstHit = null;
-        $origin = $this->lastExtremePosition ?? $this->origin;
         $radius = $this->radius;
-
-        $centerHit = array_shift($this->lastPositions);
-        if ($centerHit === null) {
-            throw new GameException("Should not be here");
-        }
-        $centerHit = new Point($centerHit[0], $centerHit[1], $centerHit[2]);
-        if ($centerHit->equals($origin)) {
-            throw new GameException("Instant collision on new origin?");
-        }
-
+        $radius2 = 2 * $this->radius;
         $candidate = new Point();
-        [$angleH, $angleV] = Util::worldAngle($centerHit, $origin);
+        if ($this->lastExtremePosition && Util::distanceSquared($this->lastExtremePosition, $point) > 9) {
+            [$angleH, $angleV] = Util::worldAngle($point, $this->lastExtremePosition);
+            $angleH = $angleH ?? $angleHorizontal;
+            $angleV = $angleV ?? $angleVertical;
+        } else {
+            $angleH = $angleHorizontal;
+            $angleV = $angleVertical;
+        }
         $isFullVertical = (abs($angleV) === 90.0);
-        foreach ($this->lastPositions as $pos) {
-            $this->backtrackCount++;
-            $collision = false;
-            [$x, $y, $z] = $pos;
+        [$x, $y, $z] = $point->toFlatArray();
+        [$xPrev, $yPrev, $zPrev] = $this->lastValidPosition->toFlatArray();
 
-            if (($angleV < 0 && $y - $radius >= 0 && $this->world->findFloorSquare($candidate->set($x, $y - $radius, $z), $radius))
-                || ($angleV > 0 && $this->world->findFloorSquare($candidate->set($x, $y + $radius, $z), $radius))
-            ) {
-                $collision = true;
-                $this->calculatePlaneHitsY($x, $y, $z, $angleV);
-            }
-
-            if (!$isFullVertical && (
-                    ($angleH > 0 && $angleH < 180 && $this->world->checkXSideWallCollision($candidate->set($x + $radius, $y - $radius + 1, $z), $radius - 1, $radius))
-                    || ($angleH > 180 && $angleH < 360 && $this->world->checkXSideWallCollision($candidate->set($x - $radius, $y - $radius + 1, $z), $radius - 1, $radius))
+        $absX = 0;
+        $absY = 0;
+        $absZ = 0;
+        $distance = 0;
+        while ($distance < 9999) {
+            if ($absY <= $radius && $yPrev !== $y && (
+                    ($y < $yPrev && $y - $radius >= 0 && $this->world->findFloorSquare($candidate->set($x, $y - $radius, $z), $radius))
+                    || ($y > $yPrev && $this->world->findFloorSquare($candidate->set($x, $y + $radius, $z), $radius))
                 )
             ) {
-                $collision = true;
-                $this->calculatePlaneHitsX($x, $y, $z, $angleH);
+                if ($firstHit === null) {
+                    $firstHit = $this->firstHit->set($x, $y + ($y > $yPrev ? $radius : -$radius), $z);
+                    $this->resolutionPoint->setFrom($firstHit);
+                }
+                $this->calculatePlaneHitsY($x, $y, $z, $y > $yPrev);
             }
-
-            if (!$isFullVertical && (
-                    (($angleH > 270 || $angleH < 90) && $this->world->checkZSideWallCollision($candidate->set($x, $y - $radius + 1, $z + $radius), $radius - 1, $radius))
-                    || ($angleH > 90 && $angleH < 270 && $this->world->checkZSideWallCollision($candidate->set($x, $y - $radius + 1, $z - $radius), $radius - 1, $radius))
+            if (!$isFullVertical && $absX <= $radius && $xPrev !== $x && (
+                    ($x > $xPrev && $this->world->checkXSideWallCollision($candidate->set($x + $radius, $y - $radius + 1, $z), $radius - 1, $radius))
+                    || ($x < $xPrev && $this->world->checkXSideWallCollision($candidate->set($x - $radius, $y - $radius + 1, $z), $radius - 1, $radius))
                 )
             ) {
-                $collision = true;
-                $this->calculatePlaneHitsZ($x, $y, $z, $angleH);
+                if ($firstHit === null) {
+                    $firstHit = $this->firstHit->set($x, $y + ($y > $yPrev ? $radius : -$radius), $z);
+                    $this->resolutionPoint->setFrom($firstHit);
+                }
+                $this->calculatePlaneHitsX($x, $y, $z, $x > $xPrev);
+            }
+            if (!$isFullVertical && $absZ <= $radius && $zPrev !== $z && (
+                    ($z > $zPrev && $this->world->checkZSideWallCollision($candidate->set($x, $y - $radius + 1, $z + $radius), $radius - 1, $radius))
+                    || ($z < $zPrev && $this->world->checkZSideWallCollision($candidate->set($x, $y - $radius + 1, $z - $radius), $radius - 1, $radius))
+                )
+            ) {
+                if ($firstHit === null) {
+                    $firstHit = $this->firstHit->set($x, $y + ($y > $yPrev ? $radius : -$radius), $z);
+                    $this->resolutionPoint->setFrom($firstHit);
+                }
+                $this->calculatePlaneHitsZ($x, $y, $z, $z > $zPrev);
             }
 
-            if ($firstHit && abs($firstHit[0] - $x) >= $radius && abs($firstHit[1] - $y) >= $radius && abs($firstHit[2] - $z) >= $radius) {
+            if ($distance === 0 && $this->hits === []) { // no collision
+                if ($this->lastExtremePosition) {
+                    if ($this->yGrowing && $point->y < $this->lastValidPosition->y) {
+                        $this->lastExtremePosition->setFrom($point);
+                        $this->yGrowing = false;
+                    } elseif (!$this->yGrowing && $point->y > $this->lastValidPosition->y) {
+                        $this->lastExtremePosition->setFrom($point);
+                        $this->yGrowing = true;
+                    }
+                }
+                $this->lastValidPosition->setFrom($point);
+                return false;
+            }
+
+            if (($isFullVertical || fmod(abs($angleV), 90) < 1) && $absY >= $radius2) {
                 break;
             }
-            if (!$collision) {
-                continue;
+            if ($angleV > -1 && $angleV < 1 && $absX >= $radius2 && $absZ >= $radius2) {
+                break;
+            }
+            if (fmod($angleH, 90) < 1) {
+                if ($angleV === 0.0 && ($absX >= $radius2 || $absZ >= $radius2)) {
+                    break;
+                }
+                if ($absY >= $radius2 && ($absX >= $radius2 || $absZ >= $radius2)) {
+                    break;
+                }
+            }
+            if ($absX >= $radius && $absY >= $radius && $absZ >= $radius) {
+                break;
             }
 
-            $firstHit = $pos;
+            $xPrev = $x;
+            $yPrev = $y;
+            $zPrev = $z;
+            [$xR, $yR, $zR] = Util::movementXYZ($angleH, $angleV, ++$distance);
+            $x = $point->x + $xR;
+            $y = $point->y + $yR;
+            $z = $point->z + $zR;
+            $absX = abs($point->x - $x);
+            $absY = abs($point->y - $y);
+            $absZ = abs($point->z - $z);
+            $x = max(-1, min($x, $point->x + $radius));
+            $y = max(-1, min($y, $point->y + $radius));
+            $z = max(-1, min($z, $point->z + $radius));
+        }
+        if ($this->hits === []) {
+            throw new GameException("None of sensor was hit!");
         }
 
-        if (null === $firstHit) {
-            if ($this->lastResolution) {
-                return [$this->lastResolution, null, null];
-            }
-            throw new GameException("NONE of sensor was hit. Already inside something from start?");
-        }
-
-        $firstHit = new Point($firstHit[0], $firstHit[1], $firstHit[2]);
-        [$h, $v] = $this->getResolutionAngles($centerHit, $firstHit, $angleH, $angleV);
-        $this->lastPositions = [];
-        $this->lastResolution = $firstHit->clone();
-        $this->lastExtremePosition = $firstHit->clone();
+        $validPosition = $this->lastValidPosition->clone();
+        [$h, $v] = $this->getResolutionAngles($point, $validPosition, $angleH, $angleV);
+        $this->lastExtremePosition = $point->clone();
         $this->yGrowing = ($v > 0);
-        return [$firstHit, $h, $v];
+        $this->resolutionAngleHorizontal = $h;
+        $this->resolutionAngleVertical = $v;
+        return true;
     }
 
     /**
      * @return float[] [horizontal, vertical]
      */
-    private function getResolutionAngles(Point $centerHit, Point $firstHit, float $h, float $v): array
+    private function getResolutionAngles(Point $firstTouch, Point $validPosition, float $h, float $v): array
     {
+        // todo remove self::planes and just do some resolution point math normalization magic //return Util::worldAngle($this->firstHit, $this->resolutionPoint);
+
         $sums = [];
         foreach (self::ALL_PLANES as $planeKey) {
             $sums[$planeKey] = 0;
@@ -177,7 +203,7 @@ class BallCollider
 
         $yDirection = $sums[self::PLANE_Y_DOWN] <=> $sums[self::PLANE_Y_UP];
         if ($yDirection !== 0) {
-            $v = -$v;
+            $v = $yDirection === 1 ? abs($v) : -abs($v);
         }
 
         $xMax = max($sums[self::PLANE_X_LEFT], $sums[self::PLANE_X_RIGHT]);
@@ -190,80 +216,22 @@ class BallCollider
             }
         }
 
-        $quarter = [1 => 0, 0, 0, 0];
-        foreach ([self::PLANE_Y_DOWN, self::PLANE_Y_UP] as $planeKey) {
-            foreach (($this->hits[$planeKey] ?? []) as $x => $data2) {
-                $xDirection = ($firstHit->x <=> $x);
-
-                foreach ($data2 as $z => $hitCount) {
-                    $zDirection = ($firstHit->z <=> $z);
-                    if ($zDirection === 1) {
-                        if ($xDirection === 1) {
-                            $quarter[1] += $hitCount;
-                        } elseif ($xDirection === -1) {
-                            $quarter[3] += $hitCount;
-                        }
-                    } elseif ($zDirection === -1) {
-                        if ($xDirection === 1) {
-                            $quarter[2] += $hitCount;
-                        } elseif ($xDirection === -1) {
-                            $quarter[4] += $hitCount;
-                        }
-                    }
-                }
-            }
-        }
-
-        $sum = array_sum($quarter);
-        if ($sum > 16) {
-            $sumXLeft = ($quarter[3] + $quarter[4]);
-            $sumXRight = ($quarter[1] + $quarter[2]);
-            $sumZFar = ($quarter[3] + $quarter[1]);
-            $sumZNear = ($quarter[4] + $quarter[2]);
-
-            $value = 0;
-            $delta = 0;
-            if ($sumXLeft > $sumXRight) {
-                if ($sumZFar > $sumZNear) {
-                    $delta = Util::smallestDeltaAngle((int)$h, 135);
-                    $value = $quarter[3];
-                } elseif ($sumZNear > $sumZFar) {
-                    $delta = Util::smallestDeltaAngle((int)$h, 45);
-                    $value = $quarter[4];
-                }
-            } elseif ($sumXRight > $sumXLeft) {
-                if ($sumZFar > $sumZNear) {
-                    $delta = Util::smallestDeltaAngle((int)$h, 225);
-                    $value = $quarter[1];
-                } elseif ($sumZNear > $sumZFar) {
-                    $delta = Util::smallestDeltaAngle((int)$h, 315);
-                    $value = $quarter[2];
-                }
-            }
-
-            if ($value > 0 && $value > 1.2 * $sum / 4) {
-                $max = $this->backtrackCount * $this->radius * $this->radius;
-                $h += 0.5 * $delta * $value / $max;
-            }
-        }
-
-        // todo some plane quarter? sums magic simplification to single line planes and do percentage offset angle math :D
         return [Util::normalizeAngle($h), Util::normalizeAngleVertical($v)];
     }
 
-    private function calculatePlaneHitsY(int $x, int $y, int $z, float $angleVertical): void
+    private function calculatePlaneHitsY(int $x, int $y, int $z, bool $yGrowing): void
     {
         $radius = $this->radius;
-        $base = new Point($x - $radius, $y + ($angleVertical > 0 ? $radius : -$radius), $z - $radius);
+        $base = new Point($x - $radius, $y + ($yGrowing ? $radius : -$radius), $z - $radius);
         $floors = $this->world->getYFloors($base->y);
         if ($floors === []) {
-            throw new GameException("Plane Y '{$angleVertical}' intersect but no floors found");
+            throw new GameException("Plane Y '{$y}' intersect but no floors found");
         }
 
         $wasHit = false;
         $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($angleVertical > 0 ? self::PLANE_Y_UP : self::PLANE_Y_DOWN);
+        $plane = ($yGrowing ? self::PLANE_Y_UP : self::PLANE_Y_DOWN);
         for ($x = 0; $x <= $radius2; $x++) {
             $candidate->setFrom($base);
             $candidate->x = $base->x + $x;
@@ -276,6 +244,9 @@ class BallCollider
                         continue;
                     }
 
+                    $this->resolutionPoint->addX($candidate->x <=> $this->firstHit->x);
+                    $this->resolutionPoint->addY($candidate->y <=> $this->firstHit->y);
+                    $this->resolutionPoint->addZ($candidate->z <=> $this->firstHit->z);
                     if (!isset($this->hits[$plane][$candidate->x][$candidate->z])) {
                         $this->hits[$plane][$candidate->x][$candidate->z] = 0;
                     }
@@ -287,28 +258,28 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane Y '{$angleVertical}' intersect but none of points");
+            throw new GameException("Plane Y '{$plane}' intersect [{$base}] but none of points");
         }
     }
 
-    private function calculatePlaneHitsX(int $x, int $y, int $z, float $angleHorizontal): void
+    private function calculatePlaneHitsX(int $x, int $y, int $z, bool $xGrowing): void
     {
         $radius = $this->radius;
-        $base = new Point($x + ($angleHorizontal > 0 && $angleHorizontal < 180 ? $radius : -$radius), $y - $radius, $z - $radius);
+        $base = new Point($x + ($xGrowing ? $radius : -$radius), $y - $radius + 1, $z - $radius);
         $walls = $this->world->getXWalls($base->x);
         if ($walls === []) {
-            throw new GameException("Plane X '{$angleHorizontal}' intersect but no walls found");
+            throw new GameException("Plane X '{$x}' intersect but no walls found");
         }
 
         $wasHit = false;
         $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($angleHorizontal > 0 && $angleHorizontal < 180 ? self::PLANE_X_RIGHT : self::PLANE_X_LEFT);
+        $plane = ($xGrowing ? self::PLANE_X_RIGHT : self::PLANE_X_LEFT);
         for ($z = 0; $z <= $radius2; $z++) {
             $candidate->setFrom($base);
             $candidate->z = $base->z + $z;
 
-            for ($y = 1; $y < $radius2; $y++) {
+            for ($y = 0; $y < $radius2; $y++) {
                 $candidate->y = $base->y + $y;
 
                 foreach ($walls as $wall) {
@@ -316,6 +287,9 @@ class BallCollider
                         continue;
                     }
 
+                    $this->resolutionPoint->addX($candidate->x <=> $this->firstHit->x);
+                    $this->resolutionPoint->addY($candidate->y <=> $this->firstHit->y);
+                    $this->resolutionPoint->addZ($candidate->z <=> $this->firstHit->z);
                     if (!isset($this->hits[$plane][$candidate->z][$candidate->y])) {
                         $this->hits[$plane][$candidate->z][$candidate->y] = 0;
                     }
@@ -327,28 +301,28 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane X '{$angleHorizontal}' intersect but none of points");
+            throw new GameException("Plane X '{$xGrowing}' intersect [{$base}] but none of points");
         }
     }
 
-    private function calculatePlaneHitsZ(int $x, int $y, int $z, float $angleHorizontal): void
+    private function calculatePlaneHitsZ(int $x, int $y, int $z, bool $zGrowing): void
     {
         $radius = $this->radius;
-        $base = new Point($x - $radius, $y - $radius, $z + ($angleHorizontal > 90 && $angleHorizontal < 270 ? -$radius : $radius));
+        $base = new Point($x - $radius, $y - $radius + 1, $z + ($zGrowing ? $radius : -$radius));
         $walls = $this->world->getZWalls($base->z);
         if ($walls === []) {
-            throw new GameException("Plane Z '{$angleHorizontal}' intersect but no walls found");
+            throw new GameException("Plane Z '{$z}' intersect but no walls found");
         }
 
         $wasHit = false;
         $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($angleHorizontal > 90 && $angleHorizontal < 270 ? self::PLANE_Z_NEAR : self::PLANE_Z_FAR);
+        $plane = ($zGrowing ? self::PLANE_Z_FAR : self::PLANE_Z_NEAR);
         for ($x = 0; $x <= $radius2; $x++) {
             $candidate->setFrom($base);
             $candidate->x = $base->x + $x;
 
-            for ($y = 1; $y < $radius2; $y++) {
+            for ($y = 0; $y < $radius2; $y++) {
                 $candidate->y = $base->y + $y;
 
                 foreach ($walls as $wall) {
@@ -356,6 +330,9 @@ class BallCollider
                         continue;
                     }
 
+                    $this->resolutionPoint->addX($candidate->x <=> $this->firstHit->x);
+                    $this->resolutionPoint->addY($candidate->y <=> $this->firstHit->y);
+                    $this->resolutionPoint->addZ($candidate->z <=> $this->firstHit->z);
                     if (!isset($this->hits[$plane][$candidate->x][$candidate->y])) {
                         $this->hits[$plane][$candidate->x][$candidate->y] = 0;
                     }
@@ -367,8 +344,23 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane Z '{$angleHorizontal}' intersect but none of points");
+            throw new GameException("Plane Z '{$plane}' intersect [{$base}] but none of points");
         }
+    }
+
+    public function getLastValidPosition(): Point
+    {
+        return $this->lastValidPosition->clone();
+    }
+
+    public function getResolutionAngleHorizontal(): float
+    {
+        return $this->resolutionAngleHorizontal;
+    }
+
+    public function getResolutionAngleVertical(): float
+    {
+        return $this->resolutionAngleVertical;
     }
 
 }

@@ -3,12 +3,12 @@
 namespace cs\Event;
 
 use cs\Core\Bullet;
+use cs\Core\GameException;
 use cs\Core\Item;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Core\World;
-use cs\Enum\ItemId;
 use cs\Enum\SoundType;
 use cs\Equipment\Flashbang;
 use cs\Equipment\Grenade;
@@ -26,6 +26,7 @@ final class ThrowEvent extends Event implements Attackable
     private BallCollider $ball;
     private int $bounceCount = 0;
     private bool $needsToLandOnFloor;
+    private bool $lastBounce = false;
     private int $tickMax;
 
     public function __construct(
@@ -40,10 +41,14 @@ final class ThrowEvent extends Event implements Attackable
         int                      $maxTimeMs = 99999,
     )
     {
+        if ($this->velocity <= 0) {
+            throw new GameException("Velocity needs to be positive");
+        }
+
         $this->position = $origin->clone();
         $this->lastEventPosition = $origin->clone();
         $this->ball = new BallCollider($this->world, $origin, $radius);
-        $this->needsToLandOnFloor = ($item->getId() !== ItemId::$map[Flashbang::class]);
+        $this->needsToLandOnFloor = !($this->item instanceof Flashbang);
         $this->timeIncrement = 1 / Util::millisecondsToFrames(150); // fixme some good value or velocity or gravity :)
         $this->tickMax = $this->getTickId() + Util::millisecondsToFrames($maxTimeMs);
     }
@@ -66,31 +71,22 @@ final class ThrowEvent extends Event implements Attackable
     {
         if (!$this->needsToLandOnFloor) {
             $this->makeEvent($point, SoundType::GRENADE_LAND);
-            foreach ($this->onComplete as $func) {
-                call_user_func($func, $this);
-            }
+            $this->runOnCompleteHooks();
             return;
         }
 
-        $candidate = $point->clone();
-        $candidate->addY(-$this->radius);
-        if ($this->world->findFloor($candidate, $this->radius)) {
-            $this->makeEvent($point, SoundType::GRENADE_LAND);
-            foreach ($this->onComplete as $func) {
-                call_user_func($func, $this);
-            }
-            return;
+        if ($this->tickMax > 0) {
+            $point->addY(-$this->radius);
+            $this->tickMax = 0;
         }
-
-        while (true) { // apply gravity when low velocity, fixme not optimal - find better minimal velocity or at least split into multiple tick instead of single while true
-            if (!$this->world->findFloor($candidate->addY(-1), $this->radius)) {
+        for ($i = 1; $i <= ceil(Util::GRAVITY * 2); $i++) {
+            if (!$this->world->findFloor($point, $this->radius)) {
+                $point->addY(-1);
                 continue;
             }
 
-            $this->makeEvent($candidate->addY($this->radius), SoundType::GRENADE_LAND);
-            foreach ($this->onComplete as $func) {
-                call_user_func($func, $this);
-            }
+            $this->makeEvent($point->addY($this->radius), SoundType::GRENADE_LAND);
+            $this->runOnCompleteHooks();
             return;
         }
     }
@@ -110,16 +106,23 @@ final class ThrowEvent extends Event implements Attackable
         $x = $pos->x;
         $y = $pos->y;
         $z = $pos->z;
+
         $targetX = Util::nearbyInt($this->velocity * $this->time * cos(deg2rad($this->angleVertical)));
         $targetY = $y + Util::nearbyInt($this->velocity * $this->time * sin(deg2rad($this->angleVertical)) - (.5 * Util::GRAVITY * $this->time * $this->time));
         [$targetX, $targetZ] = Util::rotatePointY($this->angleHorizontal, 0, $targetX);
         $targetX += $x;
         $targetZ += $z;
-        $directionY = ($targetY <=> $y);
         $maxStep = max(abs($targetX - $x), abs($targetY - $y), abs($targetZ - $z)); // fixme cap to some max (min value) and do partial float round sub-step for lower targets based on maxTargetDistance
         if ($maxStep === 0) {
             return;
         }
+        if ($this->lastBounce && $this->angleVertical >= 0 && $targetY < $y) { // gravity force too strong for going up
+            $this->finishLanding($pos);
+            return;
+        }
+        $this->lastBounce = false;
+
+        $directionY = ($targetY <=> $y);
         for ($step = 1; $step <= $maxStep; $step++) {
             if ($targetX !== $x) {
                 $x += $directionX;
@@ -134,19 +137,11 @@ final class ThrowEvent extends Event implements Attackable
                 $pos->z = $z;
             }
 
-            $collision = $this->ball->resolveCollision($pos);
-            if (!$collision) {
+            if (!$this->ball->hasCollision($pos, $this->angleHorizontal, $this->angleVertical)) {
                 continue;
             }
 
-            [$newPosition, $angleH, $angleV] = $collision;
-            if ($angleH === null || $angleV === null) {
-                $this->finishLanding($newPosition);
-                return;
-            }
-
-            $this->setAngles($angleH, $angleV);
-            $pos->setFrom($newPosition);
+            $this->setAngles($this->ball->getResolutionAngleHorizontal(), $this->ball->getResolutionAngleVertical());
             $this->bounceCount++;
             $this->velocity = $this->velocity / ($this->bounceCount > 4 ? $this->bounceCount : 1.5);
             if ($this->velocity < 1) { // fixme some value based on velocity and gravity that will give lowest possible (angle 0.01/90) distance < 1
@@ -155,11 +150,13 @@ final class ThrowEvent extends Event implements Attackable
             }
 
             $this->makeEvent($pos, SoundType::GRENADE_BOUNCE);
+            $this->lastBounce = true;
             $this->time = 0.0;
+            $pos->setFrom($this->ball->getLastValidPosition());
             return;
         }
 
-        $this->makeEvent(Util::lerpPoint($this->lastEventPosition, $pos, 0.6), SoundType::GRENADE_AIR); // fixme remove lerp and precalculate next bounce so there is no visual backtrack or ghosting
+        $this->makeEvent($pos, SoundType::GRENADE_AIR);
     }
 
     public function fire(): AttackResult

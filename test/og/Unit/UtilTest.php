@@ -163,39 +163,47 @@ class UtilTest extends BaseTest
         $this->assertSame([0, -3], Util::rotatePointZ(-14, -1, -2, 3, 2));
     }
 
+    public function testWorldAngleUsingMovement(): void
+    {
+        foreach (range(0, 359) as $h) {
+            foreach (range(-89, 89) as $v) {
+                $start = new Point(rand(-1000, 1000), rand(-1000, 1000), rand(-1000, 1000));
+                $this->_testWorldAngleUsingMovement($start, $h, $v);
+            }
+        }
+    }
+
+    protected function _testWorldAngleUsingMovement(Point $start, float $h, float $v, int $distance = 9999): void
+    {
+        $end = $start->clone();
+        $end->addFromArray(Util::movementXYZ($h, $v, $distance));
+        [$actualH, $actualV] = Util::worldAngle($end, $start);
+        if (is_float($actualH)) {
+            $actualH = round($actualH);
+        }
+        if (is_float($actualV)) {
+            $actualV = round($actualV);
+        }
+        $this->assertSame([$h, $v], [$actualH, $actualV], "{$start}, angle ({$h},{$v})");
+    }
+
     public function testWorldAngle(): void
     {
+        $this->assertSame([null, -90.0], Util::worldAngle(new Point(), new Point(0, 10, 0)));
+        $this->assertSame([null, 90.0], Util::worldAngle(new Point(), new Point(0, -10, 0)));
+        $this->assertSame([Util::normalizeAngle(-90.0), 0.0], Util::worldAngle(new Point(), new Point(10, 0, 0)));
+        $this->assertSame([180.0, 0.0], Util::worldAngle(new Point(), new Point(0, 0, 10)));
+        $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(), new Point(0, 0, -10)));
+        $this->assertNotSame([180.0, -90.0], Util::worldAngle(new Point(829, 773, 10), new Point(829, 940, 145)));
+        $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(10, 0, 0)));
+        $this->assertSame([null, null], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
+        $this->assertSame([null, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
+
         $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(10, 0, 0)));
         $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(0, 0, 10)));
         $this->assertSame([45.0, 0.0], Util::worldAngle(new Point(5, 0, 5)));
-        [$h, $v] = Util::worldAngle(new Point(5, 9999, 5));
-        $this->assertSame(45.0, $h);
-        $this->assertGreaterThan(89, $v);
-        $this->assertLessThan(90, $v);
-        [$h, $v] = Util::worldAngle(new Point(5, 2, 5));
-        $this->assertSame(45.0, $h);
-        $this->assertGreaterThan(21, $v);
-        $this->assertLessThan(22, $v);
-        [$h, $v] = Util::worldAngle(new Point(22, 1, 22));
-        $this->assertSame(45.0, $h);
-        $this->assertLessThan(3, $v);
-        [$h, $v] = Util::worldAngle(new Point(-2, -999, 2));
-        $this->assertSame(360 - 45.0, $h);
-        $this->assertLessThan(-89, $v);
-        $this->assertGreaterThan(-90, $v);
-        [$h, $v] = Util::worldAngle(new Point(-1, -4, -222));
-        $this->assertLessThan(181, $h);
-        $this->assertGreaterThanOrEqual(180, $h);
-        $this->assertLessThan(-75, $v);
-        $this->assertGreaterThanOrEqual(-76, $v);
-        [$h, $v] = Util::worldAngle(new Point(-2, -4, -222));
-        $this->assertLessThan(181, $h);
-        $this->assertGreaterThanOrEqual(180, $h);
-        $this->assertLessThan(-63, $v);
-        $this->assertGreaterThanOrEqual(-64, $v);
-
-        $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
-        $this->assertSame([0.0, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
+        $this->assertSame([null, null], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
+        $this->assertSame([null, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
     }
 
     public function testLerp(): void
@@ -303,6 +311,27 @@ class UtilTest extends BaseTest
             $prev = $test;
         }
         $this->assertSame([52274, 70341, 58056], $test);
+    }
+
+    public function testMovementXYZOnlyGrowByMaxOfOneFromPrevious1(): void
+    {
+        $prev = [0, 0, 0];
+        for ($distance = 1; $distance <= 105123; $distance++) {
+            $test = Util::movementXYZ(.1, .1, $distance);
+
+            [$x, $y, $z] = $test;
+            if (false === ($prev[0] === $x || $prev[0] + 1 === $x)) {
+                $this->fail("X grows more than 1 unit, from '{$prev[0]}' to '{$x}'");
+            }
+            if (false === ($prev[1] === $y || $prev[1] + 1 === $y)) {
+                $this->fail("Y grows more than 1 unit, from '{$prev[0]}' to '{$y}'");
+            }
+            if (false === ($prev[2] === $z || $prev[2] + 1 === $z)) {
+                $this->fail("Z grows more than 1 unit, from '{$prev[0]}' to '{$z}'");
+            }
+            $prev = $test;
+        }
+        $this->assertSame([183, 183, 105123], $test);
     }
 
 }

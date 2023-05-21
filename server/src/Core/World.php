@@ -591,7 +591,7 @@ class World
     public function getXWalls(int $x): array
     {
         if ($x < 0) {
-            return [new Wall(new Point($x, -1, -1), true, 99999, 99999)];
+            return [new Wall(new Point($x, -1, -1), false, 99999, 99999)];
         }
         return ($this->walls[self::WALL_X][$x] ?? []);
     }
@@ -602,7 +602,7 @@ class World
     public function getZWalls(int $z): array
     {
         if ($z < 0) {
-            return [new Wall(new Point(-1, -1, $z), false, 99999, 99999)];
+            return [new Wall(new Point(-1, -1, $z), true, 99999, 99999)];
         }
         return ($this->walls[self::WALL_Z][$z] ?? []);
     }

@@ -5,7 +5,7 @@ namespace cs\Core;
 final class Util
 {
 
-    public const GRAVITY = 10;
+    public const GRAVITY = 9.8;
     public static int $TICK_RATE = 20;
 
     public static function millisecondsToFrames(int $timeMs): int
@@ -52,7 +52,7 @@ final class Util
     }
 
     /**
-     * @return float[] world angles [horizontal, vertical] in degree
+     * @return null[]|float[] world angles [horizontal, vertical] in degree
      */
     public static function worldAngle(Point $point, Point $origin = new Point()): array
     {
@@ -60,18 +60,17 @@ final class Util
         $cy = $point->y - $origin->y;
         $cz = $point->z - $origin->z;
 
-        $h = 0.0;
+        $h = null;
         if ($cz !== 0 || $cx !== 0) {
             $h = fmod(450 - rad2deg(atan2($cz, $cx)), 360.0);
         }
 
-        $x = abs($cx);
-        if ($x === 0) {
-            $v = 90.0 * ($point->y <=> $origin->y);
-        } else {
-            $v = rad2deg(atan($cy / $x));
+        $d = Util::distanceSquared($origin, $point);
+        if ($d === 0) {
+            return [$h, null];
         }
-        return [$h, $v];
+        $v = rad2deg(asin(abs($cy) / sqrt($d)));
+        return [$h, (($cy) >= 0 ? $v : -$v)];
     }
 
     public static function directionX(float $angleHorizontal): int

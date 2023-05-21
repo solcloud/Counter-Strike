@@ -22,9 +22,7 @@ class TickEvent extends Event
             call_user_func($this->callback, $this, $tick);
         }
         if ($this->onComplete !== [] && ($this->maxTickCount === 0 || $this->tickCount === $this->maxTickCount)) {
-            foreach ($this->onComplete as $func) {
-                call_user_func($func, $this);
-            }
+            $this->runOnCompleteHooks();
         }
     }
 

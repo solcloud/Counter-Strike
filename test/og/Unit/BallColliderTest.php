@@ -49,39 +49,37 @@ class BallColliderTest extends BaseTest
         } else {
             $this->fail("Unknown plane given");
         }
-        $ball = new BallCollider($world, $ballCenter->clone(), $ballRadius);
-        $direction = Util::movementXYZ($angleHorizontal, $angleVertical, 1);
+        $ball = new BallCollider($world, $ballCenter, $ballRadius);
 
+        $candidate = $ballCenter->clone();
         for ($distance = 1; $distance <= $maxDistance; $distance++) {
-            $collision = $ball->resolveCollision($ballCenter);
-            if (!$collision) {
-                $ballCenter->addFromArray($direction);
+            $candidate->setFrom($ballCenter);
+            $candidate->addFromArray(Util::movementXYZ($angleHorizontal, $angleVertical, $distance));
+            if (!$ball->hasCollision($candidate, $angleHorizontal, $angleVertical)) {
                 continue;
             }
 
-            [$newPosition, $angleH, $angleV] = $collision;
-            $this->assertInstanceOf(Point::class, $newPosition);
-            $this->assertSame($expectedAngleHorizontal, $angleH);
-            $this->assertSame($expectedAngleVertical, $angleV);
+            $this->assertSame($expectedAngleHorizontal, round($ball->getResolutionAngleHorizontal()));
+            $this->assertSame($expectedAngleVertical, round($ball->getResolutionAngleVertical()));
 
             $p = $plane->getStart();
             if ($isWall) {
                 if ($plane->getPlane() === 'xy') {
-                    $this->assertSame($p->clone()->addZ($angleHorizontal > 270 || $angleHorizontal < 90 ? -$ballRadius : +$ballRadius)->z, $newPosition->z);
+                    $this->assertSame($p->clone()->addZ($angleHorizontal > 270 || $angleHorizontal < 90 ? -$ballRadius : +$ballRadius)->z, $candidate->z);
                 } else {
-                    $this->assertSame($p->clone()->addX($angleHorizontal > 0 && $angleHorizontal < 180 ? -$ballRadius : +$ballRadius)->x, $newPosition->x);
+                    $this->assertSame($p->clone()->addX($angleHorizontal > 0 && $angleHorizontal < 180 ? -$ballRadius : +$ballRadius)->x, $candidate->x);
                 }
             } else {
                 if ($angleVertical === 0.0) {
                     $this->fail('Floor with 0 vertical angle');
                 }
-                $this->assertSame($p->clone()->addY($angleVertical > 0 ? -$ballRadius : +$ballRadius)->y, $newPosition->y);
+                $this->assertSame($p->clone()->addY($angleVertical > 0 ? -$ballRadius : +$ballRadius)->y, $candidate->y);
             }
 
             return;
         }
 
-        $this->fail();
+        $this->fail('No collision detected');
     }
 
     private function createWorld(): World

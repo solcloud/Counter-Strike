@@ -25,9 +25,7 @@ class TimeoutEvent extends Event
             call_user_func($this->callback, $this, $tick);
         }
         if ($this->onComplete !== []) {
-            foreach ($this->onComplete as $func) {
-                call_user_func($func, $this);
-            }
+            $this->runOnCompleteHooks();
         }
     }
 

@@ -26,6 +26,13 @@ abstract class Event implements NetSerializable
         $this->onComplete = [];
     }
 
+    protected function runOnCompleteHooks(): void
+    {
+        foreach ($this->onComplete as $func) {
+            call_user_func($func, $this);
+        }
+    }
+
     public function getCode(): int
     {
         return EventList::map[get_class($this)] ?? 0;

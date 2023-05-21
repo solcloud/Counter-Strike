@@ -5,8 +5,6 @@ namespace Test\Shooting;
 use cs\Core\Floor;
 use cs\Core\Player;
 use cs\Core\Point;
-use cs\Core\Point2D;
-use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
@@ -32,7 +30,7 @@ class GrenadeTest extends BaseTestCase
                     continue;
                 }
                 if ($event->type === SoundType::GRENADE_LAND) {
-                    $this->assertNull($landEvent, 'Only one landEvent please');
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
                     $landEvent = $event;
                 }
                 if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
@@ -60,7 +58,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($floorY, $bounceEvent->position->y);
         $this->assertSame($floorY, $landEvent->position->y);
-        $this->assertPositionSame(new Point(364, $floorY, 1403), $landEvent->position);
+        $this->assertPositionSame(new Point(152, $floorY, 720), $landEvent->position);
     }
 
     public function testThrow2(): void
@@ -75,7 +73,7 @@ class GrenadeTest extends BaseTestCase
                     continue;
                 }
                 if ($event->type === SoundType::GRENADE_LAND) {
-                    $this->assertNull($landEvent, 'Only one landEvent please');
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
                     $landEvent = $event;
                 }
                 if ($event->type === SoundType::GRENADE_BOUNCE) {
@@ -103,7 +101,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertPositionNotSame($bounceEvent->position, $landEvent->position);
         $this->assertSame($y, $bounceEvent->position->y);
         $this->assertSame($y, $landEvent->position->y);
-        $this->assertPositionSame(new Point(1173, $y, 211), $landEvent->position);
+        $this->assertPositionSame(new Point(1168, $y, 210), $landEvent->position);
     }
 
     public function testThrow3(): void
@@ -117,7 +115,7 @@ class GrenadeTest extends BaseTestCase
                     continue;
                 }
                 if ($event->type === SoundType::GRENADE_LAND) {
-                    $this->assertNull($landEvent, 'Only one landEvent please');
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
                     $landEvent = $event;
                 }
                 if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
@@ -147,7 +145,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($y, $bounceEvent->position->y);
         $this->assertSame($y, $landEvent->position->y);
-        $this->assertPositionSame(new Point(579, 10, 579), $landEvent->position);
+        $this->assertPositionSame(new Point(470, $y, 470), $landEvent->position);
     }
 
     public function testFullVerticalThrow(): void
@@ -170,7 +168,7 @@ class GrenadeTest extends BaseTestCase
                     continue;
                 }
                 if ($event->type === SoundType::GRENADE_LAND) {
-                    $this->assertNull($landEvent, 'Only one landEvent please');
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
                     $landEvent = $event;
                 }
                 if ($event->type === SoundType::GRENADE_BOUNCE) {
@@ -209,7 +207,7 @@ class GrenadeTest extends BaseTestCase
                     continue;
                 }
                 if ($event->type === SoundType::GRENADE_LAND) {
-                    $this->assertNull($landEvent, 'Only one landEvent please');
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
                     $landEvent = $event;
                 }
                 if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
@@ -235,7 +233,7 @@ class GrenadeTest extends BaseTestCase
         $pp = $game->getPlayer(1)->getPositionClone();
         $this->assertGreaterThan($pp->x, $landEvent->position->x);
         $this->assertGreaterThan($pp->z, $landEvent->position->z);
-        $this->assertPositionSame(new Point(463, Smoke::boundingRadius, 336), $landEvent->position);
+        $this->assertPositionSame(new Point(559, Smoke::boundingRadius, 347), $landEvent->position);
     }
 
 }
