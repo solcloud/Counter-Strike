@@ -14,6 +14,7 @@ export class ModelRepository {
     #textures = {
         cap: {}
     }
+    #mapObjects = [];
 
     constructor() {
         this.#gltfLoader = new THREE.GLTFLoader()
@@ -30,12 +31,19 @@ export class ModelRepository {
         return this.#textureLoader.loadAsync(url)
     }
 
+    getMapObjects() {
+        return this.#mapObjects
+    }
+
     loadMap(mapName) {
+        const self = this
+        self.#mapObjects = []
         return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     if (object.name !== 'world') {
                         object.castShadow = true
+                        self.#mapObjects.push(object)
                     }
                     if (object.name === 'floor') {
                         object.material.envMapIntensity = .08
@@ -51,7 +59,6 @@ export class ModelRepository {
             const sun = new THREE.DirectionalLight(0xffeac2, .9)
             sun.position.set(4000, 4999, -4000)
             sun.castShadow = true
-            //sun.shadow.bias = .0001
             sun.shadow.mapSize.width = 4096
             sun.shadow.mapSize.height = 4096
             sun.shadow.camera.far = 10000
@@ -112,7 +119,9 @@ export class ModelRepository {
     }
 
     loadAll() {
+        const self = this
         const promises = []
+
         promises.push(this.#loadModel('./resources/model/player.glb').then((model) => {
             model.scene.traverse(function (object) {
                 object.frustumCulled = false // fixme find out how to recalculate bounding boxes or bake animation
@@ -135,18 +144,39 @@ export class ModelRepository {
             this.#models.player = model.scene.getObjectByName('player')
             this.#models.playerAnimation = model.animations
         }))
-        promises.push(this.#loadModel('./resources/model/bomb.glb').then((model) => {
-            model.scene.children.forEach((root) => root.visible = false)
-            const item = model.scene.getObjectByName('item')
-            item.traverse(function (object) {
-                if (object.isMesh) {
-                    object.castShadow = true
-                }
-            })
-            item.visible = true
 
-            this.#models[ItemId.Bomb] = model.scene
-        }))
+        const models = {}
+        models[ItemId.Bomb] = 'bomb.glb'
+        models[ItemId.Knife] = 'knife.glb'
+        models[ItemId.RifleAk] = 'ak.glb'
+        models[ItemId.RifleM4A4] = 'm4.glb'
+        models[ItemId.PistolUsp] = 'pistol.glb' // fixme
+        models[ItemId.PistolP250] = 'pistol.glb'
+        models[ItemId.PistolGlock] = 'pistol.glb' // fixme
+        if (false) { // fixme
+            models[ItemId.HighExplosive] = 'highexplosive.glb'
+            models[ItemId.Flashbang] = 'flashbang.glb'
+            models[ItemId.Smoke] = 'smoke.glb'
+            models[ItemId.Decoy] = 'decoy.glb'
+            models[ItemId.Incendiary] = 'incendiary.glb'
+            models[ItemId.Molotov] = 'molotov.glb'
+        }
+
+        Object.keys(models).forEach(function (itemId) {
+            const fileName = models[itemId]
+            promises.push(self.#loadModel(`./resources/model/${fileName}`).then((model) => {
+                model.scene.children.forEach((root) => root.visible = false)
+                const item = model.scene.getObjectByName('item')
+                item.traverse(function (object) {
+                    if (object.isMesh) {
+                        object.castShadow = true
+                    }
+                })
+                item.visible = true
+
+                self.#models[itemId] = model.scene
+            }))
+        })
         promises.push(this.#loadModel('./resources/model/kit.glb').then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
@@ -156,60 +186,7 @@ export class ModelRepository {
 
             this.#models[ItemId.DefuseKit] = model.scene
         }))
-        promises.push(this.#loadModel('./resources/model/knife.glb').then((model) => {
-            model.scene.children.forEach((root) => root.visible = false)
-            const item = model.scene.getObjectByName('item')
-            item.traverse(function (object) {
-                if (object.isMesh) {
-                    object.castShadow = true
-                }
-            })
-            item.visible = true
 
-            this.#models[ItemId.Knife] = model.scene
-        }))
-        promises.push(this.#loadModel('./resources/model/pistol.glb').then((model) => {
-            model.scene.children.forEach((root) => root.visible = false)
-            const item = model.scene.getObjectByName('item')
-            item.traverse(function (object) {
-                if (object.isMesh) {
-                    object.castShadow = true
-                }
-            })
-            item.visible = true
-
-            this.#models[ItemId.PistolUsp] = model.scene
-            this.#models[ItemId.PistolP250] = model.scene // fixme
-            this.#models[ItemId.PistolGlock] = model.scene // fixme
-        }))
-        promises.push(this.#loadModel('./resources/model/ak.glb').then((model) => {
-            model.scene.children.forEach((root) => root.visible = false)
-            const item = model.scene.getObjectByName('item')
-            item.traverse(function (object) {
-                if (object.isMesh) {
-                    object.castShadow = true
-                }
-            })
-            item.visible = true
-
-            this.#models[ItemId.RifleAk] = model.scene
-        }))
-        promises.push(this.#loadModel('./resources/model/m4.glb').then((model) => {
-            model.scene.children.forEach((root) => root.visible = false)
-            const item = model.scene.getObjectByName('item')
-            item.traverse(function (object) {
-                if (object.isMesh) {
-                    object.castShadow = true
-                }
-            })
-            item.visible = true
-
-            // fixme inside model
-            const povSpark = model.scene.getObjectByName('pov-spark')
-            povSpark.position.z = 0
-
-            this.#models[ItemId.RifleM4A4] = model.scene
-        }))
         promises.push(this.#loadTexture('./resources/img/player/outfit_0.png').then((texture) => {
             texture.flipY = false
             texture.encoding = THREE.sRGBEncoding
@@ -220,26 +197,13 @@ export class ModelRepository {
             texture.encoding = THREE.sRGBEncoding
             this.#textures.opponent = texture
         }))
-        promises.push(this.#loadTexture('./resources/img/player/cap_1.png').then((texture) => {
-            texture.flipY = false
-            this.#textures.cap[1] = texture
-        }))
-        promises.push(this.#loadTexture('./resources/img/player/cap_2.png').then((texture) => {
-            texture.flipY = false
-            this.#textures.cap[2] = texture
-        }))
-        promises.push(this.#loadTexture('./resources/img/player/cap_3.png').then((texture) => {
-            texture.flipY = false
-            this.#textures.cap[3] = texture
-        }))
-        promises.push(this.#loadTexture('./resources/img/player/cap_4.png').then((texture) => {
-            texture.flipY = false
-            this.#textures.cap[4] = texture
-        }))
-        promises.push(this.#loadTexture('./resources/img/player/cap_5.png').then((texture) => {
-            texture.flipY = false
-            this.#textures.cap[5] = texture
-        }))
+        for (let number = 1; number <= 5; number++) {
+            promises.push(self.#loadTexture(`./resources/img/player/cap_${number}.png`).then((texture) => {
+                texture.flipY = false
+                self.#textures.cap[number] = texture
+            }))
+        }
+
         promises.push(this.#loadTexture('./resources/img/sphere_glow.png').then((texture) => {
             const material = new THREE.SpriteMaterial({
                 map: texture,
@@ -259,6 +223,10 @@ export class ModelRepository {
             materialTeam.map = this.#textures.team
             const materialOpponent = outfit.material.clone()
             materialOpponent.map = this.#textures.opponent
+
+            // fixme inside model
+            const povSpark = self.#models[ItemId.RifleM4A4].getObjectByName('pov-spark')
+            povSpark.position.z = 0
 
             this.#materials.outfitTeam = materialTeam
             this.#materials.outfitOpponent = materialOpponent

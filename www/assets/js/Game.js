@@ -174,10 +174,62 @@ export class Game {
             grenade.position.set(data.position.x, data.position.y, -data.position.z)
         }
         if (data.type === SoundType.GRENADE_LAND) {
-            setTimeout(() => this.removeGrenade(data.extra.id), 1000) // todo responsive volumetric smokes, flashes, fire etc.
+            this.#grenadeLand(data.extra.id, data.item, data.player, data.position)
         }
 
         this.#soundRepository.play(data, spectatorId, this.#tick)
+    }
+
+    #grenadeLand(throwableId, item, playerId, position) {
+        if (item.slot === InventorySlot.SLOT_GRENADE_DECOY) {
+            const player = this.players[playerId]
+            const soundItem = player.data.slots[InventorySlot.SLOT_PRIMARY] ? player.data.slots[InventorySlot.SLOT_PRIMARY] : (player.data.slots[InventorySlot.SLOT_SECONDARY] ? player.data.slots[InventorySlot.SLOT_SECONDARY] : player.data.slots[InventorySlot.SLOT_KNIFE])
+            const soundName = this.#soundRepository.getItemAttackSound(soundItem)
+
+            const game = this
+            const world = this.#world
+            let endTime = Date.now() + 15 * 1E6
+            const callback = function () {
+                world.playSound(soundName, position, false)
+                if (Date.now() > endTime) {
+                    game.removeGrenade(throwableId)
+                    return
+                }
+                setTimeout(callback, Math.random() * 1000)
+            }
+            setTimeout(callback, 100)
+            return
+        }
+        if (item.slot === InventorySlot.SLOT_GRENADE_FLASH) {
+            const grenade = this.#throwables[throwableId]
+            const sight = this.playerSpectate.get3DObject().getObjectByName('sight')
+            const sightPosition = sight.getWorldPosition(new THREE.Vector3())
+            const direction = grenade.getWorldPosition(new THREE.Vector3()).sub(sightPosition).normalize()
+            if (this.#world.getCamera().getWorldDirection(new THREE.Vector3()).dot(direction) <= 0) { // flash behind spectator
+                this.removeGrenade(throwableId)
+                return;
+            }
+
+            const ray = new THREE.Raycaster(sightPosition, direction)
+            const intersects = ray.intersectObjects([grenade, ...this.#world.getMapObjects()]);
+            if (intersects.length >= 1 && intersects[0].object === grenade) {
+                this.#hud.showFlashBangScreen()
+            }
+            this.removeGrenade(throwableId)
+            return;
+        }
+        if (item.slot === InventorySlot.SLOT_GRENADE_SMOKE) {
+            const grenade = this.#throwables[throwableId]
+            const smoke = new THREE.Mesh(new THREE.DodecahedronGeometry(300, 1), new THREE.MeshStandardMaterial({color: 0xdadada}))
+            smoke.material.side = THREE.DoubleSide
+            smoke.position.y = 150
+            grenade.add(smoke)
+            setTimeout(() => this.removeGrenade(throwableId), 18000)
+            return;
+        }
+
+        console.warn("No handler for grenade: ", item)
+        setTimeout(() => this.removeGrenade(throwableId), 1000) // todo responsive volumetric smokes, flashes, fire etc.
     }
 
     spawnGrenade(item, id) {

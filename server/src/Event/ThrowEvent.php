@@ -12,6 +12,7 @@ use cs\Core\World;
 use cs\Enum\SoundType;
 use cs\Equipment\Flashbang;
 use cs\Equipment\Grenade;
+use cs\Equipment\HighExplosive;
 use cs\HitGeometry\BallCollider;
 use cs\Interface\Attackable;
 
@@ -48,7 +49,7 @@ final class ThrowEvent extends Event implements Attackable
         $this->position = $origin->clone();
         $this->lastEventPosition = $origin->clone();
         $this->ball = new BallCollider($this->world, $origin, $radius);
-        $this->needsToLandOnFloor = !($this->item instanceof Flashbang);
+        $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
         $this->timeIncrement = 1 / Util::millisecondsToFrames(150); // fixme some good value or velocity or gravity :)
         $this->tickMax = $this->getTickId() + Util::millisecondsToFrames($maxTimeMs);
     }

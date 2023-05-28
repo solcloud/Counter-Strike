@@ -20,6 +20,7 @@ export class HUD {
         showGameMenu: false,
     }
     #elements = {
+        flash: null,
         score: null,
         scoreDetail: null,
         buyMenu: null,
@@ -45,6 +46,7 @@ export class HUD {
         time: null,
         killFeed: null,
     }
+    #flashInterval = null;
     #dropAnimationInterval = null;
     #countDownIntervalId = null;
     #scoreBoardData = null;
@@ -96,6 +98,23 @@ export class HUD {
 
     showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
         this.#killFeed.showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId)
+    }
+
+    showFlashBangScreen(fullFlashTimeMs = 1000, resetTimeMs = 3000) {
+        clearTimeout(this.#flashInterval)
+        const element = this.#elements.flash
+        element.style.opacity = 1.0
+        const timePortion = resetTimeMs / 100
+
+        const callback = function () {
+            element.style.opacity -= 0.01
+            if (element.style.opacity < .01) {
+                element.style.opacity = 0
+            } else {
+                setTimeout(callback, timePortion)
+            }
+        }
+        this.#flashInterval = setTimeout(callback, fullFlashTimeMs)
     }
 
     roundStart(roundTimeMs) {
@@ -229,6 +248,7 @@ export class HUD {
         }
 
         elementHud.innerHTML = `
+        <div id="flash"></div>
         <div id="cross"></div>
         <div id="hit-feedback"></div>
         <div id="equipped-item">
@@ -289,7 +309,7 @@ export class HUD {
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_SMOKE}">Smoke</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_FLASH}">Flash</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_HE}">HighExplosive</p>
+                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_HE}">Frag</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_MOLOTOV}">Molotov</p>
                     <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_DECOY}">Decoy</p>
                 </div>
@@ -300,6 +320,9 @@ export class HUD {
         </section>
     `;
 
+        elementHud.style.setProperty('--flash-bang-color', setting.getFlashBangColor())
+
+        this.#elements.flash = elementHud.querySelector('#flash')
         this.#elements.score = elementHud.querySelector('#scoreboard')
         this.#elements.buyMenu = elementHud.querySelector('#buy-menu')
         this.#elements.gameMenu = elementHud.querySelector('#game-menu')

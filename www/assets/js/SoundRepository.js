@@ -48,19 +48,7 @@ export class SoundRepository {
         }
 
         if (type === SoundType.ITEM_ATTACK) {
-            if (item.slot === InventorySlot.SLOT_SECONDARY) {
-                return '387480__cosmicembers__dart-thud-2.wav'
-            }
-            if (item.slot === InventorySlot.SLOT_PRIMARY) {
-                return '513421__pomeroyjoshua__anu-clap-09.wav'
-            }
-            if (item.slot === InventorySlot.SLOT_KNIFE) {
-                return '240788__f4ngy__knife-hitting-wood.wav'
-            }
-            if (this.#grenadesSlots.includes(item.slot)) {
-                return '163458__lemudcrab__grenade-launcher.wav'
-            }
-            return '558117__abdrtar__move.mp3'
+            return this.getItemAttackSound(item)
         }
         if (type === SoundType.ITEM_ATTACK2) {
             if (item.slot === InventorySlot.SLOT_KNIFE) {
@@ -158,6 +146,22 @@ export class SoundRepository {
 
         console.warn("No song defined for", arguments)
         return null
+    }
+
+    getItemAttackSound(item) {
+        if (item.slot === InventorySlot.SLOT_SECONDARY) {
+            return '387480__cosmicembers__dart-thud-2.wav'
+        }
+        if (item.slot === InventorySlot.SLOT_PRIMARY) {
+            return '513421__pomeroyjoshua__anu-clap-09.wav'
+        }
+        if (item.slot === InventorySlot.SLOT_KNIFE) {
+            return '240788__f4ngy__knife-hitting-wood.wav'
+        }
+        if (this.#grenadesSlots.includes(item.slot)) {
+            return '163458__lemudcrab__grenade-launcher.wav'
+        }
+        return '558117__abdrtar__move.mp3'
     }
 
 }

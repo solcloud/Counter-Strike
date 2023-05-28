@@ -57,7 +57,7 @@ export class BuyMenu {
             : ``
         }
         ${playerData.slots[Enum.InventorySlot.SLOT_GRENADE_HE] === undefined
-            ? `<p${money < 300 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_HE}" class="hud-action action-buy">HE for ${this.#formatPrice(300)}</a></p>`
+            ? `<p${money < 300 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_HE}" class="hud-action action-buy">Frag for ${this.#formatPrice(300)}</a></p>`
             : ``
         }
         ${playerData.slots[Enum.InventorySlot.SLOT_GRENADE_MOLOTOV] === undefined

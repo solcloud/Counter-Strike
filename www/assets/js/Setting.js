@@ -12,6 +12,7 @@ export class Setting {
             crosshair: '✛',
             crosshairColor: '#d31b1b',
             crosshairSize: 40,
+            flashBangColor: '#FFFFFF',
             preferPerformance: false,
             matchServerFps: false,
             anisotropic: 16,
@@ -131,4 +132,7 @@ export class Setting {
         return this.#setting.base.crosshairSize ?? 40
     }
 
+    getFlashBangColor() {
+        return this.#setting.base.flashBangColor ?? '#FFFFFF';
+    }
 }

@@ -134,6 +134,10 @@ export class World {
         return model
     }
 
+    getMapObjects() {
+        return this.#modelRepository.getMapObjects()
+    }
+
     itemAttack(player, item, isSpectator) {
         const sparkFeedbackSlots = [Enum.InventorySlot.SLOT_PRIMARY, Enum.InventorySlot.SLOT_SECONDARY]
         if (sparkFeedbackSlots.includes(item.slot)) {

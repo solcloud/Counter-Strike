@@ -2,6 +2,7 @@
 
 namespace Test\Unit;
 
+use cs\Core\Box;
 use cs\Core\Floor;
 use cs\Core\GameFactory;
 use cs\Core\Plane;
@@ -15,6 +16,43 @@ use Test\BaseTest;
 
 class BallColliderTest extends BaseTest
 {
+
+    public function testResolution1(): void
+    {
+        /////
+        $radius = 2;
+        $angleHorizontal = 0.0;
+        $angleVertical = -90.0;
+        $start = new Point(10, 10, 0);
+        $resolutionPoint = new Point(10, 4, 0);
+        $resolutionAngleHorizontal = $angleHorizontal;
+        $resolutionAngleVertical = 90.0;
+        /////
+
+        $ball = $this->createBall($start, $radius, $world);
+        $world->addBox(new Box(new Point(9), 1, 1, 1));
+        $world->addBox(new Box(new Point(10), 1, 1, 1));
+        $world->addBox(new Box(new Point(11), 1, 1, 1));
+
+        $this->runCollision($ball, $start, $angleHorizontal, $angleVertical);
+        $this->assertPositionSame($resolutionPoint, $ball->getLastValidPosition());
+        $this->assertSame($resolutionAngleHorizontal, $ball->getResolutionAngleHorizontal());
+        $this->assertSame($resolutionAngleVertical, $ball->getResolutionAngleVertical());
+    }
+
+    protected function runCollision(BallCollider $ball, Point $start, float $angleHorizontal, float $angleVertical): void
+    {
+        $candidate = $start->clone();
+        for ($distance = 1; $distance <= 128; $distance++) {
+            $candidate->setFrom($start);
+            $candidate->addFromArray(Util::movementXYZ($angleHorizontal, $angleVertical, $distance));
+            if ($ball->hasCollision($candidate, $angleHorizontal, $angleVertical)) {
+                return;
+            }
+        }
+
+        $this->fail("No '{$start}' collision detected");
+    }
 
     public function testSingleWallBounce(): void
     {
@@ -80,6 +118,12 @@ class BallColliderTest extends BaseTest
         }
 
         $this->fail('No collision detected');
+    }
+
+    private function createBall(Point $start, int $radius, ?World &$world): BallCollider
+    {
+        $world = $world ?? $this->createWorld();
+        return new BallCollider($world, $start, $radius);
     }
 
     private function createWorld(): World
