@@ -60,7 +60,6 @@ trait MovementTrait
 
     public function setPosition(Point $newPosition): void
     {
-        $this->stop();
         $this->position->setFrom($newPosition);
         $this->setActiveFloor($this->world->findFloor($this->position, $this->playerBoundingRadius));
     }
