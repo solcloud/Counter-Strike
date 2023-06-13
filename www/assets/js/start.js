@@ -80,10 +80,7 @@ let launchGame
         setting.addUpdateCallback('sensitivity', (newValue) => pointerLock.pointerSpeed = parseFloat(newValue))
         setting.addUpdateCallback('volume', (newValue) => world.volume = parseFloat(newValue))
         connector.connect(url.hostname, url.port, loginCode, control)
-
-        if (window.nodeApi) {
-            window.addEventListener('beforeunload', () => connector.close());
-        }
+        window.addEventListener('beforeunload', () => connector.close());
     }
 
     function render() {

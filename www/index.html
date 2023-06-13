@@ -109,14 +109,15 @@
 <script>
     if (window.nodeApi) {
         document.getElementById('join-url').value = 'udp://localhost:8080?map=default&code=acode'
+    } else {
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            return "Are you sure to leave this page?"
+        });
     }
     if (window.location.search === '?dev-join') {
         joinGameUrl(document.getElementById('join-url').value)
     }
-    window.addEventListener('beforeunload', (e) => {
-        e.preventDefault();
-        return "Are you sure to leave this page?"
-    });
 </script>
 </body>
 </html>
