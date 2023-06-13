@@ -276,7 +276,7 @@ class World
             return;
         }
 
-        // Drop item pickup
+        // Dropped item pickup
         foreach ($this->dropItems as $key => $dropItem) {
             if (!$this->canBeSeen($player, $dropItem->getPosition(), $dropItem->getBoundingRadius(), self::ITEM_PICK_MAX_DISTANCE)) {
                 continue;

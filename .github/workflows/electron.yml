@@ -37,7 +37,7 @@ jobs:
         timeout-minutes: 5
         uses: actions/upload-artifact@v3
         with:
-          name: linux.zip
+          name: counter-strike-football-linux.zip
           path: electron/linux.zip
           if-no-files-found: error
 
@@ -45,7 +45,7 @@ jobs:
         timeout-minutes: 5
         uses: actions/upload-artifact@v3
         with:
-          name: windows.zip
+          name: counter-strike-football-windows.zip
           path: electron/windows.zip
           if-no-files-found: error
 
@@ -53,6 +53,6 @@ jobs:
         timeout-minutes: 5
         uses: actions/upload-artifact@v3
         with:
-          name: macos.zip
+          name: counter-strike-football-macos.zip
           path: electron/macos.zip
           if-no-files-found: error
