@@ -122,8 +122,13 @@ export class World {
         bomb.visible = true
     }
 
-    spawnGrenade(item) {
-        const grenade = this.getModelForItem(item)
+    spawnGrenade(item, radius) {
+        const grenade = new THREE.Group()
+        const model = this.getModelForItem(item).getObjectByName('item')
+        const bb = new THREE.Mesh(new THREE.SphereGeometry(radius, 32, 20), new THREE.MeshBasicMaterial())
+        bb.name = 'collider'
+        bb.visible = false
+        grenade.add(model, bb)
         this.#scene.add(grenade)
         return grenade
     }

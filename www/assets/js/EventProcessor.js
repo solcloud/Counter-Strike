@@ -101,7 +101,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.ThrowEvent] = function (data) {
-            game.spawnGrenade(data.item, data.id)
+            game.spawnGrenade(data.item, data.id, data.radius)
         }
 
         this.#callbacks = eventsCallback

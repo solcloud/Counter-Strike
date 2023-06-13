@@ -171,10 +171,15 @@ export class Game {
         }
         if (data.type === SoundType.GRENADE_AIR || data.type === SoundType.GRENADE_BOUNCE || data.type === SoundType.GRENADE_LAND) {
             const grenade = this.#throwables[data.extra.id];
+            grenade.rotation.x += 0.1
+            grenade.rotation.y += 0.1
+            grenade.rotation.z += 0.1
             grenade.position.set(data.position.x, data.position.y, -data.position.z)
-        }
-        if (data.type === SoundType.GRENADE_LAND) {
-            this.#grenadeLand(data.extra.id, data.item, data.player, data.position)
+
+            if (data.type === SoundType.GRENADE_LAND) {
+                grenade.rotation.set(0, 0, 0)
+                this.#grenadeLand(data.extra.id, data.item, data.player, data.position)
+            }
         }
 
         this.#soundRepository.play(data, spectatorId, this.#tick)
@@ -201,7 +206,7 @@ export class Game {
             return
         }
         if (item.slot === InventorySlot.SLOT_GRENADE_FLASH) {
-            const grenade = this.#throwables[throwableId]
+            const grenade = this.#throwables[throwableId].getObjectByName('collider')
             const sight = this.playerSpectate.get3DObject().getObjectByName('sight')
             const sightPosition = sight.getWorldPosition(new THREE.Vector3())
             const direction = grenade.getWorldPosition(new THREE.Vector3()).sub(sightPosition).normalize()
@@ -211,7 +216,7 @@ export class Game {
             }
 
             const ray = new THREE.Raycaster(sightPosition, direction)
-            const intersects = ray.intersectObjects([grenade, ...this.#world.getMapObjects()]);
+            const intersects = ray.intersectObjects([grenade, ...this.#world.getMapObjects()], false);
             if (intersects.length >= 1 && intersects[0].object === grenade) {
                 this.#hud.showFlashBangScreen()
             }
@@ -232,8 +237,8 @@ export class Game {
         setTimeout(() => this.removeGrenade(throwableId), 1000) // todo responsive volumetric smokes, flashes, fire etc.
     }
 
-    spawnGrenade(item, id) {
-        this.#throwables[id] = this.#world.spawnGrenade(item)
+    spawnGrenade(item, id, radius) {
+        this.#throwables[id] = this.#world.spawnGrenade(item, radius)
     }
 
     removeGrenade(id) {
