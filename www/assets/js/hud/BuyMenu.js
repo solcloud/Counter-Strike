@@ -49,7 +49,7 @@ export class BuyMenu {
             ? `<p${money < 400 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.DEFUSE_KIT}" class="hud-action action-buy">Defuse Kit for ${this.#formatPrice(400)}</a></p>`
             : ``
         }
-            <h3>Grenades (⚠️beta)</h3>
+            <h3>Grenades</h3>
             <div class="menu-grenades">
         <p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_FLASH}" class="hud-action action-buy">Flash for ${this.#formatPrice(200)}</a></p>
         ${playerData.slots[Enum.InventorySlot.SLOT_GRENADE_SMOKE] === undefined
