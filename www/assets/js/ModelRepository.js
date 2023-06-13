@@ -153,14 +153,12 @@ export class ModelRepository {
         models[ItemId.PistolUsp] = 'pistol.glb' // fixme
         models[ItemId.PistolP250] = 'pistol.glb'
         models[ItemId.PistolGlock] = 'pistol.glb' // fixme
-        if (false) { // fixme
-            models[ItemId.HighExplosive] = 'highexplosive.glb'
-            models[ItemId.Flashbang] = 'flashbang.glb'
-            models[ItemId.Smoke] = 'smoke.glb'
-            models[ItemId.Decoy] = 'decoy.glb'
-            models[ItemId.Incendiary] = 'incendiary.glb'
-            models[ItemId.Molotov] = 'molotov.glb'
-        }
+        models[ItemId.HighExplosive] = 'highexplosive.glb'
+        models[ItemId.Flashbang] = 'flashbang.glb'
+        models[ItemId.Smoke] = 'smoke.glb'
+        models[ItemId.Decoy] = 'decoy.glb'
+        models[ItemId.Incendiary] = 'incendiary.glb'
+        models[ItemId.Molotov] = 'molotov.glb'
 
         Object.keys(models).forEach(function (itemId) {
             const fileName = models[itemId]
@@ -223,10 +221,6 @@ export class ModelRepository {
             materialTeam.map = this.#textures.team
             const materialOpponent = outfit.material.clone()
             materialOpponent.map = this.#textures.opponent
-
-            // fixme inside model
-            const povSpark = self.#models[ItemId.RifleM4A4].getObjectByName('pov-spark')
-            povSpark.position.z = 0
 
             this.#materials.outfitTeam = materialTeam
             this.#materials.outfitOpponent = materialOpponent
