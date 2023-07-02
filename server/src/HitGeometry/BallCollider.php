@@ -222,6 +222,12 @@ class BallCollider
     private function calculatePlaneHitsY(int $x, int $y, int $z, bool $yGrowing): void
     {
         $radius = $this->radius;
+        $radius2 = 2 * $radius;
+        $plane = ($yGrowing ? self::PLANE_Y_UP : self::PLANE_Y_DOWN);
+        if (count($this->hits[$plane] ?? []) === $radius2 + 1) { // full collision on first layer, do not go deeper
+            return;
+        }
+
         $base = new Point($x - $radius, $y + ($yGrowing ? $radius : -$radius), $z - $radius);
         $floors = $this->world->getYFloors($base->y);
         if ($floors === []) {
@@ -229,9 +235,7 @@ class BallCollider
         }
 
         $wasHit = false;
-        $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($yGrowing ? self::PLANE_Y_UP : self::PLANE_Y_DOWN);
         for ($x = 0; $x <= $radius2; $x++) {
             $candidate->setFrom($base);
             $candidate->x = $base->x + $x;
@@ -265,6 +269,12 @@ class BallCollider
     private function calculatePlaneHitsX(int $x, int $y, int $z, bool $xGrowing): void
     {
         $radius = $this->radius;
+        $radius2 = 2 * $radius;
+        $plane = ($xGrowing ? self::PLANE_X_RIGHT : self::PLANE_X_LEFT);
+        if (count($this->hits[$plane] ?? []) === $radius2 + 1) { // full collision on first layer, do not go deeper
+            return;
+        }
+
         $base = new Point($x + ($xGrowing ? $radius : -$radius), $y - $radius + 1, $z - $radius);
         $walls = $this->world->getXWalls($base->x);
         if ($walls === []) {
@@ -272,9 +282,7 @@ class BallCollider
         }
 
         $wasHit = false;
-        $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($xGrowing ? self::PLANE_X_RIGHT : self::PLANE_X_LEFT);
         for ($z = 0; $z <= $radius2; $z++) {
             $candidate->setFrom($base);
             $candidate->z = $base->z + $z;
@@ -308,6 +316,12 @@ class BallCollider
     private function calculatePlaneHitsZ(int $x, int $y, int $z, bool $zGrowing): void
     {
         $radius = $this->radius;
+        $radius2 = 2 * $radius;
+        $plane = ($zGrowing ? self::PLANE_Z_FAR : self::PLANE_Z_NEAR);
+        if (count($this->hits[$plane] ?? []) === $radius2 + 1) { // full collision on first layer, do not go deeper
+            return;
+        }
+
         $base = new Point($x - $radius, $y - $radius + 1, $z + ($zGrowing ? $radius : -$radius));
         $walls = $this->world->getZWalls($base->z);
         if ($walls === []) {
@@ -315,9 +329,7 @@ class BallCollider
         }
 
         $wasHit = false;
-        $radius2 = 2 * $radius;
         $candidate = new Point();
-        $plane = ($zGrowing ? self::PLANE_Z_FAR : self::PLANE_Z_NEAR);
         for ($x = 0; $x <= $radius2; $x++) {
             $candidate->setFrom($base);
             $candidate->x = $base->x + $x;
