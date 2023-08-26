@@ -27,7 +27,8 @@ class Box
         public        readonly int $widthX,
         public        readonly int $heightY,
         public        readonly int $depthZ,
-        int           $sides = self::SIDE_ALL
+        int           $sides = self::SIDE_ALL,
+        bool          $penetrable = true,
     )
     {
         if ($sides & self::SIDE_BOTTOM) {
@@ -53,6 +54,13 @@ class Box
 
         if ($this->floors === [] && $this->walls === []) {
             throw new GameException("Choose at least one box side");
+        }
+
+        foreach ($this->floors as $plane) {
+            $plane->setPenetrable($penetrable);
+        }
+        foreach ($this->walls as $plane) {
+            $plane->setPenetrable($penetrable);
         }
     }
 

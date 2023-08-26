@@ -27,7 +27,7 @@ class DefaultMap extends BoxMap
         $boxHeight = $heightCrouch + 2;
         $heightStand = 190;
 
-        $this->addBox(new Box(new Point(0, $y, 0), 43 * $scale, 5 * $heightStand, 32 * $scale));
+        $this->addBox(new Box(new Point(0, $y, 0), 43 * $scale, 5 * $heightStand, 32 * $scale, Box::SIDE_ALL, false));
         foreach ([5, 13, 21, 29, 37] as $x) {
             $attackers[] = new Point($x * $scale + $scaleHalf, $y, 4 * $scale - $radiusHalf);
             $this->addBox(new Box(new Point(($x - 1) * $scale, $y, 5 * $scale), 3 * $scale, $boxHeight, $scale));

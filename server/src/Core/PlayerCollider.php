@@ -32,14 +32,13 @@ class PlayerCollider
         }
     }
 
-    public function tryHitPlayer(Bullet $bullet, Backtrack $backtrack): ?Hittable
+    public function tryHitPlayer(Bullet $bullet, Point $bulletPosition, Backtrack $backtrack): ?Hittable
     {
-        $bp = $bullet->position;
         foreach ($backtrack->getStates() as $state) {
             $backtrack->apply($state, $this->playerId);
 
             if (false === Collision::pointWithCylinder(
-                    $bp,
+                    $bulletPosition,
                     $this->player->getReferenceToPosition(),
                     $this->player->getBoundingRadius(),
                     $this->player->getHeadHeight()
@@ -48,7 +47,7 @@ class PlayerCollider
             }
 
             foreach ($this->hitBoxes as $hitBox) {
-                if ($hitBox->intersect($bp)) {
+                if ($hitBox->intersect($bulletPosition)) {
                     $hitBox->registerHit($bullet);
                     return $hitBox;
                 }

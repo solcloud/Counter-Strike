@@ -36,7 +36,7 @@ final class DynamicFloor extends Floor
      */
     public function getHitAntiForce(Point $point): int
     {
-        return $this->hitAntiForce;
+        return 0;
     }
 
     /**

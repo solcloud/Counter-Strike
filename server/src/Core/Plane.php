@@ -4,8 +4,11 @@ namespace cs\Core;
 
 abstract class Plane extends SolidSurface
 {
-    private const PLANE_WALL_BANG_EDGE_MARGIN = 8;
 
+    protected bool $penetrable = true;
+    protected int $hitAntiForce = 25123;
+    protected int $hitAntiForceMargin = 10;
+    protected int $wallBangEdgeMarginDistance = 8;
     protected Point2D $point2DStart;
     protected Point2D $point2DEnd;
 
@@ -15,21 +18,36 @@ abstract class Plane extends SolidSurface
         $this->point2DEnd = $this->end->to2D($axis2d);
     }
 
+    public function setPenetrable(bool $penetrable): static
+    {
+        $this->penetrable = $penetrable;
+        return $this;
+    }
+
+    public function setHitAntiForce(int $hitAntiForceBody, int $hitAntiForceMargin, int $wallBangEdgeMarginDistance): void
+    {
+        $this->setPenetrable(true);
+        $this->hitAntiForce = max(0, $hitAntiForceBody);
+        $this->hitAntiForceMargin = max(0, $hitAntiForceMargin);
+        $this->wallBangEdgeMarginDistance = max(0, $wallBangEdgeMarginDistance);
+    }
+
     public function getHitAntiForce(Point $point): int
     {
-        if ($this->point2DStart->x <= 0 || $this->point2DStart->y <= 0) { // World boundary, cannot penetrate
-            return 999999;
+        if (!$this->penetrable) {
+            return 99999;
         }
 
+        $margin = $this->wallBangEdgeMarginDistance;
         $hit = $point->to2D($this->axis2d);
-        if ($hit->x - $this->point2DStart->x <= self::PLANE_WALL_BANG_EDGE_MARGIN || $this->point2DEnd->x - $hit->x <= self::PLANE_WALL_BANG_EDGE_MARGIN) {
-            return 10;
+        if ($hit->x - $this->point2DStart->x <= $margin || $this->point2DEnd->x - $hit->x <= $margin) {
+            return $this->hitAntiForceMargin;
         }
-        if ($hit->y - $this->point2DStart->y <= self::PLANE_WALL_BANG_EDGE_MARGIN || $this->point2DEnd->y - $hit->y <= self::PLANE_WALL_BANG_EDGE_MARGIN) {
-            return 10;
+        if ($hit->y - $this->point2DStart->y <= $margin || $this->point2DEnd->y - $hit->y <= $margin) {
+            return $this->hitAntiForceMargin;
         }
 
-        return parent::getHitAntiForce($point);
+        return $this->hitAntiForce;
     }
 
     public function intersect(Point $point, int $radius = 0): bool

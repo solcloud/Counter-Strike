@@ -8,7 +8,7 @@ class Bullet
 {
 
     private Point $origin;
-    public Point $position;
+    private Point $position;
     private int $originPlayerId;
     private bool $originPlayerIsAttacker;
     private int $distanceTraveled;
@@ -33,6 +33,7 @@ class Bullet
         $this->originPlayerId = $playerId;
         $this->originPlayerIsAttacker = $attackerSide;
         $this->origin = $origin;
+        $this->position = $origin->clone();
         $this->addPlayerIdSkip($playerId);
     }
 
@@ -68,7 +69,7 @@ class Bullet
 
     public function move(Point $point): void
     {
-        $this->position = $point;
+        $this->position->setFrom($point);
     }
 
     public function incrementDistance(): int

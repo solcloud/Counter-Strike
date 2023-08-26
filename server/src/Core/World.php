@@ -97,10 +97,6 @@ class World
 
     public function isWallAt(Point $point): ?Wall
     {
-        if ($point->x < 0 || $point->z < 0) {
-            return new Wall(new Point(-1, -1, -1), $point->z < 0);
-        }
-
         foreach (($this->walls[self::WALL_Z][$point->z] ?? []) as $wall) {
             if ($wall->intersect($point)) {
                 return $wall;
@@ -361,17 +357,16 @@ class World
     /**
      * @return Hittable[]
      */
-    public function calculateHits(Bullet $bullet): array
+    public function calculateHits(Bullet $bullet, Point $bulletPosition): array
     {
         $hits = [];
-        $bp = $bullet->getPosition();
         $skipPlayerIds = $bullet->getPlayerSkipIds();
         foreach ($this->playersColliders as $playerId => $playerCollider) {
             if (isset($skipPlayerIds[$playerId])) {
                 continue;
             }
 
-            $hitBox = $playerCollider->tryHitPlayer($bullet, $this->game->getBacktrack());
+            $hitBox = $playerCollider->tryHitPlayer($bullet, $bulletPosition, $this->game->getBacktrack());
             if (!$hitBox) {
                 continue;
             }
@@ -386,12 +381,12 @@ class World
             }
         }
 
-        $floor = $this->findFloor($bp);
+        $floor = $this->findFloor($bulletPosition);
         if ($floor) {
             $hits[] = $floor;
         }
 
-        $wall = $this->isWallAt($bp);
+        $wall = $this->isWallAt($bulletPosition);
         if ($wall) {
             $hits[] = $wall;
         }
@@ -461,7 +456,7 @@ class World
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
         if ($bottomCenter->x < 0) {
-            return new Wall(new Point(-1, -1, -1), false);
+            return (new Wall(new Point(-1, -1, -1), false))->setPenetrable(false);
         }
 
         $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
@@ -478,7 +473,7 @@ class World
     public function checkZSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
         if ($bottomCenter->z < 0) {
-            return new Wall(new Point(-1, -1, -1), true);
+            return (new Wall(new Point(-1, -1, -1), true))->setPenetrable(false);
         }
 
         $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);

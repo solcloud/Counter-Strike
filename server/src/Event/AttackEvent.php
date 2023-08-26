@@ -62,7 +62,7 @@ final class AttackEvent implements Attackable
                 $this->world->optimizeBulletHitCheck($bullet);
             }
 
-            foreach ($this->world->calculateHits($bullet) as $hit) {
+            foreach ($this->world->calculateHits($bullet, $newPos) as $hit) {
                 $bullet->lowerDamage($hit->getHitAntiForce($newPos));
                 $result->addHit($hit);
                 $this->world->bulletHit($hit, $bullet, $hit->wasHeadShot());

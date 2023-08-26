@@ -37,8 +37,8 @@ abstract class Map
     public function getWalls(): array
     {
         return [
-            new Wall(new Point(0, 0, -1), true, 99999),
-            new Wall(new Point(-1, 0, 0), false, 99999),
+            (new Wall(new Point(0, 0, -1), true, 99999))->setPenetrable(false),
+            (new Wall(new Point(-1, 0, 0), false, 99999))->setPenetrable(false),
         ];
     }
 
@@ -47,7 +47,9 @@ abstract class Map
      */
     public function getFloors(): array
     {
-        return [new Floor(new Point(), 99999, 99999)];
+        return [
+            (new Floor(new Point(), 99999, 99999))->setPenetrable(false),
+        ];
     }
 
     /**
