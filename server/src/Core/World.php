@@ -455,10 +455,6 @@ class World
 
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        if ($bottomCenter->x < 0) {
-            return (new Wall(new Point(-1, -1, -1), false))->setPenetrable(false);
-        }
-
         $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
         $width = 2 * $radius;
         foreach (($this->walls[self::WALL_X][$bottomCenter->x] ?? []) as $wall) {
@@ -472,10 +468,6 @@ class World
 
     public function checkZSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        if ($bottomCenter->z < 0) {
-            return (new Wall(new Point(-1, -1, -1), true))->setPenetrable(false);
-        }
-
         $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);
         $width = 2 * $radius;
         foreach (($this->walls[self::WALL_Z][$bottomCenter->z] ?? []) as $wall) {
