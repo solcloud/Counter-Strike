@@ -16,7 +16,6 @@ use cs\Enum\Color;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemId;
 use cs\Event\KillEvent;
-use cs\Weapon\Knife;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
 use cs\Weapon\RifleM4A4;
@@ -38,6 +37,8 @@ class PlayerKillTest extends BaseTestCase
 
         $game = $this->createGame([GameProperty::START_MONEY => $startMoney]);
         $game->addPlayer($player2);
+        $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
+        $player2->setPosition(new Point(300, 0, 500));
         $this->playPlayer($game, $player2Commands, $player2->getId());
         $this->assertTrue($game->getScore()->isTie());
 
@@ -152,6 +153,8 @@ class PlayerKillTest extends BaseTestCase
         $game = $this->createTestGame();
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
+        $player1->setPosition(new Point(300, 0, 300));
+        $player2->setPosition(new Point(300, 0, 350));
         $this->playPlayer($game, $player2Commands, $player2->getId());
 
         $this->assertSame(100, $player1->getHealth());
@@ -255,7 +258,8 @@ class PlayerKillTest extends BaseTestCase
         $game = $this->createTestGame();
         $game->getPlayer(1)->crouch();
         $game->addPlayer($player2);
-        $player2->setPosition((new Point())->addZ(200));
+        $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
+        $player2->setPosition(new Point(300, 0, 500));
 
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(180, -18),
@@ -284,7 +288,8 @@ class PlayerKillTest extends BaseTestCase
         $game = $this->createTestGame();
         $game->getPlayer(1)->crouch();
         $game->addPlayer($player2);
-        $player2->setPosition(new Point(100, 0, 200));
+        $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
+        $player2->setPosition(new Point(400, 0, 500));
 
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(206, -11),
@@ -313,7 +318,8 @@ class PlayerKillTest extends BaseTestCase
 
         $game = $this->createTestGame();
         $game->addPlayer($player2);
-        $player2->setPosition(new Point(100, 0, 200));
+        $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
+        $player2->setPosition(new Point(400, 0, 500));
 
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(207, 9),
@@ -366,10 +372,9 @@ class PlayerKillTest extends BaseTestCase
     public function testMultiRoundKills(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $player2->getSight()->lookHorizontal(180);
-
         $game = $this->createNoPauseGame(15);
         $game->addPlayer($player2);
+        $p1 = $game->getPlayer(1);
 
         $afterRoundWaitTicks = 2;
         $killEventsCount = 0;
@@ -383,24 +388,27 @@ class PlayerKillTest extends BaseTestCase
             }
         });
         $this->playPlayer($game, [
-            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
-            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            fn() => $p1->setPosition(new Point(500, 0, 300)),
+            fn(Player $p) => $p->setPosition(new Point(300, 0, 300)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(90),
             function (Player $p) {
                 $ar = $p->attack();
                 $this->assertNotNull($ar);
                 $this->assertNotEmpty($ar->getHits());
             },
             $this->waitXTicks($afterRoundWaitTicks),
-            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
-            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            fn() => $p1->setPosition(new Point(500, 0, 300)),
+            fn(Player $p) => $p->setPosition(new Point(300, 0, 300)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(90),
             function (Player $p) {
                 $ar = $p->attack();
                 $this->assertNotNull($ar);
                 $this->assertNotEmpty($ar->getHits());
             },
             $this->waitXTicks($afterRoundWaitTicks),
-            fn(Player $p) => $p->setPosition(new Point(0, 0, Setting::playerBoundingRadius() * 6)),
-            fn(Player $p) => $p->getSight()->lookHorizontal(180),
+            fn() => $p1->setPosition(new Point(500, 0, 300)),
+            fn(Player $p) => $p->setPosition(new Point(300, 0, 300)),
+            fn(Player $p) => $p->getSight()->lookHorizontal(90),
             function (Player $p) {
                 $ar = $p->attack();
                 $this->assertNotNull($ar);

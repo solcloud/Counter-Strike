@@ -4,7 +4,6 @@ namespace cs\Map;
 
 use cs\Core\Box;
 use cs\Core\Point;
-use cs\Core\Setting;
 
 class TestMap extends Map
 {
@@ -14,7 +13,7 @@ class TestMap extends Map
     public function __construct()
     {
         $this->setAttackersSpawnPositions([new Point()]);
-        $this->setDefendersSpawnPositions([(new Point())->setZ(Setting::moveDistancePerTick())]);
+        $this->setDefendersSpawnPositions([(new Point())->setZ(50)]);
 
         $this->buyArea = new Box(new Point(), 99999, 999, 99999);
     }

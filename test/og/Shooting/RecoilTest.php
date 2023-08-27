@@ -18,7 +18,7 @@ class RecoilTest extends BaseTestCase
         $game = $this->createNoPauseGame();
         $game->getPlayer(1)->getInventory()->earnMoney(16000);
         $game->getPlayer(1)->buyItem(BuyMenuItem::RIFLE_AK);
-        $game->getPlayer(1)->setPosition(new Point(500, 0, 0));
+        $game->getPlayer(1)->setPosition(new Point(500, 0, 500));
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
 
@@ -45,6 +45,7 @@ class RecoilTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
+        $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
         $player->getInventory()->earnMoney(16000);
         $player->buyItem(BuyMenuItem::RIFLE_AK);
         $ak = $player->getEquippedItem();
@@ -79,6 +80,7 @@ class RecoilTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
+        $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);
@@ -113,6 +115,7 @@ class RecoilTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
+        $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);
@@ -146,6 +149,7 @@ class RecoilTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
+        $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);

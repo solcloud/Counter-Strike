@@ -95,7 +95,7 @@ class WorldCollisionTest extends BaseTestCase
     {
         $yStart = Setting::playerHeadHeightStand() * 6;
         $playerCommands = [
-            fn(Player $p) => $p->setPosition(new Point(0, $yStart, 0)),
+            fn(Player $p) => $p->setPosition(new Point(500, $yStart, 500)),
             $this->waitXTicks((int)ceil($yStart / Setting::fallAmountPerTick())),
             $this->endGame(),
         ];

@@ -5,6 +5,7 @@ namespace Test\Game;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
+use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
@@ -46,6 +47,7 @@ class RoundTest extends BaseTestCase
         $killEvents = [];
         $dropEvents = [];
         $game = $this->createNoPauseGame();
+        $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
         $game->onEvents(function (array $events) use (&$killEvents, &$dropEvents, &$break): void {
             if ($break) {
                 return;
