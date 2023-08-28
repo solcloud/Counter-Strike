@@ -4,7 +4,6 @@ namespace cs\Core;
 
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemId;
-use cs\Enum\ItemName;
 use cs\Enum\ItemType;
 use cs\Event\EquipEvent;
 

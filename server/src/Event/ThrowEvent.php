@@ -163,6 +163,7 @@ final class ThrowEvent extends Event implements Attackable
     {
         $this->id = "{$this->player->getId()}-{$this->item->getId()}-{$this->getTickId()}";
         $this->player->getInventory()->removeEquipped();
+        $this->player->equip($this->player->getEquippedItem()->getSlot());
         $this->velocity *= $this->item->getSpeedMultiplier();
         $bullet = new Bullet($this->item);
         return new AttackResult($bullet);

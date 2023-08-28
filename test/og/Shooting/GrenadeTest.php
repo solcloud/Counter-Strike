@@ -325,4 +325,34 @@ class GrenadeTest extends BaseTestCase
         $this->assertPositionSame(new Point(559, Smoke::boundingRadius, 347), $landEvent->position);
     }
 
+    public function testMultiThrow(): void
+    {
+        $game = $this->createNoPauseGame();
+        $this->playPlayer($game, [
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertInstanceOf(Flashbang::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertFalse($p->getEquippedItem()->isEquipped()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            $this->waitNTicks(Flashbang::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
+            fn(Player $p) => $this->assertTrue($p->getEquippedItem()->isEquipped()),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
+            $this->endGame(),
+        ]);
+
+        $this->assertCount(3, $game->getPlayer(1)->getInventory()->getItems());
+        $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_KNIFE->value));
+        $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+        $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_BOMB->value));
+    }
+
+
 }
