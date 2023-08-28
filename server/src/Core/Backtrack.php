@@ -15,7 +15,7 @@ final class Backtrack
     public function __construct(private Game $game, public readonly int $numberOfHistoryStates)
     {
         if ($numberOfHistoryStates < 0) {
-            throw new GameException("Variable '{$numberOfHistoryStates}' needs to be bigger or equal zero");
+            throw new GameException("Variable '{$numberOfHistoryStates}' needs to be bigger or equal zero"); // @codeCoverageIgnore
         }
     }
 

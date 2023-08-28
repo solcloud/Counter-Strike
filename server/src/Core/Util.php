@@ -83,14 +83,6 @@ final class Util
         return ($angleHorizontal === 90.0 || $angleHorizontal === 270.0) ? 0 : ($angleHorizontal > 270 || $angleHorizontal < 90 ? +1 : -1);
     }
 
-    public static function directionY(float $angleVertical): int
-    {
-        if ($angleVertical === 0.0) {
-            return 0;
-        }
-        return ($angleVertical > 0 ? +1 : -1);
-    }
-
     public static function nearbyInt(float $float): int
     {
         return (int)($float > 0 ? $float + .5 : $float - .5);

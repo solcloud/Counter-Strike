@@ -274,6 +274,7 @@ final class Player
     }
 
     /**
+     * @codeCoverageIgnore
      * @return array{id: int, color: int, isAttacker: bool}
      */
     public function toArray(): array

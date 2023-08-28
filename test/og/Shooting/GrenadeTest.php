@@ -10,6 +10,7 @@ use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
+use cs\Equipment\Flashbang;
 use cs\Equipment\Smoke;
 use cs\Event\SoundEvent;
 use Test\BaseTestCase;
@@ -59,6 +60,53 @@ class GrenadeTest extends BaseTestCase
         $this->assertSame($floorY, $bounceEvent->position->y);
         $this->assertSame($floorY, $landEvent->position->y);
         $this->assertPositionSame(new Point(152, $floorY, 720), $landEvent->position);
+    }
+
+    public function testThrowRun(): void
+    {
+        $floorY = 100;
+        $landEvent = null;
+        $bounceEvent = null;
+        $game = $this->createTestGame();
+        $game->getWorld()->addFloor(new Floor(new Point(-50, $floorY, 300), 1500, 3500));
+        $game->onEvents(function (array $events) use (&$landEvent, &$bounceEvent): void {
+            foreach ($events as $event) {
+                if (!($event instanceof SoundEvent)) {
+                    continue;
+                }
+                if ($event->type === SoundType::GRENADE_LAND) {
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
+                    $landEvent = $event;
+                }
+                if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
+                    $bounceEvent = $event;
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(12, 15),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            function (Player $p) {
+                $p->moveForward();
+                $this->assertNotNull($p->attack());
+            },
+            $this->waitNTicks(1800),
+            $this->endGame(),
+        ]);
+
+        $floorY += Smoke::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
+        $this->assertInstanceOf(SoundEvent::class, $landEvent);
+        $this->assertPositionNotSame(new Point(), $landEvent->position);
+        $this->assertGreaterThan(1, $bounceEvent->position->z);
+        $this->assertPositionNotSame($bounceEvent->position, $landEvent->position);
+        $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
+        $this->assertSame($floorY, $bounceEvent->position->y);
+        $this->assertSame($floorY, $landEvent->position->y);
+        $this->assertPositionSame(new Point(221, $floorY, 1022), $landEvent->position);
     }
 
     public function testThrow2(): void
@@ -146,6 +194,47 @@ class GrenadeTest extends BaseTestCase
         $this->assertSame($y, $bounceEvent->position->y);
         $this->assertSame($y, $landEvent->position->y);
         $this->assertPositionSame(new Point(470, $y, 470), $landEvent->position);
+    }
+
+    public function testThrowFlashBang(): void
+    {
+        $landEvent = null;
+        $bounceEvent = null;
+        $game = $this->createTestGame();
+        $game->onEvents(function (array $events) use (&$landEvent, &$bounceEvent): void {
+            foreach ($events as $event) {
+                if (!($event instanceof SoundEvent)) {
+                    continue;
+                }
+                if ($event->type === SoundType::GRENADE_LAND) {
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
+                    $landEvent = $event;
+                }
+                if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
+                    $bounceEvent = $event;
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(45, 89),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_FLASH)),
+            $this->waitNTicks(Flashbang::equipReadyTimeMs),
+            fn(Player $p) => $p->jump(),
+            function (Player $p) {
+                $p->moveForward();
+                $this->assertNotNull($p->attack());
+            },
+            $this->waitNTicks(2200),
+            $this->endGame(),
+        ]);
+
+        $y = Flashbang::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $this->assertNull($bounceEvent);
+        $this->assertInstanceOf(SoundEvent::class, $landEvent);
+        $this->assertGreaterThan($y, $landEvent->position->y);
+        $this->assertPositionSame(new Point(158, 470, 158), $landEvent->position);
     }
 
     public function testFullVerticalThrow(): void

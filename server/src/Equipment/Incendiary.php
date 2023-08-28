@@ -3,7 +3,6 @@
 namespace cs\Equipment;
 
 use cs\Enum\InventorySlot;
-use cs\Enum\ItemType;
 
 class Incendiary extends Grenade
 {

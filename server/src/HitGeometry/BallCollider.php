@@ -44,7 +44,7 @@ class BallCollider
     )
     {
         if ($this->radius <= 0) {
-            throw new GameException("Radius needs to be bigger than zero");
+            throw new GameException("Radius needs to be bigger than zero"); // @codeCoverageIgnore
         }
 
         $this->origin = $origin->clone();
@@ -56,7 +56,7 @@ class BallCollider
     public function hasCollision(Point $point, float $angleHorizontal, float $angleVertical): bool
     {
         if ($point->y < 0 || $point->x < 0 || $point->z < 0) {
-            throw new GameException("Point '{$point}' cannot be lower than zero! Invalid angle resolution somewhere...");
+            throw new GameException("Point '{$point}' cannot be lower than zero! Invalid angle resolution somewhere..."); // @codeCoverageIgnore
         }
 
         if ($this->lastExtremePosition === null) {
@@ -170,7 +170,7 @@ class BallCollider
             $z = max(-1, min($z, $point->z + $radius));
         }
         if ($this->hits === []) {
-            throw new GameException("None of sensor was hit!");
+            throw new GameException("None of sensor was hit!"); // @codeCoverageIgnore
         }
 
         $validPosition = $this->lastValidPosition->clone();
@@ -231,7 +231,7 @@ class BallCollider
         $base = new Point($x - $radius, $y + ($yGrowing ? $radius : -$radius), $z - $radius);
         $floors = $this->world->getYFloors($base->y);
         if ($floors === []) {
-            throw new GameException("Plane Y '{$y}' intersect but no floors found");
+            throw new GameException("Plane Y '{$y}' intersect but no floors found"); // @codeCoverageIgnore
         }
 
         $wasHit = false;
@@ -262,7 +262,7 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane Y '{$plane}' intersect [{$base}] but none of points");
+            throw new GameException("Plane Y '{$plane}' intersect [{$base}] but none of points"); // @codeCoverageIgnore
         }
     }
 
@@ -278,7 +278,7 @@ class BallCollider
         $base = new Point($x + ($xGrowing ? $radius : -$radius), $y - $radius + 1, $z - $radius);
         $walls = $this->world->getXWalls($base->x);
         if ($walls === []) {
-            throw new GameException("Plane X '{$x}' intersect but no walls found");
+            throw new GameException("Plane X '{$x}' intersect but no walls found"); // @codeCoverageIgnore
         }
 
         $wasHit = false;
@@ -309,7 +309,7 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane X '{$xGrowing}' intersect [{$base}] but none of points");
+            throw new GameException("Plane X '{$xGrowing}' intersect [{$base}] but none of points"); // @codeCoverageIgnore
         }
     }
 
@@ -325,7 +325,7 @@ class BallCollider
         $base = new Point($x - $radius, $y - $radius + 1, $z + ($zGrowing ? $radius : -$radius));
         $walls = $this->world->getZWalls($base->z);
         if ($walls === []) {
-            throw new GameException("Plane Z '{$z}' intersect but no walls found");
+            throw new GameException("Plane Z '{$z}' intersect but no walls found"); // @codeCoverageIgnore
         }
 
         $wasHit = false;
@@ -356,7 +356,7 @@ class BallCollider
         }
 
         if ($wasHit === false) {
-            throw new GameException("Plane Z '{$plane}' intersect [{$base}] but none of points");
+            throw new GameException("Plane Z '{$plane}' intersect [{$base}] but none of points"); // @codeCoverageIgnore
         }
     }
 

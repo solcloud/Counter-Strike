@@ -4,7 +4,6 @@ namespace cs\Equipment;
 
 use cs\Core\Item;
 use cs\Enum\InventorySlot;
-use cs\Enum\ItemType;
 
 class Flashbang extends Grenade
 {

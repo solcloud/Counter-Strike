@@ -126,7 +126,7 @@ class World
     public function findFloorSquare(Point $point, int $radius): ?Floor
     {
         if ($point->y < 0) {
-            throw new GameException("Y value cannot be lower than zero");
+            throw new GameException("Y value cannot be lower than zero"); // @codeCoverageIgnore
         }
         $floors = $this->floors[$point->y] ?? [];
         if ($floors === []) {
@@ -146,7 +146,7 @@ class World
     public function findFloor(Point $point, int $radius = 0): ?Floor
     {
         if ($point->y < 0) {
-            throw new GameException("Y value cannot be lower than zero");
+            throw new GameException("Y value cannot be lower than zero"); // @codeCoverageIgnore
         }
 
         $floors = $this->floors[$point->y] ?? [];

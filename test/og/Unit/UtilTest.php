@@ -228,6 +228,8 @@ class UtilTest extends BaseTest
             'x' => 3,
             'y' => 2,
         ], $point->to2D('zy')->toArray());
+        $point->setFromArray([1,3,2]);
+        $this->assertTrue((new Point(1,3,2))->equals($point));
     }
 
     public function testGamePropertyUnknownFieldGet(): void

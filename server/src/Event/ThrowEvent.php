@@ -39,11 +39,10 @@ final class ThrowEvent extends Event implements Attackable
         private float            $angleVertical,
         public readonly int      $radius,
         private float            $velocity,
-        int                      $maxTimeMs = 99999,
     )
     {
         if ($this->velocity <= 0) {
-            throw new GameException("Velocity needs to be positive");
+            throw new GameException("Velocity needs to be positive"); // @codeCoverageIgnore
         }
 
         $this->position = $origin->clone();
@@ -51,7 +50,7 @@ final class ThrowEvent extends Event implements Attackable
         $this->ball = new BallCollider($this->world, $origin, $radius);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
         $this->timeIncrement = 1 / Util::millisecondsToFrames(150); // fixme some good value or velocity or gravity :)
-        $this->tickMax = $this->getTickId() + Util::millisecondsToFrames($maxTimeMs);
+        $this->tickMax = $this->getTickId() + Util::millisecondsToFrames($this->needsToLandOnFloor ? 99999 : 1200);
     }
 
     private function makeEvent(Point $point, SoundType $type): Event
@@ -188,6 +187,9 @@ final class ThrowEvent extends Event implements Attackable
         $this->angleVertical = $angleVertical;
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function serialize(): array
     {
         return [

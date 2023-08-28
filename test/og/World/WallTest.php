@@ -21,6 +21,7 @@ class WallTest extends BaseTestCase
     {
         $wallHorizontal = new Wall(new Point(0, 0, 0), true, 2, 1);
         $wallVertical = new Wall(new Point(0, 0, 0), false, 2, 1);
+        $wallHorizontal->setHitAntiForce(123, 10, 1);
         $world = new World(new Game());
         $world->addWall($wallHorizontal);
         $world->addWall($wallVertical);
