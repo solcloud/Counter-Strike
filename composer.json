@@ -2,9 +2,9 @@
     "scripts": {
         "stan": "php vendor/bin/phpstan --memory-limit=300M analyze",
         "unit": "php vendor/bin/phpunit -d memory_limit=70M",
-        "dev": "php cli/server.php 1 8080 1 & php cli/udp-ws-bridge.php",
-        "dev2": "php cli/server.php 2 8080 1 & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
-        "dev2c": "php cli/server.php 2 8080 1 & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
+        "dev": "php cli/server.php 1 8080 --debug & php cli/udp-ws-bridge.php",
+        "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
+        "dev2c": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
         "test": [
             "@putenv TEST_ENVIRONMENT=true",
             "@unit"
