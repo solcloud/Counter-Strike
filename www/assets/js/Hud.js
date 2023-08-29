@@ -203,15 +203,12 @@ export class HUD {
         this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
         this.#elements.haveDefuseKit.classList.toggle('hidden', (player.slots[Enum.InventorySlot.SLOT_KIT] === undefined));
         this.#elements.spectateUi.classList.toggle('hidden', this.#game.playerMe.getId() === this.#game.playerSpectate.getId());
-        if (player.canBuy) {
-            if (this.#showAble.showBuyMenu && this.#elements.buyMenu.classList.contains('hidden')) {
+        if (player.canBuy && this.#showAble.showBuyMenu) {
+            if (this.#elements.buyMenu.classList.contains('hidden')) {
                 this.#elements.buyMenu.classList.remove('hidden')
                 this.#game.requestPointerUnLock()
-                this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
-            } else if (!this.#showAble.showBuyMenu && !this.#elements.buyMenu.classList.contains('hidden')) {
-                this.#elements.buyMenu.classList.add('hidden')
-                this.#game.requestPointerLock()
             }
+            this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
         } else if (!this.#elements.buyMenu.classList.contains('hidden')) {
             this.#elements.buyMenu.classList.add('hidden')
             this.#showAble.showBuyMenu = false

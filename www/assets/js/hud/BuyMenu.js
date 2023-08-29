@@ -3,7 +3,7 @@ import * as Enum from "../Enums.js";
 export class BuyMenu {
     #element
     #priceFormatter
-    #lastPlayerMoney = null
+    #lastData = ''
 
     constructor(buyMenuElement) {
         this.#element = buyMenuElement
@@ -19,6 +19,12 @@ export class BuyMenu {
     }
 
     refresh(playerData, teamName) {
+        const data = JSON.stringify([playerData.money, playerData.slots, playerData.isAttacker, playerData.armor, playerData.armorType])
+        if (this.#lastData === data) {
+            return;
+        }
+        this.#lastData = data
+
         const money = playerData.money
         const isAttacker = playerData.isAttacker
         const cannotBuyKevlar = (playerData.armorType === Enum.ArmorType.BODY_AND_HEAD && playerData.armor === 100)
@@ -29,7 +35,6 @@ export class BuyMenu {
         } else if (playerData.armorType === Enum.ArmorType.BODY_AND_HEAD) {
             kevlarHeadPrice = 650
         }
-        this.#lastPlayerMoney = money
 
         this.#element.innerHTML = `
             <p class="title">${teamName} Buy Store. Your money balance $ <strong>${money}</strong></p>
