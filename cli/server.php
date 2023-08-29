@@ -13,12 +13,11 @@ require __DIR__ . '/../vendor/autoload.php';
 $playersMax = (int)($argv[1] ?? 1);
 $port = (int)($argv[2] ?? 8080);
 $debug = in_array('--debug', $argv);
-$tickMs = (in_array('--fast', $argv) ? 10 : 16);
 $bindAddress = "udp://0.0.0.0:$port";
 /////
 
 $logger = new ConsoleLogger();
-$settings = new ServerSetting($playersMax, $tickMs);
+$settings = new ServerSetting($playersMax);
 $logger->info("Starting server on '{$bindAddress}', waiting maximum of '{$settings->warmupWaitSec}' sec for '{$playersMax}' player" . ($playersMax > 1 ? 's' : '') . " to connect.");
 $net = new ClueSocket($bindAddress);
 
