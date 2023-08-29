@@ -6,7 +6,6 @@ use cs\Core\Bullet;
 use cs\Core\Util;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
-use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
 use cs\Event\ReloadEvent;
 use cs\Interface\Attackable;

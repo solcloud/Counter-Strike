@@ -8,7 +8,6 @@ use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\InventorySlot;
 use cs\Enum\ItemType;
-use cs\Event\AttackEvent;
 use cs\Event\AttackResult;
 use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;

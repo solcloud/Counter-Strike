@@ -19,10 +19,6 @@ export class BuyMenu {
     }
 
     refresh(playerData, teamName) {
-        if (this.#lastPlayerMoney === playerData.money && this.#element.innerHTML !== '') {
-            return
-        }
-
         const money = playerData.money
         const isAttacker = playerData.isAttacker
         const cannotBuyKevlar = (playerData.armorType === Enum.ArmorType.BODY_AND_HEAD && playerData.armor === 100)

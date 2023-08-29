@@ -203,14 +203,20 @@ export class HUD {
         this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
         this.#elements.haveDefuseKit.classList.toggle('hidden', (player.slots[Enum.InventorySlot.SLOT_KIT] === undefined));
         this.#elements.spectateUi.classList.toggle('hidden', this.#game.playerMe.getId() === this.#game.playerSpectate.getId());
-        if (player.canBuy && this.#showAble.showBuyMenu) {
-            this.#game.requestPointerUnLock()
-            this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
-            this.#elements.buyMenu.classList.remove('hidden');
+        if (player.canBuy) {
+            if (this.#showAble.showBuyMenu && this.#elements.buyMenu.classList.contains('hidden')) {
+                this.#elements.buyMenu.classList.remove('hidden')
+                this.#game.requestPointerUnLock()
+                this.#buyMenu.refresh(player, this.#game.playerMe.getTeamName())
+            } else if (!this.#showAble.showBuyMenu && !this.#elements.buyMenu.classList.contains('hidden')) {
+                this.#elements.buyMenu.classList.add('hidden')
+                this.#game.requestPointerLock()
+            }
         } else if (!this.#elements.buyMenu.classList.contains('hidden')) {
+            this.#elements.buyMenu.classList.add('hidden')
+            this.#showAble.showBuyMenu = false
             this.#game.requestPointerLock()
-            this.#elements.buyMenu.innerHTML = ''
-            this.#elements.buyMenu.classList.add('hidden');
+        } else {
             this.#showAble.showBuyMenu = false
         }
         if (this.#showAble.showGameMenu) {
@@ -231,7 +237,7 @@ export class HUD {
         if (player.ammo === null) {
             this.#elements.ammo.innerText = Enum.ItemIdToName[player.item.id]
         } else {
-            this.#elements.ammo.innerText = `${Enum.ItemIdToName[player.item.id]} - ${player.ammo} / ${player.ammoReserve}`
+            this.#elements.ammo.innerText = `${Enum.ItemIdToName[player.item.id]}  \u00a0 ${player.ammo} / ${player.ammoReserve}`
         }
 
         let myTeamIndex = this.#game.playerMe.getTeamIndex()
