@@ -152,7 +152,8 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
                     $newAmmo = static::magazineCapacity;
                 } else {
                     $newAmmo = $this->ammo + $this->ammoReserve;
-                    $this->ammoReserve = 0;
+                    $this->ammoReserve = (int)abs(static::magazineCapacity - $newAmmo);
+                    $newAmmo = min(static::magazineCapacity, $newAmmo);
                 }
 
                 $this->ammo = $newAmmo;
