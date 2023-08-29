@@ -22,6 +22,7 @@ export class Game {
     #bombTimerId = null;
     #eventProcessor
     #throwables = [];
+    #roundIntervalIds = [];
     score = null
     bombDropPosition = null
     alivePlayers = [0, 0]
@@ -43,6 +44,10 @@ export class Game {
         this.#paused = true
         console.log("Pause: " + msg + " for " + timeMs + "ms")
         clearInterval(this.#bombTimerId)
+        this.#roundIntervalIds.forEach((id) => clearInterval(id))
+        this.#roundIntervalIds = []
+        Object.keys(this.#throwables).forEach((id) => this.removeGrenade(id))
+        this.#throwables = []
         this.#world.reset()
 
         const game = this
@@ -186,23 +191,23 @@ export class Game {
     }
 
     #grenadeLand(throwableId, item, playerId, position) {
+        const game = this
         if (item.slot === InventorySlot.SLOT_GRENADE_DECOY) {
             const player = this.players[playerId]
             const soundItem = player.data.slots[InventorySlot.SLOT_PRIMARY] ? player.data.slots[InventorySlot.SLOT_PRIMARY] : (player.data.slots[InventorySlot.SLOT_SECONDARY] ? player.data.slots[InventorySlot.SLOT_SECONDARY] : player.data.slots[InventorySlot.SLOT_KNIFE])
             const soundName = this.#soundRepository.getItemAttackSound(soundItem)
 
-            const game = this
             const world = this.#world
-            let endTime = Date.now() + 15 * 1E6
+            let endTime = Date.now() + 15 * 1E3
             const callback = function () {
                 world.playSound(soundName, position, false)
                 if (Date.now() > endTime) {
                     game.removeGrenade(throwableId)
                     return
                 }
-                setTimeout(callback, Math.random() * 1000)
+                game.#roundIntervalIds.push(setTimeout(callback, Math.random() * 1000))
             }
-            setTimeout(callback, 100)
+            game.#roundIntervalIds.push(setTimeout(callback, 100))
             return
         }
         if (item.slot === InventorySlot.SLOT_GRENADE_FLASH) {
@@ -229,12 +234,12 @@ export class Game {
             smoke.material.side = THREE.DoubleSide
             smoke.position.y = 150
             grenade.add(smoke)
-            setTimeout(() => this.removeGrenade(throwableId), 18000)
+            game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 18000))
             return;
         }
 
         console.warn("No handler for grenade: ", item)
-        setTimeout(() => this.removeGrenade(throwableId), 1000) // todo responsive volumetric smokes, flashes, fire etc.
+        game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 1000)) // todo responsive volumetric smokes, flashes, fire etc.
     }
 
     spawnGrenade(item, id, radius) {
