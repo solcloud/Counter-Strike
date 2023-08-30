@@ -6,6 +6,7 @@ use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Flashbang;
+use cs\Equipment\Grenade;
 use cs\Equipment\Kevlar;
 use cs\Event\EquipEvent;
 use cs\Weapon\Knife;
@@ -20,6 +21,8 @@ class Inventory
     private int $dollars = 0;
     private int $equippedSlot;
     private int $lastEquippedSlotId;
+    /** @var int[] */
+    private array $lastEquippedGrenadeSlots = [];
     private BuyMenu $store;
 
     public function __construct(bool $isAttackerSide)
@@ -36,6 +39,7 @@ class Inventory
             ];
             $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
+            $this->lastEquippedGrenadeSlots = [];
         } else {
             foreach ($this->items as $item) {
                 $item->reset();
@@ -83,6 +87,9 @@ class Inventory
         $item = $this->items[$this->equippedSlot];
         if ($item->getQuantity() === 1) {
             unset($this->items[$this->equippedSlot]);
+            if ($item instanceof Grenade) {
+                unset($this->lastEquippedGrenadeSlots[$this->equippedSlot]);
+            }
             $this->updateEquippedSlot();
             $item->unEquip();
         } else {
@@ -145,6 +152,10 @@ class Inventory
         $this->items[$this->equippedSlot]->unEquip();
         $this->lastEquippedSlotId = $this->equippedSlot;
         $this->equippedSlot = $slot->value;
+        if ($item instanceof Grenade) {
+            unset($this->lastEquippedGrenadeSlots[$slot->value]);
+            array_unshift($this->lastEquippedGrenadeSlots, $slot->value);
+        }
         return $item->equip();
     }
 
@@ -203,6 +214,14 @@ class Inventory
             $output[$key] = $item->toArrayCache;
         }
         return $output;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getLastEquippedGrenadeSlots(): array
+    {
+        return $this->lastEquippedGrenadeSlots;
     }
 
     public function getKevlar(): ?Kevlar

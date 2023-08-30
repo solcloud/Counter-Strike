@@ -108,6 +108,12 @@ final class Player
         } elseif (isset($items[InventorySlot::SLOT_BOMB->value])) {
             $dropItems[] = $items[InventorySlot::SLOT_BOMB->value];
         }
+        foreach ($this->inventory->getLastEquippedGrenadeSlots() as $slot) {
+            if (isset($items[$slot])) {
+                $dropItems[] = $items[$slot];
+                break;
+            }
+        }
 
         $dropCount = count($dropItems);
         if ($dropCount > 0) {
