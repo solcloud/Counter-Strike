@@ -277,10 +277,22 @@ class World
             if (!$this->canBeSeen($player, $dropItem->getPosition(), $dropItem->getBoundingRadius(), self::ITEM_PICK_MAX_DISTANCE)) {
                 continue;
             }
-            if ($player->getInventory()->pickup($dropItem->getItem())) {
+
+            $gunSwap = false;
+            $item = $dropItem->getItem();
+            $slot = $item->getSlot();
+            $slotId = $slot->value;
+            if ($player->getInventory()->has($slotId) && in_array($slotId, [InventorySlot::SLOT_PRIMARY->value, InventorySlot::SLOT_SECONDARY->value], true)) {
+                $gunSwap = true;
+                $player->dropItemFromSlot($slotId);
+            }
+            if ($player->getInventory()->pickup($item)) {
                 $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
-                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem()));
+                $this->makeSound($sound->setPlayer($player)->setItem($item));
                 unset($this->dropItems[$key]);
+                if ($gunSwap) {
+                    $player->equip($slot);
+                }
                 return;
             }
         }

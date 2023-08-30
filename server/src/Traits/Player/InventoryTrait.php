@@ -47,6 +47,21 @@ trait InventoryTrait
         return $this->inventory->getEquipped();
     }
 
+    public function dropItemFromSlot(int $slot): bool
+    {
+        if (!$this->inventory->has($slot)) {
+            return false;
+        }
+        $item = $this->inventory->getItems()[$slot];
+        if (!$item->isUserDroppable()) {
+            return false;
+        }
+
+        $this->inventory->removeSlot($slot);
+        $this->world->dropItem($this, $item);
+        return true;
+    }
+
     public function dropEquippedItem(bool $instantRemove = true): ?Item
     {
         $item = $this->getEquippedItem();

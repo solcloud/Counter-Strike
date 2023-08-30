@@ -99,6 +99,25 @@ class Inventory
         return $item;
     }
 
+    public function removeSlot(int $slot): void
+    {
+        $item = $this->items[$slot] ?? false;
+        if (!$item) {
+            return;
+        }
+
+        if ($this->equippedSlot === $slot) {
+            $this->removeEquipped();
+            return;
+        }
+
+        unset($this->items[$slot]);
+        if ($item instanceof Grenade) {
+            unset($this->lastEquippedGrenadeSlots[$slot]);
+        }
+        $this->updateEquippedSlot();
+    }
+
     public function canBuy(Item $item): bool
     {
         $alreadyHave = $this->items[$item->getSlot()->value] ?? null;
