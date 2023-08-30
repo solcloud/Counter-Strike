@@ -30,7 +30,19 @@ export class Game {
     players = []
     playerMe = null
     playerSpectate = null
-    #playerSlotsVisibleModels = [InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_BOMB, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY, InventorySlot.SLOT_KIT]
+    #playerSlotsVisibleModels = [
+        InventorySlot.SLOT_KNIFE,
+        InventorySlot.SLOT_PRIMARY,
+        InventorySlot.SLOT_SECONDARY,
+        InventorySlot.SLOT_BOMB,
+        InventorySlot.SLOT_GRENADE_DECOY,
+        InventorySlot.SLOT_GRENADE_MOLOTOV,
+        InventorySlot.SLOT_GRENADE_SMOKE,
+        InventorySlot.SLOT_GRENADE_FLASH,
+        InventorySlot.SLOT_GRENADE_HE,
+        InventorySlot.SLOT_TASER,
+        InventorySlot.SLOT_KIT,
+    ]
 
     constructor(world, hud, stats) {
         this.#world = world
