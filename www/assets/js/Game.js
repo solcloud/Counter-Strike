@@ -458,6 +458,7 @@ export class Game {
     updateOtherPlayersModels(player, data) {
         const playerObject = player.get3DObject()
         playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
+        playerObject.getObjectByName('sight').rotation.x = serverVerticalRotationToThreeRadian(data.look.vertical)
 
         const hand = playerObject.getObjectByName('hand')
         if (hand.children.length) {
