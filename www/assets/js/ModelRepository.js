@@ -144,23 +144,22 @@ export class ModelRepository {
             const slot4 = new THREE.Object3D()
             slot4.name = 'slot-4'
             slot4.rotation.x = degreeToRadian(90)
-            slot4.position.set(-13, 110, -8)
+            slot4.position.set(16, 131, -5)
             const slot5 = new THREE.Object3D()
             slot5.name = 'slot-5'
             slot5.rotation.x = degreeToRadian(90)
-            slot5.position.set(-14, 110, -5)
+            slot5.position.set(-14, 114, -9)
             const slot6 = new THREE.Object3D()
             slot6.name = 'slot-6'
             slot6.rotation.x = degreeToRadian(90)
-            slot6.position.set(-15, 110, 0)
+            slot6.position.set(-19, 114, 3)
             const slot7 = new THREE.Object3D()
             slot7.name = 'slot-7'
             slot7.rotation.x = degreeToRadian(90)
-            slot7.position.set(15, 110, 0)
+            slot7.position.set(16.5, 130, 1)
             const slot8 = new THREE.Object3D()
             slot8.name = 'slot-8'
-            slot8.rotation.x = degreeToRadian(90)
-            slot8.position.set(14, 110, -5)
+            slot8.position.set(-18, 112, -4)
             const slot9 = new THREE.Object3D()
             slot9.name = 'slot-9'
             slot9.rotation.x = degreeToRadian(90)
