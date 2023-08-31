@@ -88,7 +88,10 @@ export class SoundRepository {
             return '211500__taira-komori__knocking-wall.mp3'
         }
 
-        if (type === SoundType.ITEM_DROP) {
+        if (type === SoundType.ITEM_DROP_AIR) {
+            return null
+        }
+        if (type === SoundType.ITEM_DROP_LAND) {
             return '12734__leady__dropping-a-gun.wav'
         }
 

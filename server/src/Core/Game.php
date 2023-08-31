@@ -8,6 +8,7 @@ use cs\Enum\PauseReason;
 use cs\Enum\RoundEndReason;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Event\DropEvent;
 use cs\Event\Event;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
@@ -245,6 +246,11 @@ class Game
     }
 
     public function addThrowEvent(ThrowEvent $event): void
+    {
+        $this->addEvent($event);
+    }
+
+    public function addDropEvent(DropEvent $event): void
     {
         $this->addEvent($event);
     }

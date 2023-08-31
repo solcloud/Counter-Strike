@@ -161,7 +161,7 @@ final class ThrowEvent extends Event implements Attackable
 
     public function fire(): AttackResult
     {
-        $this->id = "{$this->player->getId()}-{$this->item->getId()}-{$this->getTickId()}";
+        $this->id = "throw-{$this->player->getId()}-{$this->getTickId()}";
         $this->player->getInventory()->removeEquipped();
         $this->player->equip($this->player->getEquippedItem()->getSlot());
         $this->velocity *= $this->item->getSpeedMultiplier();

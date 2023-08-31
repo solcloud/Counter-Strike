@@ -18,6 +18,7 @@ final class EventList
         SoundEvent::class            => 9,
         PlantEvent::class            => 10,
         ThrowEvent::class            => 11,
+        DropEvent::class             => 12,
     ];
 
 }

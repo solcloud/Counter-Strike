@@ -8,7 +8,6 @@ export class World {
     #soundListener
     #audioLoader
     #modelRepository
-    #dropItems = []
     #decals = []
     volume = 30
 
@@ -163,38 +162,11 @@ export class World {
         }
     }
 
-    itemDrop(position, item) {
+    itemDropped(item) {
         const dropItem = this.getModelForItem(item)
-        dropItem.position.set(position.x, position.y, -position.z)
         dropItem.visible = true
         this.#scene.add(dropItem)
-
-        if (item.id !== Enum.ItemId.Bomb) {
-            this.#dropItems.push(dropItem)
-        }
-    }
-
-    itemPickup(position, item, isSpectatorPickup) {
-        if (item.id === Enum.ItemId.Bomb) {
-            if (isSpectatorPickup) {
-                const bomb = this.#modelRepository.getBomb()
-                bomb.visible = false
-            }
-            return
-        }
-
-        for (let i = 0; i < this.#dropItems.length; i++) {
-            const dropItem = this.#dropItems[i]
-            if (!dropItem || dropItem.name !== `item-${item.id}`) {
-                continue
-            }
-
-            if (dropItem.position.x === position.x && dropItem.position.y === position.y && dropItem.position.z === -position.z) {
-                this.destroyObject(dropItem)
-                delete this.#dropItems[i]
-                return
-            }
-        }
+        return dropItem
     }
 
     bulletWallHit(position, surface, radius) {
@@ -231,8 +203,6 @@ export class World {
 
     reset() {
         this.clearDecals()
-        this.#dropItems.forEach((item) => this.destroyObject(item))
-        this.#dropItems = []
         const bomb = this.#modelRepository.getBomb()
         if (bomb.parent && bomb.parent.type === 'Scene') {
             bomb.visible = false
@@ -240,6 +210,10 @@ export class World {
     }
 
     destroyObject(object) {
+        if (object.name === `item-${Enum.ItemId.Bomb}`) {
+            return
+        }
+
         object.clear()
         object.removeFromParent()
         object.geometry && object.geometry.dispose()

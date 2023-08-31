@@ -60,7 +60,7 @@ class RoundTest extends BaseTestCase
                 if ($event instanceof KillEvent) {
                     $killEvents[] = $event;
                 }
-                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_DROP) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_DROP_LAND) {
                     $dropEvents[] = $event;
                 }
             }

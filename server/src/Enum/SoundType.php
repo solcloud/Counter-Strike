@@ -9,7 +9,7 @@ enum SoundType: int
     case PLAYER_STEP = 1;
     case ITEM_ATTACK = 2;
     case ITEM_ATTACK2 = 3;
-    case ITEM_DROP = 4;
+    //
     case ITEM_BUY = 5;
     case BULLET_HIT = 6;
     case PLAYER_DEAD = 7;
@@ -25,5 +25,7 @@ enum SoundType: int
     case GRENADE_LAND = 17;
     case GRENADE_BOUNCE = 18;
     case GRENADE_AIR = 19;
+    case ITEM_DROP_AIR = 20;
+    case ITEM_DROP_LAND = 21;
 
 }

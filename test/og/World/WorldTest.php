@@ -54,7 +54,7 @@ class WorldTest extends BaseTestCase
             $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100)
         );
         $this->assertFalse($game->getWorld()->canBeSeen(
-            $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(101), 10, 100)
+            $player, $player->getSightPositionClone()->addZ(101), 10, 100)
         );
 
         $game->getWorld()->addWall(new Wall((new Point())->addPart(-20, -20, 20), true, 200));

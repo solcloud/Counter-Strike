@@ -5,6 +5,7 @@ namespace cs\Core;
 use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Event\DropEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
 use cs\Interface\Hittable;
@@ -230,7 +231,7 @@ class World
 
             if ($player->getInventory()->pickup($dropItem->getItem())) {
                 $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
-                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem()));
+                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem())->addExtra('id', $dropItem->getId()));
                 unset($this->dropItems[$key]);
             }
         }
@@ -238,13 +239,11 @@ class World
 
     public function dropItem(Player $player, Item $item): void
     {
-        $dropItem = new DropItem($item);
-        $dropPosition = $dropItem->calculateDropPosition($player, $this, $item);
-        if ($dropPosition) {
-            $this->dropItems[] = $dropItem;
-            $sound = new SoundEvent($dropPosition, SoundType::ITEM_DROP);
-            $this->makeSound($sound->setPlayer($player)->setItem($item));
-        }
+        $dropEvent = new DropEvent($player, $item, $this);
+        $dropEvent->onLand(function (DropEvent $event): void {
+            $this->dropItems[] = $event->getDropItem();
+        });
+        $this->game->addDropEvent($dropEvent);
     }
 
     public function playerUse(Player $player): void
@@ -288,7 +287,7 @@ class World
             }
             if ($player->getInventory()->pickup($item)) {
                 $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
-                $this->makeSound($sound->setPlayer($player)->setItem($item));
+                $this->makeSound($sound->setPlayer($player)->setItem($item)->addExtra('id', $dropItem->getId()));
                 unset($this->dropItems[$key]);
                 if ($gunSwap) {
                     $player->equip($slot);
@@ -300,7 +299,7 @@ class World
 
     public function canBeSeen(Player $observer, Point $targetCenter, int $targetRadius, int $maximumDistance, bool $checkForOtherPlayersAlso = false): bool
     {
-        $start = $observer->getPositionClone()->addY($observer->getSightHeight());
+        $start = $observer->getSightPositionClone();
         if (Util::distanceSquared($start, $targetCenter) > $maximumDistance * $maximumDistance) {
             return false;
         }

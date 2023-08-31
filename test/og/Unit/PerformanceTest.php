@@ -25,6 +25,7 @@ class PerformanceTest extends BaseTest
 
     public static function setUpBeforeClass(): void
     {
+        gc_collect_cycles();
         parent::setUpBeforeClass();
         if (getenv('CI') !== false) {
             self::markTestSkipped('CI too slow');
@@ -37,7 +38,7 @@ class PerformanceTest extends BaseTest
             $sum -= $sum;
         }
         $took = $timer->stop();
-        if ($took->asMicroseconds() > 8000) {
+        if ($took->asMicroseconds() > 7500) {
             self::markTestSkipped('Performance test skipped');
         }
 

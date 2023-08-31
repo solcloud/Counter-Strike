@@ -62,21 +62,15 @@ trait InventoryTrait
         return true;
     }
 
-    public function dropEquippedItem(bool $instantRemove = true): ?Item
+    public function dropEquippedItem(): ?Item
     {
         $item = $this->getEquippedItem();
         if (!$item->isUserDroppable()) {
             return null;
         }
 
-        if ($instantRemove) {
-            $this->inventory->removeEquipped();
-            $this->world->dropItem($this, $item);
-            $this->world->tryPickDropItems($this);
-        } else {
-            $this->world->dropItem($this, $item);
-            $this->inventory->removeEquipped();
-        }
+        $this->inventory->removeEquipped();
+        $this->world->dropItem($this, $item);
         $this->equip($this->getEquippedItem()->getSlot());
         return $item;
     }
@@ -90,7 +84,7 @@ trait InventoryTrait
         $equipEvent = $this->inventory->purchase($this, $item);
         if ($equipEvent) {
             $this->addEvent($equipEvent, $this->eventIdPrimary);
-            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_BUY);
+            $sound = new SoundEvent($this->getSightPositionClone(), SoundType::ITEM_BUY);
             $this->world->makeSound($sound->setPlayer($this));
             return true;
         }

@@ -37,7 +37,7 @@ trait AttackTrait
             return null; // @codeCoverageIgnore
         }
         if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
-            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ATTACK_NO_AMMO);
+            $sound = new SoundEvent($this->getSightPositionClone(), SoundType::ATTACK_NO_AMMO);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return null;
         }
@@ -47,7 +47,7 @@ trait AttackTrait
 
         $result = $item->attack($this->createAttackEvent($item));
         if ($result) {
-            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK);
+            $sound = new SoundEvent($this->getSightPositionClone(), SoundType::ITEM_ATTACK);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
             return $this->processAttackResult($result);
         }
@@ -64,7 +64,7 @@ trait AttackTrait
         if ($item instanceof Knife || $item instanceof Grenade) {
             $result = $item->attackSecondary($this->createAttackEvent($item));
             if ($result) {
-                $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_ATTACK2);
+                $sound = new SoundEvent($this->getSightPositionClone(), SoundType::ITEM_ATTACK2);
                 $this->world->makeSound($sound->setPlayer($this)->setItem($item));
                 return $this->processAttackResult($result);
             }
@@ -166,7 +166,7 @@ trait AttackTrait
         $event = $item->reload();
         if ($event) {
             $this->addEvent($event, $this->eventIdPrimary);
-            $sound = new SoundEvent($this->getPositionClone()->addY($this->getSightHeight()), SoundType::ITEM_RELOAD);
+            $sound = new SoundEvent($this->getSightPositionClone(), SoundType::ITEM_RELOAD);
             $this->world->makeSound($sound->setPlayer($this)->setItem($item));
         }
     }

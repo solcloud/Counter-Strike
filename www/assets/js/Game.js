@@ -1,6 +1,6 @@
 import {EventProcessor} from "./EventProcessor.js";
 import {Player} from "./Player.js";
-import {InventorySlot, SoundType} from "./Enums.js";
+import {InventorySlot, ItemId, SoundType} from "./Enums.js";
 import {SoundRepository} from "./SoundRepository.js";
 
 export class Game {
@@ -21,6 +21,7 @@ export class Game {
     #hudDebounceTicks = 1
     #bombTimerId = null;
     #eventProcessor
+    #dropItems = [];
     #throwables = [];
     #roundIntervalIds = [];
     score = null
@@ -58,6 +59,8 @@ export class Game {
         clearInterval(this.#bombTimerId)
         this.#roundIntervalIds.forEach((id) => clearInterval(id))
         this.#roundIntervalIds = []
+        Object.keys(this.#dropItems).forEach((id) => this.itemPickUp(id))
+        this.#dropItems = []
         Object.keys(this.#throwables).forEach((id) => this.removeGrenade(id))
         this.#throwables = []
         this.#world.reset()
@@ -162,9 +165,6 @@ export class Game {
         if (data.type === SoundType.ITEM_ATTACK) {
             this.#world.itemAttack(this.players[data.player], data.item, (data.player === spectatorId))
         }
-        if (data.type === SoundType.ITEM_PICKUP) {
-            this.#world.itemPickup(data.position, data.item, (spectatorId === data.player))
-        }
         if (data.type === SoundType.BULLET_HIT) {
             if (data.player) {
                 this.playerHit(data, false)
@@ -174,14 +174,26 @@ export class Game {
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
             this.playerHit(data, true)
         }
-        if (data.type === SoundType.ITEM_DROP) {
-            this.#world.itemDrop(data.position, data.item)
-            if (data.player === spectatorId) {
-                this.dropFeedback(data.item)
+        if (data.type === SoundType.ITEM_PICKUP) {
+            if (data.item.id === ItemId.Bomb && spectatorId === data.player) {
+                this.#dropItems[data.extra.id].visible = false
             }
+            this.itemPickUp(data.extra.id)
+        }
+        if (data.type === SoundType.ITEM_DROP_AIR) {
+            const item = this.#dropItems[data.extra.id];
+            item.rotation.x -= 0.1
+            item.rotation.y -= 0.1
+            item.rotation.z -= 0.1
+            item.position.set(data.position.x, data.position.y, -data.position.z)
+        }
+        if (data.type === SoundType.ITEM_DROP_LAND) {
             if (data.item.slot === InventorySlot.SLOT_BOMB) {
                 this.bombDropPosition = data.position
             }
+            const item = this.#dropItems[data.extra.id];
+            item.rotation.set(0, 0, 0)
+            item.position.set(data.position.x, data.position.y, -data.position.z)
         }
         if (data.type === SoundType.BOMB_DEFUSED || data.type === SoundType.BOMB_EXPLODED) {
             clearInterval(this.#bombTimerId)
@@ -252,6 +264,17 @@ export class Game {
 
         console.warn("No handler for grenade: ", item)
         game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 1000)) // todo responsive volumetric smokes, flashes, fire etc.
+    }
+
+    itemDrop(item, id) {
+        const model = this.#world.itemDropped(item)
+        this.#dropItems[id] = model
+    }
+
+    itemPickUp(id) {
+        const dropItem = this.#dropItems[id]
+        this.#world.destroyObject(dropItem)
+        delete this.#dropItems[id]
     }
 
     spawnGrenade(item, id, radius) {
@@ -391,10 +414,6 @@ export class Game {
         this.#world.spawnPlayer(player, this.playerMe.isAttacker() !== data.isAttacker)
         this.players[data.id] = player
         return player
-    }
-
-    dropFeedback(item) {
-        this.#hud.showDropAnimation(item)
     }
 
     equip(slotId) {

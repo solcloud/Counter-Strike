@@ -29,8 +29,6 @@ export class HUD {
         canPlantIcon: null,
         haveDefuseKit: null,
         spectateUi: null,
-        equippedItem: null,
-        dropModel: null,
         inventory: null,
         money: null,
         health: null,
@@ -47,7 +45,6 @@ export class HUD {
         killFeed: null,
     }
     #flashInterval = null;
-    #dropAnimationInterval = null;
     #countDownIntervalId = null;
     #scoreBoardData = null;
 
@@ -179,12 +176,6 @@ export class HUD {
         this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
     }
 
-    showDropAnimation(item) {
-        clearTimeout(this.#dropAnimationInterval)
-        this.#elements.dropModel.classList.remove('hidden');
-        this.#dropAnimationInterval = setTimeout(() => this.#elements.dropModel.classList.add('hidden'), 100)
-    }
-
     updateHud(player) {
         if (this.#radar) {
             this.#radar.update(
@@ -254,11 +245,6 @@ export class HUD {
         <div id="flash"></div>
         <div id="cross"></div>
         <div id="hit-feedback"></div>
-        <div id="equipped-item">
-            <div>
-                <img data-drop class="hidden" src="./resources/drop.gif">
-            </div>
-        </div>
         <div id="scoreboard" class="hidden">
             <div id="scoreboard-detail"></div>
         </div>
@@ -334,8 +320,6 @@ export class HUD {
         this.#elements.haveDefuseKit = elementHud.querySelector('[data-have-defuse-kit]')
         this.#elements.spectateUi = elementHud.querySelector('#mode-spectate')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
-        this.#elements.equippedItem = elementHud.querySelector('#equipped-item')
-        this.#elements.dropModel = elementHud.querySelector('#equipped-item img[data-drop]')
         this.#elements.inventory = elementHud.querySelector('.inventory')
         this.#elements.money = elementHud.querySelector('[data-money]')
         this.#elements.health = elementHud.querySelector('[data-health]')

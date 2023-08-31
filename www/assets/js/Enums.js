@@ -29,6 +29,7 @@ const EventList = {
     SoundEvent: 9,
     PlantEvent: 10,
     ThrowEvent: 11,
+    DropEvent: 12,
 }
 
 // server/src/Enum/GameOverReason.php
@@ -82,7 +83,6 @@ const SoundType = {
     PLAYER_STEP: 1,
     ITEM_ATTACK: 2,
     ITEM_ATTACK2: 3,
-    ITEM_DROP: 4,
     ITEM_BUY: 5,
     BULLET_HIT: 6,
     PLAYER_DEAD: 7,
@@ -98,6 +98,8 @@ const SoundType = {
     GRENADE_LAND: 17,
     GRENADE_BOUNCE: 18,
     GRENADE_AIR: 19,
+    ITEM_DROP_AIR: 20,
+    ITEM_DROP_LAND: 21,
 }
 
 // server/src/Enum/ArmorType.php

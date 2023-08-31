@@ -19,25 +19,6 @@
     color: var(--color-opponent);
 }
 
-#hud #equipped-item {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-#hud #equipped-item > div {
-    position: relative;
-    left: -10vh;
-    text-align: center;
-}
-
-#hud #equipped-item img[data-drop] {
-    position: absolute;
-    top: 5vh;
-    height: 20vh;
-}
-
 #hud #cross {
     position: absolute;
     top: 50%;

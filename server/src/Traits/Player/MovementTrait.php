@@ -53,6 +53,11 @@ trait MovementTrait
         return $this->position->clone();
     }
 
+    public function getSightPositionClone(): Point
+    {
+        return $this->position->clone()->addY($this->getSightHeight());
+    }
+
     public function getReferenceToPosition(): Point
     {
         return $this->position;
