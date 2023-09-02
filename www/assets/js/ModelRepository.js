@@ -2,7 +2,6 @@ import {ItemId} from "./Enums.js";
 
 export class ModelRepository {
     #gltfLoader
-    #objectLoader
     #textureLoader
     #models = {}
     #meshes = {}
@@ -18,9 +17,7 @@ export class ModelRepository {
 
     constructor() {
         this.#gltfLoader = new THREE.GLTFLoader()
-        this.#objectLoader = new THREE.ObjectLoader()
         this.#textureLoader = new THREE.TextureLoader()
-
     }
 
     #loadModel(url) {

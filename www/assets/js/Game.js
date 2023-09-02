@@ -1,6 +1,6 @@
 import {EventProcessor} from "./EventProcessor.js";
 import {Player} from "./Player.js";
-import {InventorySlot, ItemId, SoundType} from "./Enums.js";
+import {InventorySlot, SoundType} from "./Enums.js";
 import {SoundRepository} from "./SoundRepository.js";
 
 export class Game {
@@ -21,9 +21,15 @@ export class Game {
     #hudDebounceTicks = 1
     #bombTimerId = null;
     #eventProcessor
-    #dropItems = [];
-    #throwables = [];
+    #dropItems = {};
+    #throwables = {};
     #roundIntervalIds = [];
+    #playerSlotsVisibleModels = [
+        InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY,
+        InventorySlot.SLOT_BOMB, InventorySlot.SLOT_GRENADE_DECOY, InventorySlot.SLOT_GRENADE_MOLOTOV,
+        InventorySlot.SLOT_GRENADE_SMOKE, InventorySlot.SLOT_GRENADE_FLASH, InventorySlot.SLOT_GRENADE_HE,
+        InventorySlot.SLOT_TASER, InventorySlot.SLOT_KIT,
+    ]
     score = null
     bombDropPosition = null
     alivePlayers = [0, 0]
@@ -31,19 +37,6 @@ export class Game {
     players = []
     playerMe = null
     playerSpectate = null
-    #playerSlotsVisibleModels = [
-        InventorySlot.SLOT_KNIFE,
-        InventorySlot.SLOT_PRIMARY,
-        InventorySlot.SLOT_SECONDARY,
-        InventorySlot.SLOT_BOMB,
-        InventorySlot.SLOT_GRENADE_DECOY,
-        InventorySlot.SLOT_GRENADE_MOLOTOV,
-        InventorySlot.SLOT_GRENADE_SMOKE,
-        InventorySlot.SLOT_GRENADE_FLASH,
-        InventorySlot.SLOT_GRENADE_HE,
-        InventorySlot.SLOT_TASER,
-        InventorySlot.SLOT_KIT,
-    ]
 
     constructor(world, hud, stats) {
         this.#world = world
@@ -53,17 +46,19 @@ export class Game {
         this.#soundRepository = new SoundRepository((...args) => world.playSound(...args))
     }
 
-    pause(msg, score, timeMs) {
-        this.#paused = true
-        console.log("Pause: " + msg + " for " + timeMs + "ms")
+    #roundReset() {
         clearInterval(this.#bombTimerId)
         this.#roundIntervalIds.forEach((id) => clearInterval(id))
         this.#roundIntervalIds = []
         Object.keys(this.#dropItems).forEach((id) => this.itemPickUp(id))
-        this.#dropItems = []
         Object.keys(this.#throwables).forEach((id) => this.removeGrenade(id))
-        this.#throwables = []
         this.#world.reset()
+    }
+
+    pause(msg, score, timeMs) {
+        this.#paused = true
+        console.log("Pause: " + msg + " for " + timeMs + "ms")
+        this.#roundReset()
 
         const game = this
         this.players.forEach(function (player) {
@@ -175,9 +170,6 @@ export class Game {
             this.playerHit(data, true)
         }
         if (data.type === SoundType.ITEM_PICKUP) {
-            if (data.item.id === ItemId.Bomb && spectatorId === data.player) {
-                this.#dropItems[data.extra.id].visible = false
-            }
             this.itemPickUp(data.extra.id)
         }
         if (data.type === SoundType.ITEM_DROP_AIR) {

@@ -21,6 +21,7 @@ export class World {
 
     init(mapName, setting) {
         const scene = new THREE.Scene()
+        scene.name = 'MainScene'
         scene.background = new THREE.Color(0xdadada)
 
         const promises = []
@@ -204,13 +205,16 @@ export class World {
     reset() {
         this.clearDecals()
         const bomb = this.#modelRepository.getBomb()
-        if (bomb.parent && bomb.parent.type === 'Scene') {
+        if (bomb.parent && bomb.parent.name === 'MainScene') {
             bomb.visible = false
         }
     }
 
     destroyObject(object) {
         if (object.name === `item-${Enum.ItemId.Bomb}`) {
+            if (object.parent && object.parent.name === 'MainScene') {
+                object.visible = false
+            }
             return
         }
 

@@ -225,7 +225,7 @@ export class HUD {
         if (player.ammo === null) {
             this.#elements.ammo.innerText = Enum.ItemIdToName[player.item.id]
         } else {
-            this.#elements.ammo.innerText = `${Enum.ItemIdToName[player.item.id]}  \u00a0 ${player.ammo} / ${player.ammoReserve}`
+            this.#elements.ammo.innerText = `${Enum.ItemIdToName[player.item.id]} \u00a0 ${player.ammo} / ${player.ammoReserve}`
         }
 
         let myTeamIndex = this.#game.playerMe.getTeamIndex()
