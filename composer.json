@@ -24,8 +24,8 @@
         "ext-sockets": "*",
 
         "clue/socket-raw": "1.6.0",
-        "psr/log": "3.0.0",
-        "textalk/websocket": "1.5.8"
+        "textalk/websocket": "1.5.8",
+        "psr/log": "3.0.0"
     },
     "autoload": {
         "psr-4": {
