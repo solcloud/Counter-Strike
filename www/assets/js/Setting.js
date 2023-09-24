@@ -1,4 +1,4 @@
-import {Action} from "./Enums.js";
+import {Action, BuyMenuItem} from "./Enums.js";
 
 export class Setting {
     #onUpdate = {}
@@ -34,7 +34,10 @@ export class Setting {
             'KeyZ': Action.EQUIP_MOLOTOV,
             'KeyX': Action.EQUIP_SMOKE,
             'KeyC': Action.EQUIP_HE,
-            'Period': Action.EQUIP_DECOY,
+            'KeyN': Action.EQUIP_DECOY,
+            'KeyV': Action.EQUIP_KNIFE,
+            'KeyT': Action.DROP_BOMB,
+            'KeyH': Action.SWITCH_HANDS,
             'Digit1': Action.EQUIP_PRIMARY,
             'Digit2': Action.EQUIP_SECONDARY,
             'Digit3': Action.EQUIP_KNIFE,
@@ -43,6 +46,18 @@ export class Setting {
             'KeyB': Action.BUY_MENU,
             'Tab': Action.SCORE_BOARD,
             'Backquote': Action.GAME_MENU,
+            'Enter': Action.CLEAR_DECALS,
+            'CapsLock': Action.CLEAR_DECALS,
+            'ArrowLeft': `buy ${BuyMenuItem.RIFLE_AK},${BuyMenuItem.RIFLE_M4A4}`,
+            'ArrowRight': `buy ${BuyMenuItem.RIFLE_AWP}`,
+            'ArrowUp': `buy ${BuyMenuItem.DEFUSE_KIT}`,
+            'ArrowDown': `buy ${BuyMenuItem.KEVLAR_BODY_AND_HEAD}`,
+            'Delete': `buy ${BuyMenuItem.KEVLAR_BODY}`,
+            'End': `buy ${BuyMenuItem.PISTOL_P250}`,
+            'Home': `buy ${BuyMenuItem.GRENADE_HE}`,
+            'PageUp': `buy ${BuyMenuItem.GRENADE_FLASH}`,
+            'PageDown': `buy ${BuyMenuItem.GRENADE_SMOKE}`,
+            'Insert': `buy ${BuyMenuItem.GRENADE_MOLOTOV},${BuyMenuItem.GRENADE_INCENDIARY}`,
         },
     }
 

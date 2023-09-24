@@ -19,7 +19,7 @@ class GameFactory
     public static function createDebug(): Game
     {
         $properties = new GameProperty();
-        $properties->start_money = 6123;
+        $properties->start_money = 16000;
         $properties->max_rounds = 22;
         $properties->freeze_time_sec = 0;
         $properties->half_time_freeze_sec = 0;

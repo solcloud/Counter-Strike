@@ -431,6 +431,16 @@ export class Game {
         return true
     }
 
+    switchHands() {
+        const povItem = this.#world.getCamera().getObjectByName('pov-item')
+        povItem.scale.x *= -1
+        povItem.position.x *= -1
+    }
+
+    clearDecals() {
+        this.#world.clearDecals()
+    }
+
     tick(state) {
         this.#stats.begin()
         this.#tick++

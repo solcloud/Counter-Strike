@@ -1,12 +1,40 @@
 import {Action, InventorySlot} from "./Enums.js";
 
 export class PlayerAction {
+    #game
     #states = {}
-    actionCallback = {}
+    #actionCallback = {}
 
-    constructor(hud) {
-        this.#loadCallbacks(hud)
+    constructor(game, hud) {
+        this.#game = game
+        this.#loadCallbacks(game, hud)
         this.resetStates()
+    }
+
+    execute(actionIndex, isKeyDown) {
+        if (this.#actionCallback[actionIndex]) {
+            this.#actionCallback[actionIndex](isKeyDown)
+            return
+        }
+
+        if (!isKeyDown && actionIndex.startsWith('buy ')) {
+            const match = actionIndex.match(/buy (\d+)([,\d]+)?/)
+            if (match === null) {
+                return
+            }
+            if (match[1]) {
+                this.#game.buyList.push(match[1])
+            }
+            if (match[2]) {
+                match[2].split(',').forEach((value) => {
+                    let buyItemId = parseInt(value)
+                    if (buyItemId) {
+                        this.#game.buyList.push(buyItemId)
+                    }
+                })
+            }
+            return
+        }
     }
 
     resetStates() {
@@ -33,29 +61,37 @@ export class PlayerAction {
         }
     }
 
-    #loadCallbacks(hud) {
-        this.actionCallback[Action.MOVE_FORWARD] = (enabled) => this.#states.moveForward = enabled
-        this.actionCallback[Action.MOVE_LEFT] = (enabled) => this.#states.moveLeft = enabled
-        this.actionCallback[Action.MOVE_BACK] = (enabled) => this.#states.moveBackward = enabled
-        this.actionCallback[Action.MOVE_RIGHT] = (enabled) => this.#states.moveRight = enabled
-        this.actionCallback[Action.USE] = (enabled) => this.#states.use = enabled
-        this.actionCallback[Action.JUMP] = (enabled) => enabled && (this.#states.jumping = true)
-        this.actionCallback[Action.CROUCH] = (enabled) => enabled ? this.#states.crouching = true : this.#states.standing = true
-        this.actionCallback[Action.WALK] = (enabled) => enabled ? this.#states.shifting = true : this.#states.running = true
-        this.actionCallback[Action.DROP] = (enabled) => enabled && (this.#states.drop = true)
-        this.actionCallback[Action.RELOAD] = (enabled) => enabled && this.reload()
-        this.actionCallback[Action.EQUIP_KNIFE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_KNIFE)
-        this.actionCallback[Action.EQUIP_PRIMARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_PRIMARY)
-        this.actionCallback[Action.EQUIP_SECONDARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_SECONDARY)
-        this.actionCallback[Action.EQUIP_BOMB] = (enabled) => enabled && this.equip(InventorySlot.SLOT_BOMB)
-        this.actionCallback[Action.EQUIP_SMOKE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_SMOKE)
-        this.actionCallback[Action.EQUIP_FLASH] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_FLASH)
-        this.actionCallback[Action.EQUIP_HE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_HE)
-        this.actionCallback[Action.EQUIP_MOLOTOV] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_MOLOTOV)
-        this.actionCallback[Action.EQUIP_DECOY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_DECOY)
-        this.actionCallback[Action.BUY_MENU] = (enabled) => enabled && hud.toggleBuyMenu()
-        this.actionCallback[Action.GAME_MENU] = (enabled) => enabled && hud.toggleGameMenu()
-        this.actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
+    #loadCallbacks(game, hud) {
+        this.#actionCallback[Action.MOVE_FORWARD] = (enabled) => this.#states.moveForward = enabled
+        this.#actionCallback[Action.MOVE_LEFT] = (enabled) => this.#states.moveLeft = enabled
+        this.#actionCallback[Action.MOVE_BACK] = (enabled) => this.#states.moveBackward = enabled
+        this.#actionCallback[Action.MOVE_RIGHT] = (enabled) => this.#states.moveRight = enabled
+        this.#actionCallback[Action.USE] = (enabled) => this.#states.use = enabled
+        this.#actionCallback[Action.JUMP] = (enabled) => enabled && (this.#states.jumping = true)
+        this.#actionCallback[Action.CROUCH] = (enabled) => enabled ? this.#states.crouching = true : this.#states.standing = true
+        this.#actionCallback[Action.WALK] = (enabled) => enabled ? this.#states.shifting = true : this.#states.running = true
+        this.#actionCallback[Action.DROP] = (enabled) => enabled && (this.#states.drop = true)
+        this.#actionCallback[Action.RELOAD] = (enabled) => enabled && this.reload()
+        this.#actionCallback[Action.EQUIP_KNIFE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_KNIFE)
+        this.#actionCallback[Action.EQUIP_PRIMARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_PRIMARY)
+        this.#actionCallback[Action.EQUIP_SECONDARY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_SECONDARY)
+        this.#actionCallback[Action.EQUIP_BOMB] = (enabled) => enabled && this.equip(InventorySlot.SLOT_BOMB)
+        this.#actionCallback[Action.EQUIP_SMOKE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_SMOKE)
+        this.#actionCallback[Action.EQUIP_FLASH] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_FLASH)
+        this.#actionCallback[Action.EQUIP_HE] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_HE)
+        this.#actionCallback[Action.EQUIP_MOLOTOV] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_MOLOTOV)
+        this.#actionCallback[Action.EQUIP_DECOY] = (enabled) => enabled && this.equip(InventorySlot.SLOT_GRENADE_DECOY)
+        this.#actionCallback[Action.BUY_MENU] = (enabled) => enabled && hud.toggleBuyMenu()
+        this.#actionCallback[Action.GAME_MENU] = (enabled) => enabled && hud.toggleGameMenu()
+        this.#actionCallback[Action.CLEAR_DECALS] = (enabled) => enabled && game.clearDecals()
+        this.#actionCallback[Action.SWITCH_HANDS] = (enabled) => enabled && game.switchHands()
+        this.#actionCallback[Action.SCORE_BOARD] = (enabled) => hud.toggleScore(enabled)
+        this.#actionCallback[Action.DROP_BOMB] = (enabled) => {
+            if (enabled && game.playerMe.data.slots[InventorySlot.SLOT_BOMB]) {
+                this.equip(InventorySlot.SLOT_BOMB)
+                this.#states.drop = true
+            }
+        }
     }
 
     #rotationToServerLook(xy) {

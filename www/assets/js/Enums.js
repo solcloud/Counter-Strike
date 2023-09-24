@@ -132,6 +132,7 @@ const BuyMenuItem = {
     KEVLAR_BODY: 12,
     GRENADE_INCENDIARY: 13,
     DEFUSE_KIT: 14,
+    RIFLE_AWP: 'TODO',
 }
 
 // server/src/Enum/InventorySlot.php
@@ -211,5 +212,8 @@ const Action = {
     GAME_MENU: 'game_menu',
     SCORE_BOARD: 'score_board',
     DROP: 'drop',
+    DROP_BOMB: 'drop_bomb',
+    SWITCH_HANDS: 'switch_hands',
     USE: 'use',
+    CLEAR_DECALS: 'clear_decals',
 }

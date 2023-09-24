@@ -91,7 +91,7 @@ export class Control {
     #processKeyboardEvent(event, isKeyDown) {
         const actionIndex = this.#setting.getBinds()[event.code]
         if (actionIndex !== undefined) {
-            this.#action.actionCallback[actionIndex](isKeyDown)
+            this.#action.execute(actionIndex, isKeyDown)
         }
     }
 
