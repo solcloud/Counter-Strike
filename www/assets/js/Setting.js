@@ -8,11 +8,13 @@ export class Setting {
             volume: 20,
             radarZoom: 0.9,
             sensitivity: 1.0,
+            inScopeSensitivity: 0.5,
             sprayTriggerDeltaMs: 80,
             crosshair: '✛',
             crosshairColor: '#d31b1b',
             crosshairSize: 40,
             flashBangColor: '#FFFFFF',
+            scopeSize: '2px',
             preferPerformance: false,
             matchServerFps: false,
             anisotropic: 16,
@@ -127,6 +129,10 @@ export class Setting {
         return this.#setting.base.sensitivity ?? 1.0
     }
 
+    getInScopeSensitivity() {
+        return this.#setting.base.inScopeSensitivity ?? 0.5
+    }
+
     getExposure() {
         return this.#setting.base.exposure ?? 0.8
     }
@@ -149,5 +155,9 @@ export class Setting {
 
     getFlashBangColor() {
         return this.#setting.base.flashBangColor ?? '#FFFFFF';
+    }
+
+    getScopeSize() {
+        return this.#setting.base.scopeSize ?? '2px';
     }
 }

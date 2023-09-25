@@ -8,6 +8,7 @@ export class Game {
     #hud
     #stats
     #pointer
+    #setting
     #shouldRenderInsideTick
     #tick = 0
     #round = 1
@@ -467,6 +468,9 @@ export class Game {
         player.get3DObject().getObjectByName('sight').position.y = serverState.sight
         player.get3DObject().position.set(serverState.position.x, serverState.position.y, -serverState.position.z)
 
+        if (player.data.scopeLevel !== serverState.scopeLevel) {
+            this.#updateScopeState(player, serverState.scopeLevel)
+        }
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
             if (player.data.money !== serverState.money) {
                 this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
@@ -476,6 +480,7 @@ export class Game {
             player.data.item = serverState.item
             player.data.sight = serverState.sight
             player.data.isAttacker = serverState.isAttacker
+            player.data.scopeLevel = serverState.scopeLevel
         }
 
         if (this.playerMe.getId() === serverState.id || this.playerSpectate.getId() === serverState.id) {
@@ -544,6 +549,20 @@ export class Game {
         modelInHand.visible = true
     }
 
+    #updateScopeState(player, scopeLevel) {
+        const isPlayerSpectate = (this.playerSpectate.getId() === player.getId())
+        if (scopeLevel > 0) {
+            this.#world.playSound('210018__supakid13__sniper-scope-zoom-in.wav', player.data.position, isPlayerSpectate)
+        }
+        if (isPlayerSpectate) {
+            this.#hud.updateCrossHair(scopeLevel)
+            this.#world.updateCameraZoom(scopeLevel === 0 ? 1.0 : scopeLevel * 2.2)
+            if (this.meIsAlive()) {
+                this.#pointer.pointerSpeed = (scopeLevel === 0 ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
+            }
+        }
+    }
+
     getMyTeamPlayers() {
         let meIsAttacker = this.playerMe.isAttacker()
         return this.players.filter((player) => player.isAttacker() === meIsAttacker)
@@ -557,9 +576,10 @@ export class Game {
         return (!this.meIsAlive())
     }
 
-    setDependency(pointer, renderWorldInsideTick) {
+    setDependency(pointer, setting) {
         this.#pointer = pointer
-        this.#shouldRenderInsideTick = renderWorldInsideTick
+        this.#setting = setting
+        this.#shouldRenderInsideTick = setting.shouldMatchServerFps()
     }
 
     getPlayerMeRotation() {

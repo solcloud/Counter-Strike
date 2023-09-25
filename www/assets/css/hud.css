@@ -9,6 +9,7 @@
     --color-opponent: #de6868;
     --color-opponent-hsl: 0, 64%, 64%;
     --flash-bang-color: #FFFFFF;
+    --scope-size: 2px;
 }
 
 #hud .color-me {
@@ -19,11 +20,56 @@
     color: var(--color-opponent);
 }
 
+#hud-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 #hud #cross {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    opacity: 1;
+}
+
+#hud #scope {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    height: 82%;
+    width: auto;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    margin: auto auto;
+    box-shadow: 0 0 0 9999px #000, rgba(0, 0, 0, 0.5) 0 0 10px 4px inset;
+    opacity: 0;
+}
+
+#hud #scope .scope-cross {
+    width: 100%;
+    height: 100%;
+    filter: blur(0);
+}
+
+#hud #scope .scope-cross::before,
+#hud #scope .scope-cross::after {
+    width: 100%;
+    height: 100%;
+    display: block;
+    content: "";
+}
+
+#hud #scope .scope-cross::before {
+    border-left: var(--scope-size) solid #000000;
+    transform: translate(calc(50% - 0.5 * var(--scope-size)), 0%);
+}
+
+#hud #scope .scope-cross::after {
+    border-top: var(--scope-size) solid #000000;
+    transform: translate(0%, calc(-50% - 0.5 * var(--scope-size)));
 }
 
 #hud #flash {

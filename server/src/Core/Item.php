@@ -15,6 +15,7 @@ abstract class Item
     private int $skinId;
     protected bool $equipped = false;
     protected int $price = 9999;
+    protected int $scopeLevel = 0;
     private ?EquipEvent $eventEquip = null;
     /** @var array<string,int> */
     public readonly array $toArrayCache;
@@ -62,6 +63,11 @@ abstract class Item
     public function getQuantity(): int
     {
         return 1;
+    }
+
+    public function getScopeLevel(): int
+    {
+        return $this->scopeLevel;
     }
 
     public function decrementQuantity(): void
@@ -119,6 +125,7 @@ abstract class Item
         if ($this->eventEquip === null) {
             $this->eventEquip = new EquipEvent(function () {
                 $this->equipped = true;
+                $this->scopeLevel = 0;
             }, static::equipReadyTimeMs);
         }
 
@@ -129,6 +136,7 @@ abstract class Item
     public function unEquip(): void
     {
         $this->equipped = false;
+        $this->scopeLevel = 0;
     }
 
     public function isEquipped(): bool

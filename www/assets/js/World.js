@@ -256,6 +256,11 @@ export class World {
         this.#renderer.render(this.#scene, this.#camera)
     }
 
+    updateCameraZoom(zoomLevel) {
+        this.#camera.zoom = zoomLevel
+        this.#camera.updateProjectionMatrix()
+    }
+
     getCamera() {
         return this.#camera
     }

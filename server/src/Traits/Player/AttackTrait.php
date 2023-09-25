@@ -14,6 +14,7 @@ use cs\Event\ThrowEvent;
 use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
 use cs\Interface\Reloadable;
+use cs\Interface\ScopeItem;
 use cs\Weapon\AmmoBasedWeapon;
 use cs\Weapon\Knife;
 
@@ -57,6 +58,9 @@ trait AttackTrait
     public function attackSecondary(): ?AttackResult
     {
         $item = $this->getEquippedItem();
+        if ($item instanceof ScopeItem) {
+            $item->scope();
+        }
         if (!($item instanceof AttackEnable)) {
             return null; // @codeCoverageIgnore
         }

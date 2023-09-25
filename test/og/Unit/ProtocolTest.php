@@ -105,6 +105,7 @@ class ProtocolTest extends BaseTest
             'ammo'        => 12,
             'ammoReserve' => 120,
             'isReloading' => false,
+            'scopeLevel'  => 0,
         ];
         $this->assertSame($playerSerializedExpected, $player->serialize());
 

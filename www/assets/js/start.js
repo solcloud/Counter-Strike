@@ -56,7 +56,7 @@ let launchGame
 
         hud.createHud(elementHud, map, setting)
         control.init(canvasParent, pointerLock, setting)
-        game.setDependency(pointerLock, setting.shouldMatchServerFps())
+        game.setDependency(pointerLock, setting)
         canvas.addEventListener("click", () => game.requestPointerLock())
         canvasParent.appendChild(canvas)
         stats.dom.style.position = 'inherit'

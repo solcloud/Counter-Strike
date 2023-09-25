@@ -11,6 +11,7 @@ use cs\Enum\ItemType;
 use cs\Enum\SoundType;
 use cs\Event\PlayerMovementEvent;
 use cs\Event\SoundEvent;
+use cs\Interface\ScopeItem;
 
 trait MovementTrait
 {
@@ -167,6 +168,9 @@ trait MovementTrait
             $speed *= Setting::getWeaponPrimarySpeedMultiplier($equippedItem->getId());
         } elseif ($equippedItem->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
             $speed *= Setting::getWeaponSecondarySpeedMultiplier($equippedItem->getId());
+        }
+        if ($equippedItem instanceof ScopeItem && $equippedItem->isScopedIn()) {
+            $speed *= .5;
         }
         if ($this->isJumping()) {
             $speed *= Setting::jumpMovementSpeedMultiplier();

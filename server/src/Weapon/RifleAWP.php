@@ -4,8 +4,9 @@ namespace cs\Weapon;
 
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
+use cs\Interface\ScopeItem;
 
-class RifleAWP extends AmmoBasedWeapon
+class RifleAWP extends AmmoBasedWeapon implements ScopeItem
 {
 
     public const reloadTimeMs = 3700;
@@ -29,6 +30,29 @@ class RifleAWP extends AmmoBasedWeapon
             HitBoxType::STOMACH => $armor->hasArmor() ? 140 : 143,
             HitBoxType::LEG => 85,
         };
+    }
+
+    protected function getSpreadOffsets(): array
+    {
+        if ($this->scopeLevel === 0) {
+            return [rand(50, 120) / (rand(0, 1) === 0 ? -10 : +10), rand(40, 80) / (rand(0, 1) === 0 ? +10 : -10)];
+        }
+
+        $this->scopeLevel = 0;
+        return [0.0, 0.0];
+    }
+
+    public function scope(): void
+    {
+        $this->scopeLevel++;
+        if ($this->scopeLevel > 2) {
+            $this->scopeLevel = 0;
+        }
+    }
+
+    public function isScopedIn(): bool
+    {
+        return ($this->scopeLevel !== 0);
     }
 
 }

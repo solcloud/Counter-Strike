@@ -71,7 +71,16 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->lastAttackTick = $event->getTickId();
 
         $this->recoilModifier($event);
+        $event->applyRecoil(...$this->getSpreadOffsets());
         return $event->fire();
+    }
+
+    /**
+     * @return float[] [offsetHorizontal, offsetVertical]
+     */
+    protected function getSpreadOffsets(): array
+    {
+        return [0.0, 0.0];
     }
 
     protected function resetRecoil(int $tickId = 0): void

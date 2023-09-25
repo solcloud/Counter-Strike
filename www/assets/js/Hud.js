@@ -43,6 +43,8 @@ export class HUD {
         aliveOpponentTeam: null,
         time: null,
         killFeed: null,
+        cross: null,
+        scope: null,
     }
     #flashInterval = null;
     #countDownIntervalId = null;
@@ -112,6 +114,11 @@ export class HUD {
             }
         }
         this.#flashInterval = setTimeout(callback, fullFlashTimeMs)
+    }
+
+    updateCrossHair(scopeLevel) {
+        this.#elements.cross.style.opacity = (scopeLevel === 0 ? 1.0 : 0.0)
+        this.#elements.scope.style.opacity = (scopeLevel === 0 ? 0.0 : 1.0)
     }
 
     roundStart(roundTimeMs) {
@@ -242,7 +249,9 @@ export class HUD {
         }
 
         elementHud.innerHTML = `
+        <div id="scope"><div class="scope-cross"></div></div>
         <div id="flash"></div>
+    <div id="hud-container">
         <div id="cross"></div>
         <div id="hit-feedback"></div>
         <div id="scoreboard" class="hidden">
@@ -307,9 +316,11 @@ export class HUD {
                 </div>
             </div>
         </section>
+    </div>
     `;
 
         elementHud.style.setProperty('--flash-bang-color', setting.getFlashBangColor())
+        elementHud.style.setProperty('--scope-size', setting.getScopeSize())
 
         this.#elements.flash = elementHud.querySelector('#flash')
         this.#elements.score = elementHud.querySelector('#scoreboard')
@@ -334,9 +345,10 @@ export class HUD {
         this.#elements.aliveOpponentTeam = elementHud.querySelector('.team-opponent-alive')
         this.#elements.time = elementHud.querySelector('#time')
         this.#elements.killFeed = elementHud.querySelector('.kill-feed')
+        this.#elements.cross = elementHud.querySelector('#cross')
+        this.#elements.scope = elementHud.querySelector('#scope')
 
-        const cross = elementHud.querySelector('#cross')
-        cross.innerText = setting.getCrosshairSymbol()
+        this.#elements.cross.innerText = setting.getCrosshairSymbol()
         setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = newValue)
         setting.update('crosshairColor', setting.getCrosshairColor())
         setting.addUpdateCallback('crosshairSize', (newValue) => cross.style.fontSize = newValue + 'px')

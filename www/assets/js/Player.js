@@ -24,6 +24,7 @@ export class Player {
         ammo: null,
         ammoReserve: null,
         isReloading: null,
+        scopeLevel: null,
     }
     #custom = {
         slotId: null,

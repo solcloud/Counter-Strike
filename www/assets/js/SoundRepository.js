@@ -1,4 +1,4 @@
-import {InventorySlot, SoundType} from "./Enums.js";
+import {InventorySlot, SoundType, ItemId} from "./Enums.js";
 
 export class SoundRepository {
     #alwaysInHeadTypes = [
@@ -152,6 +152,10 @@ export class SoundRepository {
     }
 
     getItemAttackSound(item) {
+        if (item.id === ItemId.RifleAWP) {
+            return '371574__matrixxx__rifle-gun-tikka-t3-tactical-shot-04.wav'
+        }
+
         if (item.slot === InventorySlot.SLOT_SECONDARY) {
             return '387480__cosmicembers__dart-thud-2.wav'
         }

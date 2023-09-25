@@ -326,6 +326,7 @@ final class Player
             'ammo'        => $ammo,
             'ammoReserve' => $ammoReserve,
             'isReloading' => $reloading,
+            'scopeLevel'  => $equippedItem->getScopeLevel(),
         ];
     }
 
