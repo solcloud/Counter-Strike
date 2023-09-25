@@ -83,6 +83,7 @@ export class BuyMenu {
             ? `<p${money < 2700 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.RIFLE_AK}" class="hud-action action-buy">AK-47 for ${this.#formatPrice(2700)}</a></p>`
             : `<p${money < 3100 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.RIFLE_M4A4}" class="hud-action action-buy">M4-A1 for ${this.#formatPrice(3100)}</a></p>`
         }
+            <p${money < 4750 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.RIFLE_AWP}" class="hud-action action-buy">AWP for ${this.#formatPrice(4750)}</a></p>
         `;
     }
 }

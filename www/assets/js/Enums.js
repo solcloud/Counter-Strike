@@ -132,7 +132,7 @@ const BuyMenuItem = {
     KEVLAR_BODY: 12,
     GRENADE_INCENDIARY: 13,
     DEFUSE_KIT: 14,
-    RIFLE_AWP: 'TODO',
+    RIFLE_AWP: 15,
 }
 
 // server/src/Enum/InventorySlot.php
@@ -160,6 +160,7 @@ const ItemId = {
     PistolUsp: 4,
     RifleAk: 5,
     RifleM4A4: 6,
+    RifleAWP: 7,
     Decoy: 30,
     Flashbang: 31,
     HighExplosive: 32,
@@ -179,6 +180,7 @@ const ItemIdToName = {
     4: 'USP',
     5: 'AK-47',
     6: 'M4-A1',
+    7: 'AWP',
     30: 'Decoy',
     31: 'Flashbang',
     32: 'High explosive',

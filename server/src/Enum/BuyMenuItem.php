@@ -19,7 +19,7 @@ enum BuyMenuItem: int
     case KEVLAR_BODY = 12;
     case GRENADE_INCENDIARY = 13;
     case DEFUSE_KIT = 14;
-    #case RIFLE_AWP = 15;
+    case RIFLE_AWP = 15;
 
 
 }

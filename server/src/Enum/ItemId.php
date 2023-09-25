@@ -22,6 +22,7 @@ class ItemId
         Weapon\PistolUsp::class   => 4,
         Weapon\RifleAk::class     => 5,
         Weapon\RifleM4A4::class   => 6,
+        Weapon\RifleAWP::class    => 7,
 
         Equipment\Decoy::class         => 30,
         Equipment\Flashbang::class     => 31,

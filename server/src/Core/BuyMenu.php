@@ -36,6 +36,7 @@ class BuyMenu
         return match ($buyCandidate) {
             BuyMenuItem::RIFLE_AK => $this->forAttackerStore ? new Weapon\RifleAk() : null,
             BuyMenuItem::RIFLE_M4A4 => !$this->forAttackerStore ? new Weapon\RifleM4A4() : null,
+            BuyMenuItem::RIFLE_AWP => new Weapon\RifleAWP(),
             BuyMenuItem::PISTOL_USP => !$this->forAttackerStore ? new Weapon\PistolUsp() : null,
             BuyMenuItem::PISTOL_GLOCK => $this->forAttackerStore ? new Weapon\PistolGlock() : null,
             BuyMenuItem::PISTOL_P250 => new Weapon\PistolP250(),
