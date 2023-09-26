@@ -41,6 +41,9 @@ by **Shivansh SIngh** from https://sketchfab.com/3d-models/molotov-game-ready-7f
 #### smoke.glb (CC4)
 by **GANJACKSON TONY** from https://sketchfab.com/3d-models/pubg-m18-smoke-grenade-b006a1dcef1646fb84a962929fb511d0
 
+#### awp.glb (CC4)
+by **un1que** from https://sketchfab.com/3d-models/awp-200iq-ac8e35e499b549b7b2ba9064acea3fc0
+
 # Acknowledgement
 
 Thanks original authors for providing this awesome models for free!

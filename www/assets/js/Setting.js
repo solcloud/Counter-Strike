@@ -10,6 +10,7 @@ export class Setting {
             sensitivity: 1.0,
             inScopeSensitivity: 0.5,
             sprayTriggerDeltaMs: 80,
+            mouseClickTimeMs: 40,
             crosshair: '✛',
             crosshairColor: '#d31b1b',
             crosshairSize: 40,
@@ -100,6 +101,10 @@ export class Setting {
 
     getSprayTriggerDeltaMs() {
         return this.#setting.base.sprayTriggerDeltaMs ?? 80
+    }
+
+    getMouseClickTimeMs() {
+        return this.#setting.base.mouseClickTimeMs ?? 40
     }
 
     getRadarZoom() {

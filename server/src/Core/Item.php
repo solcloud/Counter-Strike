@@ -125,7 +125,6 @@ abstract class Item
         if ($this->eventEquip === null) {
             $this->eventEquip = new EquipEvent(function () {
                 $this->equipped = true;
-                $this->scopeLevel = 0;
             }, static::equipReadyTimeMs);
         }
 

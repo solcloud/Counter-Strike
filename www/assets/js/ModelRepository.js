@@ -172,7 +172,7 @@ export class ModelRepository {
         models[ItemId.Knife] = 'knife.glb'
         models[ItemId.RifleAk] = 'ak.glb'
         models[ItemId.RifleM4A4] = 'm4.glb'
-        models[ItemId.RifleAWP] = 'm4.glb' // fixme :D
+        models[ItemId.RifleAWP] = 'awp.glb'
         models[ItemId.PistolUsp] = 'pistol.glb' // fixme
         models[ItemId.PistolP250] = 'pistol.glb'
         models[ItemId.PistolGlock] = 'pistol.glb' // fixme

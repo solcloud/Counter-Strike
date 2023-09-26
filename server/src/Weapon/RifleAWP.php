@@ -38,7 +38,6 @@ class RifleAWP extends AmmoBasedWeapon implements ScopeItem
             return [rand(50, 120) / (rand(0, 1) === 0 ? -10 : +10), rand(40, 80) / (rand(0, 1) === 0 ? +10 : -10)];
         }
 
-        $this->scopeLevel = 0;
         return [0.0, 0.0];
     }
 

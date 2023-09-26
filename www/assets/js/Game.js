@@ -555,10 +555,12 @@ export class Game {
             this.#world.playSound('210018__supakid13__sniper-scope-zoom-in.wav', player.data.position, isPlayerSpectate)
         }
         if (isPlayerSpectate) {
+            const isNotScopedIn = (scopeLevel === 0)
+            this.#world.getCamera().getObjectByName('pov-item').visible = isNotScopedIn
             this.#hud.updateCrossHair(scopeLevel)
-            this.#world.updateCameraZoom(scopeLevel === 0 ? 1.0 : scopeLevel * 2.2)
+            this.#world.updateCameraZoom(isNotScopedIn ? 1.0 : scopeLevel * 2.2)
             if (this.meIsAlive()) {
-                this.#pointer.pointerSpeed = (scopeLevel === 0 ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
+                this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
             }
         }
     }

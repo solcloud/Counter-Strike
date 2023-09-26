@@ -97,7 +97,7 @@ export class Control {
 
     getTickAction() {
         if (this.#game.isPlaying() && this.#game.meIsAlive()) {
-            return this.#action.getPlayerAction(this.#game, this.#setting.getSprayTriggerDeltaMs())
+            return this.#action.getPlayerAction(this.#game, this.#setting)
         }
         this.#action.resetStates()
         return ''

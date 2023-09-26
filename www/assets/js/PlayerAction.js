@@ -41,6 +41,7 @@ export class PlayerAction {
         this.#states = {
             attackLook: '',
             lastLook: '',
+            attack2StartMs: 0,
             sprayTriggerStartMs: null,
             moveForward: false,
             moveBackward: false,
@@ -130,7 +131,7 @@ export class PlayerAction {
         this.#states.sprayTriggerStartMs = null
     }
 
-    getPlayerAction(game, sprayTriggerDeltaMs) {
+    getPlayerAction(game, userSetting) {
         let action = []
 
         if (game.buyList.length) {
@@ -187,15 +188,16 @@ export class PlayerAction {
             this.#states.drop = false
         }
 
-        if (this.#states.attack2) {
+        if (this.#states.attack2 && this.#states.attack2StartMs + userSetting.getMouseClickTimeMs() < Date.now()) {
             action.push('attack2')
             this.#states.attack2 = false
+            this.#states.attack2StartMs = Date.now()
         }
         if (this.#states.attack) {
             action.push(this.#states.attackLook)
             action.push('attack')
             this.#states.attack = false
-        } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + sprayTriggerDeltaMs < Date.now()) {
+        } else if (this.#states.spraying && this.#states.sprayTriggerStartMs && this.#states.sprayTriggerStartMs + userSetting.getSprayTriggerDeltaMs() < Date.now()) {
             action.push(this.#rotationToServerLook(game.getPlayerMeRotation()))
             action.push('attack')
         } else {

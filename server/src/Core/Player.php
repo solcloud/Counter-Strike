@@ -300,6 +300,7 @@ final class Player
         $ammo = null;
         $ammoReserve = null;
         $reloading = false;
+        $canAttack = $this->world->canAttack($this);
         $equippedItem = $this->inventory->getEquipped();
         if ($equippedItem instanceof AmmoBasedWeapon) {
             $ammo = $equippedItem->getAmmo();
@@ -312,7 +313,7 @@ final class Player
             'color'       => $this->color->value,
             'money'       => $this->inventory->getDollars(),
             'item'        => $equippedItem->toArrayCache,
-            'canAttack'   => $this->world->canAttack($this),
+            'canAttack'   => $canAttack,
             'canBuy'      => $this->world->canBuy($this),
             'canPlant'    => $this->world->canPlant($this),
             'slots'       => $this->inventory->getFilledSlots(),
@@ -326,7 +327,7 @@ final class Player
             'ammo'        => $ammo,
             'ammoReserve' => $ammoReserve,
             'isReloading' => $reloading,
-            'scopeLevel'  => $equippedItem->getScopeLevel(),
+            'scopeLevel'  => $canAttack ? $equippedItem->getScopeLevel() : 0,
         ];
     }
 
