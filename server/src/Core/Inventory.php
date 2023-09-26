@@ -21,8 +21,8 @@ class Inventory
     private int $dollars = 0;
     private int $equippedSlot;
     private int $lastEquippedSlotId;
-    /** @var int[] */
-    private array $lastEquippedGrenadeSlots = [];
+    /** @var int[] [slotId] */
+    private array $lastEquippedGrenadeSlots;
     private BuyMenu $store;
 
     public function __construct(bool $isAttackerSide)
@@ -39,7 +39,10 @@ class Inventory
             ];
             $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
-            $this->lastEquippedGrenadeSlots = [];
+            $this->lastEquippedGrenadeSlots = [
+                InventorySlot::SLOT_GRENADE_SMOKE->value, InventorySlot::SLOT_GRENADE_MOLOTOV->value, InventorySlot::SLOT_GRENADE_HE->value,
+                InventorySlot::SLOT_GRENADE_FLASH->value, InventorySlot::SLOT_GRENADE_DECOY->value,
+            ];
         } else {
             foreach ($this->items as $item) {
                 $item->reset();
