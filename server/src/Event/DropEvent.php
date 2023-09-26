@@ -36,7 +36,7 @@ class DropEvent extends Event
         $this->timeIncrement = 1 / Util::millisecondsToFrames(100);
         if (!$this->player->isAlive()) {
             $this->velocity = 7;
-            $this->timeIncrement = Setting::fallAmountPerTick();
+            $this->timeIncrement = 7;
         }
     }
 
