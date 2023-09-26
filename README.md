@@ -1,9 +1,10 @@
 # Counter-Strike: Football [![Tests](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml/badge.svg)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml)
 
-Competitive multiplayer game where two football fans teams, each team have 5 players, fights in 30 rounds with goal to win more rounds than opponents team.
-Teams are Attackers and Defenders. Defenders team has goal of protecting their fan base sanctuary every round from desecrate by attackers using their graffiti bomb ball.
+Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team.
 
 ![promo](https://user-images.githubusercontent.com/74121353/210066609-3a691c0d-202b-4634-9f49-d1f6ff3538c8.png)
+
+Teams are Attackers and Defenders. The Defenders team has a goal of protecting their fan base sanctuary every round from desecrating by attackers using their graffiti bomb ball.
 
 Defenders win round by:
 - eliminated all attackers players before bomb planted (touchdown)
@@ -16,7 +17,7 @@ Attackers win round by:
 
 If attackers deploy graffiti bomb before round time ends, then round clock countdown is set to 40 sec and defenders has 30 sec (or 35 sec in case of using defuse kit) to defuse bomb.
 
-_This is low violence game so there is no red blood or similar violence visuals._
+_This is low violence game so there is no red blood, animal killing or similar violence visuals._
 
 ## Setup
 
@@ -52,18 +53,8 @@ composer install -a --no-dev
 php cli/server.php 2 # will start server waiting for 2 players to connect
 ```
 
-Enabling PHP's JIT compilation should give performance boost so we recommend that.
+Enabling PHP's JIT compilation should give a performance boost, so we recommend doing that.
 
-## TODO
+## Help us
 
-Actually not so many hard math things. Mostly just polishing. If you know html/css/js/php languages or 3D modeling/texturing you can join project and help us improve project quicker.  
-
-### NOT going to implement
-- burst fire and guns with absurd fire rate
-- different players model hit boxes (same hit boxes for all players, only visual clothing design change)
-- player breath animation or any player animation beside walking, crouching, jumping and look movement
-- lag compensation - when you lag it is your problem - your disadvantage
-
-### To Be Decided (maybe)
-- aim punch (body shot without kevlar and headshot)
-- aim spread
+If you know html/css/js/php languages or 3D modeling/texturing/animation you can join project and help us improve this game quicker.
