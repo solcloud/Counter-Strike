@@ -44,6 +44,12 @@ by **GANJACKSON TONY** from https://sketchfab.com/3d-models/pubg-m18-smoke-grena
 #### awp.glb (CC4)
 by **un1que** from https://sketchfab.com/3d-models/awp-200iq-ac8e35e499b549b7b2ba9064acea3fc0
 
+#### p250.glb (CC4)
+by **csgolaser** from https://sketchfab.com/3d-models/csgo-weapon-skin-p250-vector-purple-0c14cb80686f457da8fe4a78b548e399
+
+#### usp.glb (CC4)
+by **xinus22** from https://sketchfab.com/3d-models/half-life-2-hk-usp-match-ce279b2fb6344757935e8660fa7d1a37
+
 # Acknowledgement
 
 Thanks original authors for providing this awesome models for free!
