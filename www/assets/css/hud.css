@@ -1,7 +1,4 @@
 #hud {
-    font-family: Arial;
-    pointer-events: none;
-    user-select: none;
     --color-attackers: #ff9145;
     --color-defenders: #43b4fd;
     --color-me: #afde68;
@@ -10,6 +7,12 @@
     --color-opponent-hsl: 0, 64%, 64%;
     --flash-bang-color: #FFFFFF;
     --scope-size: 2px;
+    --hud-color: #ff8e8e;
+    --hud-color-shadow: #626262;
+    font-family: Arial, serif;
+    pointer-events: none;
+    user-select: none;
+    color: var(--hud-color);
 }
 
 #hud .color-me {
@@ -96,7 +99,7 @@
 }
 
 #hud section {
-    text-shadow: 0px 0px 2px #626262;
+    text-shadow: 0px 0px 2px var(--hud-color-shadow);
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -303,6 +306,7 @@
     border-radius: 50%;
     background-color: #000000;
     box-shadow: 0 0 5px 0 rgba(23, 21, 21, 0.8);
+    border: 1px solid var(--hud-color);
 }
 
 #hud #radar-canvas {
@@ -317,7 +321,6 @@
 #hud .health {
     padding: .6rem .8rem;
     max-width: 250px;
-    color: #ddb9b9;
 }
 
 #hud .hp {
@@ -333,7 +336,6 @@
 #hud .money {
     display: inline;
     padding: .2rem .4rem;
-    color: #ff8e8e;
     font-weight: bold;
 }
 
@@ -391,21 +393,38 @@
 }
 
 #hud #message-top {
-    padding: 2rem 0;
     flex-grow: 1;
     font-size: 130%;
 }
 
 #hud #message-bottom {
-    padding-bottom: 5rem;
-    font-size: 80%;
+    font-size: 90%;
     font-style: italic;
+}
+
+#hud #message-top,
+#hud #message-bottom {
+    color: #000000;
+    padding: 2rem 0.5rem;
+}
+
+#hud #mode-spectate {
+    padding: 1.1rem;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--hud-color);
+    border-right: 4px solid var(--hud-color);
+    background: var(--hud-color-shadow);
+    opacity: 0.8;
+}
+
+#hud #mode-spectate span {
+    font-weight: bolder;
+    font-size: 130%;
 }
 
 #hud .ammo {
     display: inline;
     padding: 4px 8px;
-    color: #ddb9b9;
 }
 
 #hud .kill-feed {

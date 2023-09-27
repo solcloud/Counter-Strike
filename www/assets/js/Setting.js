@@ -15,6 +15,8 @@ export class Setting {
             crosshairColor: '#d31b1b',
             crosshairSize: 40,
             flashBangColor: '#FFFFFF',
+            hudColor: '#ff8e8e',
+            hudColorShadow: '#626262',
             scopeSize: '2px',
             preferPerformance: false,
             matchServerFps: false,
@@ -160,6 +162,14 @@ export class Setting {
 
     getFlashBangColor() {
         return this.#setting.base.flashBangColor ?? '#FFFFFF';
+    }
+
+    getHudColor() {
+        return this.#setting.base.hudColor ?? '#ff8e8e';
+    }
+
+    getHudColorShadow() {
+        return this.#setting.base.hudColorShadow ?? '#626262';
     }
 
     getScopeSize() {

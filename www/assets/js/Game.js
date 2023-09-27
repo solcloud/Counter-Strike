@@ -396,6 +396,7 @@ export class Game {
         }
         this.playerSpectate = player
         this.equip(player.getEquippedSlotId())
+        this.#hud.changeSpectatePlayer(player)
     }
 
     createPlayer(data) {

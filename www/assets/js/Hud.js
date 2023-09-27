@@ -173,6 +173,10 @@ export class HUD {
         this.#elements.messageBottom.innerHTML = ''
     }
 
+    changeSpectatePlayer(player) {
+        this.#elements.spectateUi.getElementsByTagName('span').innerText = Enum.ColorNames[player.getColorIndex()]
+    }
+
     equip(slotId, availableSlots) {
         this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
             node.classList.remove('highlight', 'hidden')
@@ -265,7 +269,6 @@ export class HUD {
                     <div id="radar">
                         <canvas id="radar-canvas"></canvas>
                     </div>
-                    <div id="mode-spectate" class="hidden" style="padding:12px 4px">Spectating</div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
                     <div data-can-plant class="hidden" style="margin:22px 4px">⇣&nbsp;💣&nbsp;⇣</div>
                     <div data-have-defuse-kit class="hidden" style="margin:22px 4px;font-size:140%">✂</div>
@@ -296,6 +299,7 @@ export class HUD {
                 </div>
                 <div id="message-top"></div>
                 <div id="message-bottom"></div>
+                <div id="mode-spectate" class="hidden">Spectating player <span></span></div>
             </div>
             <div class="right">
                 <div class="kill-feed">
@@ -321,6 +325,8 @@ export class HUD {
 
         elementHud.style.setProperty('--flash-bang-color', setting.getFlashBangColor())
         elementHud.style.setProperty('--scope-size', setting.getScopeSize())
+        elementHud.style.setProperty('--hud-color', setting.getHudColor())
+        elementHud.style.setProperty('--hud-color-shadow', setting.getHudColorShadow())
 
         this.#elements.flash = elementHud.querySelector('#flash')
         this.#elements.score = elementHud.querySelector('#scoreboard')
