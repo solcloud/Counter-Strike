@@ -5,6 +5,9 @@ on:
 
 jobs:
   electron-build:
+    if: github.actor == 'solcloud'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -15,7 +18,7 @@ jobs:
         timeout-minutes: 3
         run: |
           sudo apt-get update && sudo apt-get install -y \
-            npm zip
+            npm zip curl
 
       - name: "Install Node dependencies"
         timeout-minutes: 3
@@ -35,24 +38,48 @@ jobs:
 
       - name: "Publish Linux Artifact"
         timeout-minutes: 5
-        uses: actions/upload-artifact@v3
-        with:
-          name: counter-strike-football-linux.zip
-          path: electron/linux.zip
-          if-no-files-found: error
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "release: $RELEASE_ID"
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-linux.zip" \
+              --data-binary "@electron/linux.zip"
 
       - name: "Publish Windows Artifact"
         timeout-minutes: 5
-        uses: actions/upload-artifact@v3
-        with:
-          name: counter-strike-football-windows.zip
-          path: electron/windows.zip
-          if-no-files-found: error
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "release: $RELEASE_ID"
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-windows.zip" \
+              --data-binary "@electron/windows.zip"
 
       - name: "Publish MacOS Artifact"
         timeout-minutes: 5
-        uses: actions/upload-artifact@v3
-        with:
-          name: counter-strike-football-macos.zip
-          path: electron/macos.zip
-          if-no-files-found: error
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "release: $RELEASE_ID"
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-macos.zip" \
+              --data-binary "@electron/macos.zip"
