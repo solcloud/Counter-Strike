@@ -432,22 +432,6 @@
     padding: 4px 8px;
 }
 
-#hud .kill-feed {
-    font-family: csIcons;
-    max-height: 220px;
-    font-size: .9rem;
-    line-height: 80%;
-    white-space: nowrap;
-    overflow: hidden;
-    color: #ffffff;
-    padding: 12px 4px;
-}
-
-#hud .kill-feed .highlight {
-    font-weight: bold;
-    background-color: rgba(0, 0, 0, .3);
-}
-
 #hud .inventory {
     font-family: csIcons;
     margin-top: auto;
@@ -464,11 +448,40 @@
     color: #ffebc5;
 }
 
-#hud .kill-feed .team-me {
+#hud .kill-feed {
+    font-family: csIcons, Arial, serif;
+    max-height: 220px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #ffffff;
+    padding: 4px 2px;
+}
+
+#hud .kill-feed > p {
+    margin: 0;
+    padding: 0.3em 0;
+}
+
+#hud .kill-feed > p > span {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid transparent;
+    border-radius: 0.2em;
+    padding: 0.2em 0.5em;
+    vertical-align: middle;
+}
+
+#hud .kill-feed > p.highlight > span {
+    font-weight: bold;
+    border-color: #db0101;
+    background: rgba(41, 37, 37, 0.7);
+}
+
+#hud .kill-feed span.team-me {
     color: var(--color-me);
 }
 
-#hud .kill-feed .team-opponent {
+#hud .kill-feed span.team-opponent {
     color: var(--color-opponent);
 }
 

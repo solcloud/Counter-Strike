@@ -42,14 +42,16 @@ export class KillFeed {
         }
 
         const row = document.createElement('p')
+        const line = document.createElement('span')
         let shouldHighlight = (playerCulprit.id === playerMe.id || playerDead.id === playerMe.id)
         if (shouldHighlight) {
             row.classList.add('highlight')
         }
-        let headshot = (wasHeadshot ? ' 🗣' : '')
-        row.append(culprit)
-        row.append(` ${ItemIdToIcon[killedItemId]}${headshot} `)
-        row.append(dead)
+        let headshot = (wasHeadshot ? ' ⌖' : '')
+        line.append(culprit)
+        line.append(` ${ItemIdToIcon[killedItemId]}${headshot} `)
+        line.append(dead)
+        row.append(line)
         parentElement.append(row)
 
         setTimeout(() => row.remove(), 3000)
