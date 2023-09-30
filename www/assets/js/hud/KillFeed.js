@@ -1,4 +1,4 @@
-import {ItemId} from "../Enums.js";
+import {ItemId, ItemIdToIcon} from "../Enums.js";
 
 export class KillFeed {
     #element
@@ -29,7 +29,7 @@ export class KillFeed {
         const culprit = document.createElement('span')
         const culpritOnMyTeam = (playerCulprit.isAttacker === playerMe.isAttacker)
         culprit.classList.add(culpritOnMyTeam ? 'team-me' : 'team-opponent')
-        culprit.innerText = killedByBomb ? '💣' : this.#scoreBoard.getPlayerName(playerCulprit, playerMe)
+        culprit.innerText = killedByBomb ? ItemIdToIcon[ItemId.Bomb] : this.#scoreBoard.getPlayerName(playerCulprit, playerMe)
 
         const dead = document.createElement('span')
         const deadOnyMyTeam = (playerDead.isAttacker === playerMe.isAttacker)
@@ -46,9 +46,9 @@ export class KillFeed {
         if (shouldHighlight) {
             row.classList.add('highlight')
         }
-        let headshot = (wasHeadshot ? ' ⌖' : '')
+        let headshot = (wasHeadshot ? ' 🗣' : '')
         row.append(culprit)
-        row.append(` killed${headshot} `)
+        row.append(` ${ItemIdToIcon[killedItemId]}${headshot} `)
         row.append(dead)
         parentElement.append(row)
 

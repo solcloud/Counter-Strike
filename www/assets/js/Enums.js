@@ -12,6 +12,7 @@ export {
     InventorySlot,
     ItemId,
     ItemIdToName,
+    ItemIdToIcon,
     Action,
 }
 
@@ -189,6 +190,27 @@ const ItemIdToName = {
     35: 'Molotov',
     36: 'Smoke',
     50: 'Bomb',
+    51: 'Defuse Kit',
+}
+
+const ItemIdToIcon = {
+    0: '\uE000',
+    1: '\uE03B',
+    2: '\uE004',
+    3: '\uE013',
+    4: '\uE00E',
+    5: '\uE007',
+    6: '\uE00E',
+    7: '\uE009',
+    30: '\uE02F',
+    31: '\uE02B',
+    32: '\uE02C',
+    33: '\uE030',
+    34: '\uE064',
+    35: '\uE02E',
+    36: '\uE02D',
+    50: '\uE031',
+    51: '\uE066',
 }
 
 // PlayerAction.js

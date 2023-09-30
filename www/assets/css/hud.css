@@ -1,3 +1,8 @@
+@font-face {
+    font-family: csIcons;
+    src: url("../../resources/font/csgo_icons.ttf");
+}
+
 #hud {
     --color-attackers: #ff9145;
     --color-defenders: #43b4fd;
@@ -428,6 +433,7 @@
 }
 
 #hud .kill-feed {
+    font-family: csIcons;
     max-height: 220px;
     font-size: .9rem;
     line-height: 80%;
@@ -443,6 +449,7 @@
 }
 
 #hud .inventory {
+    font-family: csIcons;
     font-size: 80%;
 }
 
