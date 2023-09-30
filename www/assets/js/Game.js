@@ -484,10 +484,8 @@ export class Game {
             player.data.scopeLevel = serverState.scopeLevel
         }
 
-        if (this.playerMe.getId() === serverState.id || this.playerSpectate.getId() === serverState.id) {
-            if (this.playerSpectate.isInventoryChanged(serverState)) {
-                this.equip(serverState.item.slot)
-            }
+        if (this.playerSpectate.getId() === serverState.id && this.playerSpectate.isInventoryChanged(serverState)) {
+            this.equip(serverState.item.slot)
         }
         if (this.playerMe.getId() !== serverState.id) {
             this.updateOtherPlayersModels(player, serverState)
