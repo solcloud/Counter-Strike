@@ -49,6 +49,8 @@ export class HUD {
     #flashInterval = null;
     #countDownIntervalId = null;
     #scoreBoardData = null;
+    #weaponSlots = [Enum.InventorySlot.SLOT_PRIMARY, Enum.InventorySlot.SLOT_SECONDARY, Enum.InventorySlot.SLOT_KNIFE]
+    #grenadeSlots = [Enum.InventorySlot.SLOT_GRENADE_DECOY, Enum.InventorySlot.SLOT_GRENADE_HE, Enum.InventorySlot.SLOT_GRENADE_MOLOTOV, Enum.InventorySlot.SLOT_GRENADE_SMOKE, Enum.InventorySlot.SLOT_GRENADE_FLASH]
 
     injectDependency(game) {
         this.#game = game
@@ -177,14 +179,26 @@ export class HUD {
         this.#elements.spectateUi.querySelector('span').innerText = Enum.ColorNames[player.getColorIndex()]
     }
 
-    equip(slotId, availableSlots) {
-        this.#elements.inventory.querySelectorAll('[data-slot]').forEach(function (node) {
-            node.classList.remove('highlight', 'hidden')
-            if (availableSlots[node.dataset.slot] === undefined) {
-                node.classList.add('hidden')
+    equip(slotId, itemId, availableSlots) {
+        let html = ''
+        this.#weaponSlots.forEach((slot) => {
+            const item = availableSlots[slot]
+            if (!item) {
+                return
             }
+
+            html += `<p${slotId === slot ? ' class="highlight"' : ''}>${Enum.ItemIdToIcon[item.id]}</p>`
         })
-        this.#elements.inventory.querySelector(`[data-slot="${slotId}"]`).classList.add('highlight')
+        let grenade = ''
+        this.#grenadeSlots.forEach((slot) => {
+            const item = availableSlots[slot]
+            if (!item) {
+                return
+            }
+
+            grenade += `<span${slotId === slot ? ' class="highlight"' : ''}>${Enum.ItemIdToIcon[item.id]}</span>`
+        })
+        this.#elements.inventory.innerHTML = html + `<div class="grenades">${grenade}</div>`
     }
 
     updateHud(player) {
@@ -304,17 +318,7 @@ export class HUD {
             <div class="right">
                 <div class="kill-feed">
                 </div>
-                <div class="inventory">
-                    <p data-slot="${Enum.InventorySlot.SLOT_KNIFE}">Knife</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_PRIMARY}">Primary</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_SECONDARY}">Secondary</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_BOMB}">Bomb</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_SMOKE}">Smoke</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_FLASH}">Flash</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_HE}">Frag</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_MOLOTOV}">Molotov</p>
-                    <p class="hidden" data-slot="${Enum.InventorySlot.SLOT_GRENADE_DECOY}">Decoy</p>
-                </div>
+                <div class="inventory"></div>
                 <div>
                     <span data-ammo class="ammo bg"></span>
                 </div>

@@ -429,7 +429,7 @@ export class Game {
         model.getObjectByName('pov').visible = true
         model.visible = true
 
-        this.#hud.equip(slotId, this.playerSpectate.data.slots)
+        this.#hud.equip(slotId, item.id, this.playerSpectate.data.slots)
         return true
     }
 

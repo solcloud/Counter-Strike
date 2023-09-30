@@ -450,7 +450,13 @@
 
 #hud .inventory {
     font-family: csIcons;
-    font-size: 80%;
+    margin-top: auto;
+    margin-bottom: 1rem;
+    font-size: 150%;
+}
+
+#hud .inventory .grenades span {
+    padding: 8px;
 }
 
 #hud .inventory .highlight {
