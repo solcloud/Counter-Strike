@@ -19,6 +19,7 @@ export class Setting {
             hudColorShadow: '#626262',
             scopeSize: '2px',
             preferPerformance: false,
+            showFps: true,
             matchServerFps: false,
             anisotropic: 16,
             exposure: 0.8,
@@ -126,6 +127,10 @@ export class Setting {
 
     shouldPreferPerformance() {
         return this.#setting.base.preferPerformance ?? false
+    }
+
+    shouldShowFps() {
+        return this.#setting.base.showFps ?? true
     }
 
     shouldMatchServerFps() {

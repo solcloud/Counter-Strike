@@ -12,7 +12,7 @@ let launchGame
 ////////////
 
     const validMaps = ['default']
-    let initialized = false, statsLocal
+    let initialized = false, statsLocal = null
     const world = new World()
     const hud = new HUD()
     const stats = new Stats()
@@ -59,8 +59,10 @@ let launchGame
         game.setDependency(pointerLock, setting)
         canvas.addEventListener("click", () => game.requestPointerLock())
         canvasParent.appendChild(canvas)
-        stats.dom.style.position = 'inherit'
-        elementHud.querySelector('#fps-stats').appendChild(stats.dom)
+        if (setting.shouldShowFps()) {
+            stats.dom.style.position = 'inherit'
+            elementHud.querySelector('#fps-stats').appendChild(stats.dom)
+        }
 
         game.onEnd(function (msg) {
             connector.close()
@@ -70,9 +72,11 @@ let launchGame
         })
         game.onReady(function () {
             if (!setting.shouldMatchServerFps()) {
-                statsLocal = new Stats()
-                statsLocal.dom.style.position = 'inherit'
-                elementHud.querySelector('#fps-stats').appendChild(statsLocal.dom)
+                if (setting.shouldShowFps()) {
+                    statsLocal = new Stats()
+                    statsLocal.dom.style.position = 'inherit'
+                    elementHud.querySelector('#fps-stats').appendChild(statsLocal.dom)
+                }
                 render()
             }
         })
@@ -84,9 +88,9 @@ let launchGame
     }
 
     function render() {
-        statsLocal.begin()
+        statsLocal && statsLocal.begin()
         world.render()
-        statsLocal.end()
+        statsLocal && statsLocal.end()
         requestAnimationFrame(render)
     }
 
