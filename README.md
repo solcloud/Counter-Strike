@@ -2,7 +2,7 @@
 
 Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team.
 
-![promo](https://user-images.githubusercontent.com/74121353/210066609-3a691c0d-202b-4634-9f49-d1f6ff3538c8.png)
+![promo](https://github.com/solcloud/Counter-Strike/assets/74121353/dfca8ed0-4624-4199-8d4c-336e101e0922)
 
 Teams are Attackers and Defenders. The Defenders team has a goal of protecting their fan base sanctuary every round from desecrating by attackers using their graffiti bomb ball.
 
@@ -23,7 +23,7 @@ _This is low violence game so there is no red blood, animal killing or similar v
 
 ### Client
 
-Download executable binary for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or build latest locally from project source folder.
+Download executable asset for your platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest), or build latest locally from project source folder.
 
 ```bash
 cd electron/
