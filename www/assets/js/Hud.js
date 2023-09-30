@@ -174,7 +174,7 @@ export class HUD {
     }
 
     changeSpectatePlayer(player) {
-        this.#elements.spectateUi.getElementsByTagName('span').innerText = Enum.ColorNames[player.getColorIndex()]
+        this.#elements.spectateUi.querySelector('span').innerText = Enum.ColorNames[player.getColorIndex()]
     }
 
     equip(slotId, availableSlots) {
