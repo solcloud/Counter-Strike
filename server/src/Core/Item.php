@@ -42,7 +42,7 @@ abstract class Item
 
     public function reset(): void
     {
-        // empty hook
+        $this->scopeLevel = 0;
     }
 
     public function isUserDroppable(): bool

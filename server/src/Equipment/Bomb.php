@@ -41,6 +41,7 @@ class Bomb extends BaseEquipment
 
     public function reset(): void
     {
+        parent::reset();
         $this->plantTickCount = 0;
         $this->defuseTickCount = 0;
     }
