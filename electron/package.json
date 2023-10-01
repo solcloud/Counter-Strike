@@ -5,7 +5,7 @@
         "build": "electron-packager . build --platform=all --asar --executable-name=start_game --ignore='\\.php$' --out='build'"
     },
     "devDependencies": {
-        "electron": "*",
+        "electron": "25.*",
         "electron-packager": "*"
     }
 }
