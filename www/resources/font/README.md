@@ -7,6 +7,6 @@ by **ohmygosh** from https://www.unknowncheats.me/forum/downloads.php?do=file&id
 
 # Acknowledgement
 
-Thanks original authors for providing these awesome images for free!
+Thanks original authors for providing these awesome fonts for free!
 
 If you find file here that violence license, please open issue.

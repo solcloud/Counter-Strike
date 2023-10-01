@@ -3,6 +3,10 @@
     src: url("../../resources/font/csgo_icons.ttf");
 }
 
+.icons {
+    font-family: csIcons, Arial, serif;
+}
+
 #hud {
     --color-attackers: #ff9145;
     --color-defenders: #43b4fd;
@@ -433,7 +437,6 @@
 }
 
 #hud .inventory {
-    font-family: csIcons;
     margin-top: auto;
     margin-bottom: 1rem;
     font-size: 150%;
@@ -449,7 +452,6 @@
 }
 
 #hud .kill-feed {
-    font-family: csIcons, Arial, serif;
     max-height: 220px;
     font-size: 0.9rem;
     white-space: nowrap;

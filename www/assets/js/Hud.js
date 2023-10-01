@@ -28,6 +28,7 @@ export class HUD {
         canBuyIcon: null,
         canPlantIcon: null,
         haveDefuseKit: null,
+        haveBomb: null,
         spectateUi: null,
         inventory: null,
         money: null,
@@ -80,7 +81,7 @@ export class HUD {
     bombPlanted(detonationTimeSec) {
         this.#resetCountDown()
         this.#elements.time.innerText = '⚠️ 💣'
-        this.displayBottomMessage(`<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>${detonationTimeSec} seconds to detonation.`)
+        this.displayBottomMessage(`<span class="text-danger">⚠️ Alert</span><br>The bomb has been planted.<br>${detonationTimeSec} seconds till detonation.`)
         setTimeout(() => this.clearBottomMessage(), 3000)
     }
 
@@ -218,6 +219,7 @@ export class HUD {
         this.#elements.canBuyIcon.classList.toggle('hidden', !player.canBuy);
         this.#elements.canPlantIcon.classList.toggle('hidden', !player.canPlant);
         this.#elements.haveDefuseKit.classList.toggle('hidden', (player.slots[Enum.InventorySlot.SLOT_KIT] === undefined));
+        this.#elements.haveBomb.classList.toggle('hidden', (player.slots[Enum.InventorySlot.SLOT_BOMB] === undefined));
         this.#elements.spectateUi.classList.toggle('hidden', this.#game.playerMe.getId() === this.#game.playerSpectate.getId());
         if (player.canBuy && this.#showAble.showBuyMenu) {
             if (this.#elements.buyMenu.classList.contains('hidden')) {
@@ -284,8 +286,8 @@ export class HUD {
                         <canvas id="radar-canvas"></canvas>
                     </div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
-                    <div data-can-plant class="hidden" style="margin:22px 4px">⇣&nbsp;💣&nbsp;⇣</div>
-                    <div data-have-defuse-kit class="hidden" style="margin:22px 4px;font-size:140%">✂</div>
+                    <div data-have-bomb class="hidden icons" style="margin:22px 4px;font-size:200%;color:#fdf46e"><span data-can-plant class="hidden">🠻&nbsp;</span>\uE031</div>
+                    <div data-have-defuse-kit class="hidden icons" style="margin:22px 4px;font-size:200%;color:#5d8dea">\uE066</div>
                 </div>
                 <div class="bottom">
                     <div id="fps-stats"></div>
@@ -316,9 +318,9 @@ export class HUD {
                 <div id="mode-spectate" class="hidden">Spectating player <span></span></div>
             </div>
             <div class="right">
-                <div class="kill-feed">
+                <div class="kill-feed icons">
                 </div>
-                <div class="inventory"></div>
+                <div class="inventory icons"></div>
                 <div>
                     <span data-ammo class="ammo bg"></span>
                 </div>
@@ -339,6 +341,7 @@ export class HUD {
         this.#elements.canBuyIcon = elementHud.querySelector('[data-can-buy]')
         this.#elements.canPlantIcon = elementHud.querySelector('[data-can-plant]')
         this.#elements.haveDefuseKit = elementHud.querySelector('[data-have-defuse-kit]')
+        this.#elements.haveBomb = elementHud.querySelector('[data-have-bomb]')
         this.#elements.spectateUi = elementHud.querySelector('#mode-spectate')
         this.#elements.scoreDetail = elementHud.querySelector('#scoreboard-detail')
         this.#elements.inventory = elementHud.querySelector('.inventory')
