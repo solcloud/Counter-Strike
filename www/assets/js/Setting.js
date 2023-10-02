@@ -21,6 +21,7 @@ export class Setting {
             preferPerformance: false,
             showFps: true,
             matchServerFps: false,
+            weaponInRightHand: true,
             anisotropic: 16,
             exposure: 0.8,
         },
@@ -135,6 +136,10 @@ export class Setting {
 
     shouldMatchServerFps() {
         return this.#setting.base.matchServerFps ?? false
+    }
+
+    hasWeaponInRightHand() {
+        return this.#setting.base.weaponInRightHand ?? true
     }
 
     getSensitivity() {
