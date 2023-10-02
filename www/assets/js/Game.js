@@ -9,6 +9,7 @@ export class Game {
     #stats
     #pointer
     #setting
+    #playerAction
     #shouldRenderInsideTick
     #tick = 0
     #round = 1
@@ -469,9 +470,7 @@ export class Game {
         player.get3DObject().getObjectByName('sight').position.y = serverState.sight
         player.get3DObject().position.set(serverState.position.x, serverState.position.y, -serverState.position.z)
 
-        if (player.data.scopeLevel !== serverState.scopeLevel) {
-            this.#updateScopeState(player, serverState.scopeLevel)
-        }
+        this.#updateScopeState(player, serverState.scopeLevel)
         if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
             if (player.data.money !== serverState.money) {
                 this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
@@ -550,6 +549,14 @@ export class Game {
 
     #updateScopeState(player, scopeLevel) {
         const isPlayerSpectate = (this.playerSpectate.getId() === player.getId())
+
+        if (scopeLevel > 0 && isPlayerSpectate) {
+            this.#hud.scopeBlur((this.#playerAction.isMoving() && !this.#playerAction.isCrouching()) ? 3 : 0)
+        }
+        if (player.data.scopeLevel === scopeLevel) {
+            return
+        }
+
         if (scopeLevel > 0) {
             this.#world.playSound('210018__supakid13__sniper-scope-zoom-in.wav', player.data.position, isPlayerSpectate)
         }
@@ -577,9 +584,10 @@ export class Game {
         return (!this.meIsAlive())
     }
 
-    setDependency(pointer, setting) {
+    setDependency(pointer, setting, action) {
         this.#pointer = pointer
         this.#setting = setting
+        this.#playerAction = action
         this.#shouldRenderInsideTick = setting.shouldMatchServerFps()
     }
 

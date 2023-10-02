@@ -46,6 +46,7 @@ export class HUD {
         killFeed: null,
         cross: null,
         scope: null,
+        scopeCross: null,
     }
     #flashInterval = null;
     #countDownIntervalId = null;
@@ -122,6 +123,10 @@ export class HUD {
     updateCrossHair(scopeLevel) {
         this.#elements.cross.style.opacity = (scopeLevel === 0 ? 1.0 : 0.0)
         this.#elements.scope.style.opacity = (scopeLevel === 0 ? 0.0 : 1.0)
+    }
+
+    scopeBlur(int) {
+        this.#elements.scopeCross.style.filter = `blur(${int}px)`
     }
 
     roundStart(roundTimeMs) {
@@ -360,6 +365,7 @@ export class HUD {
         this.#elements.killFeed = elementHud.querySelector('.kill-feed')
         this.#elements.cross = elementHud.querySelector('#cross')
         this.#elements.scope = elementHud.querySelector('#scope')
+        this.#elements.scopeCross = elementHud.querySelector('#scope .scope-cross')
 
         this.#elements.cross.innerText = setting.getCrosshairSymbol()
         setting.addUpdateCallback('crosshairColor', (newValue) => cross.style.color = newValue)

@@ -49,6 +49,7 @@ export class PlayerAction {
             moveRight: false,
             use: false,
             jumping: false,
+            crouch: false,
             crouching: false,
             standing: false,
             attack: false,
@@ -161,10 +162,12 @@ export class PlayerAction {
         }
         if (this.#states.crouching) {
             action.push('crouch')
+            this.#states.crouch = true
             this.#states.crouching = false
         }
         if (this.#states.standing) {
             action.push('stand')
+            this.#states.crouch = false
             this.#states.standing = false
         }
         if (this.#states.shifting) {
@@ -210,4 +213,13 @@ export class PlayerAction {
 
         return action.join('|')
     }
+
+    isMoving() {
+        return (this.#states.moveLeft || this.#states.moveRight || this.#states.moveForward || this.#states.moveBackward)
+    }
+
+    isCrouching() {
+        return (this.#states.crouch)
+    }
+
 }

@@ -56,7 +56,7 @@ let launchGame
 
         hud.createHud(elementHud, map, setting)
         control.init(canvasParent, pointerLock, setting)
-        game.setDependency(pointerLock, setting)
+        game.setDependency(pointerLock, setting, action)
         canvas.addEventListener("click", () => game.requestPointerLock())
         canvasParent.appendChild(canvas)
         if (setting.shouldShowFps()) {
