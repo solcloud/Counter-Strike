@@ -113,8 +113,8 @@ const ArmorType = {
 // server/src/Enum/ArmorType.php
 const ArmorTypeIcon = {
     0: '♢',
-    1: '🛡️',
-    2: '⛑️',
+    1: '\uE064',
+    2: '\uE065',
 }
 
 // server/src/Enum/BuyMenuItem.php

@@ -296,9 +296,9 @@ export class HUD {
                 </div>
                 <div class="bottom">
                     <div id="fps-stats"></div>
-                    <div class="health row bg">
+                    <div class="health row bg icons">
                         <div class="hp">
-                            ➕ <span data-health>100</span>
+                            + <span data-health>100</span>
                         </div>
                         <div class="hp">
                             <span data-armor-type>♢️</span> <span data-armor>0</span>
