@@ -558,7 +558,7 @@ export class Game {
         }
 
         if (scopeLevel > 0) {
-            this.#world.playSound('210018__supakid13__sniper-scope-zoom-in.wav', player.data.position, isPlayerSpectate)
+            this.#world.playSound('210018__supakid13__sniper-scope-zoom-in.wav', player.getSightPosition(), isPlayerSpectate)
         }
         if (isPlayerSpectate) {
             const isNotScopedIn = (scopeLevel === 0)

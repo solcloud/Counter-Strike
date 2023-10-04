@@ -105,6 +105,14 @@ export class Player {
         return this.data.id
     }
 
+    getSightPosition() {
+        return {
+            "x": this.data.position.x,
+            "y": this.data.position.y + this.data.sight,
+            "z": this.data.position.z,
+        }
+    }
+
     getColorIndex() {
         return this.data.color
     }
