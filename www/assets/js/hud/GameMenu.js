@@ -32,10 +32,13 @@ export class GameMenu {
     #saveSetting() {
         const setting = this.#setting
         setting.update('sensitivity', parseFloat(this.#element.querySelector('input[name="sensitivity"]').value))
+        setting.update('inScopeSensitivity', parseFloat(this.#element.querySelector('input[name="sensitivity-scope"]').value))
+        setting.update('radarZoom', parseFloat(this.#element.querySelector('input[name="radar-zoom"]').value))
         setting.update('volume', parseFloat(this.#element.querySelector('input[name="volume"]').value))
         setting.update('crosshairColor', '' + this.#element.querySelector('input[name="crosshair-color"]').value)
         setting.update('crosshairSize', parseInt(this.#element.querySelector('input[name="crosshair-size"]').value))
-        setting.update('radarZoom', parseFloat(this.#element.querySelector('input[name="radar-zoom"]').value))
+        setting.update('hudColor', '' + this.#element.querySelector('input[name="hud-color"]').value)
+        setting.update('hudColorShadow', '' + this.#element.querySelector('input[name="hud-color-shadow"]').value)
 
         const json = setting.getJson()
         setting.loadSettings(json)
@@ -48,25 +51,45 @@ export class GameMenu {
         }
 
         this.#element.innerHTML = `
-            <div>
-                <p>Mouse sensitivity:</p>
-                <p><input name="sensitivity" type="number" min="0.1" max="99" step="0.1" value="${this.#setting.getSensitivity()}"></p>
+            <div class="row">
+                <div>
+                    <p>Mouse sensitivity:</p>
+                    <p><input name="sensitivity" type="number" min="0.1" max="99" step="0.1" value="${this.#setting.getSensitivity()}"></p>
+                </div>
+                <div>
+                    <p>Mouse scope sensitivity:</p>
+                    <p><input name="sensitivity-scope" type="number" min="0.1" max="99" step="0.1" value="${this.#setting.getInScopeSensitivity()}"></p>
+                </div>
             </div>
-            <div>
-                <p>Radar zoom:</p>
-                <p><input name="radar-zoom" type="number" min="0.1" max="99" step="0.1" value="${this.#setting.getRadarZoom()}"></p>
+             <div class="row">
+                <div>
+                    <p>Radar zoom:</p>
+                    <p><input name="radar-zoom" type="number" min="0.1" max="99" step="0.1" value="${this.#setting.getRadarZoom()}"></p>
+                </div>
+                <div>
+                    <p>Master volume:</p>
+                    <p><input name="volume" type="number" min="0" max="100" step="1" value="${this.#setting.getMasterVolume()}"></p>
+                </div>
             </div>
-            <div>
-                <p>Master volume:</p>
-                <p><input name="volume" type="number" min="0" max="100" step="1" value="${this.#setting.getMasterVolume()}"></p>
+            <div class="row">
+                <div>
+                    <p>Crosshair size:</p>
+                    <p><input name="crosshair-size" type="number" min="1" max="200" step="1" value="${this.#setting.getCrosshairSize()}"></p>
+                </div>
+                <div>
+                    <p>Crosshair color:</p>
+                    <p><input name="crosshair-color" type="color" value="${this.#setting.getCrosshairColor()}"></p>
+                </div>
             </div>
-            <div>
-                <p>Crosshair size:</p>
-                <p><input name="crosshair-size" type="number" min="1" max="200" step="1" value="${this.#setting.getCrosshairSize()}"></p>
-            </div>
-            <div>
-                <p>Crosshair color:</p>
-                <p><input name="crosshair-color" type="color" value="${this.#setting.getCrosshairColor()}"></p>
+            <div class="row">
+                <div>
+                    <p>Hud color:</p>
+                    <p><input name="hud-color" type="color" value="${this.#setting.getHudColor()}"></p>
+                </div>
+                <div>
+                    <p>Hud shadow color:</p>
+                    <p><input name="hud-color-shadow" type="color" value="${this.#setting.getHudColorShadow()}"></p>
+                </div>
             </div>
         `;
     }

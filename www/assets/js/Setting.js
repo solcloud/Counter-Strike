@@ -92,10 +92,9 @@ export class Setting {
 
     update(key, value) {
         const callback = this.#onUpdate[key]
-        if (callback === undefined) {
-            return
+        if (callback) {
+            callback(value)
         }
-        callback(value)
         this.#setting.base[key] = value
     }
 

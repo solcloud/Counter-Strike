@@ -336,8 +336,10 @@ export class HUD {
 
         elementHud.style.setProperty('--flash-bang-color', setting.getFlashBangColor())
         elementHud.style.setProperty('--scope-size', setting.getScopeSize())
-        elementHud.style.setProperty('--hud-color', setting.getHudColor())
-        elementHud.style.setProperty('--hud-color-shadow', setting.getHudColorShadow())
+        setting.addUpdateCallback('hudColor', (newValue) => elementHud.style.setProperty('--hud-color', newValue))
+        setting.update('hudColor', setting.getHudColor())
+        setting.addUpdateCallback('hudColorShadow', (newValue) => elementHud.style.setProperty('--hud-color-shadow', newValue))
+        setting.update('hudColorShadow', setting.getHudColorShadow())
 
         this.#elements.flash = elementHud.querySelector('#flash')
         this.#elements.score = elementHud.querySelector('#scoreboard')
