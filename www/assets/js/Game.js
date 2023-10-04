@@ -483,6 +483,7 @@ export class Game {
         } else {
             player.data.item = serverState.item
             player.data.sight = serverState.sight
+            player.data.position = serverState.position
             player.data.isAttacker = serverState.isAttacker
             player.data.scopeLevel = serverState.scopeLevel
         }

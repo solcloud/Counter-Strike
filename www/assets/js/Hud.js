@@ -388,7 +388,7 @@ export class HUD {
             const radarCanvas = elementHud.querySelector('#radar-canvas')
             radarCanvas.width = this.width
             radarCanvas.height = this.height
-            self.#radar = new Radar(radarCanvas, radarImage, map, setting.getRadarZoom())
+            self.#radar = new Radar(radarCanvas, radarImage, map, game, setting.getRadarZoom())
             setting.addUpdateCallback('radarZoom', (newValue) => self.#radar.setZoom(newValue))
         }
         radarImage.src = `./resources/map/${map}.png`

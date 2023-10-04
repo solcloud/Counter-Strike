@@ -113,6 +113,14 @@ export class Player {
         }
     }
 
+    getSightPositionThreeVector() {
+        return new THREE.Vector3(
+            this.data.position.x,
+            this.data.position.y + this.data.sight,
+            -this.data.position.z,
+        )
+    }
+
     getColorIndex() {
         return this.data.color
     }

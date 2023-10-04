@@ -4,6 +4,12 @@ export class Radar {
     #image
     #canvas
     #ctx
+    #players
+    #mapObjects
+    #rayCaster
+    #camera
+    #frustum
+    #spottedPlayerIds = {}
     #scaleX
     #scaleY
     #zoom
@@ -15,7 +21,7 @@ export class Radar {
         "default": {x: 3440, y: 2560},
     }
 
-    constructor(canvas, mapImage, map, zoom = 0.9) {
+    constructor(canvas, mapImage, map, game, zoom = 0.9) {
         const mapSize = this.#mapSizes[map]
         if (!mapSize) {
             throw new Error("Unknown size for map: " + map)
@@ -25,6 +31,14 @@ export class Radar {
         this.#image = mapImage
         this.#canvas = canvas
         this.#ctx = this.#canvas.getContext('2d')
+
+        this.#players = game.players
+        this.#mapObjects = game.getMapObjects()
+        this.#rayCaster = new THREE.Raycaster()
+        this.#camera = new THREE.PerspectiveCamera(70, 2, 1, 9999)
+        this.#camera.rotation.reorder('YXZ')
+        this.#camera.matrixAutoUpdate = false
+        this.#frustum = new THREE.Frustum()
 
         this.#mapCenterX = Math.round(mapSize.x / 2)
         this.#mapCenterY = Math.round(mapSize.y / 2)
@@ -46,28 +60,29 @@ export class Radar {
         }
     }
 
-    update(players, idSpectator, spectatorRotationHorizontal, bombPosition) {
+    update(myTeamPlayers, idSpectator, spectatorRotationHorizontal, bombPosition) {
         let spectator
         let bombHasPlayer = false
         const ctx = this.#ctx
+        this.#spottedPlayerIds = {}
         ctx.resetTransform()
         ctx.drawImage(this.#image, 0, 0, this.#canvas.width, this.#canvas.height)
 
         ctx.translate(0, this.#canvas.height)
         ctx.scale(this.#scaleX, this.#scaleY)
-        players.forEach(function (player) {
+        myTeamPlayers.forEach((player) => {
             if (!player.isAlive()) {
                 return
             }
             if (player.getId() === idSpectator) {
                 spectator = player
-                ctx.lineWidth = 12;
+                ctx.lineWidth = 12
                 ctx.strokeStyle = "#462b02"
             } else {
-                ctx.lineWidth = 10;
+                ctx.lineWidth = 10
                 ctx.strokeStyle = "#70a670"
             }
-            ctx.fillStyle = "#" + Color[player.data.color].toString(16).padStart(6, '0');
+            ctx.fillStyle = "#" + Color[player.data.color].toString(16).padStart(6, '0')
 
             ctx.beginPath()
             ctx.arc(player.data.position.x, -player.data.position.z, 60, 0, 2 * Math.PI)
@@ -81,10 +96,11 @@ export class Radar {
                 bombHasPlayer = true
                 bombPosition = player.data.position
             }
+            this.#checkEnemySpotted(player, ctx)
         })
         if (bombPosition) {
             ctx.beginPath()
-            ctx.fillStyle = "#FF1100";
+            ctx.fillStyle = "#FF1100"
             if (bombHasPlayer) {
                 ctx.arc(bombPosition.x + 55, -bombPosition.z + 55, 42, 0, 2 * Math.PI)
             } else {
@@ -102,13 +118,46 @@ export class Radar {
         const centerX = (meX > this.#mapCenterX ? -(meX - this.#mapCenterX) : this.#mapCenterX - meX)
         const centerY = (meY > this.#mapCenterY ? -(meY - this.#mapCenterY) : this.#mapCenterY - meY)
         ctx.resetTransform()
-        ctx.globalCompositeOperation = "copy";
+        ctx.globalCompositeOperation = "copy"
         ctx.translate(this.#canvas.width / 2, this.#canvas.height / 2)
         ctx.rotate(-spectatorRotationHorizontal * Math.PI / 180)
         ctx.scale(this.#zoom, this.#zoom)
         ctx.translate(this.#canvas.width / -2, this.#canvas.height / -2)
-        ctx.drawImage(ctx.canvas, centerX * this.#scaleX, -centerY * this.#scaleY);
+        ctx.drawImage(ctx.canvas, centerX * this.#scaleX, -centerY * this.#scaleY)
         ctx.globalCompositeOperation = "source-over"
+    }
+
+    #checkEnemySpotted(myTeamPlayer, ctx) {
+        const meIsAttacker = myTeamPlayer.isAttacker()
+        const matePosition = myTeamPlayer.getSightPositionThreeVector()
+        this.#camera.position.set(matePosition.x, matePosition.y, matePosition.z)
+        this.#camera.rotation.set(serverVerticalRotationToThreeRadian(myTeamPlayer.data.look.vertical), serverHorizontalRotationToThreeRadian(myTeamPlayer.data.look.horizontal), 0)
+        this.#camera.zoom = (myTeamPlayer.data.scopeLevel === 0) ? 1.0 : myTeamPlayer.data.scopeLevel * 2.2
+        this.#camera.aspect = (myTeamPlayer.data.scopeLevel === 0) ? 2 : 1
+        this.#camera.updateMatrix()
+        this.#camera.updateMatrixWorld()
+        this.#camera.updateProjectionMatrix()
+        this.#frustum.setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(this.#camera.projectionMatrix, this.#camera.matrixWorldInverse))
+
+        this.#players.forEach((player) => {
+            if (!player.isAlive() || player.isAttacker() === meIsAttacker || this.#spottedPlayerIds[player.getId()]) {
+                return
+            }
+            if (!this.#frustum.containsPoint(player.getSightPositionThreeVector())) {
+                return
+            }
+
+            this.#rayCaster.set(matePosition, player.getSightPositionThreeVector().sub(matePosition).normalize())
+            const intersects = this.#rayCaster.intersectObjects(this.#mapObjects, false)
+            if (intersects.length > 0 && intersects[0].distance < matePosition.distanceTo(player.getSightPositionThreeVector())) {
+                return
+            }
+
+            ctx.fillStyle = "#FF0000"
+            ctx.beginPath()
+            ctx.arc(player.data.position.x, -player.data.position.z, 60, 0, 2 * Math.PI)
+            ctx.fill()
+        })
     }
 
 }
