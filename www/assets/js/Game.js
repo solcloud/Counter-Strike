@@ -239,7 +239,7 @@ export class Game {
             }
 
             const ray = new THREE.Raycaster(sightPosition, direction)
-            const intersects = ray.intersectObjects([grenade, ...this.#world.getMapObjects()], false);
+            const intersects = ray.intersectObjects([grenade, ...this.getMapObjects()], false);
             if (intersects.length >= 1 && intersects[0].object === grenade) {
                 this.#hud.showFlashBangScreen()
             }
@@ -442,6 +442,10 @@ export class Game {
 
     clearDecals() {
         this.#world.clearDecals()
+    }
+
+    getMapObjects() {
+        return this.#world.getMapObjects()
     }
 
     tick(state) {
