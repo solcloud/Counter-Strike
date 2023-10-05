@@ -35,7 +35,7 @@ class RifleAWP extends AmmoBasedWeapon implements ScopeItem
     protected function getSpreadOffsets(): array
     {
         if ($this->scopeLevel === 0) {
-            return [rand(50, 120) / (rand(0, 1) === 0 ? -10 : +10), rand(40, 80) / (rand(0, 1) === 0 ? +10 : -10)];
+            return [rand(30, 60) / (rand(0, 1) === 0 ? -10 : +10), rand(20, 50) / (rand(0, 1) === 0 ? +10 : -10)];
         }
 
         return [0.0, 0.0];
