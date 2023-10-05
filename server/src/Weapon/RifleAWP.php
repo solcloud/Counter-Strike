@@ -15,7 +15,7 @@ class RifleAWP extends AmmoBasedWeapon implements ScopeItem
     public const reserveAmmo = 30;
     public const killAward = 100;
     public const fireRateMs = 1463;
-    public const damage = 20;
+    public const damage = 270;
     public const armorPenetration = 90;
 
     protected bool $isWeaponPrimary = true;

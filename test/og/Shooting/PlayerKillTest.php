@@ -15,9 +15,12 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemId;
+use cs\Event\AttackResult;
 use cs\Event\KillEvent;
+use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
+use cs\Weapon\RifleAWP;
 use cs\Weapon\RifleM4A4;
 use Test\BaseTestCase;
 
@@ -223,6 +226,58 @@ class PlayerKillTest extends BaseTestCase
         $hits = $result->getHits();
         $this->assertCount(1, $hits);
         $this->assertInstanceOf(Wall::class, $hits[0]);
+    }
+
+    public function testAwpOneBulletTripleHeadShotKills(): void
+    {
+        $gp = new GameProperty();
+        $gp->start_money = 5000;
+
+        $game = $this->createTestGame(null, $gp);
+        $player2 = new Player(2, Color::GREEN, false);
+        $game->addPlayer($player2);
+        $player2->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $player2->setPosition(new Point(300, 0, 300));
+        $player3 = new Player(3, Color::ORANGE, false);
+        $game->addPlayer($player3);
+        $player3->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $player3->setPosition(new Point(500, 0, 500));
+        $player4 = new Player(4, Color::YELLOW, false);
+        $game->addPlayer($player4);
+        $player4->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $player4->setPosition(new Point(700, 0, 700));
+        $player5 = new Player(5, Color::PURPLE, false);
+        $game->addPlayer($player5);
+        $player5->buyItem(BuyMenuItem::KEVLAR_BODY_AND_HEAD);
+        $player5->setPosition(new Point(900, 0, 900));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_AWP)),
+            $this->waitNTicks(RifleAWP::equipReadyTimeMs),
+            function (Player $p) {
+                $p->getSight()->look(45, 0);
+                $p->attackSecondary();
+                $ar = $p->attack();
+                $this->assertInstanceOf(AttackResult::class, $ar);
+                $this->assertTrue($ar->somePlayersWasHit());
+                $hits = $ar->getHits();
+                $this->assertCount(3, $hits);
+                foreach ($hits as $hit) {
+                    $this->assertTrue($hit->playerWasKilled());
+                    $this->assertTrue($hit->wasHeadShot());
+                }
+            },
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            fn(Player $p) => $this->assertCount(2, $game->getAlivePlayers()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertSame(2, $game->getRoundNumber()),
+            $this->endGame(),
+        ]);
     }
 
     public function testPlayerCanDodgeBulletByCrouchWithAngleDown(): void

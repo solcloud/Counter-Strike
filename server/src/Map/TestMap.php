@@ -13,7 +13,13 @@ class TestMap extends Map
     public function __construct()
     {
         $this->setAttackersSpawnPositions([new Point()]);
-        $this->setDefendersSpawnPositions([(new Point())->setZ(50)]);
+        $this->setDefendersSpawnPositions([
+            (new Point())->setZ(50),
+            new Point(9999, 0, 9999),
+            new Point(9999, 0, 9999),
+            new Point(9999, 0, 9999),
+            new Point(9999, 0, 9999),
+        ]);
 
         $this->buyArea = new Box(new Point(), 99999, 999, 99999);
     }
