@@ -569,7 +569,7 @@ export class Game {
             const isNotScopedIn = (scopeLevel === 0)
             this.#world.getCamera().getObjectByName('pov-item').visible = isNotScopedIn
             this.#hud.updateCrossHair(scopeLevel)
-            this.#world.updateCameraZoom(isNotScopedIn ? 1.0 : scopeLevel * 2.2)
+            this.#world.updateCameraZoom(scopeLevelToZoom(scopeLevel))
             if (this.meIsAlive()) {
                 this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
             }

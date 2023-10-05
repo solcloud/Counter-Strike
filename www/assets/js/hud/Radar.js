@@ -132,7 +132,7 @@ export class Radar {
         const matePosition = myTeamPlayer.getSightPositionThreeVector()
         this.#camera.position.set(matePosition.x, matePosition.y, matePosition.z)
         this.#camera.rotation.set(serverVerticalRotationToThreeRadian(myTeamPlayer.data.look.vertical), serverHorizontalRotationToThreeRadian(myTeamPlayer.data.look.horizontal), 0)
-        this.#camera.zoom = (myTeamPlayer.data.scopeLevel === 0) ? 1.0 : myTeamPlayer.data.scopeLevel * 2.2
+        this.#camera.zoom = scopeLevelToZoom(myTeamPlayer.data.scopeLevel)
         this.#camera.aspect = (myTeamPlayer.data.scopeLevel === 0) ? 2 : 1
         this.#camera.updateMatrix()
         this.#camera.updateMatrixWorld()

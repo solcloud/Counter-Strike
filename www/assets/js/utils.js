@@ -29,6 +29,14 @@ function serverVerticalRotationToThreeRadian(angleDegree) {
     return degreeToRadian(angleDegree)
 }
 
+function scopeLevelToZoom(scopeLevel) {
+    if (!scopeLevel) {
+        return 1
+    }
+
+    return scopeLevel * 2.2
+}
+
 function msToTick(timeMs) {
     return Math.ceil(timeMs / window._csfGlobal.tickMs)
 }
