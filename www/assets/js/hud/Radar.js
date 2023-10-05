@@ -149,7 +149,7 @@ export class Radar {
 
             this.#rayCaster.set(matePosition, player.getSightPositionThreeVector().sub(matePosition).normalize())
             const intersects = this.#rayCaster.intersectObjects(this.#mapObjects, false)
-            if (intersects.length > 0 && intersects[0].distance < matePosition.distanceTo(player.getSightPositionThreeVector())) {
+            if (intersects.length === 0 || intersects[0].distance < matePosition.distanceTo(player.getSightPositionThreeVector())) {
                 return
             }
 

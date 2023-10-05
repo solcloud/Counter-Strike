@@ -38,9 +38,9 @@ export class ModelRepository {
         return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
+                    self.#mapObjects.push(object)
                     if (object.name !== 'world') {
                         object.castShadow = true
-                        self.#mapObjects.push(object)
                     }
                     if (object.name === 'floor') {
                         object.material.envMapIntensity = .08
