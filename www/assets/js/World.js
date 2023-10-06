@@ -34,6 +34,7 @@ export class World {
         const povItem = new THREE.Group()
         povItem.name = 'pov-item'
         povItem.scale.setScalar(.7)
+        povItem.scale.x *= (setting.hasWeaponInRightHand() ? 1 : -1)
         povItem.position.x = (setting.hasWeaponInRightHand() ? 8 : -8)
         povItem.position.z = -12
         povItem.position.y = -14
