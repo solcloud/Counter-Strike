@@ -157,10 +157,6 @@
     pointer-events: initial;
 }
 
-#hud #game-menu div[data-setting] > div.row {
-    clear: both;
-}
-
 #hud #game-menu div[data-setting] > div.row > div {
     float: left;
     width: 50%;
@@ -332,6 +328,42 @@
 #hud #radar-canvas {
     width: 100%;
     height: 100%;
+}
+
+#hud #round-damage-stat {
+    font-size: 80%;
+    color: #ffffff;
+    margin: 0.9rem 0;
+}
+
+#hud #round-damage-stat table {
+    width: auto;
+    background: rgba(0, 0, 0, 0.6);
+    text-align: right;
+    border-collapse: collapse;
+}
+
+#hud #round-damage-stat table td,
+#hud #round-damage-stat table th {
+    padding: 2px 8px;
+    border: 1px dotted #ffffff47;
+}
+
+#hud #round-damage-stat tr > *:nth-child(1) {
+    text-align: left;
+}
+
+#hud #round-damage-stat tr td:nth-child(2).highlight {
+    text-shadow: 0 0 2px green;
+}
+
+#hud #round-damage-stat tr td:nth-child(3).highlight {
+    text-shadow: 0 0 2px red;
+}
+
+#hud #fps-stats > div {
+    float: left;
+    margin-right: 4px;
 }
 
 #hud .bg {

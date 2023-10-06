@@ -26,6 +26,7 @@ export class Game {
     #dropItems = {};
     #throwables = {};
     #roundIntervalIds = [];
+    #roundDamage = {did: {},got: {}}
     #playerSlotsVisibleModels = [
         InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY,
         InventorySlot.SLOT_BOMB, InventorySlot.SLOT_GRENADE_DECOY, InventorySlot.SLOT_GRENADE_MOLOTOV,
@@ -93,6 +94,8 @@ export class Game {
     unpause() {
         this.#paused = false
         this.#hud.clearTopMessage()
+        this.#hud.updateRoundDamage(null)
+        this.#roundDamage = {did: {},got: {}}
         console.log("Game unpause")
     }
 
@@ -119,6 +122,7 @@ export class Game {
         this.#round = newRoundNumber
         this.#hud.displayTopMessage(winner + ' wins')
         this.#hud.requestFullScoreBoardUpdate(this.score)
+        this.#hud.updateRoundDamage(this.#roundDamage, this.getEnemyPlayers())
     }
 
     halfTime() {
@@ -130,7 +134,8 @@ export class Game {
     }
 
     playerHit(data, wasHeadshot) {
-        if (data.player === this.playerSpectate.getId()) {
+        const playerHitId = data.player
+        if (playerHitId === this.playerSpectate.getId()) {
             const anglePlayer = Math.round(this.getPlayerSpectateRotation()[0])
             const camera = this.#world.getCamera()
 
@@ -154,6 +159,21 @@ export class Game {
             data.position.z = cameraPosition.z + rotate[1]
         } else {
             this.#world.bulletPlayerHit(data.position, wasHeadshot)
+        }
+
+        const damage = data.extra.damage
+        const myId = this.playerMe.getId()
+        const attackerId = data.extra.shooter
+        if (playerHitId === myId) {
+            if (!this.#roundDamage.got[attackerId]) {
+                this.#roundDamage.got[attackerId] = []
+            }
+            this.#roundDamage.got[attackerId].push(damage)
+        } else if (attackerId === myId) {
+            if (!this.#roundDamage.did[playerHitId]) {
+                this.#roundDamage.did[playerHitId] = []
+            }
+            this.#roundDamage.did[playerHitId].push(damage)
         }
     }
 
@@ -571,6 +591,11 @@ export class Game {
     getMyTeamPlayers() {
         let meIsAttacker = this.playerMe.isAttacker()
         return this.players.filter((player) => player.isAttacker() === meIsAttacker)
+    }
+
+    getEnemyPlayers() {
+        let meIsAttacker = this.playerMe.isAttacker()
+        return this.players.filter((player) => player.isAttacker() !== meIsAttacker)
     }
 
     meIsAlive() {

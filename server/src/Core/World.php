@@ -501,10 +501,14 @@ class World
         if ($hit instanceof SolidSurface) {
             $soundEvent->setSurface($hit);
         }
+        $damage = $hit->getDamage();
+        $attacker = $bullet->getOriginPlayerId();
         $soundEvent->addExtra('origin', $bullet->getOrigin()->toArray());
+        $soundEvent->addExtra('damage', min(100, $damage));
+        $soundEvent->addExtra('shooter', $attacker);
 
         $this->makeSound($soundEvent);
-        $this->game->getScore()->getPlayerStat($bullet->getOriginPlayerId())->addDamage($hit->getDamage());
+        $this->game->getScore()->getPlayerStat($attacker)->addDamage($damage);
     }
 
     public function tryPlantBomb(Player $player): void

@@ -5,6 +5,7 @@ import {KillFeed} from "./hud/KillFeed.js";
 import {Radar} from "./hud/Radar.js";
 import {HitFeedback} from "./hud/HitFeedback.js";
 import {GameMenu} from "./hud/GameMenu.js";
+import {RoundDamageStat} from "./hud/RoundDamageStat.js";
 
 export class HUD {
     #game
@@ -13,6 +14,7 @@ export class HUD {
     #gameMenu = null;
     #killFeed = null;
     #hitFeedback = null;
+    #roundDamageStat = null;
     #radar = null;
     #showAble = {
         showScore: false,
@@ -88,6 +90,10 @@ export class HUD {
 
     requestFullScoreBoardUpdate(scoreBoardData) {
         this.#scoreBoardData = scoreBoardData
+    }
+
+    updateRoundDamage(roundDamage, enemyPlayers) {
+        this.#roundDamageStat.update(roundDamage, enemyPlayers)
     }
 
     updateMyTeamPlayerMoney(playerData, money) {
@@ -295,7 +301,8 @@ export class HUD {
                     <div data-have-defuse-kit class="hidden icons" style="margin:22px 4px;font-size:200%;color:#5d8dea">\uE066</div>
                 </div>
                 <div class="bottom">
-                    <div id="fps-stats"></div>
+                    <div id="round-damage-stat"></div>
+                    <div id="fps-stats" class="row"></div>
                     <div class="health row bg icons">
                         <div class="hp">
                             + <span data-health>100</span>
@@ -381,6 +388,7 @@ export class HUD {
         this.#gameMenu = new GameMenu(this.#elements.gameMenu, setting, this)
         this.#killFeed = new KillFeed(this.#scoreBoard, this.#elements.killFeed)
         this.#hitFeedback = new HitFeedback(elementHud.querySelector('#hit-feedback'))
+        this.#roundDamageStat = new RoundDamageStat(elementHud.querySelector('#round-damage-stat'))
 
         const self = this
         const radarImage = new Image()
