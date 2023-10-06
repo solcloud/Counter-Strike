@@ -475,18 +475,10 @@ export class Game {
         player.get3DObject().position.set(serverState.position.x, serverState.position.y, -serverState.position.z)
 
         this.#updateScopeState(player, serverState.scopeLevel)
-        if (player.data.isAttacker === this.playerMe.data.isAttacker) { // if player on my team
-            if (player.data.money !== serverState.money) {
-                this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
-            }
-            player.updateData(serverState)
-        } else {
-            player.data.item = serverState.item
-            player.data.sight = serverState.sight
-            player.data.position = serverState.position
-            player.data.isAttacker = serverState.isAttacker
-            player.data.scopeLevel = serverState.scopeLevel
+        if (player.data.isAttacker === this.playerMe.data.isAttacker && player.data.money !== serverState.money) {
+            this.#hud.updateMyTeamPlayerMoney(player.data, serverState.money)
         }
+        player.updateData(serverState)
 
         if (this.playerSpectate.getId() === serverState.id && this.playerSpectate.isInventoryChanged(serverState)) {
             this.equip(serverState.item.slot)
