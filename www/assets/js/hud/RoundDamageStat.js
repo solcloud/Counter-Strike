@@ -8,7 +8,7 @@ export class RoundDamageStat {
     }
 
     update(damage, enemyPlayers) {
-        if (damage === null) {
+        if (damage === null || !enemyPlayers.length) {
             this.#element.innerHTML = ''
             return
         }

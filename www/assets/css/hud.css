@@ -108,7 +108,6 @@
 }
 
 #hud section {
-    text-shadow: 0px 0px 2px var(--hud-color-shadow);
     display: flex;
     flex-direction: row;
     height: 100%;
@@ -120,6 +119,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    text-shadow: 0 0 2px var(--hud-color-shadow);
 }
 
 #hud .right {
@@ -151,6 +151,7 @@
     max-height: 1200px;
     color: white;
     overflow-y: auto;
+    text-shadow: none;
 }
 
 #hud #buy-menu, #hud #game-menu {
@@ -333,6 +334,7 @@
 #hud #round-damage-stat {
     font-size: 80%;
     color: #ffffff;
+    text-shadow: none;
     margin: 0.9rem 0;
 }
 
