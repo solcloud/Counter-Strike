@@ -348,7 +348,12 @@
 #hud #round-damage-stat table td,
 #hud #round-damage-stat table th {
     padding: 2px 8px;
-    border: 1px dotted #ffffff47;
+    border-bottom: 1px solid #ffffff47;
+}
+
+#hud #round-damage-stat table tr:last-child td,
+#hud #round-damage-stat table tr:last-child th {
+    border-bottom: none;
 }
 
 #hud #round-damage-stat tr > *:nth-child(1) {
