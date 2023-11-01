@@ -141,6 +141,50 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player1->isAlive());
     }
 
+    public function testM4KillPlayerInFourBulletsInChestWithNoKevlar(): void
+    {
+        $game = $this->createTestGame();
+        $p2 = new Player(2, Color::BLUE, false);
+        $game->addPlayer($p2);
+        $p2->setPosition(new Point(500, 0, 500));
+        $game->getPlayer(1)->setPosition($p2->getPositionClone()->addZ(-200));
+
+        $finished = false;
+        $attackCallback = function (Player $p) use ($game) {
+            $this->assertSame(1, $game->getRoundNumber());
+            $res = $p->attack();
+            $this->assertNotNull($res);
+            $this->assertTrue($res->somePlayersWasHit());
+            $hits = $res->getHits();
+            $this->assertCount(2, $hits);
+            $hit = $hits[0];
+            $this->assertInstanceOf(HitBox::class, $hit);
+            $this->assertSame(HitBoxType::CHEST, $hit->getType());
+        };
+
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getInventory()->earnMoney(5000),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_M4A4)),
+            fn(Player $p) => $p->getSight()->look(180, -10),
+            $this->waitNTicks(RifleM4A4::equipReadyTimeMs),
+            $attackCallback,
+            $this->waitNTicks(RifleM4A4::recoilResetMs),
+            $attackCallback,
+            $this->waitNTicks(RifleM4A4::recoilResetMs),
+            $attackCallback,
+            $this->waitNTicks(RifleM4A4::recoilResetMs),
+            $attackCallback,
+            $this->waitNTicks(RifleM4A4::recoilResetMs),
+            fn() => $this->assertSame(2, $game->getRoundNumber()),
+            function () use (&$finished) {
+                $finished = true;
+            },
+            $this->endGame(),
+        ], $p2->getId());
+        $this->assertTrue($finished);
+    }
+
     public function testUspKillPlayerInThreeBulletsInChestWithNoKevlar(): void
     {
         $player2Commands = [
