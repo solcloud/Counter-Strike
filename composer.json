@@ -5,6 +5,7 @@
         "dev": "php cli/server.php 1 8080 --debug & php cli/udp-ws-bridge.php",
         "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
         "dev2c": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
+        "dev3c": "php cli/server.php 3 8080 --debug & php cli/udp-ws-bridge.php & sleep 1 ; php cli/client.php acode 8080 & php cli/client.php acode 8080",
         "test": [
             "@putenv TEST_ENVIRONMENT=true",
             "@unit"
