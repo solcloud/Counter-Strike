@@ -221,6 +221,7 @@ const Action = {
     MOVE_BACK: 'back',
     MOVE_RIGHT: 'right',
     JUMP: 'jump',
+    JUMP_THROW: 'jump_throw',
     CROUCH: 'crouch',
     WALK: 'walk',
     RELOAD: 'reload',

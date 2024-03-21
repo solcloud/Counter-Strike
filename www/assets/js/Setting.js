@@ -45,6 +45,7 @@ export class Setting {
             'KeyV': Action.EQUIP_KNIFE,
             'KeyT': Action.DROP_BOMB,
             'KeyH': Action.SWITCH_HANDS,
+            'KeyJ': Action.JUMP_THROW,
             'Digit1': Action.EQUIP_PRIMARY,
             'Digit2': Action.EQUIP_SECONDARY,
             'Digit3': Action.EQUIP_KNIFE,

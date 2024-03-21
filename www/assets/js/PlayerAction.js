@@ -1,4 +1,4 @@
-import {Action, InventorySlot} from "./Enums.js";
+import {Action, GrenadeSlots, InventorySlot} from "./Enums.js";
 
 export class PlayerAction {
     #game
@@ -70,6 +70,12 @@ export class PlayerAction {
         this.#actionCallback[Action.MOVE_RIGHT] = (enabled) => this.#states.moveRight = enabled
         this.#actionCallback[Action.USE] = (enabled) => this.#states.use = enabled
         this.#actionCallback[Action.JUMP] = (enabled) => enabled && (this.#states.jumping = true)
+        this.#actionCallback[Action.JUMP_THROW] = (enabled) => {
+            if (enabled && GrenadeSlots.includes(game.playerMe.getEquippedSlotId())) {
+                this.#states.jumping = true
+                this.attack(game.getPlayerMeRotation())
+            }
+        }
         this.#actionCallback[Action.CROUCH] = (enabled) => enabled ? this.#states.crouching = true : this.#states.standing = true
         this.#actionCallback[Action.WALK] = (enabled) => enabled ? this.#states.shifting = true : this.#states.running = true
         this.#actionCallback[Action.DROP] = (enabled) => enabled && (this.#states.drop = true)
