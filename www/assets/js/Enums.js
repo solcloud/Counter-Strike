@@ -14,6 +14,7 @@ export {
     ItemIdToName,
     ItemIdToIcon,
     Action,
+    GrenadeSlots,
 }
 
 // server/src/Event/EventList.php
@@ -241,3 +242,8 @@ const Action = {
     USE: 'use',
     CLEAR_DECALS: 'clear_decals',
 }
+
+const GrenadeSlots = [
+    InventorySlot.SLOT_GRENADE_SMOKE, InventorySlot.SLOT_GRENADE_MOLOTOV, InventorySlot.SLOT_GRENADE_HE,
+    InventorySlot.SLOT_GRENADE_FLASH, InventorySlot.SLOT_GRENADE_DECOY,
+]

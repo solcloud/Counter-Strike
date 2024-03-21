@@ -1,4 +1,4 @@
-import {InventorySlot, SoundType, ItemId} from "./Enums.js";
+import {InventorySlot, SoundType, ItemId, GrenadeSlots} from "./Enums.js";
 
 export class SoundRepository {
     #alwaysInHeadTypes = [
@@ -8,10 +8,6 @@ export class SoundRepository {
         SoundType.ITEM_RELOAD, SoundType.ITEM_PICKUP, SoundType.ITEM_ATTACK, SoundType.ITEM_ATTACK2, SoundType.ITEM_BUY,
         SoundType.PLAYER_STEP, SoundType.ATTACK_NO_AMMO,
         SoundType.BOMB_PLANTING, SoundType.BOMB_DEFUSING,
-    ]
-    #grenadesSlots = [
-        InventorySlot.SLOT_GRENADE_SMOKE, InventorySlot.SLOT_GRENADE_MOLOTOV, InventorySlot.SLOT_GRENADE_HE,
-        InventorySlot.SLOT_GRENADE_FLASH, InventorySlot.SLOT_GRENADE_DECOY,
     ]
     #soundPlayer
     #lastSpectatorMoveSoundTick = 0
@@ -165,7 +161,7 @@ export class SoundRepository {
         if (item.slot === InventorySlot.SLOT_KNIFE) {
             return '240788__f4ngy__knife-hitting-wood.wav'
         }
-        if (this.#grenadesSlots.includes(item.slot)) {
+        if (GrenadeSlots.includes(item.slot)) {
             return '163458__lemudcrab__grenade-launcher.wav'
         }
         return '558117__abdrtar__move.mp3'
