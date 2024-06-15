@@ -20,7 +20,7 @@ class ClueSocket implements NetConnector
         try {
             $this->socket = (new Factory())->createServer($bindAddress);
             $this->resource = $this->socket->getResource(); // @phpstan-ignore-line
-            socket_set_nonblock($this->resource);
+            socket_set_nonblock($this->resource); // @phpstan-ignore-line
         } catch (Exception $ex) {
             throw new NetException($ex->getMessage(), $ex->getCode(), $ex);
         }
