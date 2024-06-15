@@ -20,6 +20,7 @@ class ClueSocket implements NetConnector
         try {
             $this->socket = (new Factory())->createServer($bindAddress);
             $this->resource = $this->socket->getResource(); // @phpstan-ignore-line
+            socket_set_nonblock($this->resource);
         } catch (Exception $ex) {
             throw new NetException($ex->getMessage(), $ex->getCode(), $ex);
         }
@@ -27,7 +28,7 @@ class ClueSocket implements NetConnector
 
     public function sendTo(Client $client, string &$msg): void
     {
-        $ret = @socket_sendto($this->resource, $msg, strlen($msg), MSG_EOR, $client->ip, $client->port);
+        $ret = @socket_sendto($this->resource, $msg, strlen($msg), 0, $client->ip, $client->port);
         if ($ret === false) {
             $code = socket_last_error($this->resource);
             throw new NetException(socket_strerror($code), $code);
@@ -36,7 +37,7 @@ class ClueSocket implements NetConnector
 
     public function receive(?string &$peerAddress, ?int &$peerPort, int $readMaxBytes = 100): ?string
     {
-        $ret = @socket_recvfrom($this->resource, $buffer, $readMaxBytes, MSG_DONTWAIT, $peerAddress, $peerPort);
+        $ret = @socket_recvfrom($this->resource, $buffer, $readMaxBytes, 0, $peerAddress, $peerPort);
         if ($ret === false) {
             $code = socket_last_error($this->resource);
             if ($code !== SOCKET_EWOULDBLOCK) {
