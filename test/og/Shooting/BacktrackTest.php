@@ -54,10 +54,7 @@ class BacktrackTest extends BaseTestCase
             }
 
             if ($i === 0) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertTrue($result->somePlayersWasHit());
+                $result = $this->assertPlayerHit($state->getPlayer(1)->attack());
                 $this->assertFalse($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }
@@ -78,10 +75,7 @@ class BacktrackTest extends BaseTestCase
 
             $state->getPlayer(2)->moveRight();
             if ($i === 1) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertFalse($result->somePlayersWasHit());
+                $result = $this->assertPlayerNotHit($state->getPlayer(1)->attack());
                 $this->assertTrue($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }
@@ -103,10 +97,7 @@ class BacktrackTest extends BaseTestCase
 
             $state->getPlayer(2)->moveRight();
             if ($i === 1) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertTrue($result->somePlayersWasHit());
+                $result = $this->assertPlayerHit($state->getPlayer(1)->attack());
                 $this->assertFalse($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }
@@ -128,10 +119,7 @@ class BacktrackTest extends BaseTestCase
 
             $state->getPlayer(2)->moveRight();
             if ($i === 2) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertTrue($result->somePlayersWasHit());
+                $result =  $this->assertPlayerHit($state->getPlayer(1)->attack());
                 $this->assertFalse($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }
@@ -153,10 +141,7 @@ class BacktrackTest extends BaseTestCase
 
             $state->getPlayer(2)->moveRight();
             if ($i === 3) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertFalse($result->somePlayersWasHit());
+                $result = $this->assertPlayerNotHit($state->getPlayer(1)->attack());
                 $this->assertTrue($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }
@@ -178,10 +163,7 @@ class BacktrackTest extends BaseTestCase
 
             $state->getPlayer(2)->moveRight();
             if ($i === 3) {
-                $result = $state->getPlayer(1)->attack();
-                $this->assertNotNull($result);
-
-                $this->assertTrue($result->somePlayersWasHit());
+                $result = $this->assertPlayerHit($state->getPlayer(1)->attack());
                 $this->assertFalse($state->getPlayer(2)->isAlive());
                 $game->quit(GameOverReason::TIE);
             }

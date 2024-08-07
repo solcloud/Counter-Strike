@@ -7,12 +7,12 @@ use cs\Core\DropItem;
 use cs\Core\Item;
 use cs\Core\Player;
 use cs\Core\Point;
-use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Core\World;
 use cs\Enum\SoundType;
+use cs\Interface\ForOneRoundMax;
 
-class DropEvent extends Event
+class DropEvent extends Event implements ForOneRoundMax
 {
 
     private string $id;

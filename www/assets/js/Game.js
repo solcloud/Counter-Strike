@@ -207,6 +207,7 @@ export class Game {
             }
             const item = this.#dropItems[data.extra.id];
             item.rotation.set(0, 0, 0)
+            item.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
             item.position.set(data.position.x, data.position.y, -data.position.z)
         }
         if (data.type === SoundType.BOMB_DEFUSED || data.type === SoundType.BOMB_EXPLODED) {
@@ -220,7 +221,6 @@ export class Game {
             grenade.position.set(data.position.x, data.position.y, -data.position.z)
 
             if (data.type === SoundType.GRENADE_LAND) {
-                grenade.rotation.set(0, 0, 0)
                 this.#grenadeLand(data.extra.id, data.item, data.player, data.position)
             }
         }

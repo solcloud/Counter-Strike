@@ -508,7 +508,9 @@ class World
         $soundEvent->addExtra('shooter', $attacker);
 
         $this->makeSound($soundEvent);
-        $this->game->getScore()->getPlayerStat($attacker)->addDamage($damage);
+        if ($hit->getPlayer() && $hit->getPlayer()->isPlayingOnAttackerSide() !== $bullet->isOriginPlayerAttackerSide()) {
+            $this->game->getScore()->getPlayerStat($attacker)->addDamage($damage);
+        }
     }
 
     public function tryPlantBomb(Player $player): void

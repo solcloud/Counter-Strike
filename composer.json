@@ -6,18 +6,15 @@
         "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
         "dev2c": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
         "dev3c": "php cli/server.php 3 8080 --debug & php cli/udp-ws-bridge.php & sleep 1 ; php cli/client.php acode 8080 & php cli/client.php acode 8080",
-        "test": [
-            "@putenv TEST_ENVIRONMENT=true",
-            "@unit"
-        ],
         "coverage": [
             "@putenv XDEBUG_MODE=coverage",
             "@unit --coverage-html www/coverage"
         ],
         "check": [
+            "@putenv PROJECT_CHECK=true",
             "@composer dumpautoload --optimize --classmap-authoritative",
             "@stan",
-            "@test"
+            "@unit"
         ]
     },
     "require": {

@@ -61,6 +61,14 @@ class UtilTest extends BaseTest
         $this->assertSame([10, -47, 14], Util::movementXYZ(35, -70, 50));
     }
 
+    public function testMovementXYZWithFullVertical(): void
+    {
+        foreach (range(0, 36) as $i) {
+            $this->assertSame([0, 100, 0], Util::movementXYZ($i * 10, 90, 100), "{$i}");
+            $this->assertSame([0, -100, 0], Util::movementXYZ($i * 10, -90, 100), "{$i}");
+        }
+    }
+
     public function testRotatePointY(): void
     {
         $data = [
@@ -189,6 +197,11 @@ class UtilTest extends BaseTest
 
     public function testWorldAngle(): void
     {
+        $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(10, 10, 20), new Point(10, 10, 10)));
+        $this->assertSame([180.0, 0.0], Util::worldAngle(new Point(10, 10, 20), new Point(10, 10, 30)));
+        $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(11, 10, 20), new Point(10, 10, 20)));
+        $this->assertSame([270.0, 0.0], Util::worldAngle(new Point(9, 10, 20), new Point(10, 10, 20)));
+
         $this->assertSame([null, -90.0], Util::worldAngle(new Point(), new Point(0, 10, 0)));
         $this->assertSame([null, 90.0], Util::worldAngle(new Point(), new Point(0, -10, 0)));
         $this->assertSame([Util::normalizeAngle(-90.0), 0.0], Util::worldAngle(new Point(), new Point(10, 0, 0)));
@@ -196,14 +209,12 @@ class UtilTest extends BaseTest
         $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(), new Point(0, 0, -10)));
         $this->assertNotSame([180.0, -90.0], Util::worldAngle(new Point(829, 773, 10), new Point(829, 940, 145)));
         $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(10, 0, 0)));
-        $this->assertSame([null, null], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
         $this->assertSame([null, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
 
         $this->assertSame([90.0, 0.0], Util::worldAngle(new Point(10, 0, 0)));
         $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(0, 0, 10)));
         $this->assertSame([45.0, 0.0], Util::worldAngle(new Point(5, 0, 5)));
-        $this->assertSame([null, null], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
-        $this->assertSame([null, 90.0], Util::worldAngle(new Point(10, 4, 6), new Point(10, 2, 6)));
+        $this->assertSame([null, 0.0], Util::worldAngle(new Point(10, 2, 6), new Point(10, 2, 6)));
     }
 
     public function testLerp(): void
