@@ -52,10 +52,15 @@ final class Util
     }
 
     /**
-     * @return null[]|float[] world angles [horizontal, vertical] in degree
+     * @return array{?float,float} world angles [horizontal, vertical] in degree
      */
     public static function worldAngle(Point $point, Point $origin = new Point()): array
     {
+        $d = Util::distanceSquared($origin, $point);
+        if ($d === 0) {
+            return [null, 0.0];
+        }
+
         $cx = $point->x - $origin->x;
         $cy = $point->y - $origin->y;
         $cz = $point->z - $origin->z;
@@ -65,10 +70,6 @@ final class Util
             $h = fmod(450 - rad2deg(atan2($cz, $cx)), 360.0);
         }
 
-        $d = Util::distanceSquared($origin, $point);
-        if ($d === 0) {
-            return [$h, null];
-        }
         $v = rad2deg(asin(abs($cy) / sqrt($d)));
         return [$h, (($cy) >= 0 ? $v : -$v)];
     }

@@ -154,11 +154,14 @@ abstract class BaseTestCase extends BaseTest
                 return;
             }
             if (!isset($commands[$i])) {
-                throw new InvalidArgumentException("No command defined for tick '{$i}' or too many tickMax in Game");
+                throw new InvalidArgumentException("No command defined for tick '{$i}' or too many tickMax (no endGame?)");
             }
             if (false === $commands[$i]) {
-                $game->setTickMax(0);
                 $i++;
+                if (count($commands) > $i) {
+                    throw new InvalidArgumentException("Early exit from iteration '{$i}'");
+                }
+                $game->setTickMax(0);
                 return;
             }
             if (is_int($commands[$i])) {

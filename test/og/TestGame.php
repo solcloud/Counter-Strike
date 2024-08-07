@@ -4,6 +4,7 @@ namespace Test;
 
 use Closure;
 use cs\Core\Game;
+use cs\Core\GameException;
 use cs\Core\Setting;
 use cs\Net\Protocol\TextProtocol;
 
@@ -27,6 +28,9 @@ class TestGame extends Game
     public function start(bool $debug = false): void
     {
         if ($debug) {
+            if (getenv('PROJECT_CHECK') === 'true') {
+                throw new GameException('Debug flag detected, see oldest item of stacktrace');
+            }
             $protocol = new TextProtocol();
             $this->gameStates[0] = json_decode($protocol->serializeGameState($this));
         }

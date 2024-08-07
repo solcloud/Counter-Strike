@@ -20,6 +20,7 @@ use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
+use cs\Interface\ForOneRoundMax;
 use cs\Map\Map;
 
 class Game
@@ -409,6 +410,11 @@ class Game
     private function roundReset(bool $firstRound, RoundEndEvent $roundEndEvent): void
     {
         $this->world->roundReset();
+        foreach ($this->events as $event) {
+            if ($event instanceof ForOneRoundMax) {
+                $this->removeEvent($event->customId);
+            }
+        }
         $randomizeSpawn = $this->properties->randomize_spawn_position;
         foreach ($this->players as $player) {
             if (!$firstRound) {

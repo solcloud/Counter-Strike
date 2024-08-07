@@ -74,8 +74,7 @@ class BallCollider
         $candidate = new Point();
         if ($this->lastExtremePosition && Util::distanceSquared($this->lastExtremePosition, $point) > 9) {
             [$angleH, $angleV] = Util::worldAngle($point, $this->lastExtremePosition);
-            $angleH = $angleH ?? $angleHorizontal;
-            $angleV = $angleV ?? $angleVertical;
+            $angleH = $angleH ?? 0;
         } else {
             $angleH = $angleHorizontal;
             $angleV = $angleVertical;

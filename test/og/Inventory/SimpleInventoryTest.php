@@ -242,7 +242,7 @@ class SimpleInventoryTest extends BaseTestCase
         $box = new Box(new Point(500, 0, 500), 800, 600, 200);
         $game->getWorld()->addBox($box);
 
-        $this->playPlayerDebug($game, [
+        $this->playPlayer($game, [
             fn(Player $p) => $p->setPosition($box->getBase()->clone()->addZ(-($player->getBoundingRadius() + 10))->addX(200)),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->equipSecondaryWeapon(),

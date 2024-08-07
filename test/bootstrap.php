@@ -6,10 +6,27 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use cs\Core\Game;
 use cs\Core\Point;
+use cs\Event\AttackResult;
 use PHPUnit\Framework\TestCase;
 
 class BaseTest extends TestCase
 {
+
+    public function assertPlayerHit(?AttackResult $attackResult): AttackResult
+    {
+        $this->assertNotNull($attackResult, 'No attack result');
+        $this->assertTrue($attackResult->somePlayersWasHit(), 'No players were hit');
+
+        return $attackResult;
+    }
+
+    public function assertPlayerNotHit(?AttackResult $attackResult): AttackResult
+    {
+        $this->assertNotNull($attackResult, 'No attack result');
+        $this->assertFalse($attackResult->somePlayersWasHit(), 'Some players were hit');
+
+        return $attackResult;
+    }
 
     public function assertPositionSame(Point $expected, Point $actual, string $extraMsg = ''): void
     {
