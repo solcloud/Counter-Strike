@@ -6,6 +6,7 @@ use Closure;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\Setting;
+use cs\Map\TestMap;
 use cs\Net\Protocol\TextProtocol;
 
 /**
@@ -97,6 +98,16 @@ class TestGame extends Game
             ])
         );
         $this->gameStates = [];
+    }
+
+    public function getTestMap(): TestMap
+    {
+        $map = $this->getWorld()->getMap();
+        if ($map instanceof TestMap) {
+            return $map;
+        }
+
+        throw new GameException("No test map is loaded");
     }
 
 }

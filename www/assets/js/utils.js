@@ -37,6 +37,14 @@ function scopeLevelToZoom(scopeLevel) {
     return scopeLevel * 2.2
 }
 
+function randomInt(start, end) {
+    return THREE.MathUtils.randInt(start, end)
+}
+
+function lerp(start, end, percentage) {
+    return THREE.MathUtils.lerp(start, end, percentage)
+}
+
 function msToTick(timeMs) {
     return Math.ceil(timeMs / window._csfGlobal.tickMs)
 }

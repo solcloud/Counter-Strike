@@ -19,6 +19,7 @@ final class EventList
         PlantEvent::class            => 10,
         ThrowEvent::class            => 11,
         DropEvent::class             => 12,
+        GrillEvent::class            => 13,
     ];
 
 }

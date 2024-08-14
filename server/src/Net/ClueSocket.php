@@ -2,6 +2,7 @@
 
 namespace cs\Net;
 
+use Socket as PHPSocketResource;
 use Socket\Raw\Exception;
 use Socket\Raw\Factory;
 use Socket\Raw\Socket;
@@ -13,14 +14,14 @@ class ClueSocket implements NetConnector
 {
 
     private Socket $socket;
-    private readonly \Socket $resource;
+    private readonly PHPSocketResource $resource;
 
     public function __construct(string $bindAddress)
     {
         try {
             $this->socket = (new Factory())->createServer($bindAddress);
+            $this->socket->setBlocking(false);
             $this->resource = $this->socket->getResource(); // @phpstan-ignore-line
-            socket_set_nonblock($this->resource); // @phpstan-ignore-line
         } catch (Exception $ex) {
             throw new NetException($ex->getMessage(), $ex->getCode(), $ex);
         }

@@ -9,6 +9,7 @@ class TestMap extends Map
 {
 
     private Box $buyArea;
+    public Point $startPointForNavigationMesh;
 
     public function __construct()
     {
@@ -22,6 +23,12 @@ class TestMap extends Map
         ]);
 
         $this->buyArea = new Box(new Point(), 99999, 999, 99999);
+        $this->startPointForNavigationMesh = new Point(100, 0, 100);
+    }
+
+    public function getStartingPointsForNavigationMesh(): array
+    {
+        return [$this->startPointForNavigationMesh];
     }
 
     public function getBuyArea(bool $forAttackers): Box

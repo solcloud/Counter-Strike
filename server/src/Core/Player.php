@@ -271,6 +271,27 @@ final class Player
         return $this->headFloor;
     }
 
+    public function getCentrePoint(): Point
+    {
+        return $this->getPositionClone()->addY((int) ceil($this->headHeight / 2));
+    }
+
+    /**
+     * @return list<Point>
+     */
+    public function getPlayerGrenadeHitPoints(): array
+    {
+        $output = [];
+        $hitPointsCount = 5;
+        $offset = max(1, (int) floor(($this->headHeight - 8) / ($hitPointsCount - 1)));
+        $candidate = $this->getPositionClone()->addY(4);
+        foreach (range(0, $hitPointsCount - 1) as $i) {
+            $output[] = $candidate->clone()->addY($i * $offset);
+        }
+
+        return $output;
+    }
+
     /**
      * @param array{id: int, color: int, isAttacker: bool} $data
      */

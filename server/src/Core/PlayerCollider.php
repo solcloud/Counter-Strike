@@ -78,4 +78,9 @@ class PlayerCollider
         return $this->hitBoxes;
     }
 
+    public function getPlayer(): Player
+    {
+        return $this->player;
+    }
+
 }

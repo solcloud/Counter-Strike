@@ -6,7 +6,6 @@
         stderr="true"
         colors="true"
         cacheResult="false"
-        stopOnFailure="true"
         executionOrder="random"
 >
     <testsuites>

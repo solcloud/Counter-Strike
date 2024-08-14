@@ -8,9 +8,11 @@ use cs\Enum\PauseReason;
 use cs\Enum\RoundEndReason;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Equipment\Grenade;
 use cs\Event\DropEvent;
 use cs\Event\Event;
 use cs\Event\GameOverEvent;
+use cs\Event\GrillEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
 use cs\Event\PauseStartEvent;
@@ -251,6 +253,11 @@ class Game
         $this->addEvent($event);
     }
 
+    public function addGrillEvent(GrillEvent $event): void
+    {
+        $this->addEvent($event);
+    }
+
     public function addDropEvent(DropEvent $event): void
     {
         $this->addEvent($event);
@@ -258,7 +265,21 @@ class Game
 
     public function playerAttackKilledEvent(Player $playerDead, Bullet $bullet, bool $headShot): void
     {
-        $playerCulprit = $this->players[$bullet->getOriginPlayerId()];
+        $this->playerKilledEvent($this->players[$bullet->getOriginPlayerId()], $playerDead, $bullet->getShootItem()->getId(), $headShot);
+    }
+
+    public function playerGrenadeKilledEvent(Player $playerCulprit, Player $playerDead, Grenade $item): void
+    {
+        $moneyAward = $item->getKillAward();
+        if ($playerCulprit->isPlayingOnAttackerSide() === $playerDead->isPlayingOnAttackerSide()) {
+            $moneyAward = -300;
+        }
+        $playerCulprit->getInventory()->earnMoney($moneyAward);
+        $this->playerKilledEvent($playerCulprit, $playerDead, $item->getId(), false);
+    }
+
+    private function playerKilledEvent(Player $playerCulprit, Player $playerDead, int $itemId, bool $headShot): void
+    {
         if ($playerDead->isPlayingOnAttackerSide() === $playerCulprit->isPlayingOnAttackerSide()) { // team kill
             $this->score->getPlayerStat($playerCulprit->getId())->removeKill();
         } else {
@@ -266,7 +287,7 @@ class Game
         }
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
-        $this->addEvent(new KillEvent($playerDead, $playerCulprit, $bullet->getShootItem()->getId(), $headShot));
+        $this->addEvent(new KillEvent($playerDead, $playerCulprit, $itemId, $headShot));
         $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }

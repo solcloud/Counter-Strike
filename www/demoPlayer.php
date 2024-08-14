@@ -217,6 +217,15 @@ $frameIdEnd = null;
         },
         showTrajectory: false,
         throwables: [],
+        flammable: [],
+        createBox: function (width, height, depth, color) {
+            let box = new THREE.Mesh(
+                new THREE.BoxGeometry(width, height, depth),
+                new THREE.MeshBasicMaterial({color: color}),
+            )
+            this.scene.add(box)
+            return box
+        },
         createBall: function (radius) {
             const ball = new THREE.Mesh(new THREE.SphereGeometry(radius), new THREE.MeshBasicMaterial({
                 color: 0xAA6611,
@@ -245,14 +254,27 @@ $frameIdEnd = null;
                         self.throwables[event.data.id] = ball
                     }
                 }
-                if (event.code === <?= EventList::map[SoundEvent::class] ?> &&
-                    ([<?= SoundType::GRENADE_LAND->value ?>, <?= SoundType::GRENADE_BOUNCE->value ?>, <?= SoundType::GRENADE_AIR->value ?>].includes(event.data.type))
-                ) {
-                    const ball = self.showTrajectory ? self.createBall(self.throwables[event.data.extra.id]) : self.throwables[event.data.extra.id]
-                    ball.visible = true
-                    ball.position.set(event.data.position.x, event.data.position.y, -event.data.position.z)
-                    if (!self.showTrajectory && event.data.type === <?= SoundType::GRENADE_LAND->value ?>) {
-                        setTimeout(() => ball.visible = false, 2000)
+                if (event.code === <?= EventList::map[SoundEvent::class] ?>) {
+                    if ([<?= SoundType::GRENADE_LAND->value ?>, <?= SoundType::GRENADE_BOUNCE->value ?>, <?= SoundType::GRENADE_AIR->value ?>].includes(event.data.type)) {
+                        const ball = self.showTrajectory ? self.createBall(self.throwables[event.data.extra.id]) : self.throwables[event.data.extra.id]
+                        ball.visible = true
+                        ball.position.set(event.data.position.x, event.data.position.y, -event.data.position.z)
+                        if (!self.showTrajectory && event.data.type === <?= SoundType::GRENADE_LAND->value ?>) {
+                            setTimeout(() => ball.visible = false, 2000)
+                        }
+                    }
+                    if (event.data.type === <?= SoundType::FLAME_SPAWN->value ?>) {
+                        const color = new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)
+                        let flame = self.createBox(event.data.extra.size, event.data.extra.height, event.data.extra.size, color)
+                        if (self.flammable[event.data.extra.fire] === undefined) {
+                            self.flammable[event.data.extra.fire] = {}
+                        }
+                        self.flammable[event.data.extra.fire][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`] = flame
+                        flame.position.set(event.data.position.x, event.data.position.y + (event.data.extra.height /  2), -event.data.position.z)
+                    }
+                    if (event.data.type === <?= SoundType::FLAME_EXTINGUISH->value ?>) {
+                        const flame = self.flammable[event.data.extra.fire][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`]
+                        flame.visible = false
                     }
                 }
             })

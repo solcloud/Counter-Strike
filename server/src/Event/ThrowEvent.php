@@ -15,8 +15,10 @@ use cs\Equipment\Grenade;
 use cs\Equipment\HighExplosive;
 use cs\HitGeometry\BallCollider;
 use cs\Interface\Attackable;
+use cs\Interface\ForOneRoundMax;
+use cs\Interface\Flammable;
 
-final class ThrowEvent extends Event implements Attackable
+final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 {
 
     private string $id;
@@ -31,14 +33,14 @@ final class ThrowEvent extends Event implements Attackable
     private int $tickMax;
 
     public function __construct(
-        private readonly Player  $player,
-        private readonly World   $world,
-        Point                    $origin,
-        private readonly Grenade $item,
-        private float            $angleHorizontal,
-        private float            $angleVertical,
-        public readonly int      $radius,
-        private float            $velocity,
+        private readonly Player $player,
+        private readonly World  $world,
+        Point                   $origin,
+        public readonly Grenade $item,
+        private float           $angleHorizontal,
+        private float           $angleVertical,
+        public readonly int     $radius,
+        private float           $velocity,
     )
     {
         if ($this->velocity <= 0) {
@@ -141,6 +143,11 @@ final class ThrowEvent extends Event implements Attackable
                 continue;
             }
 
+            if ($this->angleVertical < 10 && $this->item instanceof Flammable && $this->ball->getResolutionAngleVertical() > 0) {
+                $this->finishLanding($pos);
+                return;
+            }
+
             $this->setAngles($this->ball->getResolutionAngleHorizontal(), $this->ball->getResolutionAngleVertical());
             $this->bounceCount++;
             $this->velocity = $this->velocity / ($this->bounceCount > 4 ? $this->bounceCount : 1.5);
@@ -199,6 +206,16 @@ final class ThrowEvent extends Event implements Attackable
             'item'     => $this->item->toArray(),
             'position' => $this->position->toArray(),
         ];
+    }
+
+    public function getPositionClone(): Point
+    {
+        return $this->position->clone();
+    }
+
+    public function getPlayer(): Player
+    {
+        return $this->player;
     }
 
 }

@@ -111,6 +111,11 @@ class Point
         $this->z += $xyz[2];
     }
 
+    public function hash(): string
+    {
+        return "{$this->x},{$this->y},{$this->z}";
+    }
+
     public function to2D(string $XYaxis): Point2D
     {
         return new Point2D($this->{$XYaxis[0]}, $this->{$XYaxis[1]});
