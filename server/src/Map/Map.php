@@ -4,6 +4,7 @@ namespace cs\Map;
 
 use cs\Core\Box;
 use cs\Core\Floor;
+use cs\Core\PathFinder;
 use cs\Core\Point;
 use cs\Core\Wall;
 
@@ -29,6 +30,12 @@ abstract class Map
     public function setDefendersSpawnPositions(array $positions): void
     {
         $this->spawnPositionDefender = $positions;
+    }
+
+    /** @return Point[] */
+    public function getStartingPointsForNavigationMesh(): array
+    {
+        return array_merge($this->getSpawnPositionAttacker(), $this->getSpawnPositionDefender());
     }
 
     /**
@@ -81,6 +88,11 @@ abstract class Map
     public function getBombMaxBlastDistance(): int
     {
         return 1000;
+    }
+
+    public function getNavigationMesh(string $key): ?PathFinder
+    {
+        return null;
     }
 
     public abstract function getBuyArea(bool $forAttackers): Box;

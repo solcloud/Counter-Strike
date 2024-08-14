@@ -2,6 +2,7 @@
 
 namespace cs\Equipment;
 
+use cs\Core\GameException;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemType;
@@ -35,12 +36,12 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
 
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
-        return 0;
+        GameException::notImplementedYet('Should not be called');
     }
 
     public function getKillAward(): int
     {
-        return 0;
+        return 300;
     }
 
     public function getBoundingRadius(): int

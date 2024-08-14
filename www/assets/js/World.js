@@ -9,6 +9,7 @@ export class World {
     #audioLoader
     #modelRepository
     #decals = []
+    #flames = []
     volume = 30
 
     constructor() {
@@ -172,6 +173,20 @@ export class World {
         return dropItem
     }
 
+    spawnFlame(size, height) {
+        let mesh = new THREE.Mesh(
+            new THREE.ConeGeometry(size, height, randomInt(4, 7)),
+            new THREE.MeshStandardMaterial({color: new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)}),
+        )
+
+        mesh.castShadow = false
+        mesh.receiveShadow = false
+
+        this.#scene.add(mesh)
+        this.#flames.push(mesh)
+        return mesh
+    }
+
     bulletWallHit(position, surface, radius) {
         const hit = new THREE.Mesh(
             new THREE.CylinderGeometry(radius, radius, .4, 8, 1),
@@ -206,6 +221,8 @@ export class World {
 
     reset() {
         this.clearDecals()
+        this.#flames.forEach((item) => this.destroyObject(item))
+        this.#flames = []
         const bomb = this.#modelRepository.getBomb()
         if (bomb.parent && bomb.parent.name === 'MainScene') {
             bomb.visible = false

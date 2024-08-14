@@ -12,13 +12,11 @@ export class KillFeed {
     showKill(playerCulprit, playerDead, wasHeadshot, playerMe, killedItemId) {
         let killedByBomb = false
         this.#scoreBoard.updatePlayerIsDead(playerDead)
-        if (playerCulprit.id === playerDead.id) { // suicide or bomb
-            if (killedItemId === ItemId.SolidSurface) { // suicide
+        if (playerCulprit.id === playerDead.id) { // suicide
+            if (killedItemId === ItemId.SolidSurface) {
                 this.#scoreBoard.updatePlayerKills(playerDead, -1)
-            } else if (killedItemId === ItemId.Bomb) { // bomb
+            } else if (killedItemId === ItemId.Bomb) {
                 killedByBomb = true
-            } else {
-                throw new Error("New killing item?")
             }
         } else if (playerCulprit.isAttacker === playerDead.isAttacker) { // team kill
             this.#scoreBoard.updatePlayerKills(playerCulprit, -1)

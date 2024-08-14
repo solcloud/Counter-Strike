@@ -133,6 +133,12 @@ export class SoundRepository {
             return null
         }
 
+        if (type === SoundType.FLAME_SPAWN) {
+            return null // todo
+        }
+        if (type === SoundType.FLAME_EXTINGUISH) {
+            return null // todo
+        }
         if (type === SoundType.GRENADE_AIR) {
             return '575509__awildfilli__granada_tiro.wav'
         }

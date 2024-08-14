@@ -2,7 +2,6 @@
 
 namespace cs\Traits\Player;
 
-use cs\Core\Collision;
 use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Core\Setting;
@@ -261,13 +260,13 @@ trait MovementTrait
         if ($xMove) {
             $xGrowing = ($start->x < $candidate->x);
             $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
-            $xWallMaxHeight = $this->findHighestWall($baseX, $height, $radius, $maxWallCeiling, true);
+            $xWallMaxHeight = $this->world->findHighestWall($baseX, $height, $radius, $maxWallCeiling, true);
         }
         $zWallMaxHeight = 0;
         if ($zMove) {
             $zGrowing = ($start->z < $candidate->z);
             $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
-            $zWallMaxHeight = $this->findHighestWall($baseZ, $height, $radius, $maxWallCeiling, false);
+            $zWallMaxHeight = $this->world->findHighestWall($baseZ, $height, $radius, $maxWallCeiling, false);
         }
         if ($xWallMaxHeight === 0 && $zWallMaxHeight === 0) { // no walls
             return true;
@@ -313,11 +312,11 @@ trait MovementTrait
         // Try to move in X axis
         $oneSideCandidate = $start->clone()->addX($angle > 180 ? -1 : 1);
         $oneSideCandidateX = $oneSideCandidate->clone()->addX($angle > 180 ? -$radius : $radius);
-        $wallCeiling = $this->findHighestWall($oneSideCandidateX, $height, $radius, $maxWallCeiling, true);
+        $wallCeiling = $this->world->findHighestWall($oneSideCandidateX, $height, $radius, $maxWallCeiling, true);
         if ($wallCeiling > $maxWallCeiling) { // X too tall, try to move in Z axis
             $oneSideCandidate = $start->clone()->addZ(($angle > 270 || $angle < 90) ? 1 : -1);
             $oneSideCandidateZ = $oneSideCandidate->clone()->addZ(($angle > 270 || $angle < 90) ? $radius : -$radius);
-            $wallCeiling = $this->findHighestWall($oneSideCandidateZ, $height, $radius, $maxWallCeiling, false);
+            $wallCeiling = $this->world->findHighestWall($oneSideCandidateZ, $height, $radius, $maxWallCeiling, false);
         }
         if ($wallCeiling > $maxWallCeiling) { // tall walls everywhere
             return false;
@@ -336,39 +335,6 @@ trait MovementTrait
         }
         $candidate->setFrom($oneSideCandidate); // side effect
         return null;
-    }
-
-    private function findHighestWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling, bool $xWall): int
-    {
-        $base = $xWall ? $bottomCenter->x : $bottomCenter->z;
-        if ($base < 0) {
-            return $maxWallCeiling + 1;
-        }
-        $walls = $xWall ? $this->world->getXWalls($base) : $this->world->getZWalls($base);
-        if ($walls === []) {
-            return 0;
-        }
-
-        $width = 2 * $radius;
-        $highestWallCeiling = 0;
-        $candidatePlane = $bottomCenter->to2D($xWall ? 'zy' : 'xy')->addX(-$radius);
-        foreach ($walls as $wall) {
-            $wallCeiling = $wall->getCeiling();
-            if ($wallCeiling <= $bottomCenter->y) {
-                continue;
-            }
-            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
-                continue;
-            }
-            if ($wallCeiling > $maxWallCeiling) {
-                return $wallCeiling;
-            }
-            if ($wallCeiling > $highestWallCeiling) {
-                $highestWallCeiling = $wallCeiling;
-            }
-        }
-
-        return $highestWallCeiling;
     }
 
     private function collisionWithPlayer(Point $candidate, int $radius): bool

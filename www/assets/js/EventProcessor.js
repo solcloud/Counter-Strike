@@ -108,6 +108,10 @@ export class EventProcessor {
             game.itemDrop(data.item, data.id)
         }
 
+        eventsCallback[EventList.GrillEvent] = function (data) {
+            // todo play grill song
+        }
+
         this.#callbacks = eventsCallback
     }
 }

@@ -21,6 +21,7 @@
         "php": ">=8.1",
         "ext-sockets": "*",
 
+        "actived/graphphp": "0.2.2",
         "clue/socket-raw": "1.6.0",
         "textalk/websocket": "1.5.8",
         "psr/log": "3.0.0"

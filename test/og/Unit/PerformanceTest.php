@@ -11,7 +11,9 @@ use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Equipment\Molotov;
 use cs\Event\AttackResult;
+use cs\Interface\Flammable;
 use cs\Map\BoxMap;
 use cs\Map\Map;
 use cs\Map\TestMap;
@@ -22,15 +24,14 @@ use Test\BaseTest;
 
 class PerformanceTest extends BaseTest
 {
+    private static float $timeScale;
 
     public static function setUpBeforeClass(): void
     {
         gc_collect_cycles();
         parent::setUpBeforeClass();
-        if (getenv('CI') !== false) {
-            self::markTestSkipped('CI too slow');
-        }
 
+        self::$timeScale = 1;
         $sum = 0;
         $timer = new Timer();
         $timer->start();
@@ -39,7 +40,10 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         if ($took->asMicroseconds() > 7500) {
-            self::markTestSkipped('Performance test skipped');
+            self::$timeScale = 1.08;
+        }
+        if (getenv('CI') !== false) {
+            self::$timeScale = 1.10;
         }
 
         Util::$TICK_RATE = 20;
@@ -120,7 +124,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(21, $took->asMilliseconds());
+        $this->assertLessThan(21 * self::$timeScale, $took->asMilliseconds());
     }
 
     public function testTwoPlayersRangeShootingEachOther(): void
@@ -157,7 +161,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThan(100, $player->getHealth(), "Player: '{$player->getId()}'");
             $this->assertTrue($player->isAlive());
         }
-        $this->assertLessThan(27, $took->asMilliseconds());
+        $this->assertLessThan(27 * self::$timeScale, $took->asMilliseconds());
     }
 
     public function testPlayersMoving(): void
@@ -195,7 +199,7 @@ class PerformanceTest extends BaseTest
             $this->assertGreaterThan(50, $player->getPositionClone()->z);
             $this->assertGreaterThan(200, $player->getPositionClone()->z);
         }
-        $this->assertLessThan(17, $took->asMilliseconds());
+        $this->assertLessThan(17 * self::$timeScale, $took->asMilliseconds());
     }
 
     public function test3DMovement(): void
@@ -210,7 +214,7 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([49726, 66913, 55226], $coordinates);
-        $this->assertLessThan(38, $took->asMilliseconds());
+        $this->assertLessThan(38 * self::$timeScale, $took->asMilliseconds());
     }
 
     public function test2DMovement(): void
@@ -225,7 +229,87 @@ class PerformanceTest extends BaseTest
         }
         $took = $timer->stop();
         $this->assertSame([66913, 74314], $coordinates);
-        $this->assertLessThan(23, $took->asMilliseconds());
+        $this->assertLessThan(23 * self::$timeScale, $took->asMilliseconds());
+    }
+
+    public function testMolotov(): void
+    {
+        $game = GameFactory::createDebug();
+        $game->loadMap($this->createMolotovMap());
+
+        $timer = new Timer();
+        $timer->start();
+        $game->getWorld()->regenerateNavigationMeshes();
+        $took = $timer->stop();
+        $this->assertLessThan(120 * self::$timeScale, $took->asMilliseconds());
+
+        $player = new Player(1, Color::GREEN, true);
+        $game->addPlayer($player);
+        $this->assertTrue($player->buyItem(BuyMenuItem::GRENADE_MOLOTOV));
+        $tickId = $game->getTickId();
+        foreach (range(0, Util::millisecondsToFrames(Molotov::equipReadyTimeMs)) as $i) {
+            $game->tick(++$tickId);
+        }
+        $flammableItem = $player->getEquippedItem();
+        $this->assertInstanceOf(Flammable::class, $flammableItem);
+
+        $timer->start();
+        $this->assertNotNull($player->attack());
+        $took = $timer->stop();
+        $this->assertLessThan(0.6 * self::$timeScale, $took->asMilliseconds());
+
+        $epicentre = $player->getPositionClone()->addY($flammableItem->getBoundingRadius());
+        $timer->start();
+        $game->getWorld()->processFlammableExplosion($player, $epicentre, $flammableItem);
+        $took = $timer->stop();
+        $this->assertLessThan(0.6 * self::$timeScale, $took->asMilliseconds());
+
+        $samplesCount = 1;
+        $timer->start();
+        foreach (range(1, $samplesCount) as $i) {
+            $game->tick(++$tickId);
+        }
+        $took = $timer->stop();
+        $this->assertLessThan(100, $player->getHealth());
+        $this->assertLessThan(0.3 * self::$timeScale, $took->asMilliseconds() / $samplesCount);
+
+        $health = $player->getHealth();
+        $samplesCount = 10;
+        $timer->start();
+        foreach (range(1, $samplesCount) as $i) {
+            $game->tick(++$tickId);
+        }
+        $took = $timer->stop();
+        $this->assertLessThan($health, $player->getHealth());
+        $this->assertLessThan(0.4 * self::$timeScale, $took->asMilliseconds() / $samplesCount);
+    }
+
+    private function createMolotovMap(): Map
+    {
+        return new class() extends BoxMap {
+            private Box $boundary;
+
+            public function __construct()
+            {
+                $this->boundary = new Box(new Point(11, 12, 13), 1000, 2000, 1000);
+                $this->addBox($this->boundary);
+            }
+
+            public function getBuyArea(bool $forAttackers): Box
+            {
+                return $this->boundary;
+            }
+
+            public function getPlantArea(): Box
+            {
+                return $this->boundary;
+            }
+
+            public function getSpawnPositionAttacker(): array
+            {
+                return [new Point(500, 12, 500)];
+            }
+        };
     }
 
     private function createMap(int $depth = 2000): Map

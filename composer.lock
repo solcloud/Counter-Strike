@@ -4,8 +4,55 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1d2bad3250abdd8d557a0c90a02b2598",
+    "content-hash": "755697a61c7c4bb0a8359326d7550df3",
     "packages": [
+        {
+            "name": "actived/graphphp",
+            "version": "0.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ActiveDevOrga/graphPHP.git",
+                "reference": "2a064c45d8864bf00a546e0e24cc9a40f182e4dc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ActiveDevOrga/graphPHP/zipball/2a064c45d8864bf00a546e0e24cc9a40f182e4dc",
+                "reference": "2a064c45d8864bf00a546e0e24cc9a40f182e4dc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "GraphPHP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ActiveDeveloppment",
+                    "homepage": "https://actived.fr/"
+                },
+                {
+                    "name": "Houssem Guemer",
+                    "email": "houssem.guemer@gmail.com"
+                }
+            ],
+            "description": "A PHP graph theory package.",
+            "support": {
+                "issues": "https://github.com/ActiveDevOrga/graphphp/issues",
+                "source": "https://github.com/ActiveDevOrga/graphphp"
+            },
+            "time": "2023-10-01T09:53:53+00:00"
+        },
         {
             "name": "clue/socket-raw",
             "version": "v1.6.0",

@@ -2,12 +2,17 @@
 
 namespace cs\Core;
 
+use cs\Enum\ArmorType;
 use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Equipment\Grenade;
+use cs\Equipment\HighExplosive;
 use cs\Event\DropEvent;
+use cs\Event\GrillEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
+use cs\Interface\Flammable;
 use cs\Interface\Hittable;
 use cs\Map\Map;
 
@@ -18,6 +23,8 @@ class World
     private const BOMB_RADIUS = 90;
     private const BOMB_DEFUSE_MAX_DISTANCE = 300;
     private const ITEM_PICK_MAX_DISTANCE = 370;
+    public const GRENADE_NAVIGATION_MESH_TILE_SIZE = 31;
+    public const GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT = 80;
 
     private ?Map $map = null;
     /** @var PlayerCollider[] */
@@ -36,6 +43,7 @@ class World
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
     private int $playerPotentialDistanceSquared;
+    private ?PathFinder $grenadeNavMesh = null;
 
     public function __construct(private Game $game)
     {
@@ -67,6 +75,13 @@ class World
         foreach ($map->getFloors() as $floor) {
             $this->addFloor($floor);
         }
+    }
+
+    public function regenerateNavigationMeshes(): void
+    {
+        $key = sprintf('%d-%d', self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
+        $this->grenadeNavMesh = $this->getMap()->getNavigationMesh($key)
+            ?? $this->buildNavigationMesh(self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
     }
 
     public function addRamp(Ramp $ramp): void
@@ -172,6 +187,39 @@ class World
         }
 
         return $targetFloor;
+    }
+
+    public function findHighestWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling, bool $xWall): int
+    {
+        $base = $xWall ? $bottomCenter->x : $bottomCenter->z;
+        if ($base < 0) {
+            return $maxWallCeiling + 1;
+        }
+        $walls = $xWall ? $this->getXWalls($base) : $this->getZWalls($base);
+        if ($walls === []) {
+            return 0;
+        }
+
+        $width = 2 * $radius;
+        $highestWallCeiling = 0;
+        $candidatePlane = $bottomCenter->to2D($xWall ? 'zy' : 'xy')->addX(-$radius);
+        foreach ($walls as $wall) {
+            $wallCeiling = $wall->getCeiling();
+            if ($wallCeiling <= $bottomCenter->y) {
+                continue;
+            }
+            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+                continue;
+            }
+            if ($wallCeiling > $maxWallCeiling) {
+                return $wallCeiling;
+            }
+            if ($wallCeiling > $highestWallCeiling) {
+                $highestWallCeiling = $wallCeiling;
+            }
+        }
+
+        return $highestWallCeiling;
     }
 
     public function isOnFloor(Floor $floor, Point $position, int $radius): bool
@@ -303,14 +351,23 @@ class World
         if (Util::distanceSquared($start, $targetCenter) > $maximumDistance * $maximumDistance) {
             return false;
         }
-        $angleVertical = $observer->getSight()->getRotationVertical();
-        $angleHorizontal = $observer->getSight()->getRotationHorizontal();
 
-        $prevPos = $start->clone();
-        $candidate = $start->clone();
-        for ($distance = $observer->getBoundingRadius(); $distance <= $maximumDistance; $distance++) {
+        return $this->pointCanSeePoint(
+            $start, $targetCenter, $observer->getSight()->getRotationHorizontal(), $observer->getSight()->getRotationVertical(),
+            $maximumDistance, $checkForOtherPlayersAlso ? $observer->getId() : null, $targetRadius, $observer->getBoundingRadius(),
+        );
+    }
+
+    private function pointCanSeePoint(
+        Point $observer, Point $targetCenter, float $angleHorizontal, float $angleVertical,
+        int   $maximumDistance, int|null $playerIdSkip = -1, int $targetRadius = 1, int $startDistance = 0,
+    ): bool
+    {
+        $prevPos = $observer->clone();
+        $candidate = $observer->clone();
+        for ($distance = $startDistance; $distance <= $maximumDistance; $distance++) {
             [$x, $y, $z] = Util::movementXYZ($angleHorizontal, $angleVertical, $distance);
-            $candidate->set($start->x + $x, $start->y + $y, $start->z + $z);
+            $candidate->set($observer->x + $x, $observer->y + $y, $observer->z + $z);
             if ($candidate->equals($prevPos)) {
                 continue;
             }
@@ -325,7 +382,7 @@ class World
             if ($this->isWallAt($candidate)) {
                 return false;
             }
-            if ($checkForOtherPlayersAlso && $this->isCollisionWithOtherPlayers($observer->getId(), $candidate, 0, 0)) {
+            if ($playerIdSkip !== null && $this->isCollisionWithOtherPlayers($playerIdSkip, $candidate, 0, 0)) {
                 return false;
             }
         }
@@ -412,7 +469,108 @@ class World
 
     public function throw(ThrowEvent $event): void
     {
+        $event->onComplete[] = function (ThrowEvent $event) {
+            if ($event->item instanceof HighExplosive) {
+                $this->processHighExplosiveBlast($event->getPlayer(), $event->getPositionClone(), $event->item);
+            }
+            if ($event->item instanceof Flammable) {
+                $this->processFlammableExplosion($event->getPlayer(), $event->getPositionClone(), $event->item);
+            }
+        };
         $this->game->addThrowEvent($event);
+    }
+
+    public function processFlammableExplosion(Player $thrower, Point $epicentre, Flammable $item): void
+    {
+        if ($this->grenadeNavMesh === null) {
+            $this->regenerateNavigationMeshes();
+        }
+        assert($this->grenadeNavMesh !== null);
+
+        $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
+        $floorNavmeshPoint = $epicentreFloor->clone();
+        $this->grenadeNavMesh->convertToNavMeshNode($floorNavmeshPoint);
+
+        if (null === $this->grenadeNavMesh->getGraph()->getNodeById($floorNavmeshPoint->hash())) {
+            $floorNavmeshPoint = $this->grenadeNavMesh->tryFindClosestTile($epicentreFloor);
+            if (null === $floorNavmeshPoint) {
+                return;
+            }
+        }
+
+        $this->game->addGrillEvent(
+            new GrillEvent(
+                $thrower, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
+                $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
+            )
+        );
+    }
+
+    public function checkFlameDamage(GrillEvent $fire, int $tickId): void
+    {
+        foreach ($this->playersColliders as $playerId => $collider) {
+            $player = $collider->getPlayer();
+            if (!$player->isAlive() || !$fire->canHitPlayer($playerId, $tickId)) {
+                continue;
+            }
+
+            foreach ($fire->flames as $flame) {
+                if (!Collision::pointWithCylinder(
+                    $flame->highestPoint,
+                    $player->getReferenceToPosition(),
+                    $player->getBoundingRadius(),
+                    $player->getHeadHeight())
+                ) {
+                    continue;
+                }
+
+                $fire->playerHit($playerId, $tickId);
+                $damage = $fire->item->calculateDamage($player->getArmorType() !== ArmorType::NONE);
+                if ($fire->initiator->isPlayingOnAttackerSide() !== $player->isPlayingOnAttackerSide()) {
+                    $this->game->getScore()->getPlayerStat($fire->initiator->getId())->addDamage($damage);
+                }
+                $player->lowerHealth($damage);
+                if (!$player->isAlive()) {
+                    $this->playerDiedToFlame($fire->initiator, $player, $fire->item);
+                }
+
+                break;
+            }
+        }
+    }
+
+    private function processHighExplosiveBlast(Player $thrower, Point $epicentre, HighExplosive $item): void
+    {
+        $maxBlastDistance = $item->getMaxBlastRadius();
+        $maxBlastDistanceSquared = $maxBlastDistance * $maxBlastDistance;
+        foreach ($this->playersColliders as $playerId => $playerCollider) {
+            $player = $this->game->getPlayer($playerId);
+            if (!$player->isAlive()) {
+                continue;
+            }
+            if (Util::distanceSquared($epicentre, $player->getCentrePoint()) > $maxBlastDistanceSquared) {
+                continue;
+            }
+
+            $damage = 0;
+            foreach ($player->getPlayerGrenadeHitPoints() as $point) {
+                $distanceSquared = Util::distanceSquared($epicentre, $point);
+                if ($distanceSquared > $maxBlastDistanceSquared) {
+                    continue;
+                }
+                [$angleHorizontal, $angleVertical] = Util::worldAngle($point, $epicentre);
+                if (!$this->pointCanSeePoint($epicentre, $point, $angleHorizontal ?? 0, $angleVertical, $maxBlastDistance, null)) {
+                    continue;
+                }
+
+                $damage += $item->calculateDamage($distanceSquared, $player->getArmorType() !== ArmorType::NONE);
+            }
+
+            $player->lowerHealth($damage);
+            if (!$player->isAlive()) {
+                $this->game->playerGrenadeKilledEvent($thrower, $player, $item);
+            }
+        }
     }
 
     public function canAttack(Player $player): bool
@@ -462,6 +620,33 @@ class World
     public function playerDiedToFallDamage(Player $playerDead): void
     {
         $this->game->playerFallDamageKilledEvent($playerDead);
+    }
+
+    public function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
+    {
+        if (false === ($item instanceof Grenade)) {
+            throw new GameException("New flammable non grenade type?");
+        }
+        $this->game->playerGrenadeKilledEvent($playerCulprit, $playerDead, $item);
+    }
+
+    public function buildNavigationMesh(int $tileSize, int $objectHeight): PathFinder
+    {
+        $boundingRadius = Setting::playerBoundingRadius();
+        if ($tileSize > $boundingRadius - 2) {
+            throw new GameException('Tile size should be decently lower than player bounding radius.');
+        }
+
+        $pathFinder = new PathFinder($this, $tileSize, $objectHeight);
+        $startPoints = $this->getMap()->getStartingPointsForNavigationMesh();
+        if ([] === $startPoints) {
+            throw new GameException('No starting point for navigation defined!');
+        }
+        foreach ($startPoints as $point) {
+            $pathFinder->buildNavigationMesh($point, $objectHeight);
+        }
+
+        return $pathFinder;
     }
 
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall

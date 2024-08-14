@@ -25,6 +25,7 @@ export class Game {
     #eventProcessor
     #dropItems = {};
     #throwables = {};
+    #flammable = {};
     #roundIntervalIds = [];
     #roundDamage = {did: {},got: {}}
     #playerSlotsVisibleModels = [
@@ -55,6 +56,7 @@ export class Game {
         this.#roundIntervalIds = []
         Object.keys(this.#dropItems).forEach((id) => this.itemPickUp(id))
         Object.keys(this.#throwables).forEach((id) => this.removeGrenade(id))
+        Object.keys(this.#flammable).forEach((fireId) => Object.keys(this.#flammable[fireId]).forEach((flameId) => this.destroyFlame(fireId, flameId)))
         this.#world.reset()
     }
 
@@ -194,6 +196,12 @@ export class Game {
         if (data.type === SoundType.ITEM_PICKUP) {
             this.itemPickUp(data.extra.id)
         }
+        if (data.type === SoundType.FLAME_SPAWN) {
+            this.spawnFlame(data.position, data.extra.size, data.extra.height, data.extra.fire, `${data.position.x}-${data.position.y}-${data.position.z}`)
+        }
+        if (data.type === SoundType.FLAME_EXTINGUISH) {
+            this.destroyFlame(data.extra.fire, `${data.position.x}-${data.position.y}-${data.position.z}`)
+        }
         if (data.type === SoundType.ITEM_DROP_AIR) {
             const item = this.#dropItems[data.extra.id];
             item.rotation.x -= 0.1
@@ -275,9 +283,12 @@ export class Game {
             game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 18000))
             return;
         }
+        if (item.slot === InventorySlot.SLOT_GRENADE_MOLOTOV || item.slot === InventorySlot.SLOT_GRENADE_HE) {
+            return;
+        }
 
         console.warn("No handler for grenade: ", item)
-        game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 1000)) // todo responsive volumetric smokes, flashes, fire etc.
+        game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 1000)) // todo responsive volumetric smokes, etc.
     }
 
     itemDrop(item, id) {
@@ -299,6 +310,23 @@ export class Game {
         const grenade = this.#throwables[id]
         this.#world.destroyObject(grenade)
         delete this.#throwables[id]
+    }
+
+    spawnFlame(point, size, height, fireId, flameId) {
+        if (this.#flammable[fireId] === undefined) {
+            this.#flammable[fireId] = {}
+        }
+        height = lerp(height, randomInt(10, 16), Math.min(Math.sqrt(Object.keys(this.#flammable[fireId]).length) / (randomInt(90, 110) / 10), 1))
+        const flame = this.#world.spawnFlame(size, height)
+        this.#flammable[fireId][flameId] = flame
+        flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
+        flame.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
+    }
+
+    destroyFlame(fireId, flameId) {
+        const flame = this.#flammable[fireId][flameId]
+        this.#world.destroyObject(flame)
+        delete this.#flammable[fireId][flameId]
     }
 
     bombPlanted(timeMs, position) {
