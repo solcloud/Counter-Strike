@@ -284,6 +284,7 @@ export class Game {
             return;
         }
         if (item.slot === InventorySlot.SLOT_GRENADE_MOLOTOV || item.slot === InventorySlot.SLOT_GRENADE_HE) {
+            this.removeGrenade(throwableId)
             return;
         }
 

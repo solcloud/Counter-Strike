@@ -514,12 +514,27 @@ class World
                 continue;
             }
 
+            $pp = $player->getReferenceToPosition();
+            $playerHeight = $player->getHeadHeight();
+            $playerRadius = $player->getBoundingRadius();
+            if (
+                $pp->y > $fire->boundaryMax->y
+                || $pp->y + $playerHeight < $fire->boundaryMin->y
+                || !Collision::circleWithRect(
+                    $pp->x, $pp->z, $playerRadius,
+                    $fire->boundaryMin->x, $fire->boundaryMax->x,
+                    $fire->boundaryMin->z, $fire->boundaryMax->z,
+                )
+            ) {
+                continue;
+            }
+
             foreach ($fire->flames as $flame) {
                 if (!Collision::pointWithCylinder(
                     $flame->highestPoint,
-                    $player->getReferenceToPosition(),
-                    $player->getBoundingRadius(),
-                    $player->getHeadHeight())
+                    $pp,
+                    $playerRadius,
+                    $playerHeight)
                 ) {
                     continue;
                 }
@@ -646,7 +661,7 @@ class World
             $pathFinder->buildNavigationMesh($point, $objectHeight);
         }
 
-        return $pathFinder;
+        return $pathFinder->saveAndClear();
     }
 
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall

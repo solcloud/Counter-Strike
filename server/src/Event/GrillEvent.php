@@ -30,6 +30,9 @@ final class GrillEvent extends Event implements ForOneRoundMax
     private readonly int $damageCoolDownTickCount;
     private readonly int $maxFlameCount;
 
+    public readonly Point $boundaryMin;
+    public readonly Point $boundaryMax;
+
     /** @var SplQueue<Node> $queue */
     private SplQueue $queue;
     /** @var array<string,bool> */
@@ -59,6 +62,8 @@ final class GrillEvent extends Event implements ForOneRoundMax
         }
 
         $this->id = "grill-{$this->initiator->getId()}-{$this->world->getTickId()}";
+        $this->boundaryMin = $start->clone();
+        $this->boundaryMax = $start->clone();
         $this->queue = new SplQueue();
         $this->queue->enqueue($startNode);
         $this->igniteFlames();
@@ -100,6 +105,17 @@ final class GrillEvent extends Event implements ForOneRoundMax
     private function igniteFlames(): void
     {
         foreach ($this->loadFlames() as $candidate) {
+            $this->boundaryMin->set(
+                min($this->boundaryMin->x, $candidate->x - $this->flameRadius),
+                min($this->boundaryMin->y, $candidate->y - 0),
+                min($this->boundaryMin->z, $candidate->z - $this->flameRadius),
+            );
+            $this->boundaryMax->set(
+                max($this->boundaryMax->x, $candidate->x + $this->flameRadius),
+                max($this->boundaryMax->y, $candidate->y + $this->flameHeight),
+                max($this->boundaryMax->z, $candidate->z + $this->flameRadius),
+            );
+
             $flame = new Flame($candidate, $this->flameRadius, $this->flameHeight);
             $this->flames[] = $flame;
             $this->lastFlameSpawnTickId = $this->world->getTickId();
@@ -119,16 +135,17 @@ final class GrillEvent extends Event implements ForOneRoundMax
         $output = [];
         while (!$this->queue->isEmpty() && count($output) < min($this->spawnFlameCount, $loadCount)) {
             $current = $this->queue->dequeue();
-            if (array_key_exists($current->getId(), $this->visited)) {
+            $currentKey = $current->getId();
+            if (array_key_exists($currentKey, $this->visited)) {
                 continue;
             }
 
-            $this->visited[$current->getId()] = true;
+            $this->visited[$currentKey] = true;
             /** @var Point $point */
             $point = $current->getData();
             $output[] = $point;
 
-            foreach ($this->graph->getNeighbors($current) as $node) {
+            foreach ($this->graph->getGeneratedNeighbors($currentKey) as $node) {
                 $this->queue->enqueue($node);
             }
         }

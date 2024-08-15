@@ -61,6 +61,8 @@ final class NavigationMeshTest extends BaseTestCase
         $startNode = $path->getGraph()->getNodeById($start->hash());
         $this->assertNotNull($startNode);
         $this->assertCount(3, $path->getGraph()->getNeighbors($startNode));
+        $path->getGraph()->generateNeighbors();
+        $this->assertCount(3, $path->getGraph()->getGeneratedNeighbors($startNode->getId()));
     }
 
     public function testBoundary(): void
