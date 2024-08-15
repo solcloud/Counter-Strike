@@ -187,6 +187,13 @@ final class PathFinder
         }
     }
 
+    public function saveAndClear(): self
+    {
+        $this->visited = [];
+        $this->graph->generateNeighbors();
+        return $this;
+    }
+
     public function getGraph(): Graph
     {
         return $this->graph;
