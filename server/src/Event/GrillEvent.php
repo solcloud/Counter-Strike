@@ -45,7 +45,7 @@ final class GrillEvent extends Event implements ForOneRoundMax
         private readonly int      $flameRadius,
         private readonly int      $flameHeight,
         private readonly Graph    $graph,
-        Point                     $start,
+        private readonly Point    $start,
     )
     {
         $flameArea = ($this->flameRadius * 2 + 1) ** 2;
@@ -161,6 +161,15 @@ final class GrillEvent extends Event implements ForOneRoundMax
     public function playerHit(int $playerId, int $tickId): void
     {
         $this->playerTickHits[$playerId] = $tickId;
+    }
+
+    public function serialize(): array
+    {
+        return [
+            'position' => $this->start->toArray(),
+            'maxTime' => $this->item->getMaxTimeMs(),
+            'maxFlames' => $this->maxFlameCount,
+        ];
     }
 
 }
