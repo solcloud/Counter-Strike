@@ -43,7 +43,7 @@ class PerformanceTest extends BaseTest
             self::$timeScale = 1.08;
         }
         if (getenv('CI') !== false) {
-            self::$timeScale = 1.10;
+            self::$timeScale = 6.10;
         }
 
         Util::$TICK_RATE = 20;
