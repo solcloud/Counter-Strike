@@ -109,7 +109,7 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.GrillEvent] = function (data) {
-            // todo play grill song
+            game.grillStart(data.position, data.maxTime, data.maxFlames)
         }
 
         this.#callbacks = eventsCallback

@@ -313,6 +313,10 @@ export class Game {
         delete this.#throwables[id]
     }
 
+    grillStart(position, maxTimeMs, maxFlamesCount) {
+        this.#world.playSound('338301_4811732-lq.mp3', position, false)
+    }
+
     spawnFlame(point, size, height, fireId, flameId) {
         if (this.#flammable[fireId] === undefined) {
             this.#flammable[fireId] = {}
