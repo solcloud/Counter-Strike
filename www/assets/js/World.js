@@ -10,7 +10,6 @@ export class World {
     #modelRepository
     #decals = []
     #flames = []
-    #flameGeometry = null
     volume = 30
 
     constructor() {
@@ -175,20 +174,13 @@ export class World {
     }
 
     spawnFlame(size, height) {
-        if (this.#flameGeometry === null){
-            this.#flameGeometry = []
-            this.#flameGeometry.push(new THREE.ConeGeometry(size, height, 4))
-            this.#flameGeometry.push(new THREE.ConeGeometry(size, height, 5))
-            this.#flameGeometry.push(new THREE.ConeGeometry(size, height, 6))
-            this.#flameGeometry.push(new THREE.ConeGeometry(size, height, 7))
-        }
         let mesh = new THREE.Mesh(
-            this.#flameGeometry[randomInt(0, this.#flameGeometry.length - 1)],
-            new THREE.MeshBasicMaterial({color: new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)}),
+            new THREE.ConeGeometry(size, height, randomInt(5, 7)),
+            new THREE.MeshPhongMaterial({color: new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)}),
         )
 
         mesh.castShadow = false
-        mesh.receiveShadow = false
+        mesh.receiveShadow = true
 
         this.#scene.add(mesh)
         this.#flames.push(mesh)

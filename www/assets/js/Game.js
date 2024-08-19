@@ -321,7 +321,7 @@ export class Game {
         if (this.#flammable[fireId] === undefined) {
             this.#flammable[fireId] = {}
         }
-        height = lerp(height, randomInt(10, 16), Math.min(Math.sqrt(Object.keys(this.#flammable[fireId]).length) / (randomInt(90, 110) / 10), 1))
+        height = lerp(height, randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#flammable[fireId]).length) / randomInt(7, 9), 1))
         const flame = this.#world.spawnFlame(size, height)
         this.#flammable[fireId][flameId] = flame
         flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
