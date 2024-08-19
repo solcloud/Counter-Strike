@@ -10,6 +10,7 @@ use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Enum\RampDirection;
 use cs\Equipment\Molotov;
 use Test\BaseTestCase;
 
@@ -179,7 +180,7 @@ class MolotovGrenadeTest extends BaseTestCase
         $game->getWorld()->addBox(new Box(new Point(), 1000, 3000, 1000));
         $grenadeTileSize = $game->getWorld()::GRENADE_NAVIGATION_MESH_TILE_SIZE;
         $game->getWorld()->addBox(new Box(new Point($grenadeTileSize * 3, 0, 300), 1000, 3000, 1000));
-        $game->getWorld()->addRamp(new Ramp(new Point(-1, 0, 300), new Point2D(0, 1), 100, $grenadeTileSize * 10));
+        $game->getWorld()->addRamp(new Ramp(new Point(-1, 0, 300), RampDirection::GROW_TO_POSITIVE_Z, 100, $grenadeTileSize * 10));
 
         $this->playPlayer($game, [
             fn(Player $p) => $p->setPosition(new Point($grenadeTileSize * 2, 0, 200)),

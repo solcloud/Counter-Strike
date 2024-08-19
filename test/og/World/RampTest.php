@@ -6,6 +6,7 @@ use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Core\Wall;
+use cs\Enum\RampDirection;
 use Test\BaseTestCase;
 use Test\TestGame;
 
@@ -20,7 +21,7 @@ class RampTest extends BaseTestCase
         $stepDepth = 33;
         $ramp1 = new Ramp(
             new Point(0, 0, $player->getBoundingRadius() * 3),
-            new Point2D(0, 1),
+            RampDirection::GROW_TO_POSITIVE_Z,
             (int)floor(800 / $stepDepth),
             2123,
             true,
@@ -29,19 +30,13 @@ class RampTest extends BaseTestCase
         $game->getWorld()->addRamp($ramp1);
         $ramp2 = new Ramp(
             new Point(1000, $ramp1->stepHeight * $ramp1->stepCount, 910),
-            new Point2D(0, 1), (int)floor(1800 / $stepDepth * 2),
+            RampDirection::GROW_TO_POSITIVE_Z, (int)floor(1800 / $stepDepth * 2),
             8123,
             true,
             $stepDepth
         );
         $game->getWorld()->addRamp($ramp2);
         return $game;
-    }
-
-    public function testInvalidDirection(): void
-    {
-        $this->expectExceptionMessage('Invalid direction given');
-        new Ramp(new Point(), new Point2D(1, 1), 1, 1);
     }
 
     public function testDiagonalRampMovement1(): void
@@ -105,7 +100,7 @@ class RampTest extends BaseTestCase
         $game->getWorld()->addWall($wall);
         $game->getWorld()->addRamp(
             new Ramp($player->getPositionClone()->addZ($player->getBoundingRadius() + 10)->addX(-50),
-                new Point2D(0, 1),
+                RampDirection::GROW_TO_POSITIVE_Z,
                 20,
                 200
             )

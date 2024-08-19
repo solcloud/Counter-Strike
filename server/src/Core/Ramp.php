@@ -2,6 +2,8 @@
 
 namespace cs\Core;
 
+use cs\Enum\RampDirection;
+
 class Ramp
 {
     /** @var Box[] */
@@ -9,7 +11,7 @@ class Ramp
 
     public function __construct(
         Point   $lowerLeftPoint,
-        Point2D $direction,
+        RampDirection $direction,
         public  readonly int $stepCount,
         public  readonly int $stepWidth,
         bool    $stairsGrowingUp = true,
@@ -17,16 +19,8 @@ class Ramp
         public  readonly int $stepHeight = 20,
     )
     {
-        if (
-            ($direction->x <> 0 && $direction->y <> 0)
-            ||
-            ($direction->x === 0 && $direction->y === 0)
-        ) {
-            throw new GameException("Invalid direction given");
-        }
-
         $heightSum = $stairsGrowingUp ? $stepHeight : $stepHeight * $stepCount;
-        if ($direction->x <> 0) {
+        if ($direction->isOnXAxis()) {
             $depth = $stepWidth;
             $width = $stepDepth;
         } else {
@@ -39,10 +33,11 @@ class Ramp
             $this->boxes[] = new Box($point->clone(), $width, $heightSum, $depth); // fixme: use smallest amount of just walls and floors instead of box
 
             $heightSum = $stairsGrowingUp ? $heightSum + $stepHeight : $heightSum - $stepHeight;
-            if ($direction->x <> 0) {
-                $point->addX(($direction->x > 0 ? 1 : -1) * $stepDepth);
+            $amount = ($direction->growToPositive() ? 1 : -1) * $stepDepth;
+            if ($direction->isOnXAxis()) {
+                $point->addX($amount);
             } else {
-                $point->addZ(($direction->y > 0 ? 1 : -1) * $stepDepth);
+                $point->addZ($amount);
             }
         }
     }
