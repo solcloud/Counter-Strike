@@ -48,8 +48,8 @@ class Game
     private int $eventId = 0;
     private int $roundNumber = 1;
     private int $roundStartTickId = 0;
-    private int $roundTickCount = 0;
-    private int $buyTimeTickCount = 0;
+    private int $roundTickCount;
+    private int $buyTimeTickCount;
     private int $playersCountAttackers = 0;
     private int $playersCountDefenders = 0;
     private bool $paused = true;

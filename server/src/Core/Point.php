@@ -116,9 +116,20 @@ class Point
         return "{$this->x},{$this->y},{$this->z}";
     }
 
+    /** @deprecated */
     public function to2D(string $XYaxis): Point2D
     {
-        return new Point2D($this->{$XYaxis[0]}, $this->{$XYaxis[1]});
+        if ($XYaxis === 'xz') {
+            return new Point2D($this->x, $this->z);
+        }
+        if ($XYaxis === 'xy') {
+            return new Point2D($this->x, $this->y);
+        }
+        if ($XYaxis === 'zy') {
+            return new Point2D($this->z, $this->y);
+        }
+
+        GameException::notImplementedYet("New axis '$XYaxis'?");
     }
 
     /**

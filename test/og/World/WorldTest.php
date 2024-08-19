@@ -13,6 +13,7 @@ use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
 use cs\Enum\Color;
+use cs\Enum\RampDirection;
 use cs\Map\TestMap;
 use Test\BaseTestCase;
 
@@ -79,7 +80,7 @@ class WorldTest extends BaseTestCase
     public function testStairCaseUp(): void
     {
         $steps = 20;
-        $ramp = new Ramp(new Point(Setting::playerBoundingRadius() + 10, 0, 0), new Point2D(1, 0), $steps + 1, 250, true, Setting::moveDistancePerTick());
+        $ramp = new Ramp(new Point(Setting::playerBoundingRadius() + 10, 0, 0), RampDirection::GROW_TO_POSITIVE_X, $steps + 1, 250, true, Setting::moveDistancePerTick());
 
         $game = $this->createTestGame($steps);
         $game->getWorld()->addRamp($ramp);
@@ -95,7 +96,7 @@ class WorldTest extends BaseTestCase
         $startY = $steps * Setting::playerObstacleOvercomeHeight();
         $ramp = new Ramp(
             new Point(Setting::moveDistancePerTick() / -2, $startY, -2 * Setting::playerBoundingRadius()),
-            new Point2D(1, 0),
+            RampDirection::GROW_TO_POSITIVE_X,
             $steps,
             250,
             false,

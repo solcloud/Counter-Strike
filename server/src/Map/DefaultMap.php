@@ -6,6 +6,7 @@ use cs\Core\Box;
 use cs\Core\Point;
 use cs\Core\Point2D;
 use cs\Core\Ramp;
+use cs\Enum\RampDirection;
 
 class DefaultMap extends BoxMap
 {
@@ -45,13 +46,13 @@ class DefaultMap extends BoxMap
         $stepHeight = 10;
         $stepCount = $heightCrouch / $stepHeight;
         foreach ([0, 31] as $z) {
-            $ramp1 = new Ramp(new Point(19 * $scale, $y, $z * $scale), new Point2D(1, 0), $stepCount, $scale, true, 12, $stepHeight);
+            $ramp1 = new Ramp(new Point(19 * $scale, $y, $z * $scale), RampDirection::GROW_TO_POSITIVE_X, $stepCount, $scale, true, 12, $stepHeight);
             foreach ($ramp1->getBoxes() as $box) {
                 $this->addBox($box);
             }
             $this->addBox(new Box(new Point(21 * $scale, $y, $z * $scale), $scale, $heightCrouch, $scale));
             $this->navmeshPoints[] = new Point(21 * $scale + $scaleHalf, $y + $heightCrouch, $z * $scale + $scaleHalf);
-            $ramp2 = new Ramp(new Point(24 * $scale - 20, $y, $z * $scale), new Point2D(-1, 0), $stepCount, $scale, true, 12, $stepHeight);
+            $ramp2 = new Ramp(new Point(24 * $scale - 20, $y, $z * $scale), RampDirection::GROW_TO_NEGATIVE_X, $stepCount, $scale, true, 12, $stepHeight);
             foreach ($ramp2->getBoxes() as $box) {
                 $this->addBox($box);
             }

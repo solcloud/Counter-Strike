@@ -5,19 +5,6 @@ namespace cs\Core;
 class Collision
 {
 
-    public static function pointWithPlane(Point2D $center, Plane $plane): bool
-    {
-        $ppStart = $plane->getPoint2DStart();
-        $ppEnd = $plane->getPoint2DEnd();
-
-        return (
-            $center->x >= $ppStart->x
-            && $center->x <= $ppEnd->x
-            && $center->y >= $ppStart->y
-            && $center->y <= $ppEnd->y
-        );
-    }
-
     public static function pointWithCircle(int $pointX, int $pointY, int $circleCenterX, int $circleCenterY, int $circleRadius): bool
     {
         $a = $pointX - $circleCenterX;
@@ -77,16 +64,16 @@ class Collision
         );
     }
 
-    public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, Point2D $pointB, int $planeWidthB, int $planeHeightB): bool
+    public static function planeWithPlane(Point2D $pointA, int $planeWidthA, int $planeHeightA, int $pointBx, int $pointBy, int $planeWidthB, int $planeHeightB): bool
     {
         return (
-            $pointA->x + $planeWidthA >= $pointB->x
+            $pointA->x + $planeWidthA >= $pointBx
             &&
-            $pointA->x <= $pointB->x + $planeWidthB
+            $pointA->x <= $pointBx + $planeWidthB
             &&
-            $pointA->y + $planeHeightA >= $pointB->y
+            $pointA->y + $planeHeightA >= $pointBy
             &&
-            $pointA->y <= $pointB->y + $planeHeightB
+            $pointA->y <= $pointBy + $planeHeightB
         );
     }
 

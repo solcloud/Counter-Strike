@@ -150,9 +150,10 @@ class World
         }
 
         $distance = 2 * $radius;
-        $candidate = $point->to2D('xz')->add(-$radius, -$radius);
+        $candidateX = $point->x - $radius;
+        $candidateZ = $point->z - $radius;
         foreach ($floors as $floor) {
-            if (Collision::planeWithPlane($candidate, $distance, $distance, $floor->getPoint2DStart(), $floor->width, $floor->depth)) {
+            if (Collision::planeWithPlane($floor->getPoint2DStart(), $floor->width, $floor->depth, $candidateX, $candidateZ, $distance, $distance)) {
                 return $floor;
             }
         }
@@ -202,13 +203,13 @@ class World
 
         $width = 2 * $radius;
         $highestWallCeiling = 0;
-        $candidatePlane = $bottomCenter->to2D($xWall ? 'zy' : 'xy')->addX(-$radius);
+        $candidatePlaneA = $xWall ? $bottomCenter->z - $radius : $bottomCenter->x - $radius;
         foreach ($walls as $wall) {
             $wallCeiling = $wall->getCeiling();
             if ($wallCeiling <= $bottomCenter->y) {
                 continue;
             }
-            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+            if (!Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlaneA, $bottomCenter->y, $width, $height)) {
                 continue;
             }
             if ($wallCeiling > $maxWallCeiling) {
@@ -269,10 +270,14 @@ class World
 
     public function tryPickDropItems(Player $player): void
     {
+        $playerPosition = $player->getReferenceToPosition();
+        $boundingRadius = $player->getBoundingRadius();
+        $headHeight = $player->getHeadHeight();
+
         foreach ($this->dropItems as $key => $dropItem) {
             if (!Collision::cylinderWithCylinder(
                 $dropItem->getPosition(), $dropItem->getBoundingRadius(), $dropItem->getHeight(),
-                $player->getReferenceToPosition(), $player->getBoundingRadius(), $player->getHeadHeight()
+                $playerPosition, $boundingRadius, $headHeight
             )) {
                 continue;
             }
@@ -666,10 +671,10 @@ class World
 
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        $candidatePlane = $bottomCenter->to2D(self::WALL_X)->addX(-$radius);
+        $startZ = $bottomCenter->z - $radius;
         $width = 2 * $radius;
         foreach (($this->walls[self::WALL_X][$bottomCenter->x] ?? []) as $wall) {
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $startZ, $bottomCenter->y, $width, $height)) {
                 return $wall;
             }
         }
@@ -679,10 +684,10 @@ class World
 
     public function checkZSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
     {
-        $candidatePlane = $bottomCenter->to2D(self::WALL_Z)->addX(-$radius);
+        $startX = $bottomCenter->x - $radius;
         $width = 2 * $radius;
         foreach (($this->walls[self::WALL_Z][$bottomCenter->z] ?? []) as $wall) {
-            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $candidatePlane, $width, $height)) {
+            if (Collision::planeWithPlane($wall->getPoint2DStart(), $wall->width, $wall->height, $startX, $bottomCenter->y, $width, $height)) {
                 return $wall;
             }
         }

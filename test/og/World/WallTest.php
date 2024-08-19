@@ -12,6 +12,7 @@ use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Core\World;
+use cs\Enum\RampDirection;
 use Test\BaseTestCase;
 
 class WallTest extends BaseTestCase
@@ -124,7 +125,7 @@ class WallTest extends BaseTestCase
     {
         $stepDepth = 2;
         $stepHeight = 8;
-        $ramp = new Ramp(new Point(0, 0, 0), new Point2D(0, 1), 10, 10, true, $stepDepth, $stepHeight);
+        $ramp = new Ramp(new Point(0, 0, 0), RampDirection::GROW_TO_POSITIVE_Z, 10, 10, true, $stepDepth, $stepHeight);
         $boxes = $ramp->getBoxes();
         $this->assertCount(10, $boxes);
         $depth = 0;
@@ -155,7 +156,7 @@ class WallTest extends BaseTestCase
 
         $ramp = new Ramp(
             new Point(0, 0, Setting::playerBoundingRadius() + 1),
-            new Point2D(0, 1),
+            RampDirection::GROW_TO_POSITIVE_Z,
             $numOfBoxes * 3,
             10,
             true,
