@@ -193,6 +193,9 @@ export class Game {
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
             this.playerHit(data, true)
         }
+        if (data.type === SoundType.FLAME_PLAYER_HIT) {
+            this.playerHit(data, false)
+        }
         if (data.type === SoundType.ITEM_PICKUP) {
             this.itemPickUp(data.extra.id)
         }

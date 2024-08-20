@@ -105,6 +105,7 @@ const SoundType = {
     ITEM_DROP_AIR: 20,
     ITEM_DROP_LAND: 21,
     FLAME_EXTINGUISH: 22,
+    FLAME_PLAYER_HIT: 23,
 }
 
 // server/src/Enum/ArmorType.php
