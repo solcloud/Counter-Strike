@@ -5,7 +5,6 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
-use cs\Equipment\Flashbang;
 use cs\Equipment\Grenade;
 use cs\Equipment\Kevlar;
 use cs\Event\EquipEvent;
@@ -27,6 +26,7 @@ class Inventory
 
     public function __construct(bool $isAttackerSide)
     {
+        $this->store = new BuyMenu($isAttackerSide, []);
         $this->reset($isAttackerSide, true);
     }
 
@@ -53,7 +53,7 @@ class Inventory
         }
 
         $this->removeBomb();
-        $this->store = new BuyMenu($isAttackerSide, $this->items);
+        $this->store->reset($isAttackerSide, $this->items);
     }
 
     private function updateEquippedSlot(): int
@@ -95,11 +95,12 @@ class Inventory
             }
             $this->updateEquippedSlot();
             $item->unEquip();
-        } else {
-            $item->decrementQuantity();
+
+            return $item;
         }
 
-        return $item;
+        $item->decrementQuantity();
+        return $item->clone();
     }
 
     public function removeSlot(int $slot): void
@@ -129,7 +130,7 @@ class Inventory
         }
 
         if ($alreadyHave) {
-            return ($alreadyHave->canPurchaseMultipleTime($item));
+            return $alreadyHave->canPurchaseMultipleTime($item);
         }
         return true;
     }
@@ -144,7 +145,7 @@ class Inventory
         $alreadyHave = $this->items[$item->getSlot()->value] ?? null;
         $this->dollars -= $item->getPrice($alreadyHave);
         if ($alreadyHave) {
-            if ($alreadyHave instanceof Flashbang) {
+            if ($alreadyHave->getQuantity() < $item->getMaxQuantity()) {
                 $alreadyHave->incrementQuantity();
                 $item = $alreadyHave;
             } elseif ($alreadyHave instanceof Kevlar && $alreadyHave->getArmorType() === ArmorType::BODY_AND_HEAD) {
@@ -156,7 +157,7 @@ class Inventory
             }
         }
 
-        $this->store->buy($item);
+        $this->store->confirmPurchase($item);
         $this->items[$item->getSlot()->value] = $item;
         if ($item->canBeEquipped()) {
             return $this->equip($item->getSlot());

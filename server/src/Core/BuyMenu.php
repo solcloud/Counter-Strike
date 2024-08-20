@@ -10,15 +10,23 @@ use cs\Weapon;
 class BuyMenu
 {
     /** @var array<int,int> [itemId => count] */
-    private array $itemBuyCount = [];
-    private int $grenadeCount = 0;
+    private array $itemBuyCount;
+    private int $grenadeCount;
     private int $grenadeCountMax = 4;
 
-    /**
-     * @param Item[] $alreadyHaveItems
-     */
-    public function __construct(public readonly bool $forAttackerStore, array $alreadyHaveItems)
+    /** @param Item[] $alreadyHaveItems */
+    public function __construct(public bool $forAttackerStore, array $alreadyHaveItems)
     {
+        $this->reset($this->forAttackerStore, $alreadyHaveItems);
+    }
+
+    /** @param Item[] $alreadyHaveItems */
+    public function reset(bool $forAttackerStore, array $alreadyHaveItems): void
+    {
+        $this->grenadeCount = 0;
+        $this->itemBuyCount = [];
+        $this->forAttackerStore = $forAttackerStore;
+
         foreach ($alreadyHaveItems as $item) {
             if ($item->getType() === ItemType::TYPE_GRENADE) {
                 $this->grenadeCount++;
@@ -72,7 +80,7 @@ class BuyMenu
         return $item;
     }
 
-    public function buy(Item $item): void
+    public function confirmPurchase(Item $item): void
     {
         $this->itemBuyCount[$item->getId()]++;
         if ($item->getType() === ItemType::TYPE_GRENADE) {

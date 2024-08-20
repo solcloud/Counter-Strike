@@ -80,6 +80,11 @@ abstract class Item
         // empty hook
     }
 
+    public function clone(): static
+    {
+        throw new GameException('Override clone() method if makes sense for item: ' . get_class($this));
+    }
+
     public abstract function getType(): ItemType;
 
     public abstract function getSlot(): InventorySlot;
