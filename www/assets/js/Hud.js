@@ -297,7 +297,7 @@ export class HUD {
                         <canvas id="radar-canvas"></canvas>
                     </div>
                     <div class="money bg"><span data-money>0</span> $ <span data-can-buy>🛒</span></div>
-                    <div data-have-bomb class="hidden icons" style="margin:22px 4px;font-size:200%;color:#fdf46e"><span data-can-plant class="hidden">🠻&nbsp;</span>\uE031</div>
+                    <div data-have-bomb class="hidden icons" style="margin:22px 4px;font-size:200%;color:#fdf46e"><span data-can-plant class="hidden">⬇&nbsp;</span>\uE031</div>
                     <div data-have-defuse-kit class="hidden icons" style="margin:22px 4px;font-size:200%;color:#5d8dea">\uE066</div>
                 </div>
                 <div class="bottom">

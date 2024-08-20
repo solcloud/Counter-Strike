@@ -97,8 +97,7 @@ trait AttackTrait
 
     protected function createAttackEvent(AttackEnable $item): Attackable
     {
-        $origin = $this->getPositionClone();
-        $origin->addY($this->getSightHeight());
+        $origin = $this->getSightPositionClone();
 
         if ($item instanceof Grenade) {
             $event = new ThrowEvent(

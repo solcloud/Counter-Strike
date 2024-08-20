@@ -76,6 +76,11 @@ class DefaultMap extends BoxMap
         return 180;
     }
 
+    public function getBombMaxBlastDistance(): int
+    {
+        return 1500;
+    }
+
     public function getBuyArea(bool $forAttackers): Box
     {
         return $this->buyArea[(int)$forAttackers];
