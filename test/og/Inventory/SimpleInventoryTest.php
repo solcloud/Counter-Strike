@@ -357,6 +357,12 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertInstanceOf(Flashbang::class, $item);
         $this->assertSame($itemPrice, $item->getPrice());
         $this->assertFalse($game->getPlayer(1)->getInventory()->canBuy($item));
+
+        $flashBang1 = $game->getPlayer(1)->dropEquippedItem();
+        $this->assertInstanceOf(Flashbang::class, $flashBang1);
+        $flashBang2 = $game->getPlayer(1)->dropEquippedItem();
+        $this->assertInstanceOf(Flashbang::class, $flashBang2);
+        $this->assertFalse($flashBang1 === $flashBang2);
     }
 
     public function testPlayerBuyMaxFourGrenades(): void

@@ -26,6 +26,13 @@ class Flashbang extends Grenade
         return $this->quantity;
     }
 
+    public function clone(): static
+    {
+        $clone = clone $this;
+        $clone->quantity = 1;
+        return $clone;
+    }
+
     public function getMaxQuantity(): int
     {
         return 2;

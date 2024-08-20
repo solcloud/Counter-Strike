@@ -330,19 +330,19 @@ class World
                 continue;
             }
 
-            $gunSwap = false;
+            $shouldEquipOnPickup = false;
             $item = $dropItem->getItem();
             $slot = $item->getSlot();
             $slotId = $slot->value;
             if ($player->getInventory()->has($slotId) && in_array($slotId, [InventorySlot::SLOT_PRIMARY->value, InventorySlot::SLOT_SECONDARY->value], true)) {
-                $gunSwap = true;
+                $shouldEquipOnPickup = ($player->getEquippedItem()->getSlot() === $slot);
                 $player->dropItemFromSlot($slotId);
             }
             if ($player->getInventory()->pickup($item)) {
                 $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
                 $this->makeSound($sound->setPlayer($player)->setItem($item)->addExtra('id', $dropItem->getId()));
                 unset($this->dropItems[$key]);
-                if ($gunSwap) {
+                if ($shouldEquipOnPickup) {
                     $player->equip($slot);
                 }
                 return;

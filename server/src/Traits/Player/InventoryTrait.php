@@ -64,12 +64,11 @@ trait InventoryTrait
 
     public function dropEquippedItem(): ?Item
     {
-        $item = $this->getEquippedItem();
-        if (!$item->isUserDroppable()) {
+        $item = $this->inventory->removeEquipped();
+        if (null === $item) {
             return null;
         }
 
-        $this->inventory->removeEquipped();
         $this->world->dropItem($this, $item);
         $this->equip($this->getEquippedItem()->getSlot());
         return $item;
