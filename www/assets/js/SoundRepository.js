@@ -133,6 +133,9 @@ export class SoundRepository {
             return null
         }
 
+        if (type === SoundType.FLAME_PLAYER_HIT) {
+            return '512138__beezlefm__item-sound.wav'
+        }
         if (type === SoundType.FLAME_SPAWN || type === SoundType.FLAME_EXTINGUISH) {
             return null
         }

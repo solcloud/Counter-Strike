@@ -546,9 +546,11 @@ class World
 
                 $fire->playerHit($playerId, $tickId);
                 $damage = $fire->item->calculateDamage($player->getArmorType() !== ArmorType::NONE);
-                if ($fire->initiator->isPlayingOnAttackerSide() !== $player->isPlayingOnAttackerSide()) {
-                    $this->game->getScore()->getPlayerStat($fire->initiator->getId())->addDamage($damage);
-                }
+                assert($fire->item instanceof Item);
+                $this->playerHit(
+                    $player->getCentrePoint(), $player, $fire->initiator, SoundType::FLAME_PLAYER_HIT,
+                    $fire->item, $flame->center, $damage
+                );
                 $player->lowerHealth($damage);
                 if (!$player->isAlive()) {
                     $this->playerDiedToFlame($fire->initiator, $player, $fire->item);
@@ -697,24 +699,56 @@ class World
 
     public function bulletHit(Hittable $hit, Bullet $bullet, bool $wasHeadshot): void
     {
-        $soundEvent = new SoundEvent($bullet->getPosition()->clone(), $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT);
-        $soundEvent->setPlayer($hit->getPlayer());
-        $item = $bullet->getShootItem();
-        if ($item instanceof Item) {
-            $soundEvent->setItem($item);
+        if ($hit->getPlayer()) {
+            $item = $bullet->getShootItem();
+            assert($item instanceof Item);
+
+            $this->playerHit(
+                $bullet->getPosition()->clone(),
+                $hit->getPlayer(),
+                $this->game->getPlayer($bullet->getOriginPlayerId()),
+                $wasHeadshot ? SoundType::BULLET_HIT_HEADSHOT : SoundType::BULLET_HIT,
+                $item,
+                $bullet->getOrigin(),
+                $hit->getDamage(),
+            );
         }
+
         if ($hit instanceof SolidSurface) {
-            $soundEvent->setSurface($hit);
+            $this->surfaceHit(
+                $bullet->getPosition()->clone(),
+                $hit,
+                $bullet->getOriginPlayerId(),
+                $bullet->getOrigin(),
+                $hit->getDamage()
+            );
         }
-        $damage = $hit->getDamage();
-        $attacker = $bullet->getOriginPlayerId();
-        $soundEvent->addExtra('origin', $bullet->getOrigin()->toArray());
+    }
+
+    public function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, int $damage): void
+    {
+        $soundEvent = new SoundEvent($hitPoint, SoundType::BULLET_HIT);
+        $soundEvent->setSurface($hit);
+        $soundEvent->addExtra('origin', $origin->toArray());
         $soundEvent->addExtra('damage', min(100, $damage));
-        $soundEvent->addExtra('shooter', $attacker);
+        $soundEvent->addExtra('shooter', $attackerId);
 
         $this->makeSound($soundEvent);
-        if ($hit->getPlayer() && $hit->getPlayer()->isPlayingOnAttackerSide() !== $bullet->isOriginPlayerAttackerSide()) {
-            $this->game->getScore()->getPlayerStat($attacker)->addDamage($damage);
+    }
+
+    public function playerHit(Point $hitPoint, Player $playerHit, Player $playerCulprit, SoundType $soundType, Item $item, Point $origin, int $damage): void
+    {
+        $attackerId = $playerCulprit->getId();
+        $soundEvent = new SoundEvent($hitPoint, $soundType);
+        $soundEvent->setPlayer($playerHit);
+        $soundEvent->setItem($item);
+        $soundEvent->addExtra('origin', $origin->toArray());
+        $soundEvent->addExtra('damage', min(100, $damage));
+        $soundEvent->addExtra('shooter', $attackerId);
+
+        $this->makeSound($soundEvent);
+        if ($playerHit->isPlayingOnAttackerSide() !== $playerCulprit->isPlayingOnAttackerSide()) {
+            $this->game->getScore()->getPlayerStat($attackerId)->addDamage($damage);
         }
     }
 
