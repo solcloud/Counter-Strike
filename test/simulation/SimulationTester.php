@@ -10,6 +10,11 @@ use Test\BaseTest;
 abstract class SimulationTester extends BaseTest
 {
 
+    public function __construct()
+    {
+        parent::__construct(get_class($this));
+    }
+
     public function onGameStart(Game $game): void
     {
         // empty hook

@@ -28,6 +28,10 @@ class PerformanceTest extends BaseTest
 
     public static function setUpBeforeClass(): void
     {
+        if (getenv('XDEBUG_MODE') === 'coverage') {
+            self::markTestSkipped();
+        }
+
         gc_collect_cycles();
         parent::setUpBeforeClass();
 

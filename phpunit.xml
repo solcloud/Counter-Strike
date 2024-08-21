@@ -16,7 +16,7 @@
             <directory>./test/simulation/</directory>
         </testsuite>
     </testsuites>
-    <coverage>
+    <source>
         <include>
             <directory>server/src/</directory>
         </include>
@@ -25,5 +25,5 @@
             <directory>server/src/Map/</directory>
             <directory>server/src/Weapon/</directory>
         </exclude>
-    </coverage>
+    </source>
 </phpunit>
