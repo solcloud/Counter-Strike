@@ -94,7 +94,7 @@ final class Knife extends BaseWeapon implements AttackEnable
 
     public function getKillAward(): int
     {
-        return 1500;
+        return self::killAward;
     }
 
 }

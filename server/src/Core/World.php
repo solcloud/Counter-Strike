@@ -493,15 +493,7 @@ class World
         assert($this->grenadeNavMesh !== null);
 
         $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
-        $floorNavmeshPoint = $epicentreFloor->clone();
-        $this->grenadeNavMesh->convertToNavMeshNode($floorNavmeshPoint);
-
-        if (null === $this->grenadeNavMesh->getGraph()->getNodeById($floorNavmeshPoint->hash())) {
-            $floorNavmeshPoint = $this->grenadeNavMesh->tryFindClosestTile($epicentreFloor);
-            if (null === $floorNavmeshPoint) {
-                return;
-            }
-        }
+        $floorNavmeshPoint = $this->grenadeNavMesh->findTile($epicentreFloor, $item->getBoundingRadius());
 
         $this->game->addGrillEvent(
             new GrillEvent(
@@ -655,7 +647,7 @@ class World
     public function buildNavigationMesh(int $tileSize, int $objectHeight): PathFinder
     {
         $boundingRadius = Setting::playerBoundingRadius();
-        if ($tileSize > $boundingRadius - 2) {
+        if ($tileSize > $boundingRadius - 4) {
             throw new GameException('Tile size should be decently lower than player bounding radius.');
         }
 
@@ -699,10 +691,10 @@ class World
 
     public function bulletHit(Hittable $hit, Bullet $bullet, bool $wasHeadshot): void
     {
-        if ($hit->getPlayer()) {
-            $item = $bullet->getShootItem();
-            assert($item instanceof Item);
+        $item = $bullet->getShootItem();
+        assert($item instanceof Item);
 
+        if ($hit->getPlayer()) {
             $this->playerHit(
                 $bullet->getPosition()->clone(),
                 $hit->getPlayer(),
@@ -720,14 +712,16 @@ class World
                 $hit,
                 $bullet->getOriginPlayerId(),
                 $bullet->getOrigin(),
+                $item,
                 $hit->getDamage()
             );
         }
     }
 
-    public function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, int $damage): void
+    public function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, Item $item, int $damage): void
     {
         $soundEvent = new SoundEvent($hitPoint, SoundType::BULLET_HIT);
+        $soundEvent->setItem($item);
         $soundEvent->setSurface($hit);
         $soundEvent->addExtra('origin', $origin->toArray());
         $soundEvent->addExtra('damage', min(100, $damage));

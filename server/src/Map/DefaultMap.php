@@ -4,7 +4,6 @@ namespace cs\Map;
 
 use cs\Core\Box;
 use cs\Core\Point;
-use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Enum\RampDirection;
 

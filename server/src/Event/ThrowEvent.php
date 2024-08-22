@@ -82,12 +82,13 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
             $this->tickMax = 0;
         }
         for ($i = 1; $i <= ceil(Util::GRAVITY * 2); $i++) {
-            if (!$this->world->findFloor($point, $this->radius)) {
+            if (!$this->world->findFloorSquare($point, $this->radius)) {
                 $point->addY(-1);
                 continue;
             }
 
-            $this->makeEvent($point->addY($this->radius), SoundType::GRENADE_LAND);
+            $point->addY($this->radius);
+            $this->makeEvent($point, SoundType::GRENADE_LAND);
             $this->runOnCompleteHooks();
             return;
         }

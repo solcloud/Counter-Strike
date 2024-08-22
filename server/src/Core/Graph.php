@@ -39,4 +39,13 @@ final class Graph extends DiGraph
         }
     }
 
+    /**
+     * @return array<string,string[]>
+     * @internal
+     */
+    public function internalGetGeneratedNeighbors(): array
+    {
+        return $this->neighbors;
+    }
+
 }

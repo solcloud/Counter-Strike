@@ -1,5 +1,6 @@
 <?php
 
+use cs\Core\Game;
 use cs\Core\Setting;
 use cs\Map;
 
@@ -9,7 +10,12 @@ require __DIR__ . '/../vendor/autoload.php';
 $map = new Map\DefaultMap();
 ////////
 
+$game = new Game();
+$game->loadMap($map);
+$world = $game->getWorld();
+
 $radarMapGenerator = (isset($_GET['radar']));
+$showNavigationMesh = (isset($_GET['navmesh']));
 $buyAreas = [
     $map->getBuyArea(false)->toArray(),
     $map->getBuyArea(true)->toArray(),
@@ -204,6 +210,36 @@ foreach ($map->getBoxes() as $box) {
         area.translateY(box.height / 2)
         area.translateZ(box.depth / -2)
         scene.add(area);
+
+        <?php if ($showNavigationMesh): ?>
+        <?php
+            $tileSize = $world::GRENADE_NAVIGATION_MESH_TILE_SIZE;
+            $path = $world->buildNavigationMesh($tileSize, $world::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
+            $navmesh = [];
+            foreach ($path->getGraph()->internalGetGeneratedNeighbors() as $nodeId => $ids) {
+                $navmesh[] = $nodeId;
+            }
+        ?>
+        let mesh = null;
+        const navMeshGeometry = new THREE.BoxGeometry(<?= $tileSize ?>, .5, <?= $tileSize ?>);
+        const navMeshMaterial = new THREE.MeshStandardMaterial({color: 0xD024A3})
+        <?php foreach ($navmesh as $coords): ?>
+        mesh = new THREE.Mesh(navMeshGeometry, navMeshMaterial)
+        mesh.translateY(navMeshGeometry.parameters.height / 2)
+        mesh.position.set(<?= $coords ?>)
+        mesh.position.z *= -1
+        scene.add(mesh);
+        <?php endforeach; ?>
+        if (false) {
+            mesh = new THREE.Mesh(
+                new THREE.BoxGeometry(20, 20, 20),
+                new THREE.MeshStandardMaterial({color: 0xFF0000, transparent: true, opacity: .8})
+            )
+            mesh.position.set(1902, 20, -2550)
+            mesh.translateY(mesh.geometry.parameters.height / 2)
+            scene.add(mesh)
+        }
+        <?php endif; ?>
     }
 
     function animate() {

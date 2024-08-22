@@ -49,8 +49,8 @@ final class GrillEvent extends Event implements ForOneRoundMax
     )
     {
         $flameArea = ($this->flameRadius * 2 + 1) ** 2;
-        $this->spawnTickCount = Util::millisecondsToFrames(20);
-        $this->spawnFlameCount = (int)ceil($this->item->getSpawnAreaMetersSquared() / $flameArea);
+        $this->spawnTickCount = Util::millisecondsToFrames(30);
+        $this->spawnFlameCount = (int)ceil($this->item->getSpawnAreaMetersSquared() * 100 / $flameArea);
         $this->maxTicksCount = Util::millisecondsToFrames($this->item->getMaxTimeMs());
         $this->damageCoolDownTickCount = Util::millisecondsToFrames(100);
         $this->maxFlameCount = (int)ceil($this->item->getMaxAreaMetersSquared() / $flameArea);

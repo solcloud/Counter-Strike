@@ -60,7 +60,7 @@ final class PathFinder
         foreach (range(1, 3 * $height) as $i) {
             $fallCandidate->addY(-1);
             if ($this->world->findFloorSquare($fallCandidate, $radius)) {
-                $candidate->setY($fallCandidate->y);
+                $candidate->setY($fallCandidate->y); // side effect
                 return true;
             }
         }
@@ -105,24 +105,70 @@ final class PathFinder
         return false;
     }
 
-    public function tryFindClosestTile(Point $point): ?Point
+    public function findTile(Point $pointOnFloor, int $radius): Point
     {
-        $candidate = $point->clone();
-        foreach ($this->moves as $angle => $move) {
-            $candidate->setFrom($point);
+        $floorNavmeshPoint = $pointOnFloor->clone();
+        $this->convertToNavMeshNode($floorNavmeshPoint);
+        if ($this->getGraph()->getNodeById($floorNavmeshPoint->hash())) {
+            return $floorNavmeshPoint;
+        }
 
-            if ($this->canFullyMoveTo($candidate, $angle, $this->tileSize, 0, $this->colliderHeight)) {
-                $this->convertToNavMeshNode($candidate);
-                if ($this->getGraph()->getNodeById($candidate->hash())) {
-                    return $candidate;
+        $maxDistance = $this->tileSize * 2;
+        $maxY = $this->obstacleOvercomeHeight * 2;
+        $checkAbove = function (Point $start, int $maxY, int $radius): ?Point {
+            $yCandidate = $start->clone();
+            $navMeshCenter = $yCandidate->clone();
+            $this->convertToNavMeshNode($navMeshCenter);
+            for ($i = 1; $i <= $maxY; $i++) {
+                $yCandidate->addY(1);
+                if ($this->world->findFloorSquare($yCandidate, $radius - 1)) {
+                    break;
+                }
+                if ($this->getGraph()->getNodeById($navMeshCenter->setY($yCandidate->y)->hash())) {
+                    return $navMeshCenter;
+                }
+            }
+
+            return null;
+        };
+
+        // try navmesh above
+        $above = $checkAbove($pointOnFloor, $maxY, $radius);
+        if ($above) {
+            return $above;
+        }
+
+        // try neighbour tiles
+        $candidate = $pointOnFloor->clone();
+        $navmesh = $pointOnFloor->clone();
+        foreach ($this->moves as $angle => $move) {
+            $candidate->setFrom($pointOnFloor);
+
+            for ($distance = 1; $distance <= $maxDistance; $distance++) {
+                $candidate->addPart(...$this->moves[$angle]);
+                if (!$this->canFullyMoveTo($candidate, $angle, 1, $radius, $this->colliderHeight)) {
+                    break;
+                }
+
+                $prevNavmesh = $navmesh->hash();
+                $navmesh->setFrom($candidate);
+                $this->convertToNavMeshNode($navmesh);
+                if ($this->getGraph()->getNodeById($navmesh->hash())) {
+                    return $navmesh;
+                }
+                if ($prevNavmesh !== $navmesh->hash()) {
+                    $above = $checkAbove($candidate, $maxY, $radius);
+                    if ($above) {
+                        return $above;
+                    }
                 }
             }
         }
 
-        return null;
+        GameException::notImplementedYet('Should always find something? ' . $pointOnFloor->hash());
     }
 
-    public function convertToNavMeshNode(Point $point): float
+    public function convertToNavMeshNode(Point $point): void
     {
         if ($point->x < 1 || $point->z < 1) {
             throw new GameException('World start from 1');
@@ -132,11 +178,9 @@ final class PathFinder
         $fmodZ = fmod($point->z, $this->tileSize);
 
         $x = ((int)floor(($point->x + ($fmodX == 0 ? -1 : +0)) / $this->tileSize) * $this->tileSize) + 1 + $this->tileSizeHalf;
-        $point->setX($x);
+        $point->x = $x;
         $z = ((int)floor(($point->z + ($fmodZ == 0 ? -1 : +0)) / $this->tileSize) * $this->tileSize) + 1 + $this->tileSizeHalf;
-        $point->setZ($z);
-
-        return (abs($this->tileSizeHalf - $fmodX) + abs($this->tileSizeHalf - $fmodZ)) / 2;
+        $point->z = $z;
     }
 
     public function buildNavigationMesh(Point $start, int $objectHeight): void
@@ -182,7 +226,7 @@ final class PathFinder
                 $this->graph->addNode($currentNode);
             }
             if (++$this->iterationCount === 10_000) {
-                GameException::notImplementedYet('New map or bad test (no boundary box, bad starting point)?');
+                GameException::notImplementedYet('New map, tileSize or bad test (no boundary box, bad starting point)?');
             }
         }
     }
