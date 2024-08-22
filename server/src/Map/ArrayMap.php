@@ -16,6 +16,8 @@ class ArrayMap extends Map
     private array $walls;
     /** @var Floor[] */
     private array $floors;
+    /** @var Point[] */
+    private array $startingPointsForNavigationMesh;
 
     /**
      * @param array<string,mixed> $data
@@ -36,6 +38,16 @@ class ArrayMap extends Map
         foreach ($data['walls'] as $wallData) { // @phpstan-ignore-line
             $this->walls[] = Wall::fromArray($wallData); // @phpstan-ignore-line
         }
+
+        foreach($data['startingPointsNavMesh'] ?? [] as $pointData) { // @phpstan-ignore-line
+            $this->startingPointsForNavigationMesh[] = Point::fromArray($pointData); // @phpstan-ignore-line
+        }
+        $this->startingPointsForNavigationMesh ??= parent::getStartingPointsForNavigationMesh();
+    }
+
+    public function getStartingPointsForNavigationMesh(): array
+    {
+        return $this->startingPointsForNavigationMesh;
     }
 
     public function getWalls(): array

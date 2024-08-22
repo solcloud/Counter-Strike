@@ -5,7 +5,6 @@ namespace Test\Shooting;
 use cs\Core\Box;
 use cs\Core\Player;
 use cs\Core\Point;
-use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Enum\BuyMenuItem;

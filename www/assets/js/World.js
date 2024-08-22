@@ -10,6 +10,7 @@ export class World {
     #modelRepository
     #decals = []
     #flames = []
+    #cache = {}
     volume = 30
 
     constructor() {
@@ -173,12 +174,24 @@ export class World {
         return dropItem
     }
 
-    spawnFlame(size, height) {
-        let mesh = new THREE.Mesh(
-            new THREE.ConeGeometry(size, height, randomInt(5, 7)),
-            new THREE.MeshPhongMaterial({color: new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)}),
-        )
+    loadCache(index, loadCallback) {
+        if (this.#cache[index] === undefined) {
+            this.#cache[index] = loadCallback()
+        }
 
+        return this.#cache[index];
+    }
+
+    spawnFlame(size, height) {
+        const coneDetail = randomInt(5, 7)
+        const lightnessValue = randomInt(30, 80)
+        const geometry = this.loadCache(`flame-geo-c-${coneDetail}`, () => new THREE.ConeGeometry(1, 1, coneDetail))
+        const material = this.loadCache(`flame-mat-${lightnessValue}`, () => new THREE.MeshPhongMaterial({
+            color: new THREE.Color(`hsl(53, 100%, ${lightnessValue}%, 1)`)
+        }))
+
+        let mesh = new THREE.Mesh(geometry, material)
+        mesh.scale.set(size, height, size)
         mesh.castShadow = false
         mesh.receiveShadow = true
 

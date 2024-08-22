@@ -33,6 +33,7 @@ final class NavigationMeshTest extends BaseTestCase
                 ['326,333,326', new Point(333, 333, 333)],
                 ['450,0,295', new Point(450, 0, 285)],
                 ['450,0,295', new Point(461, 0, 285)],
+                ['1566,50,16', new Point(1570,50,26)],
             ],
         ];
         $world = new World($this->createTestGame());
@@ -81,8 +82,7 @@ final class NavigationMeshTest extends BaseTestCase
         $path->convertToNavMeshNode($closestCandidate);
         $this->assertNull($path->getGraph()->getNodeById($closestCandidate->hash()));
 
-        $validPoint = $path->tryFindClosestTile($candidate);
-        $this->assertNotNull($validPoint);
+        $validPoint = $path->findTile($candidate, 1);
         $this->assertLessThan($closestCandidate->x, $validPoint->x);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,0,5', $validPoint->hash());

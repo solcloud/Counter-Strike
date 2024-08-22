@@ -328,6 +328,7 @@ export class Game {
         const flame = this.#world.spawnFlame(size, height)
         this.#flammable[fireId][flameId] = flame
         flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
+        flame.rotation.x = randomInt(-10, 10) / 100;
         flame.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
     }
 
