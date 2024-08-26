@@ -20,6 +20,7 @@ use cs\Event\PlantEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
+use cs\Event\SmokeEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
 use cs\Interface\ForOneRoundMax;
@@ -254,6 +255,11 @@ class Game
     }
 
     public function addGrillEvent(GrillEvent $event): void
+    {
+        $this->addEvent($event);
+    }
+
+    public function addSmokeEvent(SmokeEvent $event): void
     {
         $this->addEvent($event);
     }

@@ -29,5 +29,7 @@ enum SoundType: int
     case ITEM_DROP_LAND = 21;
     case FLAME_EXTINGUISH = 22;
     case FLAME_PLAYER_HIT = 23;
+    case SMOKE_SPAWN = 24;
+    case SMOKE_FADE = 25;
 
 }

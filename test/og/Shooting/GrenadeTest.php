@@ -10,8 +10,8 @@ use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
+use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
-use cs\Equipment\Smoke;
 use cs\Event\SoundEvent;
 use Test\BaseTestCase;
 
@@ -41,16 +41,16 @@ class GrenadeTest extends BaseTestCase
         });
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(12, 15),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             $this->waitNTicks(1800),
             $this->endGame(),
         ]);
 
-        $floorY += Smoke::boundingRadius;
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $floorY += Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertPositionNotSame(new Point(), $landEvent->position);
@@ -85,9 +85,9 @@ class GrenadeTest extends BaseTestCase
         });
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(12, 15),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             function (Player $p) {
                 $p->moveForward();
                 $this->assertNotNull($p->attack());
@@ -96,8 +96,8 @@ class GrenadeTest extends BaseTestCase
             $this->endGame(),
         ]);
 
-        $floorY += Smoke::boundingRadius;
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $floorY += Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertPositionNotSame(new Point(), $landEvent->position);
@@ -132,16 +132,16 @@ class GrenadeTest extends BaseTestCase
         $this->playPlayer($game, [
             fn(Player $p) => $p->crouch(),
             fn(Player $p) => $p->getSight()->look(45, 45),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             $this->waitNTicks(1500),
             $this->endGame(),
         ]);
 
-        $y = Smoke::boundingRadius;
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $y = Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertPositionNotSame(new Point(), $landEvent->position);
@@ -174,17 +174,17 @@ class GrenadeTest extends BaseTestCase
         $this->playPlayer($game, [
             fn(Player $p) => $p->crouch(),
             fn(Player $p) => $p->getSight()->look(45, -8),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $p->jump(),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             $this->waitNTicks(1200),
             $this->endGame(),
         ]);
 
-        $y = Smoke::boundingRadius;
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $y = Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertPositionNotSame(new Point(), $landEvent->position);
@@ -230,7 +230,7 @@ class GrenadeTest extends BaseTestCase
         ]);
 
         $y = Flashbang::boundingRadius;
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertNull($bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertGreaterThan($y, $landEvent->position->y);
@@ -267,20 +267,20 @@ class GrenadeTest extends BaseTestCase
         });
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(2, 90),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             $this->waitNTicks(2500),
             $this->endGame(),
         ]);
 
-        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertCount(4, $bounceEvents);
         $bounceEvent = array_pop($bounceEvents);
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
-        $this->assertPositionSame(new Point(0, $floorY + Smoke::boundingRadius, 0), $landEvent->position, "FloorY: {$floorY}");
+        $this->assertPositionSame(new Point(0, $floorY + Decoy::boundingRadius, 0), $landEvent->position, "FloorY: {$floorY}");
         $this->assertPositionSame($bounceEvent->position, $landEvent->position);
     }
 
@@ -306,34 +306,34 @@ class GrenadeTest extends BaseTestCase
         });
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(-80, 20),
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             $this->waitNTicks(1100),
             $this->endGame(),
         ]);
 
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
-        $this->assertSame(-1 + Smoke::boundingRadius, $bounceEvent->position->x);
-        $this->assertGreaterThan(Smoke::boundingRadius + 10, $bounceEvent->position->y);
+        $this->assertSame(-1 + Decoy::boundingRadius, $bounceEvent->position->x);
+        $this->assertGreaterThan(Decoy::boundingRadius + 10, $bounceEvent->position->y);
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
-        $this->assertSame(Smoke::boundingRadius, $landEvent->position->y);
+        $this->assertSame(Decoy::boundingRadius, $landEvent->position->y);
         $pp = $game->getPlayer(1)->getPositionClone();
         $this->assertGreaterThan($pp->x, $landEvent->position->x);
         $this->assertGreaterThan($pp->z, $landEvent->position->z);
-        $this->assertPositionSame(new Point(559, Smoke::boundingRadius, 347), $landEvent->position);
+        $this->assertPositionSame(new Point(559, Decoy::boundingRadius, 347), $landEvent->position);
     }
 
     public function testMultiThrow(): void
     {
         $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
-            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
-            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
             fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
-            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertTrue($game->getWorld()->canAttack($p)),
             fn(Player $p) => $this->assertNotNull($p->attack()),
             fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),

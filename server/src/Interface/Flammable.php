@@ -2,7 +2,7 @@
 
 namespace cs\Interface;
 
-interface Flammable
+interface Flammable extends Volumetric
 {
 
     public function getMaxAreaMetersSquared(): int;

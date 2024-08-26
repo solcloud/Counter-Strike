@@ -7,6 +7,7 @@ use cs\Core\DropItem;
 use cs\Core\Item;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Sequence;
 use cs\Core\Util;
 use cs\Core\World;
 use cs\Enum\SoundType;
@@ -27,7 +28,7 @@ class DropEvent extends Event implements ForOneRoundMax
 
     public function __construct(private readonly Player $player, private readonly Item $item, private readonly World $world)
     {
-        $this->id = "drop-{$this->player->getId()}-{$this->item->getId()}-{$this->world->getTickId()}";
+        $this->id = Sequence::next();
         $this->origin = $this->player->getSightPositionClone();
         $this->dropItem = new DropItem($this->id, $this->item, $this->origin->clone());
         $this->angleHorizontal = $player->getSight()->getRotationHorizontal();

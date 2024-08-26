@@ -7,12 +7,14 @@ use cs\Core\GameException;
 use cs\Core\Item;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Sequence;
 use cs\Core\Util;
 use cs\Core\World;
 use cs\Enum\SoundType;
 use cs\Equipment\Flashbang;
 use cs\Equipment\Grenade;
 use cs\Equipment\HighExplosive;
+use cs\Equipment\Smoke;
 use cs\HitGeometry\BallCollider;
 use cs\Interface\Attackable;
 use cs\Interface\ForOneRoundMax;
@@ -21,11 +23,12 @@ use cs\Interface\Flammable;
 final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 {
 
-    private string $id;
+    private readonly string $id;
     private float $time = 0.0;
     private float $timeIncrement;
     private Point $position;
     private Point $lastEventPosition;
+    private Point $floorCandidate;
     private BallCollider $ball;
     private int $bounceCount = 0;
     private bool $needsToLandOnFloor;
@@ -47,8 +50,10 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
             throw new GameException("Velocity needs to be positive"); // @codeCoverageIgnore
         }
 
+        $this->id = Sequence::next();
         $this->position = $origin->clone();
         $this->lastEventPosition = $origin->clone();
+        $this->floorCandidate = $origin->clone();
         $this->ball = new BallCollider($this->world, $origin, $radius);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
         $this->timeIncrement = 1 / Util::millisecondsToFrames(150); // fixme some good value or velocity or gravity :)
@@ -144,9 +149,16 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
                 continue;
             }
 
-            if ($this->angleVertical < 10 && $this->item instanceof Flammable && $this->ball->getResolutionAngleVertical() > 0) {
-                $this->finishLanding($pos);
-                return;
+            if ($this->ball->getResolutionAngleVertical() > 0
+                && $this->world->findFloorSquare($this->floorCandidate->set($pos->x, $pos->y - $this->radius, $pos->z), $this->radius)) {
+                if ($this->item instanceof Flammable) {
+                    $this->finishLanding($pos);
+                    return;
+                }
+                if ($this->item instanceof Smoke && $this->world->isCollisionWithMolotov($this->floorCandidate)) {
+                    $this->finishLanding($pos);
+                    return;
+                }
             }
 
             $this->setAngles($this->ball->getResolutionAngleHorizontal(), $this->ball->getResolutionAngleVertical());
@@ -169,7 +181,6 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 
     public function fire(): AttackResult
     {
-        $this->id = "throw-{$this->player->getId()}-{$this->getTickId()}";
         $this->player->getInventory()->removeEquipped();
         $this->player->equip($this->player->getEquippedItem()->getSlot());
         $this->velocity *= $this->item->getSpeedMultiplier();

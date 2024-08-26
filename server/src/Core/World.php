@@ -8,8 +8,10 @@ use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
 use cs\Equipment\Grenade;
 use cs\Equipment\HighExplosive;
+use cs\Equipment\Smoke;
 use cs\Event\DropEvent;
 use cs\Event\GrillEvent;
+use cs\Event\SmokeEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
 use cs\Interface\Flammable;
@@ -39,6 +41,10 @@ class World
     private array $spawnPositionTakes = [];
     /** @var array<int,Point[]> */
     private array $spawnCandidates;
+    /** @var array<string,SmokeEvent> */
+    private array $activeSmokes = [];
+    /** @var array<string,GrillEvent> */
+    private array $activeMolotovs = [];
     private Bomb $bomb;
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
@@ -53,6 +59,8 @@ class World
 
     public function roundReset(): void
     {
+        $this->activeSmokes = [];
+        $this->activeMolotovs = [];
         $this->spawnCandidates = [];
         $this->spawnPositionTakes = [];
         $this->dropItems = [];
@@ -481,8 +489,32 @@ class World
             if ($event->item instanceof Flammable) {
                 $this->processFlammableExplosion($event->getPlayer(), $event->getPositionClone(), $event->item);
             }
+            if ($event->item instanceof Smoke) {
+                $this->processSmokeExpansion($event->getPlayer(), $event->getPositionClone(), $event->item);
+            }
         };
         $this->game->addThrowEvent($event);
+    }
+
+    private function processSmokeExpansion(Player $initiator, Point $epicentre, Smoke $item): void
+    {
+        if ($this->grenadeNavMesh === null) {
+            $this->regenerateNavigationMeshes();
+        }
+        assert($this->grenadeNavMesh !== null);
+
+        $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
+        $floorNavmeshPoint = $this->grenadeNavMesh->findTile($epicentreFloor, $item->getBoundingRadius());
+
+        $event = new SmokeEvent(
+            $initiator, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
+            $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
+        );
+        $event->onComplete[] = function (SmokeEvent $event) {
+            unset($this->activeSmokes[$event->id]);
+        };
+        $this->activeSmokes[$event->id] = $event;
+        $this->game->addSmokeEvent($event);
     }
 
     public function processFlammableExplosion(Player $thrower, Point $epicentre, Flammable $item): void
@@ -495,12 +527,49 @@ class World
         $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
         $floorNavmeshPoint = $this->grenadeNavMesh->findTile($epicentreFloor, $item->getBoundingRadius());
 
-        $this->game->addGrillEvent(
-            new GrillEvent(
-                $thrower, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
-                $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
-            )
+        $event = new GrillEvent(
+            $thrower, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
+            $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
         );
+        $event->onComplete[] = function (GrillEvent $event) {
+            unset($this->activeMolotovs[$event->id]);
+        };
+        $this->activeMolotovs[$event->id] = $event;
+        $this->game->addGrillEvent($event);
+    }
+
+    public function smokeTryToExtinguishFlames(Column $smoke): void
+    {
+        foreach ($this->activeMolotovs as $fire) {
+            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $fire->boundaryMin, $fire->boundaryMax)
+            ) {
+                continue;
+            }
+
+            foreach ($fire->parts as $flame) {
+                if ($flame->active && Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $flame->boundaryMin, $flame->boundaryMax)) {
+                    $fire->extinguish($flame);
+                }
+            }
+        }
+    }
+
+    public function flameCanIgnite(Column $flame): bool
+    {
+        foreach ($this->activeSmokes as $smoke) {
+            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $flame->boundaryMin, $flame->boundaryMax)
+            ) {
+                continue;
+            }
+
+            foreach ($smoke->parts as $smokePart) {
+                if (Collision::boxWithBox($smokePart->boundaryMin, $smokePart->boundaryMax, $flame->boundaryMin, $flame->boundaryMax)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public function checkFlameDamage(GrillEvent $fire, int $tickId): void
@@ -526,8 +595,8 @@ class World
                 continue;
             }
 
-            foreach ($fire->flames as $flame) {
-                if (!Collision::pointWithCylinder(
+            foreach ($fire->parts as $flame) {
+                if (!$flame->active || !Collision::pointWithCylinder(
                     $flame->highestPoint,
                     $pp,
                     $playerRadius,
@@ -537,7 +606,7 @@ class World
                 }
 
                 $fire->playerHit($playerId, $tickId);
-                $damage = $fire->item->calculateDamage($player->getArmorType() !== ArmorType::NONE);
+                $damage = $fire->getItem()->calculateDamage($player->getArmorType() !== ArmorType::NONE);
                 assert($fire->item instanceof Item);
                 $this->playerHit(
                     $player->getCentrePoint(), $player, $fire->initiator, SoundType::FLAME_PLAYER_HIT,
@@ -545,12 +614,30 @@ class World
                 );
                 $player->lowerHealth($damage);
                 if (!$player->isAlive()) {
-                    $this->playerDiedToFlame($fire->initiator, $player, $fire->item);
+                    $this->playerDiedToFlame($fire->initiator, $player, $fire->getItem());
                 }
 
                 break;
             }
         }
+    }
+
+    public function isCollisionWithMolotov(Point $pos): bool
+    {
+        foreach ($this->activeMolotovs as $molotov) {
+            if (!Collision::pointWithBoxBoundary($pos, $molotov->boundaryMin, $molotov->boundaryMax)
+            ) {
+                continue;
+            }
+
+            foreach ($molotov->parts as $flame) {
+                if ($flame->active && Collision::pointWithCylinder($pos, $flame->center, 3 * $flame->radius, $flame->height)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private function processHighExplosiveBlast(Player $thrower, Point $epicentre, HighExplosive $item): void

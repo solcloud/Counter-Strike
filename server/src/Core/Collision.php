@@ -177,4 +177,37 @@ class Collision
         return true;
     }
 
+    public static function pointWithBoxBoundary(Point $point, Point $boxMin, Point $boxMax): bool
+    {
+        if ($point->y > $boxMax->y || $point->y < $boxMin->y) {
+            return false;
+        }
+        if ($point->x > $boxMax->x || $point->x < $boxMin->x) {
+            return false;
+        }
+        if ($point->z > $boxMax->z || $point->z < $boxMin->z) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function boxWithBox(Point $boundaryAMin, Point $boundaryAMax, Point $boundaryBMin, Point $boundaryBMax): bool
+    {
+        if ($boundaryAMin->y > $boundaryBMax->y || $boundaryBMin->y > $boundaryAMax->y) {
+            return false;
+        }
+
+        if (
+            $boundaryAMax->x >= $boundaryBMin->x
+            && $boundaryAMin->x <= $boundaryBMax->x
+            && $boundaryAMax->z >= $boundaryBMin->z
+            && $boundaryAMin->z <= $boundaryBMax->z
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
 }
