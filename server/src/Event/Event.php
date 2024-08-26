@@ -26,7 +26,7 @@ abstract class Event implements NetSerializable
         $this->onComplete = [];
     }
 
-    protected function runOnCompleteHooks(): void
+    public final function runOnCompleteHooks(): void
     {
         foreach ($this->onComplete as $func) {
             call_user_func($func, $this);

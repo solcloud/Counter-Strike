@@ -2,155 +2,60 @@
 
 namespace cs\Event;
 
-use cs\Core\Flame;
-use cs\Core\GameException;
-use cs\Core\Graph;
-use cs\Core\Player;
+use cs\Core\Column;
 use cs\Core\Point;
 use cs\Core\Util;
-use cs\Core\World;
 use cs\Enum\SoundType;
 use cs\Interface\Flammable;
-use cs\Interface\ForOneRoundMax;
-use GraphPHP\Node\Node;
-use SplQueue;
 
-final class GrillEvent extends Event implements ForOneRoundMax
+final class GrillEvent extends VolumetricEvent
 {
-    private string $id;
-    /** @var list<Flame> */
-    public array $flames = [];
-    private int $startedTickId;
-    private int $lastFlameSpawnTickId;
-    private int $spawnTickCount;
-    private int $spawnFlameCount;
-    private int $maxTicksCount;
+    public const DAMAGE_COOL_DOWN_TIME_MS = 100;
+
     /** @var array<int,int> [playerId => tick] */
     private array $playerTickHits = [];
-    private readonly int $damageCoolDownTickCount;
-    private readonly int $maxFlameCount;
+    private int $damageCoolDownTickCount;
 
-    public readonly Point $boundaryMin;
-    public readonly Point $boundaryMax;
-
-    /** @var SplQueue<Node> $queue */
-    private SplQueue $queue;
-    /** @var array<string,bool> */
-    private array $visited = [];
-
-    public function __construct(
-        public readonly Player    $initiator,
-        public readonly Flammable $item,
-        private readonly World    $world,
-        private readonly int      $flameRadius,
-        private readonly int      $flameHeight,
-        private readonly Graph    $graph,
-        private readonly Point    $start,
-    )
+    protected function setup(): void
     {
-        $flameArea = ($this->flameRadius * 2 + 1) ** 2;
-        $this->spawnTickCount = Util::millisecondsToFrames(30);
-        $this->spawnFlameCount = (int)ceil($this->item->getSpawnAreaMetersSquared() * 100 / $flameArea);
-        $this->maxTicksCount = Util::millisecondsToFrames($this->item->getMaxTimeMs());
-        $this->damageCoolDownTickCount = Util::millisecondsToFrames(100);
-        $this->maxFlameCount = (int)ceil($this->item->getMaxAreaMetersSquared() / $flameArea);
-        $this->startedTickId = $this->world->getTickId();
-
-        $startNode = $this->graph->getNodeById($start->hash());
-        if (null === $startNode) {
-            throw new GameException("No node for start point: " . $start->hash());
-        }
-
-        $this->id = "grill-{$this->initiator->getId()}-{$this->world->getTickId()}";
-        $this->boundaryMin = $start->clone();
-        $this->boundaryMax = $start->clone();
-        $this->queue = new SplQueue();
-        $this->queue->enqueue($startNode);
-        $this->igniteFlames();
+        $this->damageCoolDownTickCount = Util::millisecondsToFrames(self::DAMAGE_COOL_DOWN_TIME_MS);
     }
 
-    private function extinguish(): void
+    protected function onProcess(int $tick): void
     {
-        for ($i = 1; $i <= $this->spawnFlameCount; $i++) {
-            $flame = array_pop($this->flames);
-            if ($flame === null) {
-                return;
-            }
-
-            $sound = new SoundEvent($flame->center, SoundType::FLAME_EXTINGUISH);
-            $sound->addExtra('fire', $this->id);
-            $this->world->makeSound($sound);
-        }
-    }
-
-    public function process(int $tick): void
-    {
-        if ([] === $this->flames) {
-            $this->runOnCompleteHooks();
-            return;
-        }
-        if ($tick >= $this->startedTickId + $this->maxTicksCount) {
-            $this->extinguish();
-            $this->world->checkFlameDamage($this, $tick);
-            return;
-        }
-
-        if ($tick >= $this->lastFlameSpawnTickId + $this->spawnTickCount) {
-            $this->igniteFlames();
-        }
-
         $this->world->checkFlameDamage($this, $tick);
     }
 
-    private function igniteFlames(): void
+    protected function shrinkPart(Column $column): void
     {
-        foreach ($this->loadFlames() as $candidate) {
-            $this->boundaryMin->set(
-                min($this->boundaryMin->x, $candidate->x - $this->flameRadius),
-                min($this->boundaryMin->y, $candidate->y - 0),
-                min($this->boundaryMin->z, $candidate->z - $this->flameRadius),
-            );
-            $this->boundaryMax->set(
-                max($this->boundaryMax->x, $candidate->x + $this->flameRadius),
-                max($this->boundaryMax->y, $candidate->y + $this->flameHeight),
-                max($this->boundaryMax->z, $candidate->z + $this->flameRadius),
-            );
-
-            $flame = new Flame($candidate, $this->flameRadius, $this->flameHeight);
-            $this->flames[] = $flame;
-            $this->lastFlameSpawnTickId = $this->world->getTickId();
-            $sound = new SoundEvent($flame->center, SoundType::FLAME_SPAWN);
-            $sound->addExtra('fire', $this->id);
-            $sound->addExtra('height', $flame->height);
-            $sound->addExtra('size', $this->flameRadius * 2 + 1);
-            $this->world->makeSound($sound);
-        }
+        $sound = new SoundEvent($column->center, SoundType::FLAME_EXTINGUISH);
+        $sound->addExtra('id', $this->id);
+        $this->world->makeSound($sound);
     }
 
-    /** @return list<Point> */
-    private function loadFlames(): array
+    protected function expandPart(Point $center): Column
     {
-        $loadCount = $this->maxFlameCount - count($this->flames);
-
-        $output = [];
-        while (!$this->queue->isEmpty() && count($output) < min($this->spawnFlameCount, $loadCount)) {
-            $current = $this->queue->dequeue();
-            $currentKey = $current->getId();
-            if (array_key_exists($currentKey, $this->visited)) {
-                continue;
-            }
-
-            $this->visited[$currentKey] = true;
-            /** @var Point $point */
-            $point = $current->getData();
-            $output[] = $point;
-
-            foreach ($this->graph->getGeneratedNeighbors($currentKey) as $node) {
-                $this->queue->enqueue($node);
-            }
+        $flame = new Column($center, $this->partRadius, $this->partHeight);
+        if ($this->world->flameCanIgnite($flame)) {
+            $sound = new SoundEvent($flame->center, SoundType::FLAME_SPAWN);
+            $sound->addExtra('id', $this->id);
+            $sound->addExtra('height', $flame->height);
+            $this->world->makeSound($sound);
+        } else {
+            $flame->active = false;
         }
 
-        return $output;
+        return $flame;
+    }
+
+    public function extinguish(Column $flame): void
+    {
+        if (!$flame->active) {
+            return;
+        }
+
+        $flame->active = false;
+        $this->shrinkPart($flame);
     }
 
     public function canHitPlayer(int $playerId, int $tickId): bool
@@ -163,13 +68,8 @@ final class GrillEvent extends Event implements ForOneRoundMax
         $this->playerTickHits[$playerId] = $tickId;
     }
 
-    public function serialize(): array
+    public function getItem(): Flammable
     {
-        return [
-            'position' => $this->start->toArray(),
-            'maxTime' => $this->item->getMaxTimeMs(),
-            'maxFlames' => $this->maxFlameCount,
-        ];
+        return parent::getItem(); // @phpstan-ignore return.type
     }
-
 }

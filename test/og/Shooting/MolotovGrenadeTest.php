@@ -9,8 +9,10 @@ use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Enum\InventorySlot;
 use cs\Enum\RampDirection;
 use cs\Equipment\Molotov;
+use cs\Equipment\Smoke;
 use Test\BaseTestCase;
 
 class MolotovGrenadeTest extends BaseTestCase
@@ -194,6 +196,66 @@ class MolotovGrenadeTest extends BaseTestCase
         ]);
 
         $this->assertSame(2, $game->getRoundNumber());
+    }
+
+    public function testFlameDoNotLikeSmoke(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->getWorld()->addBox(new Box(new Point(), 1000, 2000, 1000));
+        $health = 100;
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 500)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $p->getSight()->look(0, 90),
+            fn(Player $p) => $this->assertNotNull($p->attackSecondary()),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_MOLOTOV)),
+            $this->waitNTicks(Molotov::equipReadyTimeMs),
+            fn(Player $p) => $p->getSight()->look(0, -90),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(500),
+            function (Player $p) use (&$health) {
+                $this->assertLessThan($health, $p->getHealth());
+                $health = $p->getHealth();
+            },
+            $this->waitNTicks(Molotov::MAX_TIME_MS),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertSame($health, $game->getPlayer(1)->getHealth());
+        $this->assertGreaterThan(72, $game->getPlayer(1)->getHealth());
+    }
+
+    public function testSmokeExtinguishFlames(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->getWorld()->addBox(new Box(new Point(), 1000, 2000, 1000));
+        $health = 100;
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 500)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $p->getSight()->look(0, -90),
+            fn(Player $p) => $this->assertNotNull($p->attackSecondary()),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_MOLOTOV)),
+            $this->waitNTicks(Molotov::equipReadyTimeMs),
+            $this->waitNTicks((int)ceil(Smoke::MAX_TIME_MS / 3)),
+            fn(Player $p) => $p->getSight()->look(0, -90),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertSame($health, $p->getHealth()),
+            $this->waitNTicks(500),
+            fn(Player $p) => $this->assertSame($health, $p->getHealth()),
+            $this->waitNTicks(Molotov::MAX_TIME_MS),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertSame($health, $game->getPlayer(1)->getHealth());
     }
 
 }
