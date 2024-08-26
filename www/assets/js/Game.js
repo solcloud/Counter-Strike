@@ -1,7 +1,9 @@
-import {EventProcessor} from "./EventProcessor.js";
-import {Player} from "./Player.js";
-import {InventorySlot, SoundType} from "./Enums.js";
-import {SoundRepository} from "./SoundRepository.js";
+import * as THREE from 'three' // fixme try remove from game, maybe only allow import Vec3...
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js' // todo remove
+import {EventProcessor} from "./EventProcessor.js"
+import {Player} from "./Player.js"
+import {InventorySlot, SoundType} from "./Enums.js"
+import {SoundRepository} from "./SoundRepository.js"
 
 export class Game {
     #world
@@ -21,13 +23,13 @@ export class Game {
     #endCallback
     #soundRepository
     #hudDebounceTicks = 1
-    #bombTimerId = null;
+    #bombTimerId = null
     #eventProcessor
-    #dropItems = {};
-    #throwables = {};
-    #flammable = {};
-    #roundIntervalIds = [];
-    #roundDamage = {did: {},got: {}}
+    #dropItems = {}
+    #throwables = {}
+    #volumetrics = {}
+    #roundIntervalIds = []
+    #roundDamage = {did: {}, got: {}}
     #playerSlotsVisibleModels = [
         InventorySlot.SLOT_KNIFE, InventorySlot.SLOT_PRIMARY, InventorySlot.SLOT_SECONDARY,
         InventorySlot.SLOT_BOMB, InventorySlot.SLOT_GRENADE_DECOY, InventorySlot.SLOT_GRENADE_MOLOTOV,
@@ -56,7 +58,8 @@ export class Game {
         this.#roundIntervalIds = []
         Object.keys(this.#dropItems).forEach((id) => this.itemPickUp(id))
         Object.keys(this.#throwables).forEach((id) => this.removeGrenade(id))
-        Object.keys(this.#flammable).forEach((fireId) => Object.keys(this.#flammable[fireId]).forEach((flameId) => this.destroyFlame(fireId, flameId)))
+        Object.keys(this.#volumetrics).forEach((groupId) => Object.keys(this.#volumetrics[groupId]).forEach((itemId) => this.#world.destroyObject(this.#volumetrics[groupId][itemId])))
+        this.#volumetrics = {}
         this.#world.reset()
     }
 
@@ -97,7 +100,7 @@ export class Game {
         this.#paused = false
         this.#hud.clearTopMessage()
         this.#hud.updateRoundDamage(null)
-        this.#roundDamage = {did: {},got: {}}
+        this.#roundDamage = {did: {}, got: {}}
         console.log("Game unpause")
     }
 
@@ -120,7 +123,7 @@ export class Game {
     roundEnd(attackersWins, newRoundNumber, score) {
         let winner = attackersWins ? 'Attackers' : 'Defenders'
         console.log("Round " + this.#round + " ended. Round wins: " + winner)
-        this.score = score;
+        this.score = score
         this.#round = newRoundNumber
         this.#hud.displayTopMessage(winner + ' wins')
         this.#hud.requestFullScoreBoardUpdate(this.score)
@@ -200,13 +203,19 @@ export class Game {
             this.itemPickUp(data.extra.id)
         }
         if (data.type === SoundType.FLAME_SPAWN) {
-            this.spawnFlame(data.position, data.extra.size, data.extra.height, data.extra.fire, `${data.position.x}-${data.position.y}-${data.position.z}`)
+            this.spawnFlame(data.position, data.extra.height, data.extra.id, `${data.position.x}-${data.position.y}-${data.position.z}`)
+        }
+        if (data.type === SoundType.SMOKE_SPAWN) {
+            this.spawnSmoke(data.position, data.extra.height, data.extra.id, `${data.position.x}-${data.position.y}-${data.position.z}`)
         }
         if (data.type === SoundType.FLAME_EXTINGUISH) {
-            this.destroyFlame(data.extra.fire, `${data.position.x}-${data.position.y}-${data.position.z}`)
+            this.destroyFlame(data.extra.id, `${data.position.x}-${data.position.y}-${data.position.z}`)
+        }
+        if (data.type === SoundType.SMOKE_FADE) {
+            this.smokeFade(data.extra.id)
         }
         if (data.type === SoundType.ITEM_DROP_AIR) {
-            const item = this.#dropItems[data.extra.id];
+            const item = this.#dropItems[data.extra.id]
             item.rotation.x -= 0.1
             item.rotation.y -= 0.1
             item.rotation.z -= 0.1
@@ -216,7 +225,7 @@ export class Game {
             if (data.item.slot === InventorySlot.SLOT_BOMB) {
                 this.bombDropPosition = data.position
             }
-            const item = this.#dropItems[data.extra.id];
+            const item = this.#dropItems[data.extra.id]
             item.rotation.set(0, 0, 0)
             item.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
             item.position.set(data.position.x, data.position.y, -data.position.z)
@@ -225,7 +234,7 @@ export class Game {
             clearInterval(this.#bombTimerId)
         }
         if (data.type === SoundType.GRENADE_AIR || data.type === SoundType.GRENADE_BOUNCE || data.type === SoundType.GRENADE_LAND) {
-            const grenade = this.#throwables[data.extra.id];
+            const grenade = this.#throwables[data.extra.id]
             grenade.rotation.x += 0.1
             grenade.rotation.y += 0.1
             grenade.rotation.z += 0.1
@@ -266,33 +275,23 @@ export class Game {
             const direction = grenade.getWorldPosition(new THREE.Vector3()).sub(sightPosition).normalize()
             if (this.#world.getCamera().getWorldDirection(new THREE.Vector3()).dot(direction) <= 0) { // flash behind spectator
                 this.removeGrenade(throwableId)
-                return;
+                return
             }
 
             const ray = new THREE.Raycaster(sightPosition, direction)
-            const intersects = ray.intersectObjects([grenade, ...this.getMapObjects()], false);
+            const intersects = ray.intersectObjects([grenade, ...this.getMapObjects()], false)
             if (intersects.length >= 1 && intersects[0].object === grenade) {
                 this.#hud.showFlashBangScreen()
             }
             this.removeGrenade(throwableId)
-            return;
+            return
         }
-        if (item.slot === InventorySlot.SLOT_GRENADE_SMOKE) {
-            const grenade = this.#throwables[throwableId]
-            const smoke = new THREE.Mesh(new THREE.DodecahedronGeometry(300, 1), new THREE.MeshStandardMaterial({color: 0xdadada}))
-            smoke.material.side = THREE.DoubleSide
-            smoke.position.y = 150
-            grenade.add(smoke)
-            game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 18000))
-            return;
-        }
-        if (item.slot === InventorySlot.SLOT_GRENADE_MOLOTOV || item.slot === InventorySlot.SLOT_GRENADE_HE) {
-            this.removeGrenade(throwableId)
-            return;
+        if (item.slot === InventorySlot.SLOT_GRENADE_HE) {
+            this.removeGrenade(throwableId) // fixme add some cool effect
+            return
         }
 
-        console.warn("No handler for grenade: ", item)
-        game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 1000)) // todo responsive volumetric smokes, etc.
+        game.#roundIntervalIds.push(setTimeout(() => this.removeGrenade(throwableId), 500))
     }
 
     itemDrop(item, id) {
@@ -316,26 +315,67 @@ export class Game {
         delete this.#throwables[id]
     }
 
-    grillStart(position, maxTimeMs, maxFlamesCount) {
+    grillStart(fireId, position, size, maxTimeMs, maxPartCount) {
+        this.#volumetrics[fireId] = {}
+        this.#volumetrics[fireId]['size'] = size
         this.#world.playSound('338301_4811732-lq.mp3', position, false)
     }
 
-    spawnFlame(point, size, height, fireId, flameId) {
-        if (this.#flammable[fireId] === undefined) {
-            this.#flammable[fireId] = {}
-        }
-        height = lerp(height, randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#flammable[fireId]).length) / randomInt(7, 9), 1))
+    spawnFlame(point, height, fireId, partId) {
+        const size = this.#volumetrics[fireId]['size']
+        height = lerp(height, randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#volumetrics[fireId]).length) / randomInt(7, 9), 1))
         const flame = this.#world.spawnFlame(size, height)
-        this.#flammable[fireId][flameId] = flame
+        this.#volumetrics[fireId][partId] = flame
         flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
-        flame.rotation.x = randomInt(-10, 10) / 100;
+        flame.rotation.x = randomInt(-10, 10) / 100
         flame.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
     }
 
     destroyFlame(fireId, flameId) {
-        const flame = this.#flammable[fireId][flameId]
+        const flame = this.#volumetrics[fireId][flameId]
         this.#world.destroyObject(flame)
-        delete this.#flammable[fireId][flameId]
+        delete this.#volumetrics[fireId][flameId]
+    }
+
+    smokeStart(smokeId, position, size, maxTimeMs, maxPartCount) {
+        this.#volumetrics[smokeId] = {}
+        this.#volumetrics[smokeId]['size'] = size
+        this.#volumetrics[smokeId]['count'] = maxPartCount
+        this.#volumetrics[smokeId]['geometries'] = []
+    }
+
+    spawnSmoke(point, height, smokeId, partId) {
+        const size = this.#volumetrics[smokeId]['size']
+        const geo = new THREE.BoxGeometry(size, height, size)
+        geo.translate(point.x, point.y + (geo.parameters.height / 2), -point.z)
+        this.#volumetrics[smokeId]['geometries'].push(geo)
+
+        const len = this.#volumetrics[smokeId]['geometries'].length
+        if (len % 10 !== 0 && len < this.#volumetrics[smokeId]['count']) {
+            return
+        }
+
+        let geometry = BufferGeometryUtils.mergeGeometries(this.#volumetrics[smokeId]['geometries'])
+        geometry = BufferGeometryUtils.mergeVertices(geometry, 2)
+        geometry.computeBoundingBox()
+        let mesh = this.#volumetrics[smokeId]['mesh']
+        if (mesh) {
+            this.#world.destroyObject(mesh)
+        }
+
+        mesh = this.#world.spawnSmoke(geometry)
+        this.#volumetrics[smokeId]['mesh'] = mesh
+        if (len === this.#volumetrics[smokeId]['count']) {
+            this.#volumetrics[smokeId]['range'] = Math.ceil(mesh.geometry.getIndex().count / 50)
+            mesh.geometry.setDrawRange(0, mesh.geometry.getIndex().count)
+        }
+    }
+
+    smokeFade(smokeId) {
+        const range = this.#volumetrics[smokeId]['range']
+        const mesh = this.#volumetrics[smokeId]['mesh']
+
+        this.#roundIntervalIds.push(setInterval(() => mesh.geometry.setDrawRange(0, mesh.geometry.drawRange.count - range), 50))
     }
 
     bombPlanted(timeMs, position) {
@@ -347,7 +387,7 @@ export class Game {
         this.#hud.bombPlanted(bombSecCount)
 
         const tenSecWarningSecCount = Math.round(timeMs / 1000 - 10)
-        let tickSecondsCount = 0;
+        let tickSecondsCount = 0
         let bombTimerId = setInterval(function () {
             if (tickSecondsCount === bombSecCount) {
                 clearInterval(bombTimerId)
@@ -356,7 +396,7 @@ export class Game {
                 world.playSound('88532__northern87__woosh-northern87.wav', null, true)
             }
             world.playSound('536422__rudmer-rotteveel__setting-electronic-timer-1-beep.wav', position, false)
-            tickSecondsCount++;
+            tickSecondsCount++
         }, 1000)
         this.#bombTimerId = bombTimerId
     }
@@ -393,7 +433,7 @@ export class Game {
         }
 
         this.playerMe = new Player(options.player, this.#world.createPlayerMe())
-        this.players[playerId] = this.playerMe;
+        this.players[playerId] = this.playerMe
         this.playerSpectate = this.playerMe
 
         if (this.#readyCallback) {
@@ -430,7 +470,7 @@ export class Game {
         const myId = this.playerSpectate.getId()
         let aliveAvailableSpectateMates = this.getMyTeamPlayers().filter((player) => player.isAlive() && myId !== player.getId())
         if (aliveAvailableSpectateMates.length === 0) {
-            return;
+            return
         }
 
         let ids = aliveAvailableSpectateMates.map((player) => player.getId()).sort()
@@ -565,7 +605,7 @@ export class Game {
     #otherPlayersInventoryChanged(player, data) {
         const world = this.#world
         const hand = player.get3DObject().getObjectByName('hand')
-        const belt = player.get3DObject().getObjectByName('belt');
+        const belt = player.get3DObject().getObjectByName('belt')
 
         if (hand.children.length === 1) {
             const lastHandItemModel = hand.children[0]

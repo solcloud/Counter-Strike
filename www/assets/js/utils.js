@@ -1,14 +1,14 @@
 function degreeToRadian(degree) {
-    return THREE.MathUtils.degToRad(degree)
+    return degree * Math.PI / 180
 }
 
 function radianToDegree(radian) {
-    return Math.round(THREE.MathUtils.radToDeg(radian))
+    return Math.round(radian * 180 / Math.PI)
 }
 
 function threeRotationToServer(eulerYXZ) {
-    const horizontal = THREE.MathUtils.radToDeg(eulerYXZ.y)
-    const vertical = THREE.MathUtils.radToDeg(eulerYXZ.x)
+    const horizontal = eulerYXZ.y * 180 / Math.PI
+    const vertical = eulerYXZ.x * 180 / Math.PI
 
     if (horizontal === 0) {
         return [0, vertical]
@@ -38,11 +38,11 @@ function scopeLevelToZoom(scopeLevel) {
 }
 
 function randomInt(start, end) {
-    return THREE.MathUtils.randInt(start, end)
+    return start + Math.floor(Math.random() * (end - start + 1));
 }
 
 function lerp(start, end, percentage) {
-    return THREE.MathUtils.lerp(start, end, percentage)
+    return (1 - percentage) * start + percentage * end;
 }
 
 function msToTick(timeMs) {

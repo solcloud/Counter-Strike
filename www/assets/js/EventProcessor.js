@@ -109,7 +109,11 @@ export class EventProcessor {
         }
 
         eventsCallback[EventList.GrillEvent] = function (data) {
-            game.grillStart(data.position, data.maxTime, data.maxFlames)
+            game.grillStart(data.id, data.position, data.size, data.time, data.count)
+        }
+
+        eventsCallback[EventList.SmokeEvent] = function (data) {
+            game.smokeStart(data.id, data.position, data.size, data.time, data.count)
         }
 
         this.#callbacks = eventsCallback

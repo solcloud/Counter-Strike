@@ -33,6 +33,7 @@ const EventList = {
     ThrowEvent: 11,
     DropEvent: 12,
     GrillEvent: 13,
+    SmokeEvent: 14,
 }
 
 // server/src/Enum/GameOverReason.php
@@ -106,6 +107,8 @@ const SoundType = {
     ITEM_DROP_LAND: 21,
     FLAME_EXTINGUISH: 22,
     FLAME_PLAYER_HIT: 23,
+    SMOKE_SPAWN: 24,
+    SMOKE_FADE: 25,
 }
 
 // server/src/Enum/ArmorType.php

@@ -1,3 +1,6 @@
+import * as THREE from 'three'
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import {ItemId} from "./Enums.js";
 
 export class ModelRepository {
@@ -7,6 +10,7 @@ export class ModelRepository {
     #meshes = {}
     #materials = {
         caps: {},
+        smoke: null,
         outfitTeam: null,
         outfitOpponent: null,
     }
@@ -16,7 +20,7 @@ export class ModelRepository {
     #mapObjects = [];
 
     constructor() {
-        this.#gltfLoader = new THREE.GLTFLoader()
+        this.#gltfLoader = new GLTFLoader()
         this.#textureLoader = new THREE.TextureLoader()
     }
 
@@ -53,7 +57,7 @@ export class ModelRepository {
                 }
             })
 
-            const sun = new THREE.DirectionalLight(0xffeac2, .9)
+            const sun = new THREE.DirectionalLight(0xffeac2, 4)
             sun.position.set(4000, 4999, -4000)
             sun.castShadow = true
             sun.shadow.mapSize.width = 4096
@@ -63,7 +67,7 @@ export class ModelRepository {
             sun.shadow.camera.right = 2000
             sun.shadow.camera.top = 0
             sun.shadow.camera.bottom = -3000
-            model.scene.add(sun, new THREE.AmbientLight(0xcfe4bb, .4))
+            model.scene.add(sun, new THREE.AmbientLight(0xcfe4bb, 1))
             return model.scene
         })
     }
@@ -77,7 +81,7 @@ export class ModelRepository {
     }
 
     getPlayer(colorIndex, isOpponent) {
-        const clone = THREE.SkeletonUtils.clone(this.#models.player)
+        const clone = SkeletonUtils.clone(this.#models.player)
         const player = clone.getObjectByName('player')
 
         const headWear = player.getObjectByName('Wolf3D_Headwear')
@@ -99,6 +103,10 @@ export class ModelRepository {
 
     getPlayerHitMesh() {
         return this.#meshes.playerHitMesh.clone()
+    }
+
+    getSmokeMaterial() {
+        return this.#materials.smoke
     }
 
     getModelForItem(item) {
@@ -234,6 +242,14 @@ export class ModelRepository {
             });
             const sprite = new THREE.Sprite(material);
             sprite.scale.set(35, 45, 30);
+
+
+            this.#materials.smoke = new THREE.MeshStandardMaterial({ // todo better material with cool displacement map etc.
+                color: 0x798aa0,
+                map: texture,
+                blending: THREE.AdditiveBlending,
+                side: THREE.FrontSide,
+            })
 
             this.#meshes.playerHitMesh = sprite
         }))

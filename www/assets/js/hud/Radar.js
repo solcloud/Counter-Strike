@@ -1,3 +1,4 @@
+import * as THREE from 'three'
 import {Color, InventorySlot} from "../Enums.js";
 
 export class Radar {

@@ -1,5 +1,7 @@
-import * as Enum from "./Enums.js";
-import {ModelRepository} from "./ModelRepository.js";
+import * as THREE from 'three'
+import * as Enum from "./Enums.js"
+import {RGBELoader} from "three/addons/loaders/RGBELoader.js"
+import {ModelRepository} from "./ModelRepository.js"
 
 export class World {
     #scene
@@ -9,13 +11,11 @@ export class World {
     #audioLoader
     #modelRepository
     #decals = []
-    #flames = []
     #cache = {}
     volume = 30
 
     constructor() {
         THREE.Cache.enabled = true
-        THREE.ColorManagement.legacyMode = false
 
         this.#audioLoader = new THREE.AudioLoader()
         this.#modelRepository = new ModelRepository()
@@ -51,15 +51,15 @@ export class World {
         }
         const renderer = new THREE.WebGLRenderer(glParameters)
         renderer.outputEncoding = THREE.sRGBEncoding
-        renderer.toneMapping = THREE.ACESFilmicToneMapping
+        renderer.toneMapping = THREE.CineonToneMapping
         renderer.toneMappingExposure = setting.getExposure()
-        renderer.physicallyCorrectLights = false
         renderer.setSize(window.innerWidth, window.innerHeight)
         if (!setting.shouldPreferPerformance()) {
-            new THREE.RGBELoader().load('./resources/img/orlando_stadium_1k.hdr', function (texture) {
+            new RGBELoader().load('./resources/img/orlando_stadium_1k.hdr', function (texture) {
                 texture.mapping = THREE.EquirectangularReflectionMapping
                 texture.toneMapped = true
                 scene.environment = texture
+                scene.environmentIntensity = 0.4
             })
             renderer.shadowMap.enabled = true
             renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -196,7 +196,12 @@ export class World {
         mesh.receiveShadow = true
 
         this.#scene.add(mesh)
-        this.#flames.push(mesh)
+        return mesh
+    }
+
+    spawnSmoke(geometry) {
+        const mesh = new THREE.Mesh(geometry, this.#modelRepository.getSmokeMaterial())
+        this.#scene.add(mesh)
         return mesh
     }
 
@@ -234,8 +239,6 @@ export class World {
 
     reset() {
         this.clearDecals()
-        this.#flames.forEach((item) => this.destroyObject(item))
-        this.#flames = []
         const bomb = this.#modelRepository.getBomb()
         if (bomb.parent && bomb.parent.name === 'MainScene') {
             bomb.visible = false
@@ -243,6 +246,10 @@ export class World {
     }
 
     destroyObject(object) {
+        if (object.name === undefined) {
+            return
+        }
+
         if (object.name === `item-${Enum.ItemId.Bomb}`) {
             if (object.parent && object.parent.name === 'MainScene') {
                 object.visible = false
