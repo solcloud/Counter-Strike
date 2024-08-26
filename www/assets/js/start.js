@@ -5,6 +5,7 @@ import {World} from "./World.js";
 import Stats from "../threejs/Stats.js";
 import {Setting} from "./Setting.js";
 import {PlayerAction} from "./PlayerAction.js";
+import {PointerLockControls} from "three/addons/controls/PointerLockControls.js";
 
 let launchGame
 (function () {
@@ -51,7 +52,7 @@ let launchGame
 
         const setting = new Setting(settingString)
         const canvas = await world.init(map, setting)
-        const pointerLock = new THREE.PointerLockControls(world.getCamera(), canvasParent)
+        const pointerLock = new PointerLockControls(world.getCamera(), canvasParent)
         pointerLock.pointerSpeed = setting.getSensitivity()
 
         hud.createHud(elementHud, map, setting)

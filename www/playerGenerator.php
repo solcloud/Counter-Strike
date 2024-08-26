@@ -62,20 +62,30 @@ $slots = [
 <head>
     <meta charset="UTF-8">
     <title>Player model Generator</title>
-    <script src="./assets/threejs/three.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./assets/threejs/three.min.js",
+                "three/addons/": "./assets/threejs/"
+            }
+        }
+    </script>
     <script src="./assets/js/utils.js"></script>
 </head>
 <body style="margin:0">
-<script>
+<script type="module">
+    import * as THREE from 'three'
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+    import {ModelRepository} from "./assets/js/ModelRepository.js";
+
+    let camera, scene, renderer, controls;
+
     ////
     // fixme: add gui controls
     const opacityPlayer = 1.0
     const opacityHitBoxes = 0.0
     const opacityBoundingBox = 0.0
     ////
-</script>
-<script>
-    let camera, scene, renderer, controls;
 
     const materialDefault = new THREE.MeshBasicMaterial({color: 0x664b17, transparent: true, opacity: opacityHitBoxes, depthTest: false})
     const materialArm = new THREE.MeshBasicMaterial({color: 0x114b3d, transparent: true, opacity: opacityHitBoxes, depthTest: false})
@@ -103,7 +113,7 @@ $slots = [
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls = new OrbitControls(camera, renderer.domElement);
         controls.target.set(0, 110, 0)
         controls.update()
     }
@@ -130,9 +140,6 @@ $slots = [
     init()
     extra()
     animate()
-</script>
-<script type="module">
-    import {ModelRepository} from "./assets/js/ModelRepository.js";
 
     const modelRepository = new ModelRepository()
     await modelRepository.loadAll()

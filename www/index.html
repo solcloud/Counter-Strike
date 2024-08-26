@@ -48,7 +48,14 @@
         tickMs: 0,
     }
 </script>
-<script src="./assets/threejs/three.js?v=144"></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "./assets/threejs/three.min.js?v167",
+            "three/addons/": "./assets/threejs/"
+        }
+    }
+</script>
 <script src="./assets/js/utils.js"></script>
 <script type="module">
     import {Setting} from "./assets/js/Setting.js";

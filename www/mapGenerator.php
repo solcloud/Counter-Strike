@@ -38,13 +38,23 @@ foreach ($map->getBoxes() as $box) {
 <head>
     <meta charset="UTF-8">
     <title>Map Generator</title>
-    <script src="./assets/threejs/three.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./assets/threejs/three.min.js",
+                "three/addons/": "./assets/threejs/"
+            }
+        }
+    </script>
 </head>
 <body style="margin:0">
 <div style="position:absolute;<?= $radarMapGenerator ? 'display:none;' : '' ?>">
     <textarea class="map">Generating...</textarea>
 </div>
-<script>
+<script type="module">
+    import * as THREE from 'three'
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
     const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
     let camera, scene, renderer, controls, map, extra;
     const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
@@ -73,7 +83,7 @@ foreach ($map->getBoxes() as $box) {
         }
         camera.position.y = 4000
 
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls = new OrbitControls(camera, renderer.domElement);
     }
 
     function createRamp(startX = 1507.1, startY = 0, endX = 1676, endY = 140.1, depth = 80) {
@@ -130,7 +140,7 @@ foreach ($map->getBoxes() as $box) {
             map.add(mesh)
         })
 
-        const s1 = new THREE.SpotLight(0xFFFFFF, .6)
+        const s1 = new THREE.SpotLight(0xFFFFFF, 5_000_000)
         s1.castShadow = true
         s1.shadow.mapSize.width = 2048
         s1.shadow.mapSize.height = 2048
@@ -138,8 +148,8 @@ foreach ($map->getBoxes() as $box) {
         s1.shadow.camera.far = maxHeight * 10
         s1.position.set(center.position.x, maxHeight * 2.5, center.position.z)
         s1.target = center
-        const d1 = new THREE.DirectionalLight(0xffeac2, 0.6);
-        const a1 = new THREE.AmbientLight(0xDADADA, .8)
+        const d1 = new THREE.DirectionalLight(0xf0eadf, 5);
+        const a1 = new THREE.AmbientLight(0xDADADA, 1)
         extra.add(s1, d1, a1);
 
         scene.add(map, extra)

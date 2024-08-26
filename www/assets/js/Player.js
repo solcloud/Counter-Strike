@@ -1,3 +1,5 @@
+import {AnimationMixer, Vector3} from 'three'
+
 export class Player {
     data = {
         id: null,
@@ -45,7 +47,7 @@ export class Player {
 
     setAnimations(animations) {
         animations.forEach((clip) => {
-            const mixer = new THREE.AnimationMixer(this.#threeObject)
+            const mixer = new AnimationMixer(this.#threeObject)
             const action = mixer.clipAction(clip);
             if (clip.name === 'crouch') {
                 action.play()
@@ -114,7 +116,7 @@ export class Player {
     }
 
     getSightPositionThreeVector() {
-        return new THREE.Vector3(
+        return new Vector3(
             this.data.position.x,
             this.data.position.y + this.data.sight,
             -this.data.position.z,

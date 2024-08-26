@@ -4,7 +4,9 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use cs\Enum\SoundType;
 use cs\Event\EventList;
+use cs\Event\GrillEvent;
 use cs\Event\KillEvent;
+use cs\Event\SmokeEvent;
 use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
 
@@ -55,7 +57,14 @@ $frameIdEnd = null;
             width: 100%;
         }
     </style>
-    <script src="./assets/threejs/three.js"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./assets/threejs/three.min.js",
+                "three/addons/": "./assets/threejs/"
+            }
+        }
+    </script>
     <script src="./assets/js/utils.js"></script>
 </head>
 <body>
@@ -90,7 +99,9 @@ $frameIdEnd = null;
         <input type="range" id="progress" min="0" value="0" max="<?= $frameIdEnd ?>">
     </div>
 </div>
-<script>
+<script type="module">
+    import * as THREE from 'three'
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 
     const renderer = {
         gl: null,
@@ -113,7 +124,7 @@ $frameIdEnd = null;
             })))
             const lastObject = this.fillWorld(floors, walls)
             this.camera.lookAt(lastObject)
-            new THREE.OrbitControls(this.camera, this.gl.domElement);
+            new OrbitControls(this.camera, this.gl.domElement);
         },
         fillWorld: function (floors, walls) {
             let lastMesh
@@ -216,12 +227,12 @@ $frameIdEnd = null;
             return player
         },
         showTrajectory: false,
-        throwables: [],
-        flammable: [],
-        createBox: function (width, height, depth, color) {
+        throwables: {},
+        volumetrics: {},
+        createVolume: function (width, height, depth, color) {
             let box = new THREE.Mesh(
                 new THREE.BoxGeometry(width, height, depth),
-                new THREE.MeshBasicMaterial({color: color}),
+                new THREE.MeshBasicMaterial({color: color, transparent: true, opacity: 0.4}),
             )
             this.scene.add(box)
             return box
@@ -254,6 +265,9 @@ $frameIdEnd = null;
                         self.throwables[event.data.id] = ball
                     }
                 }
+                if (event.code === <?= EventList::map[GrillEvent::class] ?> || event.code === <?= EventList::map[SmokeEvent::class] ?>) {
+                    self.volumetrics[event.data.id] = {}
+                }
                 if (event.code === <?= EventList::map[SoundEvent::class] ?>) {
                     if ([<?= SoundType::GRENADE_LAND->value ?>, <?= SoundType::GRENADE_BOUNCE->value ?>, <?= SoundType::GRENADE_AIR->value ?>].includes(event.data.type)) {
                         const ball = self.showTrajectory ? self.createBall(self.throwables[event.data.extra.id]) : self.throwables[event.data.extra.id]
@@ -263,18 +277,17 @@ $frameIdEnd = null;
                             setTimeout(() => ball.visible = false, 2000)
                         }
                     }
-                    if (event.data.type === <?= SoundType::FLAME_SPAWN->value ?>) {
-                        const color = new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)
-                        let flame = self.createBox(event.data.extra.size, event.data.extra.height, event.data.extra.size, color)
-                        if (self.flammable[event.data.extra.fire] === undefined) {
-                            self.flammable[event.data.extra.fire] = {}
-                        }
-                        self.flammable[event.data.extra.fire][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`] = flame
-                        flame.position.set(event.data.position.x, event.data.position.y + (event.data.extra.height /  2), -event.data.position.z)
+                    if (event.data.type === <?= SoundType::FLAME_SPAWN->value ?> || event.data.type === <?= SoundType::SMOKE_SPAWN->value ?>) {
+                        const color = event.data.type === <?= SoundType::FLAME_SPAWN->value ?>
+                            ? new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)
+                            : new THREE.Color(0x798aa0)
+                        let mesh = self.createVolume(31, event.data.extra.height, 31, color)
+                        self.volumetrics[event.data.extra.id][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`] = mesh
+                        mesh.position.set(event.data.position.x, event.data.position.y + (event.data.extra.height / 2), -event.data.position.z)
                     }
-                    if (event.data.type === <?= SoundType::FLAME_EXTINGUISH->value ?>) {
-                        const flame = self.flammable[event.data.extra.fire][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`]
-                        flame.visible = false
+                    if (event.data.type === <?= SoundType::FLAME_EXTINGUISH->value ?> || event.data.type === <?= SoundType::SMOKE_FADE->value ?>) {
+                        const mesh = self.volumetrics[event.data.extra.id][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`]
+                        mesh.visible = false
                     }
                 }
             })
@@ -298,7 +311,7 @@ $frameIdEnd = null;
 
         const driver = {
             frameId: <?= $frameIdStart ?>,
-            defaultAnimationSpeedMs: 100,
+            defaultAnimationSpeedMs: 30,
             getFrameId: function () {
                 return this.frameId;
             }
