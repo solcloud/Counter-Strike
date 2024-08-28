@@ -192,11 +192,16 @@ $slots = [
     const slots = JSON.parse(slotsJson);
     const belt = player.getObjectByName('belt')
     belt.children.forEach(function (slot) {
-        slot.add(modelRepository.getModelForItem(slots[slot.name.replace('slot-', '')]))
+        let item = slots[slot.name.replace('slot-', '')]
+        if (item) {
+            slot.add(modelRepository.getModelForItem(item))
+        }
     })
 
-    //let handItem = modelRepository.getModelForItem(slots[<?= InventorySlot::SLOT_PRIMARY->value ?>])
     let handItem = modelRepository.getModelForItem(slots[<?= array_rand($slots) ?>])
+    if (false) {
+        handItem = modelRepository.getModelForItem(slots[<?= InventorySlot::SLOT_PRIMARY->value ?>])
+    }
     player.getObjectByName('hand').add(handItem)
 </script>
 </body>

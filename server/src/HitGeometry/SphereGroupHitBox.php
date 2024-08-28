@@ -23,7 +23,7 @@ class SphereGroupHitBox implements HitIntersect
     public function intersect(Player $player, Point $point): bool
     {
         /** @var Point $modifier */
-        $modifier = $this->centerPointModifier ? call_user_func($this->centerPointModifier, $player) : new Point();
+        $modifier = $this->centerPointModifier ? call_user_func($this->centerPointModifier, $player) : null;
         foreach ($this->getParts($player) as $part) {
             $center = $part->calculateWorldCoordinate($player, $modifier);
             if (Collision::pointWithSphere($point, $center, $part->radius)) {
@@ -36,7 +36,7 @@ class SphereGroupHitBox implements HitIntersect
 
     public function addHitBox(Point $relativeCenter, int $radius): self
     {
-        $this->parts[] = new SphereHitBox($relativeCenter, $radius);
+        $this->parts[] = $this->createHitBox($relativeCenter, $radius);
         return $this;
     }
 

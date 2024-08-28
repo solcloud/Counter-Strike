@@ -301,7 +301,7 @@ class World
     public function dropItem(Player $player, Item $item): void
     {
         $dropEvent = new DropEvent($player, $item, $this);
-        $dropEvent->onLand(function (DropEvent $event): void {
+        $dropEvent->onFloorLand(function (DropEvent $event): void {
             $this->dropItems[] = $event->getDropItem();
         });
         $this->game->addDropEvent($dropEvent);
@@ -631,7 +631,7 @@ class World
             }
 
             foreach ($molotov->parts as $flame) {
-                if ($flame->active && Collision::pointWithCylinder($pos, $flame->center, 3 * $flame->radius, $flame->height)) {
+                if ($flame->active && Collision::pointWithBoxBoundary($pos, $flame->boundaryMin, $flame->boundaryMax)) {
                     return true;
                 }
             }

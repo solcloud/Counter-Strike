@@ -8,7 +8,6 @@ use cs\Core\Graph;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Sequence;
-use cs\Core\Util;
 use cs\Core\World;
 use cs\Interface\ForOneRoundMax;
 use cs\Interface\Volumetric;
@@ -54,8 +53,8 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
         $this->id = Sequence::next();
         $this->partSize = $this->partRadius * 2 + 1;
         $this->startedTickId = $this->world->getTickId();
-        $this->spawnTickCount = Util::millisecondsToFrames(20);
-        $this->maxTicksCount = Util::millisecondsToFrames($this->item->getMaxTimeMs());
+        $this->spawnTickCount = $this->timeMsToTick(20);
+        $this->maxTicksCount =  $this->timeMsToTick($this->item->getMaxTimeMs());
 
         $partArea = ($this->partSize) ** 2;
         $this->spawnPartCount = (int)ceil($this->item->getSpawnAreaMetersSquared() * 100 / $partArea);
@@ -121,7 +120,13 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
 
     private function expand(int $tick): void
     {
-        foreach ($this->loadParts() as $candidate) {
+        $candidates = $this->loadParts();
+        if ($candidates === []) {
+            $this->lastPartSpawnTickId = $tick + $this->maxTicksCount;
+            return;
+        }
+
+        foreach ($candidates as $candidate) {
             $this->boundaryMin->set(
                 min($this->boundaryMin->x, $candidate->x - $this->partRadius),
                 min($this->boundaryMin->y, $candidate->y - 0),
@@ -133,9 +138,9 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
                 max($this->boundaryMax->z, $candidate->z + $this->partRadius),
             );
 
-            $this->lastPartSpawnTickId = $tick;
             $this->parts[] = $this->expandPart($candidate);
         }
+        $this->lastPartSpawnTickId = $tick;
     }
 
     /** @return Point[] */

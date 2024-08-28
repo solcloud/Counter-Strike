@@ -7,11 +7,13 @@ use cs\Core\Point;
 
 class HitBoxHead extends SphereGroupHitBox
 {
+    private Point $centerPoint;
 
     public function __construct()
     {
+        $this->centerPoint = new Point();
         parent::__construct(function (Player $player): Point {
-            return (new Point())->addY($player->getHeadHeight());
+            return $this->centerPoint->setScalar(0)->addY($player->getHeadHeight());
         });
 
         $this->addHitBox(new Point(0, -8, 1), 8);

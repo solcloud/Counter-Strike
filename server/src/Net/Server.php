@@ -246,7 +246,7 @@ class Server
     private function gameTick(int $tickId): ?GameOverEvent
     {
         foreach ($this->tickCommands as $playerId => $callback) {
-            call_user_func($callback, $this->clients[$playerId]->getPlayerControl());
+            call_user_func($callback, $this->clients[$playerId]->playerControl);
         }
         $this->tickCommands = [];
         return $this->game->tick($tickId);

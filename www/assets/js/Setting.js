@@ -54,6 +54,7 @@ export class Setting {
             'KeyB': Action.BUY_MENU,
             'Tab': Action.SCORE_BOARD,
             'Backquote': Action.GAME_MENU,
+            'IntlBackslash': Action.GAME_MENU,
             'Enter': Action.CLEAR_DECALS,
             'CapsLock': Action.CLEAR_DECALS,
             'ArrowLeft': `buy ${BuyMenuItem.RIFLE_AK},${BuyMenuItem.RIFLE_M4A4}`,

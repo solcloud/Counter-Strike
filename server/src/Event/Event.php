@@ -15,7 +15,7 @@ abstract class Event implements NetSerializable
 
     abstract public function process(int $tick): void;
 
-    public function timeMsToTick(int $timeMs): int
+    public final function timeMsToTick(int $timeMs): int
     {
         return Util::millisecondsToFrames($timeMs);
     }
@@ -26,7 +26,7 @@ abstract class Event implements NetSerializable
         $this->onComplete = [];
     }
 
-    public final function runOnCompleteHooks(): void
+    protected final function runOnCompleteHooks(): void
     {
         foreach ($this->onComplete as $func) {
             call_user_func($func, $this);
@@ -40,9 +40,7 @@ abstract class Event implements NetSerializable
 
     public function serialize(): array
     {
-        return [
-            'class' => get_class($this),
-        ];
+        return [];
     }
 
 }

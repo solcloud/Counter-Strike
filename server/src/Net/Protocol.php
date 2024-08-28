@@ -8,7 +8,7 @@ use cs\Core\Player;
 abstract class Protocol
 {
 
-    /** @var array<string,int> [methodName => maxCallCountPerTick] */
+    /** @var array<string,positive-int> [methodName => maxCallCountPerTick] */
     public const playerControlMethods = [
         'attack'   => 1,
         'attack2'  => 1,
@@ -29,7 +29,7 @@ abstract class Protocol
         'walk'     => 1,
     ];
 
-    /** @var array<string,int> [methodName => paramCount] */
+    /** @var array<string,non-negative-int> [methodName => paramCount] */
     public const playerControlMethodParamCount = [
         'attack'   => 0,
         'attack2'  => 0,
@@ -58,7 +58,7 @@ abstract class Protocol
         ],
     ];
 
-    /** @var array<string,int> [methodName => methodNumber] */
+    /** @var array<string,non-negative-int> [methodName => methodNumber] */
     public const playerMethodByName = [
         'attack'   => 0,
         'attack2'  => 1,
@@ -79,7 +79,7 @@ abstract class Protocol
         'walk'     => 18,
     ];
 
-    /** @var array<int,string> [methodNumber => methodName] */
+    /** @var array<non-negative-int,string> [methodNumber => methodName] */
     public const playerMethodByNumber = [
         0  => 'attack',
         1  => 'attack2',

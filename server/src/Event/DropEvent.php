@@ -34,14 +34,14 @@ class DropEvent extends Event implements ForOneRoundMax
         $this->angleHorizontal = $player->getSight()->getRotationHorizontal();
         $this->angleVertical = $player->getSight()->getRotationVertical();
         $this->velocity = ($player->isMoving() || $player->isJumping()) ? 30.0 : 20.0;
-        $this->timeIncrement = 1 / Util::millisecondsToFrames(100);
+        $this->timeIncrement = 1 / $this->timeMsToTick(100);
         if (!$this->player->isAlive()) {
             $this->velocity = 7;
             $this->timeIncrement = 7;
         }
     }
 
-    public function onLand(Closure $callback): void
+    public function onFloorLand(Closure $callback): void
     {
         $this->onLand = $callback;
     }

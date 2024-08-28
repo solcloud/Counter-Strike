@@ -56,8 +56,8 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
         $this->floorCandidate = $origin->clone();
         $this->ball = new BallCollider($this->world, $origin, $radius);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
-        $this->timeIncrement = 1 / Util::millisecondsToFrames(150); // fixme some good value or velocity or gravity :)
-        $this->tickMax = $this->getTickId() + Util::millisecondsToFrames($this->needsToLandOnFloor ? 99999 : 1200);
+        $this->timeIncrement = 1 / $this->timeMsToTick(150); // fixme some good value or velocity or gravity :)
+        $this->tickMax = $this->getTickId() + $this->timeMsToTick($this->needsToLandOnFloor ? 99999 : 1200);
     }
 
     private function makeEvent(Point $point, SoundType $type): Event

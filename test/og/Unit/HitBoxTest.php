@@ -56,19 +56,14 @@ class HitBoxTest extends BaseTest
             new SphereHitBox(new Point(), 0);
             $this->fail('Should throw');
         } catch (GameException $ex) {
+            $this->assertStringContainsStringIgnoringCase('bigger than zero', $ex->getMessage());
         }
         try {
             new SphereHitBox(new Point(), -2);
             $this->fail('Should throw');
         } catch (GameException $ex) {
+            $this->assertStringContainsStringIgnoringCase('bigger than zero', $ex->getMessage());
         }
-
-        // Just grinding code coverage...
-        $point = new Point2D(1, 1);
-        $hit = new SphereHitBox(new Point($point->clone()->setY(-1)->addY(1)->setX(0)->x, 0), 2);
-        $point->setFrom(new Point2D());
-        $this->assertTrue($hit->getRelativeCenter()->to2D('xz')->equals($point));
-        $this->assertTrue($hit->getRelativeCenter()->to2D('xy')->equals($point));
     }
 
     public function testSphereWorldPointCenter(): void
