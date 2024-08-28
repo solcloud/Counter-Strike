@@ -74,7 +74,7 @@ class TestGame extends Game
     }
 
     /**
-     * @param Closure $callback function(array $events):void {}
+     * @param Closure $callback function(array $events):void {foreach($events as $event){}}
      */
     public function onEvents(Closure $callback): void
     {
