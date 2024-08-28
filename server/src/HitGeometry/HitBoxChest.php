@@ -7,10 +7,13 @@ use cs\Core\Point;
 
 class HitBoxChest extends SphereGroupHitBox
 {
+    private Point $centerPoint;
+
     public function __construct()
     {
+        $this->centerPoint = new Point();
         parent::__construct(function (Player $player): Point {
-            return (new Point())->addY($player->getHeadHeight());
+            return $this->centerPoint->setScalar(0)->addY($player->getHeadHeight());
         });
 
         $this->createChestLeft();

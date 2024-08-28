@@ -375,7 +375,14 @@ export class Game {
         const range = this.#volumetrics[smokeId]['range']
         const mesh = this.#volumetrics[smokeId]['mesh']
 
-        this.#roundIntervalIds.push(setInterval(() => mesh.geometry.setDrawRange(0, mesh.geometry.drawRange.count - range), 50))
+        const intervalId = setInterval(function() {
+            const newRange = mesh.geometry.drawRange.count - range
+            if (newRange <= 0) {
+                clearInterval(intervalId)
+            }
+            mesh.geometry.setDrawRange(0, newRange)
+        }, 50)
+        this.#roundIntervalIds.push(intervalId)
     }
 
     bombPlanted(timeMs, position) {

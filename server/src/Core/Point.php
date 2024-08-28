@@ -74,6 +74,14 @@ class Point
         return $this;
     }
 
+    public function setScalar(int $xyz): self
+    {
+        $this->x = $xyz;
+        $this->y = $xyz;
+        $this->z = $xyz;
+        return $this;
+    }
+
     public function __toString(): string
     {
         return "Point({$this->x},{$this->y},{$this->z})";

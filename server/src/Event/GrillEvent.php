@@ -4,7 +4,6 @@ namespace cs\Event;
 
 use cs\Core\Column;
 use cs\Core\Point;
-use cs\Core\Util;
 use cs\Enum\SoundType;
 use cs\Interface\Flammable;
 
@@ -18,7 +17,7 @@ final class GrillEvent extends VolumetricEvent
 
     protected function setup(): void
     {
-        $this->damageCoolDownTickCount = Util::millisecondsToFrames(self::DAMAGE_COOL_DOWN_TIME_MS);
+        $this->damageCoolDownTickCount = $this->timeMsToTick(self::DAMAGE_COOL_DOWN_TIME_MS);
     }
 
     protected function onProcess(int $tick): void
