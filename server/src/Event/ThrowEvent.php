@@ -54,7 +54,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
         $this->position = $origin->clone();
         $this->lastEventPosition = $origin->clone();
         $this->floorCandidate = $origin->clone();
-        $this->ball = new BallCollider($this->world, $origin, $radius);
+        $this->ball = new BallCollider($this->world, $origin, $radius, $this->angleHorizontal, $this->angleVertical);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
         $this->timeIncrement = 1 / $this->timeMsToTick(150); // fixme some good value or velocity or gravity :)
         $this->tickMax = $this->getTickId() + $this->timeMsToTick($this->needsToLandOnFloor ? 99999 : 1200);
@@ -145,17 +145,20 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
                 $pos->z = $z;
             }
 
-            if (!$this->ball->hasCollision($pos, $this->angleHorizontal, $this->angleVertical)) {
+            if (!$this->ball->hasCollision($pos)) {
                 continue;
             }
 
-            if ($this->ball->getResolutionAngleVertical() > 0
-                && $this->world->findFloorSquare($this->floorCandidate->set($pos->x, $pos->y - $this->radius, $pos->z), $this->radius)) {
+            if (
+                $this->ball->getResolutionAngleVertical() > 0
+                && ($this->item instanceof Flammable || $this->item instanceof Smoke)
+                && $this->world->findFloorSquare($this->floorCandidate->set($pos->x, $pos->y - $this->radius, $pos->z), $this->radius)
+            ) {
                 if ($this->item instanceof Flammable) {
                     $this->finishLanding($pos);
                     return;
                 }
-                if ($this->item instanceof Smoke && $this->world->isCollisionWithMolotov($this->floorCandidate)) {
+                if ($this->world->isCollisionWithMolotov($this->floorCandidate)) {
                     $this->finishLanding($pos);
                     return;
                 }
@@ -201,9 +204,6 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
     public function setAngles(float $angleHorizontal, float $angleVertical): void
     {
         $this->angleHorizontal = $angleHorizontal;
-        if ($angleVertical < 0) {
-            $angleVertical /= 2;
-        }
         $this->angleVertical = $angleVertical;
     }
 

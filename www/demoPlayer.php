@@ -226,7 +226,7 @@ $frameIdEnd = null;
             this.scene.add(player)
             return player
         },
-        showTrajectory: false,
+        showTrajectory: <?= isset($_GET['showTrajectory']) ? 'true' : 'false' ?>,
         throwables: {},
         volumetrics: {},
         createVolume: function (width, height, depth, color) {

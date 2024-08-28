@@ -29,7 +29,7 @@ class BallColliderTest extends BaseTest
         $resolutionAngleVertical = 90.0;
         /////
 
-        $ball = $this->createBall($start, $radius, $world);
+        $ball = $this->createBall($start, $radius, $world, $angleHorizontal, $angleVertical);
         $world->addBox(new Box(new Point(9), 1, 1, 1));
         $world->addBox(new Box(new Point(10), 1, 1, 1));
         $world->addBox(new Box(new Point(11), 1, 1, 1));
@@ -40,13 +40,45 @@ class BallColliderTest extends BaseTest
         $this->assertSame($resolutionAngleVertical, $ball->getResolutionAngleVertical());
     }
 
+    public function testResolution2(): void
+    {
+        /////
+        $radius = 2;
+        $angleHorizontal = rand(1, 40);
+        $angleVertical = 45.0;
+        $start = new Point(14, $radius, 0);
+        $extreme = $start->clone();
+        /////
+
+        $ball = $this->createBall($start, $radius, $world, $angleHorizontal, $angleVertical);
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, 3, 0)));
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, 3, 0)));
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, 2, 0)));
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, 0, 0)));
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, 0, 0)));
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertFalse($ball->hasCollision($start->addPart(-2, -2, 0)));
+        $extreme->setFrom($start);
+        $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
+        $this->assertTrue($ball->hasCollision($start->addPart(-1, -1, 0)));
+        $this->assertPositionSame($start, $ball->getLastExtremePosition());
+        $this->assertPositionSame(new Point($radius, $radius + 6, 0), $ball->getLastValidPosition());
+        $this->assertSame(360.0 - $angleHorizontal, $ball->getResolutionAngleHorizontal());
+        $this->assertLessThan(0, $ball->getResolutionAngleVertical());
+    }
+
     protected function runCollision(BallCollider $ball, Point $start, float $angleHorizontal, float $angleVertical): void
     {
         $candidate = $start->clone();
         for ($distance = 1; $distance <= 128; $distance++) {
             $candidate->setFrom($start);
             $candidate->addFromArray(Util::movementXYZ($angleHorizontal, $angleVertical, $distance));
-            if ($ball->hasCollision($candidate, $angleHorizontal, $angleVertical)) {
+            if ($ball->hasCollision($candidate)) {
                 return;
             }
         }
@@ -87,13 +119,13 @@ class BallColliderTest extends BaseTest
         } else {
             $this->fail("Unknown plane given");
         }
-        $ball = new BallCollider($world, $ballCenter, $ballRadius);
+        $ball = new BallCollider($world, $ballCenter, $ballRadius, $angleHorizontal, $angleVertical);
 
         $candidate = $ballCenter->clone();
         for ($distance = 1; $distance <= $maxDistance; $distance++) {
             $candidate->setFrom($ballCenter);
             $candidate->addFromArray(Util::movementXYZ($angleHorizontal, $angleVertical, $distance));
-            if (!$ball->hasCollision($candidate, $angleHorizontal, $angleVertical)) {
+            if (!$ball->hasCollision($candidate)) {
                 continue;
             }
 
@@ -120,10 +152,10 @@ class BallColliderTest extends BaseTest
         $this->fail('No collision detected');
     }
 
-    private function createBall(Point $start, int $radius, ?World &$world): BallCollider
+    private function createBall(Point $start, int $radius, ?World &$world, float $angleHorizontal, float $angleVertical): BallCollider
     {
         $world = $world ?? $this->createWorld();
-        return new BallCollider($world, $start, $radius);
+        return new BallCollider($world, $start, $radius, $angleHorizontal, $angleVertical);
     }
 
     private function createWorld(): World

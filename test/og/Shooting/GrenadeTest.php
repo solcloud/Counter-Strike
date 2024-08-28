@@ -106,7 +106,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($floorY, $bounceEvent->position->y);
         $this->assertSame($floorY, $landEvent->position->y);
-        $this->assertPositionSame(new Point(221, $floorY, 1022), $landEvent->position);
+        $this->assertPositionSame(new Point(220, $floorY, 1022), $landEvent->position);
     }
 
     public function testThrow2(): void
@@ -136,7 +136,7 @@ class GrenadeTest extends BaseTestCase
             fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
             $this->waitNTicks(Decoy::equipReadyTimeMs),
             fn(Player $p) => $this->assertNotNull($p->attack()),
-            $this->waitNTicks(1500),
+            $this->waitNTicks(1700),
             $this->endGame(),
         ]);
 
@@ -149,7 +149,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertPositionNotSame($bounceEvent->position, $landEvent->position);
         $this->assertSame($y, $bounceEvent->position->y);
         $this->assertSame($y, $landEvent->position->y);
-        $this->assertPositionSame(new Point(1168, $y, 210), $landEvent->position);
+        $this->assertPositionSame(new Point(1374, $y, 416), $landEvent->position);
     }
 
     public function testThrow3(): void
@@ -322,7 +322,7 @@ class GrenadeTest extends BaseTestCase
         $pp = $game->getPlayer(1)->getPositionClone();
         $this->assertGreaterThan($pp->x, $landEvent->position->x);
         $this->assertGreaterThan($pp->z, $landEvent->position->z);
-        $this->assertPositionSame(new Point(559, Decoy::boundingRadius, 347), $landEvent->position);
+        $this->assertPositionSame(new Point(703, Decoy::boundingRadius, 374), $landEvent->position);
     }
 
     public function testMultiThrow(): void
@@ -352,6 +352,91 @@ class GrenadeTest extends BaseTestCase
         $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_KNIFE->value));
         $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
         $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_BOMB->value));
+    }
+
+    public function testExtremePosition(): void
+    {
+        $game = $this->createNoPauseGame();
+        $floor = new Floor(new Point(500, 600, 500), 10, 10);
+        $game->getWorld()->addFloor($floor);
+
+        $test = new \stdClass();
+        $test->goingUp = true;
+        $test->mid = false;
+        $test->lastPosition = null;
+        $test->bounceCount = 0;
+        $test->bounceX = 0;
+        $test->airCount = 0;
+        $test->land = null;
+        $game->onEvents(function (array $events) use (&$test): void {
+            foreach ($events as $event) {
+                if (false === ($event instanceof SoundEvent)) {
+                    continue;
+                }
+
+                if ($event->type === SoundType::GRENADE_LAND) {
+                    $this->assertNull($test->land);
+                    $test->land = $event->position;
+                    return;
+                }
+                if ($event->position->y < 2 + Decoy::boundingRadius) {
+                    return;
+                }
+                if ($event->type === SoundType::GRENADE_BOUNCE) {
+                    $test->bounceCount++;
+                    $test->bounceX = $event->position->x;
+                    continue;
+                }
+                if ($event->type === SoundType::GRENADE_AIR) {
+                    $test->airCount++;
+                    continue;
+                }
+
+                if ($test->lastPosition === null) {
+                    $test->lastPosition = $event->position->clone();
+                    continue;
+                }
+
+                if (!$test->mid && $test->lastPosition->y === $event->position->y) {
+                    $this->assertFalse($test->mid);
+                    $test->mid = true;
+                    $this->assertTrue($test->goingUp);
+                    $test->goingUp = false;
+                    $test->lastPosition->setFrom($event->position);
+                    continue;
+                }
+
+                if ($test->mid && $test->lastPosition->y === $event->position->y) {
+                    continue;
+                }
+
+                $msg = "last: {$test->lastPosition->y}, actual: {$event->position->y}";
+                if ($test->goingUp) {
+                    $this->assertTrue($test->lastPosition->y < $event->position->y, $msg);
+                } else {
+                    $this->assertTrue($test->lastPosition->y > $event->position->y, $msg);
+                }
+                $test->lastPosition->setFrom($event->position);
+            }
+        });
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition($floor->getStart()),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $p->getSight()->look(-22, 30),
+            fn(Player $p) => $this->assertGreaterThan(10, $p->getSight()->getRotationVertical()),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(2500),
+            $this->endGame(),
+        ]);
+
+        $this->assertNotNull($test->land);
+        $this->assertSame(Decoy::boundingRadius, $test->land->y);
+        $this->assertSame(1, $test->bounceCount);
+        $this->assertSame(-1 + Decoy::boundingRadius, $test->bounceX);
+        $this->assertSame(114, $test->airCount);
+        $this->assertFalse($test->goingUp);
     }
 
 
