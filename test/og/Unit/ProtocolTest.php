@@ -60,6 +60,7 @@ class ProtocolTest extends BaseTest
         $game = new Game(new GameProperty());
         $game->loadMap(new TestMap());
         $game->addPlayer($player);
+        $pp = $player->getPositionClone();
         $player->getSight()->look(12.45, 1.09);
         $protocol = new Protocol\TextProtocol();
 
@@ -90,9 +91,9 @@ class ProtocolTest extends BaseTest
             ],
             'health'      => 100,
             'position'    => [
-                'x' => 0,
-                'y' => 0,
-                'z' => 0,
+                'x' => $pp->x,
+                'y' => $pp->y,
+                'z' => $pp->z,
             ],
             'look'        => [
                 'horizontal' => 12.45,

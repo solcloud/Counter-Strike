@@ -267,6 +267,7 @@ $frameIdEnd = null;
                 }
                 if (event.code === <?= EventList::map[GrillEvent::class] ?> || event.code === <?= EventList::map[SmokeEvent::class] ?>) {
                     self.volumetrics[event.data.id] = {}
+                    self.volumetrics[event.data.id]['size'] = event.data.size
                 }
                 if (event.code === <?= EventList::map[SoundEvent::class] ?>) {
                     if ([<?= SoundType::GRENADE_LAND->value ?>, <?= SoundType::GRENADE_BOUNCE->value ?>, <?= SoundType::GRENADE_AIR->value ?>].includes(event.data.type)) {
@@ -281,13 +282,18 @@ $frameIdEnd = null;
                         const color = event.data.type === <?= SoundType::FLAME_SPAWN->value ?>
                             ? new THREE.Color(`hsl(53, 100%, ${Math.random() * 70 + 20}%, 1)`)
                             : new THREE.Color(0x798aa0)
-                        let mesh = self.createVolume(31, event.data.extra.height, 31, color)
+                        let size = self.volumetrics[event.data.extra.id]['size']
+                        let mesh = self.createVolume(size, event.data.extra.height, size, color)
                         self.volumetrics[event.data.extra.id][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`] = mesh
                         mesh.position.set(event.data.position.x, event.data.position.y + (event.data.extra.height / 2), -event.data.position.z)
                     }
                     if (event.data.type === <?= SoundType::FLAME_EXTINGUISH->value ?> || event.data.type === <?= SoundType::SMOKE_FADE->value ?>) {
                         const mesh = self.volumetrics[event.data.extra.id][`${event.data.position.x}-${event.data.position.y}-${event.data.position.z}`]
                         mesh.visible = false
+                        if (event.data.type === <?= SoundType::SMOKE_FADE->value ?>) { // single shrink event
+                            delete self.volumetrics[event.data.extra.id]['size']
+                            Object.keys(self.volumetrics[event.data.extra.id]).forEach((key) => self.volumetrics[event.data.extra.id][key].visible = false)
+                        }
                     }
                 }
             })

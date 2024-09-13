@@ -196,20 +196,19 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
         return $this->world->getTickId();
     }
 
+    /** @codeCoverageIgnore */
     public function applyRecoil(float $offsetHorizontal, float $offsetVertical): void
     {
         // no recoil on throw
     }
 
-    public function setAngles(float $angleHorizontal, float $angleVertical): void
+    protected function setAngles(float $angleHorizontal, float $angleVertical): void
     {
         $this->angleHorizontal = $angleHorizontal;
         $this->angleVertical = $angleVertical;
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
+    /** @codeCoverageIgnore */
     public function serialize(): array
     {
         return [

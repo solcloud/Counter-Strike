@@ -6,17 +6,16 @@ use cs\Core\Column;
 use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Enum\SoundType;
+use cs\Equipment\Smoke;
 
 final class SmokeEvent extends VolumetricEvent
 {
-    public const MAX_HEIGHT = 350;
-    public const MAX_CORNER_HEIGHT = 270;
 
-    private int $maxHeight = self::MAX_HEIGHT;
+    private int $maxHeight = Smoke::MAX_HEIGHT;
 
     protected function setup(): void
     {
-        if (min(self::MAX_CORNER_HEIGHT, self::MAX_HEIGHT) < $this->partHeight) {
+        if (min(Smoke::MAX_CORNER_HEIGHT, Smoke::MAX_HEIGHT) < $this->partHeight) {
             throw new GameException('Part height is too high'); // @codeCoverageIgnore
         }
     }
@@ -34,7 +33,7 @@ final class SmokeEvent extends VolumetricEvent
     {
         $count = count($this->parts);
         if ($count > 10 && $count % 2 === 0) {
-            $this->maxHeight = max(self::MAX_CORNER_HEIGHT, $this->maxHeight - 1);
+            $this->maxHeight = max(Smoke::MAX_CORNER_HEIGHT, $this->maxHeight - 1);
         }
 
         $height = $this->partHeight;

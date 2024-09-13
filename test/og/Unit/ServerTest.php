@@ -5,14 +5,15 @@ namespace Test\Unit;
 use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\GameFactory;
+use cs\Core\GameProperty;
 use cs\Core\Setting;
+use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\GameOverReason;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Molotov;
 use cs\Event\GameOverEvent;
 use cs\Map\TestMap;
-use cs\Net\ProtocolWriter;
 use cs\Net\Server;
 use cs\Net\ServerSetting;
 use cs\Net\TestConnector;
@@ -51,6 +52,26 @@ class ServerTest extends BaseTest
         $gameOver = $game->tick($game->getTickId() + 1);
         $this->assertInstanceOf(GameOverEvent::class, $gameOver);
         $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED, $gameOver->reason);
+    }
+
+    public function testServerGameOver(): void
+    {
+        $tickRate = Util::$TICK_RATE;
+        $roundTimeMs = rand($tickRate + 1, 10 * $tickRate);
+        $roundTickCount = Util::millisecondsToFrames($roundTimeMs);
+        $gameProperty = new GameProperty();
+        $gameProperty->max_rounds = 1;
+        $gameProperty->freeze_time_sec = 0;
+        $gameProperty->half_time_freeze_sec = 0;
+        $gameProperty->round_end_cool_down_sec = 0;
+        $gameProperty->round_time_ms = $roundTimeMs;
+
+        $game = new Game($gameProperty);
+        $game->loadMap(new TestMap());
+        $setting = new ServerSetting(1, 0, 'code');
+        $testNet = new TestConnector(array_merge(['login code'], array_fill(0, 3 + $roundTickCount, 'stand')));
+        $server = new Server($game, $setting, $testNet);
+        $this->assertSame(2 + $roundTickCount, $server->start());
     }
 
     public function testServer(): void

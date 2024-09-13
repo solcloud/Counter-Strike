@@ -42,6 +42,7 @@ final class Graph extends DiGraph
     /**
      * @return array<string,string[]>
      * @internal
+     * @codeCoverageIgnore
      */
     public function internalGetGeneratedNeighbors(): array
     {

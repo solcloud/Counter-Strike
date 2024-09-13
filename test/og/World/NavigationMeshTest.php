@@ -3,6 +3,7 @@
 namespace Test\World;
 
 use cs\Core\Box;
+use cs\Core\GameException;
 use cs\Core\PathFinder;
 use cs\Core\Point;
 use cs\Core\World;
@@ -33,7 +34,7 @@ final class NavigationMeshTest extends BaseTestCase
                 ['326,333,326', new Point(333, 333, 333)],
                 ['450,0,295', new Point(450, 0, 285)],
                 ['450,0,295', new Point(461, 0, 285)],
-                ['1566,50,16', new Point(1570,50,26)],
+                ['1566,50,16', new Point(1570, 50, 26)],
             ],
         ];
         $world = new World($this->createTestGame());
@@ -64,6 +65,11 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertCount(3, $path->getGraph()->getNeighbors($startNode));
         $path->getGraph()->generateNeighbors();
         $this->assertCount(3, $path->getGraph()->getGeneratedNeighbors($startNode->getId()));
+        foreach ($path->getGraph()->getGeneratedNeighbors($startNode->getId()) as $neighbor) {
+            $path->getGraph()->removeNodeById($neighbor->getId());
+        }
+        $this->expectException(GameException::class);
+        $path->getGraph()->getGeneratedNeighbors($startNode->getId());
     }
 
     public function testBoundary(): void

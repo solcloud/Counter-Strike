@@ -7,6 +7,8 @@ use cs\Interface\Volumetric;
 
 class Smoke extends Grenade implements Volumetric
 {
+    public const MAX_HEIGHT = 350;
+    public const MAX_CORNER_HEIGHT = 270;
     public const MAX_TIME_MS = 18_000;
     protected int $price = 300;
 

@@ -11,8 +11,12 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
 use cs\Enum\RampDirection;
+use cs\Enum\SoundType;
+use cs\Equipment\Incendiary;
 use cs\Equipment\Molotov;
 use cs\Equipment\Smoke;
+use cs\Event\RoundEndEvent;
+use cs\Event\SoundEvent;
 use Test\BaseTestCase;
 
 class MolotovGrenadeTest extends BaseTestCase
@@ -40,6 +44,41 @@ class MolotovGrenadeTest extends BaseTestCase
             fn(Player $p) => $this->assertSame(1, $game->getScore()->getPlayerStat($p->getId())->getDeaths()),
             $this->endGame(),
         ]);
+    }
+
+    public function testMolotovOnlyTookMaxOneRound(): void
+    {
+        $game = $this->createNoPauseGame(3);
+        $game->getPlayer(1)->setPosition(new Point(Setting::playerBoundingRadius(), 0, Setting::playerBoundingRadius()));
+        $game->getWorld()->addBox(new Box(new Point(), 1000, 3000, 1000));
+
+        $roundEndEvent = null;
+        $game->onEvents(function (array $events) use (&$roundEndEvent): void {
+            foreach ($events as $event) {
+                if ($event instanceof RoundEndEvent) {
+                    $roundEndEvent = $event;
+                    return;
+                }
+                if ($roundEndEvent !== null && $event instanceof SoundEvent && $event->type === SoundType::FLAME_PLAYER_HIT) {
+                    $this->fail('Molly should not hit after round end');
+                }
+            }
+        });
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(0, -90),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $this->assertInstanceOf(Molotov::class, $p->getEquippedItem()),
+            $this->waitNTicks(Molotov::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(Molotov::MAX_TIME_MS),
+            fn(Player $p) => $this->assertSame(2, $game->getRoundNumber(), 'Player should not survive molly'),
+            fn(Player $p) => $this->assertSame(100, $game->getPlayer(1)->getHealth()),
+            $this->endGame(),
+        ]);
+
+        $this->assertNotNull($roundEndEvent);
     }
 
     public function testWallBlockFire(): void
@@ -256,6 +295,63 @@ class MolotovGrenadeTest extends BaseTestCase
 
         $this->assertSame(1, $game->getRoundNumber());
         $this->assertSame($health, $game->getPlayer(1)->getHealth());
+    }
+
+    public function testSmokeHeightBoundaryAndShrink(): void
+    {
+        $height = 220;
+        $this->assertLessThan(Smoke::MAX_CORNER_HEIGHT, $height);
+        $this->assertGreaterThan(Setting::playerHeadHeightStand(), $height);
+
+        $game = $this->createNoPauseGame();
+        $game->getWorld()->addBox(new Box(new Point(), 1000, 3000, 1000));
+        $game->getWorld()->addRamp(new Ramp(new Point(0, 0, 200), RampDirection::GROW_TO_POSITIVE_Z, 13, 200));
+        $game->getWorld()->addBox(new Box(new Point(0, $height, 455), 1000, 10, 400));
+
+        $p2 = new Player(2, Color::BLUE, false);
+        $game->addPlayer($p2);
+        $p2->getSight()->look(0, -90);
+        $p2->setPosition(new Point(500, 265, 650));
+        $p2->buyItem(BuyMenuItem::GRENADE_INCENDIARY);
+        $p3 = new Player(3, Color::BLUE, false);
+        $game->addPlayer($p3);
+        $p3->getSight()->look(0, -90);
+        $p3->setPosition(new Point(500, 0, 650));
+        $p3->buyItem(BuyMenuItem::GRENADE_INCENDIARY);
+        $game->addPlayer(new Player(4, Color::BLUE, false));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(0, -90),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 650)),
+            $this->waitNTicks(Molotov::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            fn() => $this->assertInstanceOf(Incendiary::class, $p2->getEquippedItem()),
+            fn() => $this->assertNotNull($p2->attack()),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            function (Player $p) {
+                $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_GRENADE_MOLOTOV->value));
+                $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_GRENADE_SMOKE->value));
+            },
+            fn() => $this->assertTrue($p3->isAlive()),
+            $this->waitNTicks(Smoke::MAX_TIME_MS),
+            fn(Player $p) => $this->assertLessThan(100, $p->getHealth()),
+            fn(Player $p) => $p->setPosition(new Point(500, 265, 660)),
+            $this->waitNTicks(300),
+            fn() => $this->assertTrue($p3->isAlive()),
+            fn() => $this->assertInstanceOf(Incendiary::class, $p3->getEquippedItem()),
+            fn() => $this->assertNotNull($p3->attack()),
+            $this->waitNTicks(Incendiary::MAX_TIME_MS),
+            $this->endGame()
+        ]);
+
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertFalse($p2->isAlive());
+        $this->assertFalse($p3->isAlive());
+        $this->assertTrue($game->getPlayer(1)->isAlive());
+        $this->assertTrue($game->getPlayer(4)->isAlive());
     }
 
 }

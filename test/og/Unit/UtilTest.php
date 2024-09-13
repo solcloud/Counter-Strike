@@ -195,6 +195,19 @@ class UtilTest extends BaseTest
         $this->assertSame([$h, $v], [$actualH, $actualV], "{$start}, angle ({$h},{$v})");
     }
 
+    public function testAngleNormalize(): void
+    {
+        $this->assertSame(0.0, Util::normalizeAngle(360.0));
+        $this->assertSame(0.0, Util::normalizeAngle(720));
+        $this->assertSame(347.8, Util::normalizeAngle(-12.20));
+        $this->assertSame(190.3, Util::normalizeAngle(190.3));
+
+        $this->assertSame(-90.0, Util::normalizeAngleVertical(-91));
+        $this->assertSame(-90.0, Util::normalizeAngleVertical(-207.23));
+        $this->assertSame(90.0, Util::normalizeAngleVertical(90.1));
+        $this->assertSame(43.1, Util::normalizeAngleVertical(43.1));
+    }
+
     public function testWorldAngle(): void
     {
         $this->assertSame([0.0, 0.0], Util::worldAngle(new Point(10, 10, 20), new Point(10, 10, 10)));
@@ -236,9 +249,9 @@ class UtilTest extends BaseTest
         $this->assertSame(2, $point->y);
         $this->assertSame(3, $point->z);
         $this->assertSame([
-            'x' => 3,
-            'y' => 2,
-        ], $point->to2D('zy')->toArray());
+            'x' => 2,
+            'y' => 4,
+        ], $point->to2D('zy')->add(-1, 2)->toArray());
         $point->setFromArray([1,3,2]);
         $this->assertTrue((new Point(1,3,2))->equals($point));
     }

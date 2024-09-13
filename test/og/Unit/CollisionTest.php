@@ -248,7 +248,10 @@ class CollisionTest extends BaseTest
     public function testPointWithBoxBoundary(): void
     {
         $this->assertTrue(Collision::pointWithBoxBoundary(new Point(), new Point(-5, 0, -5), new Point(5, 4, 5)));
+        $this->assertTrue(Collision::pointWithBoxBoundary(new Point(4, 2, 5), new Point(-5, 0, -5), new Point(5, 4, 5)));
         $this->assertFalse(Collision::pointWithBoxBoundary(new Point(-6), new Point(-5, 0, -5), new Point(5, 4, 5)));
+        $this->assertFalse(Collision::pointWithBoxBoundary(new Point(4, 5, 2), new Point(-5, 0, -5), new Point(5, 4, 5)));
+        $this->assertFalse(Collision::pointWithBoxBoundary(new Point(4, 2, 6), new Point(-5, 0, -5), new Point(5, 4, 5)));
     }
 
     public function testBoxWithBox(): void

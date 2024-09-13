@@ -1,4 +1,5 @@
-/vendor/
-/electron/package-lock.json
 /electron/build/
 /electron/node_modules/
+/electron/package-lock.json
+/vendor/
+/www/coverage/

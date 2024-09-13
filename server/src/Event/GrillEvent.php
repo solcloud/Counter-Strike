@@ -49,10 +49,6 @@ final class GrillEvent extends VolumetricEvent
 
     public function extinguish(Column $flame): void
     {
-        if (!$flame->active) {
-            return;
-        }
-
         $flame->active = false;
         $this->shrinkPart($flame);
     }

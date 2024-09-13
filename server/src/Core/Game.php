@@ -244,6 +244,7 @@ class Game
         return $this->roundNumber;
     }
 
+    /** @infection-ignore-all */
     public function addSoundEvent(SoundEvent $event): void
     {
         $this->addEvent($event);
@@ -308,7 +309,7 @@ class Game
         $this->addSoundEvent($sound->setPlayer($playerDead));
     }
 
-    public function playerBombKilledEvent(Player $playerDead): void
+    protected function playerBombKilledEvent(Player $playerDead): void
     {
         $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::BOMB, false));
         $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
@@ -467,7 +468,8 @@ class Game
                 $amount += match ($roundEndEvent->reason) {
                     RoundEndReason::ALL_ENEMIES_ELIMINATED => 3250,
                     RoundEndReason::BOMB_EXPLODED => 3500,
-                    default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
+                    RoundEndReason::TIME_RUNS_OUT,
+                    RoundEndReason::BOMB_DEFUSED => throw new GameException('Invalid? ' . $roundEndEvent->reason->value), // @codeCoverageIgnore
                 };
             } elseif (!$player->isAlive()) {
                 $amount += $this->score->getMoneyLossBonus(true);
@@ -481,7 +483,7 @@ class Game
             $amount += match ($roundEndEvent->reason) {
                 RoundEndReason::ALL_ENEMIES_ELIMINATED, RoundEndReason::TIME_RUNS_OUT => 3250,
                 RoundEndReason::BOMB_DEFUSED => 3500,
-                default => throw new GameException("New win reason? " . $roundEndEvent->reason->value),
+                RoundEndReason::BOMB_EXPLODED => throw new GameException('Invalid? ' . $roundEndEvent->reason->value), // @codeCoverageIgnore
             };
         } else {
             $amount += $this->score->getMoneyLossBonus(false);

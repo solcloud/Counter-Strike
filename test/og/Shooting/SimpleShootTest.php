@@ -125,7 +125,7 @@ class SimpleShootTest extends BaseTestCase
                 $this->assertSame(RifleAk::magazineCapacity, $ak->getAmmo());
                 $this->assertSame(RifleAk::reserveAmmo, $ak->getAmmoReserve());
             },
-            fn(Player $p) => $p->attack(),
+            fn(Player $p) => $this->assertNull($p->attack()),
             function (Player $p): void {
                 $ak = $p->getEquippedItem();
                 $this->assertInstanceOf(RifleAk::class, $ak);
@@ -133,7 +133,7 @@ class SimpleShootTest extends BaseTestCase
                 $this->assertSame(RifleAk::reserveAmmo, $ak->getAmmoReserve());
             },
             $this->waitNTicks(RifleAk::equipReadyTimeMs) - 1,
-            fn(Player $p) => $p->attack(),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
             function (Player $p): void {
                 $ak = $p->getEquippedItem();
                 $this->assertInstanceOf(RifleAk::class, $ak);
@@ -154,7 +154,25 @@ class SimpleShootTest extends BaseTestCase
                 $this->assertInstanceOf(RifleAk::class, $ak);
                 $this->assertSame(RifleAk::magazineCapacity, $ak->getAmmo());
                 $this->assertSame(RifleAk::reserveAmmo - 1, $ak->getAmmoReserve());
-                $this->assertNotNull($p->attack());
+            },
+            $this->waitNTicks(RifleAk::fireRateMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            function (Player $p): void {
+                $ak = $p->getEquippedItem();
+                $this->assertInstanceOf(RifleAk::class, $ak);
+                $this->assertSame(RifleAk::magazineCapacity - 1, $ak->getAmmo());
+            },
+            fn(Player $p) => $p->reload(),
+            function (Player $p): void {
+                $ak = $p->getEquippedItem();
+                $this->assertInstanceOf(RifleAk::class, $ak);
+                $this->assertSame(RifleAk::magazineCapacity - 1, $ak->getAmmo());
+            },
+            $this->waitNTicks(RifleAk::reloadTimeMs),
+            function (Player $p): void {
+                $ak = $p->getEquippedItem();
+                $this->assertInstanceOf(RifleAk::class, $ak);
+                $this->assertSame(RifleAk::magazineCapacity, $ak->getAmmo());
             },
         ];
 

@@ -13,7 +13,6 @@ class Bullet
     private bool $originPlayerIsAttacker;
     private int $distanceTraveled;
     private int $damage = 1;
-    private int $damageArmor = 1;
     /** @var array<int,bool> [playerId => true] */
     private array $playerSkipIds = [];
 
@@ -22,10 +21,9 @@ class Bullet
         $this->distanceTraveled = Setting::playerHeadRadius(); // shooting from center of player head so lets start on head edge
     }
 
-    public function setProperties(int $damage = 1, int $damageArmor = 1): void
+    public function setProperties(int $damage): void
     {
         $this->damage = $damage;
-        $this->damageArmor = $damageArmor;
     }
 
     public function setOriginPlayer(int $playerId, bool $attackerSide, Point $origin): void
@@ -55,11 +53,6 @@ class Bullet
     public function getDamage(): int
     {
         return $this->damage;
-    }
-
-    public function getDamageArmor(): int
-    {
-        return $this->damageArmor;
     }
 
     public function isActive(): bool

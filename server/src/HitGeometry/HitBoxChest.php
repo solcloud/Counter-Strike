@@ -2,19 +2,14 @@
 
 namespace cs\HitGeometry;
 
-use cs\Core\Player;
 use cs\Core\Point;
 
 class HitBoxChest extends SphereGroupHitBox
 {
-    private Point $centerPoint;
 
     public function __construct()
     {
-        $this->centerPoint = new Point();
-        parent::__construct(function (Player $player): Point {
-            return $this->centerPoint->setScalar(0)->addY($player->getHeadHeight());
-        });
+        parent::__construct(true);
 
         $this->createChestLeft();
         $this->createChestRight();

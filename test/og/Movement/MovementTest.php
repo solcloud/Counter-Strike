@@ -163,6 +163,63 @@ class MovementTest extends BaseTestCase
         $this->assertLessThan(Setting::moveDistancePerTick() * $tickMax, $game->getPlayer(1)->getPositionClone()->z);
     }
 
+    public function testPlayerConsistentMovement(): void
+    {
+        $start = new Point(500, 0, 500);
+        $end = null;
+
+        $game = $this->createTestGame();
+        $p = $game->getPlayer(1);
+        $p->setPosition($start);
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getInventory()->earnMoney(9000),
+            fn(Player $p) => $p->getSight()->lookHorizontal(45),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            function (Player $p) use (&$end) {
+                $end = $p->getPositionClone();
+            },
+            fn(Player $p) => $p->getSight()->lookHorizontal(225),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            $this->endGame(),
+        ]);
+
+        $this->assertInstanceOf(Point::class, $end);
+        $this->assertPositionSame($start, $p->getPositionClone());
+        $this->assertPositionNotSame($end, $p->getPositionClone());
+    }
+
+    public function testPlayerSlowMovementWhenInScope(): void
+    {
+        $start = new Point(500, 0, 500);
+        $end = null;
+
+        $game = $this->createTestGame();
+        $p = $game->getPlayer(1);
+        $p->setPosition($start);
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getInventory()->earnMoney(9000),
+            fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AWP),
+            fn(Player $p) => $p->getSight()->lookHorizontal(45),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            function (Player $p) use (&$end) {
+                $end = $p->getPositionClone();
+                $p->attackSecondary();
+            },
+            fn(Player $p) => $p->getSight()->lookHorizontal(225),
+            fn(Player $p) => $p->moveForward(),
+            fn(Player $p) => $p->moveForward(),
+            $this->endGame(),
+        ]);
+
+        $this->assertNotNull($end);
+        $this->assertPositionNotSame($start, $p->getPositionClone());
+        $this->assertGreaterThan($start->x, $p->getPositionClone()->x);
+        $this->assertGreaterThan($start->z, $p->getPositionClone()->z);
+    }
+
     public function testPlayerSlowMovementWhenFlying(): void
     {
         $game = $this->createOneRoundGame();
