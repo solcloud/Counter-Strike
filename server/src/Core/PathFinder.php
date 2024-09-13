@@ -20,7 +20,7 @@ final class PathFinder
     public function __construct(private readonly World $world, public readonly int $tileSize, public readonly int $colliderHeight)
     {
         if ($this->tileSize < 3 || $tileSize % 2 !== 1) {
-            throw new GameException('Tile size should be odd and greater than 1.');
+            throw new GameException('Tile size should be odd and greater than 1.'); // @codeCoverageIgnore
         }
 
         $this->tileSizeHalf = (int)ceil(($this->tileSize - 1) / 2);
@@ -37,7 +37,7 @@ final class PathFinder
     protected function canFullyMoveTo(Point $candidate, int $angle, int $targetDistance, int $radius, int $height): bool
     {
         if ($angle % 90 !== 0) {
-            GameException::notImplementedYet();
+            GameException::notImplementedYet(); // @codeCoverageIgnore
         }
 
         $looseFloor = false;
@@ -165,13 +165,13 @@ final class PathFinder
             }
         }
 
-        GameException::notImplementedYet('Should always find something? ' . $pointOnFloor->hash());
+        GameException::notImplementedYet('Should always find something? ' . $pointOnFloor->hash()); // @codeCoverageIgnore
     }
 
     public function convertToNavMeshNode(Point $point): void
     {
         if ($point->x < 1 || $point->z < 1) {
-            throw new GameException('World start from 1');
+            throw new GameException('World start from 1'); // @codeCoverageIgnore
         }
 
         $fmodX = fmod($point->x, $this->tileSize);
@@ -188,7 +188,7 @@ final class PathFinder
         $startPoint = $start->clone();
         $this->convertToNavMeshNode($startPoint);
         if (!$this->world->findFloorSquare($startPoint, 1)) {
-            throw new GameException('No floor on start point');
+            throw new GameException('No floor on start point'); // @codeCoverageIgnore
         }
 
         /** @var SplQueue<Point> $queue */
@@ -226,7 +226,7 @@ final class PathFinder
                 $this->graph->addNode($currentNode);
             }
             if (++$this->iterationCount === 10_000) {
-                GameException::notImplementedYet('New map, tileSize or bad test (no boundary box, bad starting point)?');
+                GameException::notImplementedYet('New map, tileSize or bad test (no boundary box, bad starting point)?'); // @codeCoverageIgnore
             }
         }
     }

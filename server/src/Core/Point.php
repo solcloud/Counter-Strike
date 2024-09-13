@@ -137,7 +137,7 @@ class Point
             return new Point2D($this->z, $this->y);
         }
 
-        GameException::notImplementedYet("New axis '$XYaxis'?");
+        GameException::notImplementedYet("New axis '$XYaxis'?"); // @codeCoverageIgnore
     }
 
     /**
@@ -158,14 +158,6 @@ class Point
             'y' => $this->y,
             'z' => $this->z,
         ];
-    }
-
-    /**
-     * @return int[]
-     */
-    public function toFlatArray(): array
-    {
-        return [$this->x, $this->y, $this->z];
     }
 
 }

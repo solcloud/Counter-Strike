@@ -124,7 +124,8 @@ class RoundTest extends BaseTestCase
     public function testNoSpawnPosition(): void
     {
         $game = $this->createTestGame();
-        $player = new Player(2, Color::YELLOW, true);
+        $game->addPlayer(new Player(2, Color::YELLOW, true));
+        $player = new Player(3, Color::GREEN, true);
         $this->expectExceptionMessage("Cannot find free spawn position for 'attacker' player");
         $game->addPlayer($player);
     }

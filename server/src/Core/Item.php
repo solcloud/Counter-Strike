@@ -70,16 +70,19 @@ abstract class Item
         return $this->scopeLevel;
     }
 
+    /** @codeCoverageIgnore */
     public function decrementQuantity(): void
     {
         // empty hook
     }
 
+    /** @codeCoverageIgnore */
     public function incrementQuantity(): void
     {
         // empty hook
     }
 
+    /** @codeCoverageIgnore */
     public function clone(): static
     {
         throw new GameException('Override clone() method if makes sense for item: ' . get_class($this));
@@ -111,14 +114,10 @@ abstract class Item
 
     public function canPurchaseMultipleTime(self $newSlotItem): bool
     {
-        if ($this->getType() === ItemType::TYPE_WEAPON_PRIMARY) {
-            return true;
-        }
-        if ($this->getType() === ItemType::TYPE_WEAPON_SECONDARY) {
-            return true;
-        }
-
-        return false;
+        return match ($this->getType()) {
+            ItemType::TYPE_WEAPON_PRIMARY, ItemType::TYPE_WEAPON_SECONDARY => true,
+            default => GameException::notImplementedYet('New item? ' . get_class($this)) // @codeCoverageIgnore
+        };
     }
 
     public function equip(): ?EquipEvent

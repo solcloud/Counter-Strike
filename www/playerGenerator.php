@@ -30,22 +30,21 @@ if (is_numeric($_GET['crouch'] ?? false)) {
     }
 }
 
+$point = new Point();
 $playerParts = [];
 foreach ($collider->getHitBoxes() as $box) {
     $geometry = $box->getGeometry();
-    if ($geometry instanceof SphereGroupHitBox) {
-        $modifier = $geometry->centerPointModifier;
-        $modifier = $modifier === null ? new Point() : $modifier($player);
-        foreach ($geometry->getParts($player) as $part) {
-            $playerParts[$box->getType()->value][] = [
-                "center" => $part->calculateWorldCoordinate($player, $modifier)->toArray(),
-                "radius" => $part->radius,
-            ];
-        }
-        continue;
+    if (false === ($geometry instanceof SphereGroupHitBox)) {
+        throw new Exception("Unknown geometry '" . get_class($geometry) . "' given");
     }
 
-    throw new Exception("Unknown geometry '" . get_class($geometry) . "' given");
+    $modifier = $point->setScalar(0)->addY($geometry->usePlayerHeight ? $player->getHeadHeight() : 0);
+    foreach ($geometry->getParts($player) as $part) {
+        $playerParts[$box->getType()->value][] = [
+            "center" => $part->calculateWorldCoordinate($player, $modifier)->toArray(),
+            "radius" => $part->radius,
+        ];
+    }
 }
 
 $slots = [

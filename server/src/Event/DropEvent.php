@@ -131,6 +131,7 @@ class DropEvent extends Event implements ForOneRoundMax
         return $this->dropItem;
     }
 
+    /** @codeCoverageIgnore */
     public function serialize(): array
     {
         return [

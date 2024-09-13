@@ -3,6 +3,7 @@
 namespace Test\Shooting;
 
 use cs\Core\Floor;
+use cs\Core\GameException;
 use cs\Core\GameProperty;
 use cs\Core\HitBox;
 use cs\Core\Player;
@@ -65,6 +66,9 @@ class PlayerKillTest extends BaseTestCase
         $this->assertNull($player2->attack());
         $this->assertTrue($headHit->getType() === HitBoxType::HEAD);
         $this->assertSame($startMoney - $gun->getPrice() + $gun->getKillAward(), $player2->getMoney());
+
+        $this->expectException(GameException::class);
+        $game->addPlayer(new Player($player2->getId(), Color::BLUE, true));
     }
 
     public function testOnePlayerCanKillOtherWallBang(): void
@@ -247,6 +251,8 @@ class PlayerKillTest extends BaseTestCase
         $this->assertFalse($game->getScore()->attackersIsWinning());
         $this->assertSame(0, $game->getScore()->getScoreAttackers());
         $this->assertSame(1, $game->getScore()->getScoreDefenders());
+        $this->assertSame(0, $game->getScore()->getNumberOfLossRoundsInRow(false));
+        $this->assertSame(1, $game->getScore()->getNumberOfLossRoundsInRow(true));
         $this->assertFalse($game->getScore()->isTie());
         $this->assertSame(2, $game->getRoundNumber());
     }

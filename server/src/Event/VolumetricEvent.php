@@ -47,14 +47,14 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
     {
         $startNode = $this->graph->getNodeById($start->hash());
         if (null === $startNode) {
-            throw new GameException("No node for start point: " . $start->hash());
+            throw new GameException("No node for start point: " . $start->hash()); // @codeCoverageIgnore
         }
 
         $this->id = Sequence::next();
         $this->partSize = $this->partRadius * 2 + 1;
         $this->startedTickId = $this->world->getTickId();
         $this->spawnTickCount = $this->timeMsToTick(20);
-        $this->maxTicksCount =  $this->timeMsToTick($this->item->getMaxTimeMs());
+        $this->maxTicksCount = $this->timeMsToTick($this->item->getMaxTimeMs());
 
         $partArea = ($this->partSize) ** 2;
         $this->spawnPartCount = (int)ceil($this->item->getSpawnAreaMetersSquared() * 100 / $partArea);
@@ -67,10 +67,7 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
         $this->queue->enqueue($startNode);
     }
 
-    protected function setup(): void
-    {
-        // empty hook
-    }
+    protected abstract function setup(): void;
 
     private function shrink(int $tick): void
     {
@@ -174,6 +171,7 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
         return $this->item;
     }
 
+    /** @codeCoverageIgnore */
     public function serialize(): array
     {
         return [

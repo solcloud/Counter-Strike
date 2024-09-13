@@ -120,10 +120,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
     public function createBullet(): Bullet
     {
         $bullet = new Bullet($this, static::range);
-        $bullet->setProperties(
-            damage: static::damage,
-            damageArmor: static::damage * static::armorPenetration,
-        );
+        $bullet->setProperties(static::damage);
 
         return $bullet;
     }

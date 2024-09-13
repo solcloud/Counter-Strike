@@ -13,7 +13,8 @@ class HitBoxLegs extends SphereGroupHitBox
 
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct(false);
+
         $this->createLeftLimb();
         $this->createRightLimb();
 

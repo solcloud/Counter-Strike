@@ -541,8 +541,7 @@ class World
     public function smokeTryToExtinguishFlames(Column $smoke): void
     {
         foreach ($this->activeMolotovs as $fire) {
-            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $fire->boundaryMin, $fire->boundaryMax)
-            ) {
+            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $fire->boundaryMin, $fire->boundaryMax)) {
                 continue;
             }
 
@@ -557,8 +556,7 @@ class World
     public function flameCanIgnite(Column $flame): bool
     {
         foreach ($this->activeSmokes as $smoke) {
-            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $flame->boundaryMin, $flame->boundaryMax)
-            ) {
+            if (!Collision::boxWithBox($smoke->boundaryMin, $smoke->boundaryMax, $flame->boundaryMin, $flame->boundaryMax)) {
                 continue;
             }
 
@@ -596,12 +594,7 @@ class World
             }
 
             foreach ($fire->parts as $flame) {
-                if (!$flame->active || !Collision::pointWithCylinder(
-                    $flame->highestPoint,
-                    $pp,
-                    $playerRadius,
-                    $playerHeight)
-                ) {
+                if (!$flame->active || !Collision::pointWithCylinder($flame->highestPoint, $pp, $playerRadius, $playerHeight)) {
                     continue;
                 }
 
@@ -625,8 +618,7 @@ class World
     public function isCollisionWithMolotov(Point $pos): bool
     {
         foreach ($this->activeMolotovs as $molotov) {
-            if (!Collision::pointWithBoxBoundary($pos, $molotov->boundaryMin, $molotov->boundaryMax)
-            ) {
+            if (!Collision::pointWithBoxBoundary($pos, $molotov->boundaryMin, $molotov->boundaryMax)) {
                 continue;
             }
 
@@ -723,10 +715,10 @@ class World
         $this->game->playerFallDamageKilledEvent($playerDead);
     }
 
-    public function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
+    protected function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
     {
         if (false === ($item instanceof Grenade)) {
-            throw new GameException("New flammable non grenade type?");
+            throw new GameException("New flammable non grenade type?"); // @codeCoverageIgnore
         }
         $this->game->playerGrenadeKilledEvent($playerCulprit, $playerDead, $item);
     }
@@ -735,13 +727,13 @@ class World
     {
         $boundingRadius = Setting::playerBoundingRadius();
         if ($tileSize > $boundingRadius - 4) {
-            throw new GameException('Tile size should be decently lower than player bounding radius.');
+            throw new GameException('Tile size should be decently lower than player bounding radius.'); // @codeCoverageIgnore
         }
 
         $pathFinder = new PathFinder($this, $tileSize, $objectHeight);
         $startPoints = $this->getMap()->getStartingPointsForNavigationMesh();
         if ([] === $startPoints) {
-            throw new GameException('No starting point for navigation defined!');
+            throw new GameException('No starting point for navigation defined!'); // @codeCoverageIgnore
         }
         foreach ($startPoints as $point) {
             $pathFinder->buildNavigationMesh($point, $objectHeight);
@@ -817,7 +809,7 @@ class World
         $this->makeSound($soundEvent);
     }
 
-    public function playerHit(Point $hitPoint, Player $playerHit, Player $playerCulprit, SoundType $soundType, Item $item, Point $origin, int $damage): void
+    protected function playerHit(Point $hitPoint, Player $playerHit, Player $playerCulprit, SoundType $soundType, Item $item, Point $origin, int $damage): void
     {
         $attackerId = $playerCulprit->getId();
         $soundEvent = new SoundEvent($hitPoint, $soundType);
@@ -912,7 +904,7 @@ class World
     /**
      * @return Wall[]
      */
-    public function getXWalls(int $x): array
+    protected function getXWalls(int $x): array
     {
         return ($this->walls[self::WALL_X][$x] ?? []);
     }
@@ -920,7 +912,7 @@ class World
     /**
      * @return Wall[]
      */
-    public function getZWalls(int $z): array
+    protected function getZWalls(int $z): array
     {
         return ($this->walls[self::WALL_Z][$z] ?? []);
     }
@@ -958,14 +950,6 @@ class World
             }
         }
         return $output;
-    }
-
-    /**
-     * @return Floor[]
-     */
-    public function getYFloors(int $y): array
-    {
-        return ($this->floors[$y] ?? []);
     }
 
     /**

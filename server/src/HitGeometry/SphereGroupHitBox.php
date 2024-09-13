@@ -2,7 +2,6 @@
 
 namespace cs\HitGeometry;
 
-use Closure;
 use cs\Core\Collision;
 use cs\Core\Player;
 use cs\Core\Point;
@@ -12,21 +11,18 @@ class SphereGroupHitBox implements HitIntersect
 {
     /** @var SphereHitBox[] */
     private array $parts = [];
+    private Point $point;
 
-    /**
-     * @param ?Closure $centerPointModifier function (Player $player): Point {}
-     */
-    public function __construct(public readonly ?Closure $centerPointModifier = null)
+    public function __construct(public readonly bool $usePlayerHeight)
     {
+        $this->point = new Point();
     }
 
     public function intersect(Player $player, Point $point): bool
     {
-        /** @var Point $modifier */
-        $modifier = $this->centerPointModifier ? call_user_func($this->centerPointModifier, $player) : null;
+        $this->point->setScalar(0)->addY($this->usePlayerHeight ? $player->getHeadHeight() : 0);
         foreach ($this->getParts($player) as $part) {
-            $center = $part->calculateWorldCoordinate($player, $modifier);
-            if (Collision::pointWithSphere($point, $center, $part->radius)) {
+            if (Collision::pointWithSphere($point, $part->calculateWorldCoordinate($player, $this->point), $part->radius)) {
                 return true;
             }
         }

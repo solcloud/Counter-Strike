@@ -47,14 +47,14 @@ class Server
         $this->tickNanoSeconds = $this->setting->tickMs * (int)1E6;
     }
 
-    public function start(): void
+    public function start(): int
     {
         if (!$this->startWarmup()) {
             $playerCount = count($this->clients);
             $this->log("Not all players connected during warmup! Players: {$playerCount}/{$this->setting->playersMax}.");
             $this->game->quit(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED);
             $this->sendGameStateToClients();
-            return;
+            return 0;
         }
 
         $this->log("All players connected, starting game.");
@@ -63,6 +63,7 @@ class Server
         }
         $tickCount = $this->startGame();
         $this->log("Game ended! Ticks: {$tickCount}, Lag: {$this->serverLag}.");
+        return $tickCount;
     }
 
     protected function startWarmup(): bool
@@ -75,7 +76,7 @@ class Server
                     if ($this->setting->warmupInstantStart) {
                         return true;
                     }
-                    $gameReady = true;
+                    $gameReady = true; // @codeCoverageIgnore
                 }
             }
 
@@ -152,7 +153,7 @@ class Server
                     }
                 }
             } else {
-                $this->playerBlock($address);
+                $this->playerBlock($address); // @codeCoverageIgnore
             }
         }
     }
