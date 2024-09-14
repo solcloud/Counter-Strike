@@ -346,7 +346,8 @@ export class Game {
 
     spawnSmoke(point, height, smokeId, partId) {
         const size = this.#volumetrics[smokeId]['size']
-        const geo = new THREE.BoxGeometry(size, height, size)
+        const offset = Math.max(2, Math.ceil(size / 4));
+        const geo = new THREE.CylinderGeometry(size - randomInt(0, offset), size, height - randomInt(0, offset), randomInt(5, 22))
         geo.translate(point.x, point.y + (geo.parameters.height / 2), -point.z)
         this.#volumetrics[smokeId]['geometries'].push(geo)
 
@@ -356,7 +357,7 @@ export class Game {
         }
 
         let geometry = BufferGeometryUtils.mergeGeometries(this.#volumetrics[smokeId]['geometries'])
-        geometry = BufferGeometryUtils.mergeVertices(geometry, 2)
+        geometry = BufferGeometryUtils.mergeVertices(geometry, offset)
         geometry.computeBoundingBox()
         let mesh = this.#volumetrics[smokeId]['mesh']
         if (mesh) {
