@@ -25,18 +25,16 @@ trait CrouchTrait
                     $this->headHeight = Setting::playerHeadHeightCrouch();
                 }
             } else {
-                $targetHeadHeight = $this->headHeight + $event->moveOffset;
+                $targetHeadHeight = min(Setting::playerHeadHeightStand(), $this->headHeight + $event->moveOffset);
                 $candidate = $this->position->clone();
-                for ($h = $this->headHeight + 1; $h <= min($targetHeadHeight, Setting::playerHeadHeightStand()); $h++) {
+                for ($h = $this->headHeight + 1; $h <= $targetHeadHeight; $h++) {
                     $candidate->setY($this->position->y + $h);
                     if ($this->world->findFloor($candidate, $this->getBoundingRadius())) {
-                        $event->reset();
-                        $this->addEvent($event, $this->eventIdCrouch);
+                        $event->restartTimer();
                         break;
                     }
                     if ($this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $this->getBoundingRadius(), 2)) {
-                        $event->reset();
-                        $this->addEvent($event, $this->eventIdCrouch);
+                        $event->restartTimer();
                         break;
                     }
                     $this->headHeight = $h;

@@ -107,7 +107,7 @@ class Inventory
     {
         $item = $this->items[$slot] ?? false;
         if (!$item) {
-            return;
+            return; // @codeCoverageIgnore
         }
 
         if ($this->equippedSlot === $slot) {

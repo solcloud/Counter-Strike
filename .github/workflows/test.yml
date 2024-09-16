@@ -37,13 +37,24 @@ jobs:
       - name: "Run Composer check"
         timeout-minutes: 1
         run: |
+          export XDEBUG_MODE=off
           composer check
 
       - name: "Check code coverage min percentage"
         timeout-minutes: 5
         run: |
-          echo '<?php preg_match("~Lines:\s+([\d.]+)%~", stream_get_contents(STDIN), $m);exit((int)((float)$m[1] < 98.5));' > cc.php
-          XDEBUG_MODE=coverage php vendor/bin/phpunit -d memory_limit=70M \
-                        --coverage-text --only-summary-for-coverage-text --stderr --no-progress --colors=never 2> cc.txt
+          echo '<?php preg_match("~Lines:\s+([\d.]+)%~", stream_get_contents(STDIN), $m);exit((int)((float)$m[1] < 99.0));' > cc.php
+          export XDEBUG_MODE=coverage
+          composer unit -- --stderr --no-progress --colors=never \
+                --coverage-xml=www/coverage/coverage-xml --log-junit=www/coverage/junit.xml \
+                --coverage-text --only-summary-for-coverage-text 2> cc.txt
           cat cc.txt
           grep 'Lines: ' cc.txt | php -d error_reporting=E_ALL cc.php
+
+      - name: "Check infection mutation framework min percentage"
+        timeout-minutes: 10
+        run: |
+          export XDEBUG_MODE=off
+          grep '"timeout": 20,' infection.json5
+          sed -i 's/"timeout": 20,/"timeout": 40,/' infection.json5
+          composer infection-cache -- --threads=$(($(nproc) + 1)) --only-covering-test-cases --skip-initial-tests

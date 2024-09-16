@@ -15,4 +15,9 @@ final class CrouchEvent extends TickEvent
         $this->moveOffset = Setting::crouchDistancePerTick();
     }
 
+    public function restartTimer(): void
+    {
+        $this->tickCount = 0;
+    }
+
 }

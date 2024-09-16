@@ -5,7 +5,6 @@ namespace cs\Event;
 use cs\Core\Column;
 use cs\Core\Point;
 use cs\Enum\SoundType;
-use cs\Interface\Flammable;
 
 final class GrillEvent extends VolumetricEvent
 {
@@ -27,19 +26,19 @@ final class GrillEvent extends VolumetricEvent
 
     protected function shrinkPart(Column $column): void
     {
-        $sound = new SoundEvent($column->center, SoundType::FLAME_EXTINGUISH);
-        $sound->addExtra('id', $this->id);
-        $this->world->makeSound($sound);
+        $soundEvent = new SoundEvent($column->center, SoundType::FLAME_EXTINGUISH);
+        $soundEvent->addExtra('id', $this->id);
+        $this->world->makeSound($soundEvent);
     }
 
     protected function expandPart(Point $center): Column
     {
         $flame = new Column($center, $this->partRadius, $this->partHeight);
         if ($this->world->flameCanIgnite($flame)) {
-            $sound = new SoundEvent($flame->center, SoundType::FLAME_SPAWN);
-            $sound->addExtra('id', $this->id);
-            $sound->addExtra('height', $flame->height);
-            $this->world->makeSound($sound);
+            $soundEvent = new SoundEvent($flame->center, SoundType::FLAME_SPAWN);
+            $soundEvent->addExtra('id', $this->id);
+            $soundEvent->addExtra('height', $flame->height);
+            $this->world->makeSound($soundEvent);
         } else {
             $flame->active = false;
         }
@@ -63,8 +62,4 @@ final class GrillEvent extends VolumetricEvent
         $this->playerTickHits[$playerId] = $tickId;
     }
 
-    public function getItem(): Flammable
-    {
-        return parent::getItem(); // @phpstan-ignore return.type
-    }
 }

@@ -22,9 +22,9 @@ final class SmokeEvent extends VolumetricEvent
 
     protected function shrinkPart(Column $column): void
     {
-        $sound = new SoundEvent($column->center, SoundType::SMOKE_FADE);
-        $sound->addExtra('id', $this->id);
-        $this->world->makeSound($sound);
+        $soundEvent = new SoundEvent($column->center, SoundType::SMOKE_FADE);
+        $soundEvent->addExtra('id', $this->id);
+        $this->world->makeSound($soundEvent);
 
         $this->parts = []; // just do single shrink event
     }
@@ -47,10 +47,10 @@ final class SmokeEvent extends VolumetricEvent
         }
 
         $column = new Column($center, $this->partRadius, $height);
-        $sound = new SoundEvent($column->center, SoundType::SMOKE_SPAWN);
-        $sound->addExtra('id', $this->id);
-        $sound->addExtra('height', $column->height);
-        $this->world->makeSound($sound);
+        $soundEvent = new SoundEvent($column->center, SoundType::SMOKE_SPAWN);
+        $soundEvent->addExtra('id', $this->id);
+        $soundEvent->addExtra('height', $column->height);
+        $this->world->makeSound($soundEvent);
 
         $this->world->smokeTryToExtinguishFlames($column);
 

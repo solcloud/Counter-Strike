@@ -62,4 +62,9 @@ final class SoundEvent extends TickEvent
         return $this->item;
     }
 
+    public function getPlayerId(): ?int
+    {
+        return $this->player?->getId();
+    }
+
 }

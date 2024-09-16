@@ -18,7 +18,7 @@ use cs\Interface\Flammable;
 use cs\Interface\Hittable;
 use cs\Map\Map;
 
-class World
+final class World
 {
     private const WALL_X = 'zy';
     private const WALL_Z = 'xy';
@@ -291,8 +291,8 @@ class World
             }
 
             if ($player->getInventory()->pickup($dropItem->getItem())) {
-                $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
-                $this->makeSound($sound->setPlayer($player)->setItem($dropItem->getItem())->addExtra('id', $dropItem->getId()));
+                $soundEvent = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
+                $this->makeSound($soundEvent->setPlayer($player)->setItem($dropItem->getItem())->addExtra('id', $dropItem->getId()));
                 unset($this->dropItems[$key]);
             }
         }
@@ -317,8 +317,8 @@ class World
             if ($this->lastBombActionTick + Util::millisecondsToFrames(50) < $this->getTickId()) {
                 $bomb->reset();
                 $player->stop();
-                $sound = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_DEFUSING);
-                $this->makeSound($sound->setPlayer($player)->setItem($bomb));
+                $soundEvent = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_DEFUSING);
+                $this->makeSound($soundEvent->setPlayer($player)->setItem($bomb));
             }
             $this->lastBombActionTick = $this->getTickId();
             $this->lastBombPlayerId = $player->getId();
@@ -347,8 +347,8 @@ class World
                 $player->dropItemFromSlot($slotId);
             }
             if ($player->getInventory()->pickup($item)) {
-                $sound = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
-                $this->makeSound($sound->setPlayer($player)->setItem($item)->addExtra('id', $dropItem->getId()));
+                $soundEvent = new SoundEvent($dropItem->getPosition(), SoundType::ITEM_PICKUP);
+                $this->makeSound($soundEvent->setPlayer($player)->setItem($item)->addExtra('id', $dropItem->getId()));
                 unset($this->dropItems[$key]);
                 if ($shouldEquipOnPickup) {
                     $player->equip($slot);
@@ -415,7 +415,7 @@ class World
         $bp = $bullet->getPosition();
         $headCrouch = Setting::playerHeadHeightCrouch();
         foreach ($this->game->getPlayers() as $playerId => $player) {
-            if (isset($skipPlayerIds[$playerId])) {
+            if ($skipPlayerIds[$playerId] ?? false) {
                 continue;
             }
             if (!$player->isAlive()) {
@@ -443,7 +443,7 @@ class World
         $hits = [];
         $skipPlayerIds = $bullet->getPlayerSkipIds();
         foreach ($this->playersColliders as $playerId => $playerCollider) {
-            if (isset($skipPlayerIds[$playerId])) {
+            if ($skipPlayerIds[$playerId] ?? false) {
                 continue;
             }
 
@@ -599,7 +599,9 @@ class World
                 }
 
                 $fire->playerHit($playerId, $tickId);
-                $damage = $fire->getItem()->calculateDamage($player->getArmorType() !== ArmorType::NONE);
+                $flammableItem = $fire->getItem();
+                assert($flammableItem instanceof Flammable);
+                $damage = $flammableItem->calculateDamage($player->getArmorType() !== ArmorType::NONE);
                 assert($fire->item instanceof Item);
                 $this->playerHit(
                     $player->getCentrePoint(), $player, $fire->initiator, SoundType::FLAME_PLAYER_HIT,
@@ -607,7 +609,7 @@ class World
                 );
                 $player->lowerHealth($damage);
                 if (!$player->isAlive()) {
-                    $this->playerDiedToFlame($fire->initiator, $player, $fire->getItem());
+                    $this->playerDiedToFlame($fire->initiator, $player, $flammableItem);
                 }
 
                 break;
@@ -639,7 +641,7 @@ class World
         foreach ($this->playersColliders as $playerId => $playerCollider) {
             $player = $this->game->getPlayer($playerId);
             if (!$player->isAlive()) {
-                continue;
+                continue; // @codeCoverageIgnore
             }
             if (Util::distanceSquared($epicentre, $player->getCentrePoint()) > $maxBlastDistanceSquared) {
                 continue;
@@ -649,7 +651,7 @@ class World
             foreach ($player->getPlayerGrenadeHitPoints() as $point) {
                 $distanceSquared = Util::distanceSquared($epicentre, $point);
                 if ($distanceSquared > $maxBlastDistanceSquared) {
-                    continue;
+                    continue; // @codeCoverageIgnore
                 }
                 [$angleHorizontal, $angleVertical] = Util::worldAngle($point, $epicentre);
                 if (!$this->pointCanSeePoint($epicentre, $point, $angleHorizontal ?? 0, $angleVertical, $maxBlastDistance, null)) {
@@ -715,7 +717,7 @@ class World
         $this->game->playerFallDamageKilledEvent($playerDead);
     }
 
-    protected function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
+    private function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
     {
         if (false === ($item instanceof Grenade)) {
             throw new GameException("New flammable non grenade type?"); // @codeCoverageIgnore
@@ -809,7 +811,7 @@ class World
         $this->makeSound($soundEvent);
     }
 
-    protected function playerHit(Point $hitPoint, Player $playerHit, Player $playerCulprit, SoundType $soundType, Item $item, Point $origin, int $damage): void
+    private function playerHit(Point $hitPoint, Player $playerHit, Player $playerCulprit, SoundType $soundType, Item $item, Point $origin, int $damage): void
     {
         $attackerId = $playerCulprit->getId();
         $soundEvent = new SoundEvent($hitPoint, $soundType);
@@ -836,8 +838,8 @@ class World
         if ($this->lastBombActionTick + Util::millisecondsToFrames(200) < $this->getTickId()) {
             $bomb->reset();
             $player->stop();
-            $sound = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_PLANTING);
-            $this->makeSound($sound->setPlayer($player)->setItem($bomb));
+            $soundEvent = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_PLANTING);
+            $this->makeSound($soundEvent->setPlayer($player)->setItem($bomb));
         }
         $this->lastBombActionTick = $this->getTickId();
         $this->lastBombPlayerId = $player->getId();
@@ -868,14 +870,14 @@ class World
             return true;
         }
 
-        if ($start->x <> $candidate->x) {
+        if ($start->x !== $candidate->x) {
             $xGrowing = ($start->x < $candidate->x);
             $baseX = $candidate->clone()->addX($xGrowing ? $radius : -$radius);
             if ($this->checkXSideWallCollision($baseX, $radius, $radius)) {
                 return true;
             }
         }
-        if ($start->z <> $candidate->z) {
+        if ($start->z !== $candidate->z) {
             $zGrowing = ($start->z < $candidate->z);
             $baseZ = $candidate->clone()->addZ($zGrowing ? $radius : -$radius);
             if ($this->checkZSideWallCollision($baseZ, $radius, $radius)) {
@@ -904,7 +906,7 @@ class World
     /**
      * @return Wall[]
      */
-    protected function getXWalls(int $x): array
+    private function getXWalls(int $x): array
     {
         return ($this->walls[self::WALL_X][$x] ?? []);
     }
@@ -912,7 +914,7 @@ class World
     /**
      * @return Wall[]
      */
-    protected function getZWalls(int $z): array
+    private function getZWalls(int $z): array
     {
         return ($this->walls[self::WALL_Z][$z] ?? []);
     }
@@ -921,6 +923,7 @@ class World
      * @return array<int,array<string,mixed>>
      * @internal
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function getWalls(): array
     {
@@ -940,6 +943,7 @@ class World
      * @return array<int,array<string,mixed>>
      * @internal
      * @codeCoverageIgnore
+     * @infection-ignore-all
      */
     public function getFloors(): array
     {
@@ -973,6 +977,11 @@ class World
     public function getBacktrack(): Backtrack
     {
         return $this->game->getBacktrack();
+    }
+
+    public function activeMolotovExists(): bool
+    {
+        return ([] !== $this->activeMolotovs);
     }
 
 }

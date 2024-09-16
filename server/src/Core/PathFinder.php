@@ -34,7 +34,7 @@ final class PathFinder
         $this->obstacleOvercomeHeight = Setting::playerObstacleOvercomeHeight();
     }
 
-    protected function canFullyMoveTo(Point $candidate, int $angle, int $targetDistance, int $radius, int $height): bool
+    private function canFullyMoveTo(Point $candidate, int $angle, int $targetDistance, int $radius, int $height): bool
     {
         if ($angle % 90 !== 0) {
             GameException::notImplementedYet(); // @codeCoverageIgnore

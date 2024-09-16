@@ -2,12 +2,14 @@
 
 namespace Test\Shooting;
 
+use cs\Core\Box;
 use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\Color;
 use cs\Enum\GameOverReason;
 use cs\Enum\SoundType;
 use cs\Event\SoundEvent;
@@ -241,6 +243,49 @@ class SimpleShootTest extends BaseTestCase
         $gun = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(PistolP250::class, $gun);
         $this->assertSame($gun::magazineCapacity - 2, $gun->getAmmo());
+    }
+
+    public function testTeamDamageIsLowerThanOpponent(): void
+    {
+        $game = $this->createTestGame();
+        $game->addPlayer(new Player(2, Color::ORANGE, true));
+        $game->addPlayer(new Player(3, Color::BLUE, false));
+        $game->getWorld()->addBox(new Box(new Point(), 1000, 1000, 1000));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 500)),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $game->getPlayer(2)->setPosition(new Point(500, 0, 300)),
+            fn(Player $p) => $game->getPlayer(3)->setPosition(new Point(500, 0, 700)),
+            fn(Player $p) => $p->getSight()->look(0, -10),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $p->getSight()->look(180, -10),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            $this->endGame(),
+        ]);
+
+        $this->assertLessThan(100, $game->getPlayer(3)->getHealth());
+        $this->assertLessThan($game->getPlayer(2)->getHealth(), $game->getPlayer(3)->getHealth());
+    }
+
+    public function testDamageLowOnRangeMaxDamage(): void
+    {
+        $game = $this->createTestGame();
+        $game->addPlayer(new Player(2, Color::ORANGE, true));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500)),
+            fn(Player $p) => $game->getPlayer(2)->setPosition(new Point(500, 0, PistolGlock::rangeMaxDamage + $p->getBoundingRadius())),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $p->getSight()->look(0, 0),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(99, $game->getPlayer(2)->getHealth());
     }
 
 }

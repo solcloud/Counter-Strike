@@ -14,6 +14,7 @@ class TextProtocol extends Protocol
 
     public const separator = '|';
 
+    /** @inheritDoc */
     public function getRequestMaxSizeBytes(): int
     {
         return 960;

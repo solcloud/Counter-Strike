@@ -14,7 +14,9 @@ abstract class Item
     private int $id;
     private int $skinId;
     protected bool $equipped = false;
+    /** @var non-negative-int */
     protected int $price = 9999;
+    /** @var non-negative-int */
     protected int $scopeLevel = 0;
     private ?EquipEvent $eventEquip = null;
     /** @var array<string,int> */
@@ -50,21 +52,25 @@ abstract class Item
         return true;
     }
 
+    /** @return non-negative-int */
     public function getMaxBuyCount(): int
     {
         return 5;
     }
 
+    /** @return positive-int */
     public function getMaxQuantity(): int
     {
         return 1;
     }
 
+    /** @return positive-int */
     public function getQuantity(): int
     {
         return 1;
     }
 
+    /** @return non-negative-int */
     public function getScopeLevel(): int
     {
         return $this->scopeLevel;
@@ -107,6 +113,7 @@ abstract class Item
         return $this->skinId;
     }
 
+    /** @return non-negative-int */
     public function getPrice(?self $alreadyHaveSlotItem = null): int
     {
         return $this->price;

@@ -64,6 +64,7 @@ class CrouchTest extends BaseTestCase
                 $this->assertSame($start->z - $p->getBoundingRadius() - 1, $p->getPositionClone()->z);
             },
             fn(Player $p) => $p->crouch(),
+            fn(Player $p) => $this->assertTrue($p->isCrouching()),
             $this->waitXTicks(Setting::tickCountCrouch()),
             fn(Player $p) => $p->moveForward(),
             fn(Player $p) => $p->moveForward(),
@@ -87,6 +88,7 @@ class CrouchTest extends BaseTestCase
         $this->playPlayer($game, $commands);
         $this->assertSame($ceiling->getBase()->z + $ceiling->depthZ + $player->getBoundingRadius() + 1, $player->getPositionClone()->z);
         $this->assertSame(Setting::playerHeadHeightStand(), $player->getHeadHeight());
+        $this->assertFalse($game->getPlayer(1)->isCrouching());
     }
 
 

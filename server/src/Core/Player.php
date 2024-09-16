@@ -302,6 +302,7 @@ final class Player
 
     /**
      * @codeCoverageIgnore
+     * @infection-ignore-all
      * @return array{id: int, color: int, isAttacker: bool}
      */
     public function toArray(): array

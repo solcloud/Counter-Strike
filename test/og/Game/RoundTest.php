@@ -9,6 +9,7 @@ use cs\Core\Point;
 use cs\Core\Util;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
 use cs\Event\GameOverEvent;
@@ -200,6 +201,7 @@ class RoundTest extends BaseTestCase
             GameProperty::HALF_TIME_FREEZE_SEC => 0,
             GameProperty::START_MONEY          => 3000,
         ]);
+        $playerAttackerSpawnPosition = $game->getPlayer(1)->getPositionClone();
         $game->setTickMax($maxRounds * 2);
 
         $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
@@ -215,6 +217,9 @@ class RoundTest extends BaseTestCase
         $this->assertFalse($game->getScore()->attackersIsWinning());
         $this->assertSame(3, $game->getScore()->getScoreDefenders());
         $this->assertSame(2, $game->getScore()->getScoreAttackers());
+        $this->assertSame(9500, $game->getPlayer(1)->getMoney());
+        $this->assertPositionNotSame($playerAttackerSpawnPosition, $game->getPlayer(1)->getPositionClone());
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_BOMB->value));
     }
 
 }

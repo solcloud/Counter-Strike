@@ -104,6 +104,7 @@ abstract class Protocol
 
     public abstract function serializeGameState(Game $game): string;
 
+    /** @return positive-int */
     public abstract function getRequestMaxSizeBytes(): int;
 
     /**

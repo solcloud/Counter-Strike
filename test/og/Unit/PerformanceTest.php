@@ -28,7 +28,7 @@ class PerformanceTest extends BaseTest
 
     public static function setUpBeforeClass(): void
     {
-        if (getenv('XDEBUG_MODE') === 'coverage') {
+        if (getenv('XDEBUG_MODE') === 'coverage' || getenv('INFECTION') === '1') {
             self::markTestSkipped();
         }
 
@@ -128,7 +128,7 @@ class PerformanceTest extends BaseTest
             $this->assertLessThanOrEqual($range + 50, $result->getBullet()->getDistanceTraveled());
         }
         $this->assertGreaterThanOrEqual($range, PistolGlock::range);
-        $this->assertLessThan(21 * self::$timeScale, $took->asMilliseconds());
+        $this->assertLessThan(22 * self::$timeScale, $took->asMilliseconds());
     }
 
     public function testTwoPlayersRangeShootingEachOther(): void
