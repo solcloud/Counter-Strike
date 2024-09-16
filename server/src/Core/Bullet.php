@@ -13,7 +13,7 @@ class Bullet
     private bool $originPlayerIsAttacker;
     private int $distanceTraveled;
     private int $damage = 1;
-    /** @var array<int,bool> [playerId => true] */
+    /** @var array<int,true> [playerId => true] */
     private array $playerSkipIds = [];
 
     public function __construct(private AttackEnable $item, private int $distanceMax = 1)
@@ -91,7 +91,7 @@ class Bullet
     }
 
     /**
-     * @return array<int,bool> [playerId => true]
+     * @return array<int,true> [playerId => true]
      */
     public function getPlayerSkipIds(): array
     {

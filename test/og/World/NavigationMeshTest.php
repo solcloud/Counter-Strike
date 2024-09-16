@@ -92,6 +92,18 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertLessThan($closestCandidate->x, $validPoint->x);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,0,5', $validPoint->hash());
+
+        $orig = $candidate->clone();
+        $candidate->addX(-1);
+        $validPoint = $path->findTile($candidate, 1);
+        $this->assertLessThan($closestCandidate->x, $validPoint->x);
+        $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
+        $this->assertSame('2,0,5', $validPoint->hash());
+
+        $this->assertNotSame('2,0,5', $candidate->hash());
+        $path->convertToNavMeshNode($candidate);
+        $this->assertSame('2,0,5', $candidate->hash());
+        $this->assertPositionNotSame($orig, $candidate);
     }
 
     public function testOneWayDirection(): void

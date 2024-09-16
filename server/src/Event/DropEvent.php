@@ -96,8 +96,8 @@ class DropEvent extends Event implements ForOneRoundMax
 
             $collisionPlayer = $world->isCollisionWithOtherPlayers($playerId, $pos, $radius, $height);
             if ($collisionPlayer && $collisionPlayer->getInventory()->pickup($item)) {
-                $sound = new SoundEvent($pos->clone(), SoundType::ITEM_PICKUP);
-                $this->world->makeSound($sound->setPlayer($collisionPlayer)->setItem($item)->addExtra('id', $this->id));
+                $soundEvent = new SoundEvent($pos->clone(), SoundType::ITEM_PICKUP);
+                $this->world->makeSound($soundEvent->setPlayer($collisionPlayer)->setItem($item)->addExtra('id', $this->id));
                 $this->finish();
                 return;
             }
@@ -110,8 +110,8 @@ class DropEvent extends Event implements ForOneRoundMax
                     if ($this->onLand) {
                         call_user_func($this->onLand, $this);
                     }
-                    $sound = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_LAND);
-                    $this->world->makeSound($sound->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
+                    $soundEvent = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_LAND);
+                    $this->world->makeSound($soundEvent->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
                     $this->finish();
                     return;
                 }
@@ -122,8 +122,8 @@ class DropEvent extends Event implements ForOneRoundMax
             $dropPosition->setFrom($pos);
         }
 
-        $sound = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_AIR);
-        $this->world->makeSound($sound->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
+        $soundEvent = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_AIR);
+        $this->world->makeSound($soundEvent->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
     }
 
     public function getDropItem(): DropItem

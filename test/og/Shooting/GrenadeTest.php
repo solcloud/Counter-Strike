@@ -12,6 +12,7 @@ use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
+use cs\Equipment\Smoke;
 use cs\Event\SoundEvent;
 use Test\BaseTestCase;
 
@@ -439,5 +440,28 @@ class GrenadeTest extends BaseTestCase
         $this->assertFalse($test->goingUp);
     }
 
+    public function testSmokeCanBounceOnFloorBeforePopping(): void
+    {
+        $bounceCount = 0;
+        $game = $this->createTestGame();
+        $game->onEvents(function (array $events) use (&$bounceCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::GRENADE_BOUNCE) {
+                    $bounceCount++;
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->crouch(),
+            fn(Player $p) => $p->getSight()->look(45, -89),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
+            $this->waitNTicks(Smoke::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(900),
+            $this->endGame(),
+        ]);
+
+        $this->assertGreaterThan(1, $bounceCount);
+    }
 
 }

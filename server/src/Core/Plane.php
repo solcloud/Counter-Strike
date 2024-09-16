@@ -5,6 +5,8 @@ namespace cs\Core;
 abstract class Plane extends SolidSurface
 {
 
+    public const MAX_HIT_ANTI_FORCE = 99999;
+
     protected bool $penetrable = true;
     protected int $hitAntiForce = 25123;
     protected int $hitAntiForceMargin = 10;
@@ -26,7 +28,6 @@ abstract class Plane extends SolidSurface
 
     public function setHitAntiForce(int $hitAntiForceBody, int $hitAntiForceMargin, int $wallBangEdgeMarginDistance): void
     {
-        $this->setPenetrable(true);
         $this->hitAntiForce = max(0, $hitAntiForceBody);
         $this->hitAntiForceMargin = max(0, $hitAntiForceMargin);
         $this->wallBangEdgeMarginDistance = max(0, $wallBangEdgeMarginDistance);
@@ -35,11 +36,16 @@ abstract class Plane extends SolidSurface
     public function getHitAntiForce(Point $point): int
     {
         if (!$this->penetrable) {
-            return 99999;
+            return self::MAX_HIT_ANTI_FORCE;
+        }
+
+        $hit = $point->to2D($this->axis2d);
+        if ($hit->x < $this->point2DStart->x || $hit->x > $this->point2DEnd->x
+            || $hit->y < $this->point2DStart->y || $hit->y > $this->point2DEnd->y) {
+            throw new GameException("Hit '{$hit}' out of plane boundary '{$this}'");
         }
 
         $margin = $this->wallBangEdgeMarginDistance;
-        $hit = $point->to2D($this->axis2d);
         if ($hit->x - $this->point2DStart->x <= $margin || $this->point2DEnd->x - $hit->x <= $margin) {
             return $this->hitAntiForceMargin;
         }

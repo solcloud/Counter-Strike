@@ -244,7 +244,6 @@ class Game
         return $this->roundNumber;
     }
 
-    /** @infection-ignore-all */
     public function addSoundEvent(SoundEvent $event): void
     {
         $this->addEvent($event);
@@ -295,8 +294,8 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerCulprit, $itemId, $headShot));
-        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
-        $this->addSoundEvent($sound->setPlayer($playerDead));
+        $soundEvent = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($soundEvent->setPlayer($playerDead));
     }
 
     public function playerFallDamageKilledEvent(Player $playerDead): void
@@ -305,15 +304,15 @@ class Game
         $this->score->getPlayerStat($playerDead->getId())->addDeath();
 
         $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::SOLID_SURFACE, false));
-        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
-        $this->addSoundEvent($sound->setPlayer($playerDead));
+        $soundEvent = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($soundEvent->setPlayer($playerDead));
     }
 
-    protected function playerBombKilledEvent(Player $playerDead): void
+    private function playerBombKilledEvent(Player $playerDead): void
     {
         $this->addEvent(new KillEvent($playerDead, $playerDead, ItemId::BOMB, false));
-        $sound = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
-        $this->addSoundEvent($sound->setPlayer($playerDead)->setItem($this->bomb));
+        $soundEvent = new SoundEvent($playerDead->getPositionClone(), SoundType::PLAYER_DEAD);
+        $this->addSoundEvent($soundEvent->setPlayer($playerDead)->setItem($this->bomb));
     }
 
     private function spawnBomb(): void
@@ -342,8 +341,8 @@ class Game
     public function bombDefused(Player $defuser): void
     {
         $defuser->getInventory()->earnMoney(300);
-        $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
-        $this->addSoundEvent($sound->setItem($this->bomb));
+        $soundEvent = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_DEFUSED);
+        $this->addSoundEvent($soundEvent->setItem($this->bomb));
         $this->roundEnd(false, RoundEndReason::BOMB_DEFUSED);
         $this->bombReset();
     }
@@ -352,12 +351,12 @@ class Game
     {
         $this->bombPlanted = true;
         $planter->getInventory()->earnMoney(300);
-        $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_PLANTED);
-        $this->addSoundEvent($sound->setItem($this->bomb));
+        $soundEvent = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_PLANTED);
+        $this->addSoundEvent($soundEvent->setItem($this->bomb));
 
         $event = new PlantEvent(function (): void {
-            $sound = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_EXPLODED);
-            $this->addSoundEvent($sound->setItem($this->bomb));
+            $soundEvent = new SoundEvent($this->bomb->getPosition(), SoundType::BOMB_EXPLODED);
+            $this->addSoundEvent($soundEvent->setItem($this->bomb));
             $this->roundEnd(true, RoundEndReason::BOMB_EXPLODED);
 
             foreach ($this->getAlivePlayers() as $player) {

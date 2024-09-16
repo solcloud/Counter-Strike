@@ -66,6 +66,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertNull($player2->attack());
         $this->assertTrue($headHit->getType() === HitBoxType::HEAD);
         $this->assertSame($startMoney - $gun->getPrice() + $gun->getKillAward(), $player2->getMoney());
+        $this->assertGreaterThan(0, $headHit->getHitAntiForce(new Point()));
 
         $this->expectException(GameException::class);
         $game->addPlayer(new Player($player2->getId(), Color::BLUE, true));
@@ -312,7 +313,10 @@ class PlayerKillTest extends BaseTestCase
                 $this->assertInstanceOf(AttackResult::class, $ar);
                 $this->assertTrue($ar->somePlayersWasHit());
                 $hits = $ar->getHits();
-                $this->assertCount(3, $hits);
+                $this->assertCount(4, $hits);
+                $hit = array_pop($hits);
+                $this->assertInstanceOf(HitBox::class, $hit);
+                $this->assertFalse($hit->playerWasKilled());
                 foreach ($hits as $hit) {
                     $this->assertTrue($hit->playerWasKilled());
                     $this->assertTrue($hit->wasHeadShot());
@@ -527,6 +531,112 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(3, $killEventsCount);
         $this->assertSame(3, $game->getScore()->getScoreDefenders());
         $this->assertSame(3 + 1, $game->getRoundNumber());
+    }
+
+    public function testPlayerCannotKillDeadPlayer(): void
+    {
+        $game = $this->createNoPauseGame(15);
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+        $game->getPlayer(2)->setPosition(new Point(200, 0, 500));
+        $game->addPlayer(new Player(3, Color::GREEN, false));
+        $game->getPlayer(3)->setPosition(new Point(999, 0, 10));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(200, 0, 300)),
+            fn(Player $p) => $p->getSight()->look(0, 0),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            fn() => $this->assertFalse($game->getPlayer(2)->isAlive()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertPlayerNotHit($p->attack()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->endGame(),
+        ]);
+    }
+
+    public function testPlayerHitBoxReset(): void
+    {
+        $game = $this->createNoPauseGame(15);
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+
+        $this->playPlayer($game, [
+            fn() => $game->getPlayer(2)->setPosition(new Point(200, 0, 500)),
+            fn() => $game->getPlayer(2)->getSight()->lookHorizontal(180),
+            fn(Player $p) => $p->setPosition(new Point(200, 0, 300)),
+            fn(Player $p) => $p->getSight()->look(0, -20),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertSame(0, $this->assertPlayerHit($p->attack())->getMoneyAward()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertSame(0, $this->assertPlayerHit($p->attack())->getMoneyAward()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertGreaterThan(0, $this->assertPlayerHit($p->attack())->getMoneyAward()),
+            fn(Player $p) => $this->assertSame(2, $game->getRoundNumber()),
+            fn() => $game->getPlayer(2)->setPosition(new Point(200, 0, 500)),
+            fn() => $game->getPlayer(2)->getSight()->lookHorizontal(180),
+            fn(Player $p) => $p->setPosition(new Point(200, 0, 300)),
+            fn(Player $p) => $p->getSight()->look(0, -20),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            function (Player $p) {
+                $result = $this->assertPlayerHit($p->attack());
+                $hits = $result->getHits();
+                $this->assertCount(2, $hits);
+                $this->assertInstanceOf(Floor::class, $hits[1]);
+                $playerHit = $hits[0];
+                $this->assertInstanceOf(HitBox::class, $playerHit);
+                $this->assertSame(HitBoxType::STOMACH, $playerHit->getType());
+                $this->assertFalse($playerHit->playerWasKilled());
+                $this->assertSame(0, $playerHit->getMoneyAward());
+            },
+            fn() => $this->assertTrue($game->getPlayer(2)->isAlive()),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+    }
+
+    public function testBulletCanHitTwoPlayers(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->addPlayer(new Player(2, Color::BLUE, false));
+        $game->addPlayer(new Player(3, Color::GREEN, false));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(600, 0, 500)),
+            fn(Player $p) => $p->getSight()->look(-90, 0),
+            fn() => $game->getPlayer(2)->setPosition(new Point(400, 0, 500)),
+            fn() => $game->getPlayer(3)->setPosition(new Point(200, 0, 500)),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            function (Player $p) use ($game) {
+                $result = $this->assertPlayerHit($p->attack());
+                $hits = $result->getHits();
+                $this->assertCount(3, $hits);
+                $this->assertInstanceOf(Wall::class, $hits[2]);
+                $this->assertSame(1, $game->getRoundNumber());
+                $this->assertGreaterThan(0, $result->getMoneyAward());
+
+                $playerHit = $hits[1];
+                $this->assertInstanceOf(HitBox::class, $playerHit);
+                $this->assertSame(3, $playerHit->getPlayer()->getId());
+                $this->assertFalse($playerHit->playerWasKilled());
+
+                $playerHit = $hits[0];
+                $this->assertInstanceOf(HitBox::class, $playerHit);
+                $this->assertSame(2, $playerHit->getPlayer()->getId());
+                $this->assertTrue($playerHit->playerWasKilled());
+            },
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            fn() => $this->assertFalse($game->getPlayer(2)->isAlive()),
+            fn() => $this->assertTrue($game->getPlayer(3)->isAlive()),
+            fn() => $this->assertLessThan(100, $game->getPlayer(3)->getHealth()),
+            fn() => $this->assertGreaterThan(25, $game->getPlayer(3)->getHealth()),
+            $this->endGame(),
+        ]);
     }
 
 }

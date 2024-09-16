@@ -8,6 +8,7 @@ use cs\Enum\InventorySlot;
 class Flashbang extends Grenade
 {
 
+    /** @var positive-int */
     private int $quantity = 1;
     protected int $price = 200;
 
@@ -45,6 +46,7 @@ class Flashbang extends Grenade
 
     public function decrementQuantity(): void
     {
+        assert($this->quantity > 1);
         $this->quantity--;
     }
 

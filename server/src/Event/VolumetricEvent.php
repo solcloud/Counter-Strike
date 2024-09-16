@@ -124,18 +124,20 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
         }
 
         foreach ($candidates as $candidate) {
+            $part = $this->expandPart($candidate);
+
             $this->boundaryMin->set(
-                min($this->boundaryMin->x, $candidate->x - $this->partRadius),
+                min($this->boundaryMin->x, $candidate->x - $part->radius),
                 min($this->boundaryMin->y, $candidate->y - 0),
-                min($this->boundaryMin->z, $candidate->z - $this->partRadius),
+                min($this->boundaryMin->z, $candidate->z - $part->radius),
             );
             $this->boundaryMax->set(
-                max($this->boundaryMax->x, $candidate->x + $this->partRadius),
-                max($this->boundaryMax->y, $candidate->y + $this->partHeight),
-                max($this->boundaryMax->z, $candidate->z + $this->partRadius),
+                max($this->boundaryMax->x, $candidate->x + $part->radius),
+                max($this->boundaryMax->y, $candidate->y + $part->height),
+                max($this->boundaryMax->z, $candidate->z + $part->radius),
             );
 
-            $this->parts[] = $this->expandPart($candidate);
+            $this->parts[] = $part;
         }
         $this->lastPartSpawnTickId = $tick;
     }

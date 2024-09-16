@@ -12,9 +12,11 @@ use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
+use cs\Enum\SoundType;
 use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
 use cs\Equipment\HighExplosive;
+use cs\Event\SoundEvent;
 use cs\Weapon\Knife;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolUsp;
@@ -54,7 +56,7 @@ class SimpleInventoryTest extends BaseTestCase
         $this->assertInstanceOf(Knife::class, $knife);
         $this->assertInstanceOf(PistolUsp::class, $pistol);
         $expectedSlots = [
-            InventorySlot::SLOT_KNIFE->value     => $knife->toArray(),
+            InventorySlot::SLOT_KNIFE->value => $knife->toArray(),
             InventorySlot::SLOT_SECONDARY->value => $pistol->toArray(),
         ];
         $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
@@ -111,6 +113,29 @@ class SimpleInventoryTest extends BaseTestCase
         $game->getPlayer(1)->dropEquippedItem();
     }
 
+    public function testDropResetEquipped(): void
+    {
+        $game = $this->createNoPauseGame();
+        $glock = null;
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertFalse($p->getEquippedItem()->isEquipped()),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            fn(Player $p) => $this->assertTrue($p->getEquippedItem()->isEquipped()),
+            function (Player $p) use (&$glock) {
+                $glock = $p->getEquippedItem();
+            },
+            fn(Player $p) => $this->assertNotNull($p->dropEquippedItem()),
+            fn(Player $p) => $this->assertFalse($p->getEquippedItem()->isEquipped()),
+            $this->endGame(),
+        ]);
+
+        $this->assertInstanceOf(PistolGlock::class, $glock);
+        $this->assertFalse($glock->isEquipped());
+        $this->assertFalse($glock->isReloading());
+        $this->assertTrue($glock->isUserDroppable());
+    }
+
     public function testPlayerGetPistolOnRoundStartIfHasNone(): void
     {
         $game = $this->createNoPauseGame(10);
@@ -155,7 +180,16 @@ class SimpleInventoryTest extends BaseTestCase
         $p->getInventory()->earnMoney(15000);
 
         $this->playPlayer($game, [
+            fn(Player $p) => $this->assertEmpty($game->getWorld()->getDropItems()),
             fn(Player $p) => $p->getSight()->lookVertical(-60),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            fn(Player $p) => $this->assertNotNull($p->dropEquippedItem()),
+            $this->waitNTicks(200),
+            fn(Player $p) => $this->assertNotEmpty($game->getWorld()->getDropItems()),
+            fn(Player $p) => $p->use(),
+            fn(Player $p) => $this->assertEmpty($game->getWorld()->getDropItems()),
+            fn(Player $p) => $this->assertInstanceOf(Knife::class, $p->getEquippedItem()),
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_AK)),
             fn(Player $p) => $this->assertInstanceOf(RifleAk::class, $p->getEquippedItem()),
             fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value)),
@@ -232,6 +266,18 @@ class SimpleInventoryTest extends BaseTestCase
         $game->addPlayer(new Player(2, Color::GREEN, false));
         $game->getPlayer(2)->setPosition(new Point(150, 0, 150));
 
+        $pickEvent = null;
+        $game->onEvents(function (array $events) use (&$pickEvent): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_PICKUP) {
+                    $this->assertNull($pickEvent);
+                    $pickEvent = $event;
+                    $this->assertSame(1, $event->getPlayerId());
+                    $this->assertInstanceOf(RifleM4A4::class, $event->getItem());
+                }
+            }
+        });
+
         $this->playPlayer($game, [
             fn(Player $p) => $p->getInventory()->earnMoney(5000),
             fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value)),
@@ -247,6 +293,7 @@ class SimpleInventoryTest extends BaseTestCase
         ], 2);
 
         $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+        $this->assertNotNull($pickEvent);
     }
 
     public function testDropWallCollision(): void
@@ -400,6 +447,7 @@ class SimpleInventoryTest extends BaseTestCase
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
 
+                $this->assertFalse($p->dropItemFromSlot(InventorySlot::SLOT_KIT->value));
                 $this->assertFalse($p->dropItemFromSlot(InventorySlot::SLOT_KNIFE->value));
                 $this->assertTrue($p->dropItemFromSlot(InventorySlot::SLOT_PRIMARY->value));
 
@@ -409,6 +457,24 @@ class SimpleInventoryTest extends BaseTestCase
             },
             $this->waitNTicks(1000),
             fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value)),
+            $this->endGame(),
+        ]);
+    }
+
+    public function testIncrementItemQuantity(): void
+    {
+        $game = $this->createTestGame();
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(0, 90),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertInstanceOf(Flashbang::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertSame(2, $p->getEquippedItem()->getQuantity()),
+            fn(Player $p) => $this->assertNotNull($p->dropEquippedItem()),
+            fn(Player $p) => $this->assertInstanceOf(Flashbang::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertSame(1, $p->getEquippedItem()->getQuantity()),
+            $this->waitNTicks(1000),
+            fn(Player $p) => $this->assertSame(2, $p->getEquippedItem()->getQuantity()),
             $this->endGame(),
         ]);
     }
@@ -477,7 +543,9 @@ class SimpleInventoryTest extends BaseTestCase
 
     public function testCancelReload(): void
     {
-        $playerCommands = [
+        $game = $this->createNoPauseGame();
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getInventory()->earnMoney(6123),
             fn(Player $p) => $p->getSight()->lookVertical(-90),
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             function (Player $p): void {
@@ -496,13 +564,13 @@ class SimpleInventoryTest extends BaseTestCase
             },
             fn(Player $p) => $this->assertNotNull($p->attack()),
             fn(Player $p) => $p->reload(),
-            2,
+            fn(Player $p) => $this->assertFalse($game->getWorld()->canAttack($p)),
             fn(Player $p) => $p->equipKnife(),
             fn(Player $p) => $p->equipPrimaryWeapon(),
             $this->waitNTicks(max(RifleAk::reloadTimeMs, RifleAk::equipReadyTimeMs)),
-        ];
+            $this->endGame(),
+        ]);
 
-        $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 6123]);
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
         $this->assertSame(RifleAk::magazineCapacity - 1, $ak->getAmmo());

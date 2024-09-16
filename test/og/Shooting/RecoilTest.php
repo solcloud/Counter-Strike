@@ -56,13 +56,17 @@ class RecoilTest extends BaseTestCase
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $ak) {
             $player = $state->getPlayer(1);
             $player->moveRight();
+
             $result = $player->attack();
-            if ($result) {
-                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            if (!$result) {
+                return;
             }
+            $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
             if ($ak->getAmmo() === 0) {
-                $state->getPlayer(1)->suicide();
+                $player->suicide();
             }
+            $player->equipKnife();
+            $player->equipPrimaryWeapon();
         });
 
         $game->start();
@@ -80,35 +84,42 @@ class RecoilTest extends BaseTestCase
     {
         $game = $this->createNoPauseGame();
         $player = $game->getPlayer(1);
-        $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
+        $player->setPosition(new Point(500, 0, 500));
+        $player->getSight()->look(180, 0);
         $player->equipSecondaryWeapon();
         $glock = $player->getEquippedItem();
         $this->assertInstanceOf(PistolGlock::class, $glock);
-        $py = $player->getPositionClone()->y + $player->getSightHeight();
+        $px = $player->getPositionClone()->x;
 
-        $bulletsYCoords = [];
-        $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {
+        $bulletsXCoords = [];
+        $game->onTick(function (GameState $state) use (&$bulletsXCoords, $glock) {
             $player = $state->getPlayer(1);
-            $player->moveRight();
-            $player->jump();
+            if (!$player->isJumping()) {
+                $player->jump();
+                return;
+            }
+
             $result = $player->attack();
-            if ($result) {
-                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            if (!$result) {
+                return;
             }
+            $bulletsXCoords[] = $result->getBullet()->getPosition()->x;
             if ($glock->getAmmo() === 0) {
-                $state->getPlayer(1)->suicide();
+                $player->suicide();
             }
+            $player->equipKnife();
+            $player->equipSecondaryWeapon();
         });
 
         $game->start();
-        $this->assertCount($glock::magazineCapacity, $bulletsYCoords);
-        $yMatchPlayer = 0;
-        foreach ($bulletsYCoords as $y) {
-            if ($y === $py) {
-                $yMatchPlayer++;
+        $this->assertCount($glock::magazineCapacity, $bulletsXCoords);
+        $xMatchPlayer = 0;
+        foreach ($bulletsXCoords as $x) {
+            if ($x === $px) {
+                $xMatchPlayer++;
             }
         }
-        $this->assertLessThan(ceil($glock::magazineCapacity * .2), $yMatchPlayer);
+        $this->assertLessThan(ceil($glock::magazineCapacity * .2), $xMatchPlayer);
     }
 
     public function testPistolMovementRecoil(): void
@@ -125,13 +136,17 @@ class RecoilTest extends BaseTestCase
         $game->onTick(function (GameState $state) use (&$bulletsYCoords, $glock) {
             $player = $state->getPlayer(1);
             $player->moveRight();
+
             $result = $player->attack();
-            if ($result) {
-                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            if (!$result) {
+                return;
             }
+            $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
             if ($glock->getAmmo() === 0) {
-                $state->getPlayer(1)->suicide();
+                $player->suicide();
             }
+            $player->equipKnife();
+            $player->equipSecondaryWeapon();
         });
 
         $game->start();
@@ -160,13 +175,17 @@ class RecoilTest extends BaseTestCase
             $player = $state->getPlayer(1);
             $player->moveRight();
             $player->speedWalk();
+
             $result = $player->attack();
-            if ($result) {
-                $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
+            if (!$result) {
+                return;
             }
+            $bulletsYCoords[] = $result->getBullet()->getPosition()->y;
             if ($glock->getAmmo() === 0) {
-                $state->getPlayer(1)->suicide();
+                $player->suicide();
             }
+            $player->equipKnife();
+            $player->equipSecondaryWeapon();
         });
 
         $game->start();

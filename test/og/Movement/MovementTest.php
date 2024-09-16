@@ -12,6 +12,8 @@ use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Enum\SoundType;
+use cs\Event\SoundEvent;
 use Test\BaseTestCase;
 
 class MovementTest extends BaseTestCase
@@ -130,6 +132,24 @@ class MovementTest extends BaseTestCase
         $game->getWorld()->addFloor(new Floor(new Point(0, $wall->getCeiling(), $wall->getOther()), 0, Setting::moveDistancePerTick()));
         $game->start();
         $this->assertPlayerPosition($game, new Point(0, $wall->getCeiling(), Setting::moveDistancePerTick()));
+    }
+
+    public function testPlayerMakeStepNoise(): void
+    {
+        $game = $this->createOneRoundGame(2);
+        $stepSound = null;
+        $game->onEvents(function (array $events) use (&$stepSound): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::PLAYER_STEP) {
+                    $stepSound = $event;
+                    $this->assertSame(1, $event->getPlayerId());
+                }
+            }
+        });
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+
+        $game->start();
+        $this->assertNotNull($stepSound);
     }
 
     public function testPlayerSlowMovementWhenHaveGun(): void
@@ -294,7 +314,11 @@ class MovementTest extends BaseTestCase
     public function testPlayerMultiJump(): void
     {
         $pc = [
+            fn(Player $p) => $this->assertFalse($p->isJumping()),
+            fn(Player $p) => $this->assertTrue($p->canJump()),
             fn(Player $p) => $p->jump(),
+            fn(Player $p) => $this->assertTrue($p->isJumping()),
+            fn(Player $p) => $this->assertFalse($p->canJump()),
             fn(Player $p) => $p->jump(),
             fn(Player $p) => $p->jump(),
             function (Player $p) {

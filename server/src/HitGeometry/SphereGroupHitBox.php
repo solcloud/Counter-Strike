@@ -43,6 +43,7 @@ class SphereGroupHitBox implements HitIntersect
 
     /**
      * @return SphereHitBox[]
+     * @infection-ignore-all
      */
     public function getParts(Player $player): array
     {

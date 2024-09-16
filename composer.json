@@ -2,13 +2,15 @@
     "scripts": {
         "stan": "php vendor/bin/phpstan --memory-limit=300M analyze",
         "unit": "php vendor/bin/phpunit -d memory_limit=70M",
+        "infection": "php -d memory_limit=180M vendor/bin/infection --only-covered --threads=6 --min-covered-msi=87",
+        "infection-cache": "@infection --coverage=www/coverage/",
         "dev": "php cli/server.php 1 8080 --debug & php cli/udp-ws-bridge.php",
         "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
         "dev2c": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
         "dev3c": "php cli/server.php 3 8080 --debug & php cli/udp-ws-bridge.php & sleep 1 ; php cli/client.php acode 8080 & php cli/client.php acode 8080",
         "coverage": [
             "@putenv XDEBUG_MODE=coverage",
-            "@unit --coverage-html www/coverage"
+            "@unit --coverage-html www/coverage --coverage-xml=www/coverage/coverage-xml --log-junit=www/coverage/junit.xml"
         ],
         "check": [
             "@putenv PROJECT_CHECK=true",
@@ -32,6 +34,7 @@
         }
     },
     "require-dev": {
+        "infection/infection": "*",
         "phpstan/phpstan-phpunit": "^1.3",
         "phpunit/phpunit": "^10.5"
     },
@@ -39,6 +42,11 @@
         "psr-4": {
             "Test\\Simulation\\": "test/simulation/",
             "Test\\": "test/og/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": false
         }
     }
 }

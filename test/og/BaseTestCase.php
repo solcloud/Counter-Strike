@@ -75,6 +75,7 @@ abstract class BaseTestCase extends BaseTest
                     GameProperty::FREEZE_TIME_SEC          => 0,
                     GameProperty::ROUND_END_COOL_DOWN_SEC  => 0,
                     GameProperty::RANDOMIZE_SPAWN_POSITION => false,
+                    GameProperty::ROUND_TIME_MS            => 1000,
                 ],
                 ...$gameProperties,
             ]
@@ -121,6 +122,7 @@ abstract class BaseTestCase extends BaseTest
         $properties->half_time_freeze_sec = 0;
         $properties->round_end_cool_down_sec = 0;
         $properties->randomize_spawn_position = false;
+        $properties->round_time_ms = 30000;
 
         return $properties;
     }

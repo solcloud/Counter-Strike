@@ -10,7 +10,7 @@ use cs\Interface\HitIntersect;
 use cs\Interface\Hittable;
 use cs\Weapon\BaseWeapon;
 
-class HitBox implements Hittable
+final class HitBox implements Hittable
 {
     private int $moneyAward;
     private bool $playerWasKilled;
@@ -40,14 +40,14 @@ class HitBox implements Hittable
             if ($this->player->getArmorType()->hasArmorHead()) {
                 return 95;
             }
-            return 10;
+            return 50;
         }
 
         if ($this->player->getArmorType()->hasArmor()) {
             return 60;
         }
 
-        return 20;
+        return 30;
     }
 
     public function registerHit(Bullet $bullet): void
@@ -66,9 +66,16 @@ class HitBox implements Hittable
         if ($isTeamDamage) {
             $healthDamage = (int)ceil($healthDamage / 2);
         }
+        $bulletDamage = $bullet->getDamage();
+        $armorDamage = $this->calculateArmorDamage($shootItem, $playerArmorType, $hitBoxType);
+        if ($bulletDamage < $shootItem::damage) {
+            $portion = ($bulletDamage / $shootItem::damage) * 0.9;
+            $healthDamage = (int)ceil($healthDamage * $portion);
+            $armorDamage = (int)ceil($armorDamage * $portion);
+        }
 
         $this->player->lowerHealth($healthDamage);
-        $this->player->lowerArmor($this->calculateArmorDamage($shootItem, $playerArmorType, $hitBoxType));
+        $this->player->lowerArmor($armorDamage);
         $this->wasHeadShot = ($hitBoxType === HitBoxType::HEAD);
         $this->damage = $isTeamDamage ? 0 : $healthDamage;
         if (!$this->player->isAlive()) {

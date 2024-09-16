@@ -102,6 +102,8 @@ class WorldCollisionTest extends BaseTestCase
 
         $game = $this->simulateGame($playerCommands);
         $this->assertFalse($game->getPlayer(1)->isAlive());
+        $this->assertSame(-1, $game->getScore()->getPlayerStat(1)->getKills());
+        $this->assertSame(1, $game->getScore()->getPlayerStat(1)->getDeaths());
     }
 
     public function testPlayerCollisionWithWallWalkBypass(): void

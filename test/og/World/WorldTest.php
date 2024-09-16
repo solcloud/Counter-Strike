@@ -7,7 +7,6 @@ use cs\Core\Floor;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
-use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Core\Wall;
@@ -44,6 +43,7 @@ class WorldTest extends BaseTestCase
     {
         $game = $this->createGame();
         $player = $game->getPlayer(1);
+        $player->getSight()->look(0, 0);
         $this->assertFalse($game->getWorld()->canBeSeen($player, new Point(999, 999, 999), 10, 200));
         $this->assertFalse($game->getWorld()->canBeSeen(
             $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(-20), 10, 999)
@@ -75,6 +75,9 @@ class WorldTest extends BaseTestCase
         $this->assertFalse($game->getWorld()->canBeSeen(
             $player, $player->getPositionClone()->addY($player->getSightHeight())->addZ(100), 10, 100, true)
         );
+
+        $player->getSight()->look(0, -80);
+        $this->assertFalse($game->getWorld()->canBeSeen($player, $player->getPositionClone()->setY(-1), 10, 999));
     }
 
     public function testStairCaseUp(): void

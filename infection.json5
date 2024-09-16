@@ -1,0 +1,56 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "server/src/",
+        ],
+    },
+    "logs": {
+        "text": "/tmp/infection.log",
+    },
+    "timeout": 20,
+    "testFramework": "phpunit",
+    "mutators": {
+        "global-ignoreSourceCodeByRegex": [
+            "\\$this->log\\(.*\\);",
+            "throw new GameException\\(.+\\);",
+            "GameException::notImplementedYet\\(.*\\);",
+        ],
+        "@default": true,
+        "@arithmetic": false,
+        "@boolean": false,
+        "@cast": false,
+        "@conditional_boundary": false,
+        "@conditional_negotiation": false,
+        "@equal": false,
+        "@function_signature": true,
+        "PublicVisibility": {
+            ignoreSourceCodeByRegex: [
+                "public function processFlammableExplosion\\(.+",
+            ],
+        },
+        "@identical": true,
+        "@number": false,
+        "@operator": false,
+        "@regex": true,
+        "@removal": true,
+        "MethodCallRemoval": {
+            "ignoreSourceCodeByRegex": [
+                "\\$prevPos->setFrom\\(\\$candidate\\);",
+                "\\$prevPos->setFrom\\(\\$newPos\\);",
+                "\\$this->makeSound\\(.+\\);",
+                "\\$soundEvent->setItem\\(.+\\);",
+                "\\$soundEvent->setPlayer\\(.+\\);",
+                "\\$soundEvent->setSurface\\(.+\\);",
+                "\\$soundEvent->addExtra\\(.+\\);",
+                "\\$this->addSoundEvent\\(.+\\);",
+            ]
+        },
+        "@return_value": true,
+        "IntegerNegation": false,
+        "@sort": true,
+        "@unwrap": true,
+        "For_": true,
+        "Foreach_": true,
+    },
+}

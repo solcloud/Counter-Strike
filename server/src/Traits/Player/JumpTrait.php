@@ -26,7 +26,7 @@ trait JumpTrait
             $targetYPosition = min($jumpEvent->maxYPosition, $this->position->y + Setting::jumpDistancePerTick());
             $candidate = $this->position->clone();
             for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
-                $floorCandidate = $this->world->findFloor($candidate->setY($y), $this->playerBoundingRadius);
+                $floorCandidate = $this->world->findFloorSquare($candidate->setY($y), $this->playerBoundingRadius);
                 if ($floorCandidate) {
                     $targetYPosition = $y - 1;
                     break;

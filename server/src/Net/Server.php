@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Psr\Log\NullLogger;
 
-class Server
+final class Server
 {
 
     /** @var Client[] [playerId => Client] */
@@ -66,7 +66,7 @@ class Server
         return $tickCount;
     }
 
-    protected function startWarmup(): bool
+    private function startWarmup(): bool
     {
         $gameReady = false;
         while ($this->setting->warmupWaitSecRemains >= 0) {
@@ -88,7 +88,7 @@ class Server
         return $gameReady;
     }
 
-    protected function startGame(): int
+    private function startGame(): int
     {
         $this->sendGameStateToClients();
 
@@ -261,6 +261,7 @@ class Server
         $this->logger = $logger;
     }
 
+    /** @infection-ignore-all */
     private function log(string $msg, string $level = LogLevel::INFO): void
     {
         $this->logger->log($level, $msg);

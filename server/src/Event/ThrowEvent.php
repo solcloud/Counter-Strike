@@ -202,7 +202,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
         // no recoil on throw
     }
 
-    protected function setAngles(float $angleHorizontal, float $angleVertical): void
+    private function setAngles(float $angleHorizontal, float $angleVertical): void
     {
         $this->angleHorizontal = $angleHorizontal;
         $this->angleVertical = $angleVertical;
