@@ -30,7 +30,9 @@ trait AttackTrait
         $item = $this->getEquippedItem();
 
         if ($item instanceof Bomb) {
-            $this->world->tryPlantBomb($this);
+            if ($item->canAttack($this->world->getTickId())) {
+                $this->world->tryPlantBomb($this, $item);
+            }
             return null;
         }
 

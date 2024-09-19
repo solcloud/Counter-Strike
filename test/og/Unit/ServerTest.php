@@ -12,7 +12,9 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\GameOverReason;
 use cs\Enum\InventorySlot;
 use cs\Equipment\Molotov;
+use cs\Event\EventList;
 use cs\Event\GameOverEvent;
+use cs\Event\GameStartEvent;
 use cs\Map\TestMap;
 use cs\Net\Server;
 use cs\Net\ServerSetting;
@@ -42,16 +44,50 @@ class ServerTest extends BaseTest
         return $testNet->getResponses();
     }
 
-    public function testServerNoPlayersConnected(): void
+    public function testServerInvalidLoginCodeBlocked(): void
     {
         $game = GameFactory::createDebug();
         $setting = new ServerSetting(1, 0, 'a', 'd', false, 0);
-        $testNet = new TestConnector(['']);
+        $testNet = new TestConnector(['login some-invalid-code']);
         $server = new Server($game, $setting, $testNet);
+        $this->assertSame(0, $server->getBlockedPlayersCount());
         $server->start();
         $gameOver = $game->tick($game->getTickId() + 1);
         $this->assertInstanceOf(GameOverEvent::class, $gameOver);
         $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED, $gameOver->reason);
+        $this->assertSame(1, $server->getBlockedPlayersCount());
+        $this->assertCount(0, $testNet->getResponses());
+    }
+
+    public function testServerNotAllPlayersConnected(): void
+    {
+        $game = GameFactory::createDebug();
+        $game->loadMap(new TestMap());
+        $setting = new ServerSetting(2, 0, 'code', 'd', true, 0);
+        $testNet = new TestConnector(['login code']);
+        $server = new Server($game, $setting, $testNet);
+        $server->start();
+
+        $this->assertSame(0, $server->getBlockedPlayersCount());
+        $serverResponses = $testNet->getResponses();
+        $this->assertCount(2, $serverResponses);
+
+        $gameStartMsg = $serverResponses[0];
+        $gameStartEvent = json_decode($gameStartMsg, true);
+        $this->assertIsArray($gameStartEvent);
+        $this->assertCount(0, $gameStartEvent['players'] ?? false);
+        $this->assertCount(1, $gameStartEvent['events']);
+        $this->assertSame(EventList::map[GameStartEvent::class], $gameStartEvent['events'][0]['code'] ?? false);
+        $this->assertSame($game->getProperties()->max_rounds, $gameStartEvent['events'][0]['data']['setting']['max_rounds'] ?? false);
+        $this->assertSame(2, $gameStartEvent['events'][0]['data']['playersCount'] ?? false);
+
+        $gameOverMsg = $serverResponses[1];
+        $gameOverEvent = json_decode($gameOverMsg, true);
+        $this->assertIsArray($gameOverEvent);
+        $this->assertCount(1, $gameOverEvent['players'] ?? false);
+        $this->assertCount(1, $gameOverEvent['events']);
+        $this->assertSame(EventList::map[GameOverEvent::class], $gameOverEvent['events'][0]['code'] ?? false);
+        $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED->value, $gameOverEvent['events'][0]['data']['reason'] ?? false);
     }
 
     public function testServerGameOver(): void

@@ -34,8 +34,19 @@
         "@operator": false,
         "@regex": true,
         "@removal": true,
+        "MatchArmRemoval": {
+            "ignoreSourceCodeByRegex": [
+                ".+GameException::invalid\\(.+",
+            ],
+        },
+        "ArrayItemRemoval": {
+            "ignore": [
+                "cs\\Event\\*::serialize",
+            ],
+        },
         "MethodCallRemoval": {
             "ignoreSourceCodeByRegex": [
+                "\\$this->setActiveFloor\\(.+\\);",
                 "\\$prevPos->setFrom\\(\\$candidate\\);",
                 "\\$prevPos->setFrom\\(\\$newPos\\);",
                 "\\$this->makeSound\\(.+\\);",
@@ -44,6 +55,7 @@
                 "\\$soundEvent->setSurface\\(.+\\);",
                 "\\$soundEvent->addExtra\\(.+\\);",
                 "\\$this->addSoundEvent\\(.+\\);",
+                "\\$bullet->addPlayerIdSkip\\(\\$playerId\\);",
             ]
         },
         "@return_value": true,

@@ -15,4 +15,9 @@ class GameException extends Exception
         throw new self("Not implemented yet! " . $msg);
     }
 
+    public static function invalid(string $msg = ''): never
+    {
+        throw new self("This should not be called! " . $msg);
+    }
+
 }

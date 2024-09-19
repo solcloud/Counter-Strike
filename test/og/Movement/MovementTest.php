@@ -194,7 +194,11 @@ class MovementTest extends BaseTestCase
         $this->playPlayer($game, [
             fn(Player $p) => $p->getInventory()->earnMoney(9000),
             fn(Player $p) => $p->getSight()->lookHorizontal(45),
-            fn(Player $p) => $p->moveForward(),
+            function (Player $p) {
+                $p->moveForward();
+                $this->assertFalse($p->isWalking());
+                $this->assertTrue($p->isRunning());
+            },
             fn(Player $p) => $p->moveForward(),
             function (Player $p) use (&$end) {
                 $end = $p->getPositionClone();

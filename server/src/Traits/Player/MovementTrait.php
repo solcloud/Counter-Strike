@@ -35,7 +35,7 @@ trait MovementTrait
 
     public function isMoving(): bool
     {
-        return ($this->moveX <> 0 || $this->moveZ <> 0);
+        return ($this->moveX !== 0 || $this->moveZ !== 0);
     }
 
     public function isWalking(): bool
@@ -131,7 +131,7 @@ trait MovementTrait
         $moveZ = $this->moveZ;
         $angle = $this->sight->getRotationHorizontal();
 
-        if ($moveX <> 0 && $moveZ <> 0) { // diagonal move
+        if ($moveX !== 0 && $moveZ !== 0) { // diagonal move
             if ($moveZ === 1) {
                 $angle += $moveX * 45;
             } else {
@@ -186,7 +186,7 @@ trait MovementTrait
     private function processMovement(int $moveX, int $moveZ, Point $current): Point
     {
         // If single direction move in opposite direction than previous (counter strafing) we stop
-        if (!($moveX <> 0 && $moveZ <> 0) && (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ))) {
+        if (!($moveX !== 0 && $moveZ !== 0) && (($moveX !== 0 && $this->lastMoveX === -$moveX) || ($moveZ !== 0 && $this->lastMoveZ === -$moveZ))) {
             $this->velocityPermil = 0;
             return $current;
         }

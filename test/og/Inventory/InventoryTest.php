@@ -8,6 +8,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Wall;
+use cs\Core\World;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
@@ -23,9 +24,10 @@ use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
 use cs\Weapon\RifleAWP;
 use cs\Weapon\RifleM4A4;
+use ReflectionProperty;
 use Test\BaseTestCase;
 
-class SimpleInventoryTest extends BaseTestCase
+class InventoryTest extends BaseTestCase
 {
     public function testPlayerInventory(): void
     {
@@ -257,6 +259,9 @@ class SimpleInventoryTest extends BaseTestCase
             fn(Player $p) => $this->assertInstanceOf(PistolGlock::class, $p->getEquippedItem()),
             $this->endGame(),
         ]);
+
+        $reflection = new ReflectionProperty(World::class, 'dropItems');
+        $this->assertSame([], $reflection->getValue($game->getWorld()));
     }
 
     public function testDropToOtherPlayer(): void
@@ -441,19 +446,27 @@ class SimpleInventoryTest extends BaseTestCase
                 $this->assertFalse($p->dropItemFromSlot(InventorySlot::SLOT_PRIMARY->value));
             },
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_AK)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
             fn(Player $p) => $p->equipSecondaryWeapon(),
             function (Player $p) {
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_KNIFE->value));
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
+                $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+                $grenadeSlots = $p->getInventory()->getLastEquippedGrenadeSlots();
+                $this->assertSame(InventorySlot::SLOT_GRENADE_DECOY->value, array_shift($grenadeSlots));
 
                 $this->assertFalse($p->dropItemFromSlot(InventorySlot::SLOT_KIT->value));
                 $this->assertFalse($p->dropItemFromSlot(InventorySlot::SLOT_KNIFE->value));
                 $this->assertTrue($p->dropItemFromSlot(InventorySlot::SLOT_PRIMARY->value));
+                $this->assertTrue($p->dropItemFromSlot(InventorySlot::SLOT_GRENADE_DECOY->value));
 
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_KNIFE->value));
                 $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value));
                 $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
+                $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+                $grenadeSlots = $p->getInventory()->getLastEquippedGrenadeSlots();
+                $this->assertSame(InventorySlot::SLOT_GRENADE_SMOKE->value, array_shift($grenadeSlots));
             },
             $this->waitNTicks(1000),
             fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_PRIMARY->value)),
@@ -544,6 +557,16 @@ class SimpleInventoryTest extends BaseTestCase
     public function testCancelReload(): void
     {
         $game = $this->createNoPauseGame();
+
+        $reloadEventCount = 0;
+        $game->onEvents(function (array $events) use (&$reloadEventCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_RELOAD) {
+                    $reloadEventCount++;
+                }
+            }
+        });
+
         $this->playPlayer($game, [
             fn(Player $p) => $p->getInventory()->earnMoney(6123),
             fn(Player $p) => $p->getSight()->lookVertical(-90),
@@ -574,6 +597,7 @@ class SimpleInventoryTest extends BaseTestCase
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
         $this->assertSame(RifleAk::magazineCapacity - 1, $ak->getAmmo());
+        $this->assertSame(1, $reloadEventCount);
     }
 
     public function testKevlarBuy(): void

@@ -121,7 +121,6 @@ export class World {
     spawnBomb(position) {
         const bomb = this.#modelRepository.getBomb()
         this.#scene.add(bomb)
-        bomb.rotation.set(0, 0, 0)
         bomb.position.set(position.x, position.y, -position.z)
         bomb.visible = true
     }

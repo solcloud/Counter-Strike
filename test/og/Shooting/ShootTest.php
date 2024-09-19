@@ -19,7 +19,7 @@ use cs\Weapon\PistolP250;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
 
-class SimpleShootTest extends BaseTestCase
+class ShootTest extends BaseTestCase
 {
 
     public function testOneTapAmmoMagazine(): void
@@ -263,11 +263,20 @@ class SimpleShootTest extends BaseTestCase
             $this->waitNTicks(PistolGlock::fireRateMs),
             fn(Player $p) => $p->getSight()->look(180, -10),
             fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            function () use ($game) {
+                $this->assertLessThan(100, $game->getPlayer(3)->getHealth());
+                $this->assertLessThan($game->getPlayer(2)->getHealth(), $game->getPlayer(3)->getHealth());
+            },
+            fn(Player $p) => $p->getSight()->look(180, 0),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            $this->waitNTicks(PistolGlock::fireRateMs),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
             $this->endGame(),
         ]);
 
-        $this->assertLessThan(100, $game->getPlayer(3)->getHealth());
-        $this->assertLessThan($game->getPlayer(2)->getHealth(), $game->getPlayer(3)->getHealth());
+        $this->assertCount(2, $game->getAlivePlayers());
+        $this->assertSame(-1, $game->getScore()->getPlayerStat(1)->getKills());
     }
 
     public function testDamageLowOnRangeMaxDamage(): void

@@ -7,11 +7,12 @@ use cs\Core\GameProperty;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Enum\Color;
+use cs\Enum\GameOverReason;
+use cs\Event\GameOverEvent;
 use cs\Map\TestMap;
 use cs\Net\PlayerControl;
 use cs\Net\Protocol;
-use cs\Net\ProtocolReader;
-use cs\Net\ProtocolWriter;
+use cs\Net\ServerSetting;
 use Test\BaseTest;
 
 class ProtocolTest extends BaseTest
@@ -110,14 +111,64 @@ class ProtocolTest extends BaseTest
         ];
         $this->assertSame($playerSerializedExpected, $player->serialize());
 
+        $event = new GameOverEvent(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED);
         $expected = [
             'players' => [
                 $playerSerializedExpected,
             ],
-            'events'  => [],
+            'events' => [
+                [
+                    'code' => $event->getCode(),
+                    'data' => [
+                        'reason' => $event->reason->value,
+                    ],
+                ],
+            ],
         ];
-        $actual = $protocol->serialize($game->getPlayers(), []);
+        $actual = $protocol->serialize($game->getPlayers(), [$event]);
         $this->assertSame($expected, json_decode($actual, true));
+
+        $playerJsonSerialized = json_encode($playerSerializedExpected);
+        $expectedGameSettingsSerialized = <<<JSON
+{
+    "events": [
+        {
+            "code": 6,
+            "data": {
+                "player": $playerJsonSerialized,
+                "playerId": 1,
+                "playersCount": 9,
+                "setting": {
+                    "backtrack_history_tick_count": 0,
+                    "bomb_defuse_time_ms": 9960,
+                    "bomb_explode_time_ms": 40000,
+                    "bomb_plant_time_ms": 3200,
+                    "buy_time_sec": 20,
+                    "freeze_time_sec": 15,
+                    "half_time_freeze_sec": 15,
+                    "loss_bonuses": [
+                        1400,
+                        1900,
+                        2400,
+                        2900,
+                        3400
+                    ],
+                    "max_rounds": 30,
+                    "randomize_spawn_position": true,
+                    "round_end_cool_down_sec": 4,
+                    "round_time_ms": 115000,
+                    "start_money": 800
+                },
+                "tickMs": 20,
+                "warmupSec": 60
+            }
+        }
+    ],
+    "players": []
+}
+JSON;
+        $actualGameSettingsSerialized = $protocol->serializeGameSetting($player, new ServerSetting(9, 20), $game);
+        $this->assertJsonStringEqualsJsonString($expectedGameSettingsSerialized, $actualGameSettingsSerialized);
     }
 
 }

@@ -7,6 +7,8 @@ use cs\Core\Floor;
 use cs\Core\GameState;
 use cs\Core\Point;
 use cs\Core\Setting;
+use cs\Enum\SoundType;
+use cs\Event\SoundEvent;
 use Test\BaseTestCase;
 
 class FloorTest extends BaseTestCase
@@ -100,6 +102,41 @@ class FloorTest extends BaseTestCase
         $game->start();
         $this->assertSame($floorHeight, $p->getPositionClone()->y);
         $this->assertSame(20 * Setting::moveDistancePerTick(), $p->getPositionClone()->z);
+    }
+
+    public function testPlayerMakeNoiseWhenFallingOnFloorEdgeBoundingRadiusSerialize(): void
+    {
+        $floor = new Floor(new Point(500, 10, 500));
+        $game = $this->createTestGame(5);
+        $game->getWorld()->addFloor($floor);
+
+        $player = $game->getPlayer(1);
+        $player->setPosition($floor->getStart()->clone()->addPart(
+            -$player->getBoundingRadius(), Setting::playerObstacleOvercomeHeight() * 5, $player->getBoundingRadius(),
+        ));
+
+        $groundTouch = null;
+        $game->onEvents(function (array $events) use (&$groundTouch): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::PLAYER_GROUND_TOUCH) {
+                    $this->assertNull($groundTouch);
+                    $groundTouch = $event;
+                }
+            }
+        });
+
+        $game->start();
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertInstanceOf(SoundEvent::class, $groundTouch);
+        $this->assertSame($floor->getY(), $player->getPositionClone()->y);
+        $this->assertSame([
+            'position' => $player->getPositionClone()->setY($floor->getY())->toArray(),
+            'item' => null,
+            'player' => $player->getId(),
+            'surface' => null,
+            'type' => SoundType::PLAYER_GROUND_TOUCH->value,
+            'extra' => [],
+        ], $groundTouch->serialize());
     }
 
 }

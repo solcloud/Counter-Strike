@@ -7,6 +7,7 @@ use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Util;
+use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
@@ -16,6 +17,7 @@ use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
 use cs\Event\PauseStartEvent;
+use cs\Event\PlantEvent;
 use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
@@ -78,10 +80,10 @@ class RoundTest extends BaseTestCase
         $killEvent = $killEvents[0];
         $this->assertInstanceOf(KillEvent::class, $killEvent);
         $this->assertSame([
-            'playerDead'    => $killEvent->getPlayerDead()->getId(),
+            'playerDead' => $killEvent->getPlayerDead()->getId(),
             'playerCulprit' => $killEvent->getPlayerCulprit()->getId(),
-            'itemId'        => $killEvent->getAttackItemId(),
-            'headshot'      => $killEvent->wasHeadShot(),
+            'itemId' => $killEvent->getAttackItemId(),
+            'headshot' => $killEvent->wasHeadShot(),
         ], $killEvent->serialize());
         $this->assertFalse($killEvent->wasHeadShot());
         $this->assertSame(1, $killEvent->getPlayerDead()->getId());
@@ -166,7 +168,7 @@ class RoundTest extends BaseTestCase
     {
         $maxRounds = 5;
         $game = $this->createGame([
-            GameProperty::MAX_ROUNDS    => $maxRounds,
+            GameProperty::MAX_ROUNDS => $maxRounds,
             GameProperty::ROUND_TIME_MS => 1,
         ]);
 
@@ -196,10 +198,10 @@ class RoundTest extends BaseTestCase
     {
         $maxRounds = 5;
         $game = $this->createGame([
-            GameProperty::MAX_ROUNDS           => $maxRounds,
-            GameProperty::ROUND_TIME_MS        => 1,
+            GameProperty::MAX_ROUNDS => $maxRounds,
+            GameProperty::ROUND_TIME_MS => 1,
             GameProperty::HALF_TIME_FREEZE_SEC => 0,
-            GameProperty::START_MONEY          => 3000,
+            GameProperty::START_MONEY => 3000,
         ]);
         $playerAttackerSpawnPosition = $game->getPlayer(1)->getPositionClone();
         $game->setTickMax($maxRounds * 2);
@@ -220,6 +222,207 @@ class RoundTest extends BaseTestCase
         $this->assertSame(9500, $game->getPlayer(1)->getMoney());
         $this->assertPositionNotSame($playerAttackerSpawnPosition, $game->getPlayer(1)->getPositionClone());
         $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_BOMB->value));
+        $this->assertSame(9500, $game->getPlayer(1)->getMoney());
+        $this->assertSame([2, 0], $game->getScore()->toArray()['firstHalfScore']);
+        $this->assertSame([3, 0], $game->getScore()->toArray()['secondHalfScore']);
+        $this->assertSame(2, $game->getScore()->toArray()['halfTimeRoundNumber']);
+    }
+
+    public function testRoundEndCoolDown(): void
+    {
+        $gameProperty = $this->createNoPauseGameProperty();
+        $gameProperty->round_end_cool_down_sec = 1;
+        $gameProperty->max_rounds = 6;
+        $game = $this->createTestGame(null, $gameProperty);
+        $pos = new Point(501, 0, 502);
+        $enemy = new Player(2, Color::BLUE, false);
+        $game->addPlayer($enemy);
+        $enemy->setPosition($pos->clone()->addX(-300));
+
+        $this->playPlayer($game, [
+            fn() => $enemy->getSight()->look(-90, 0),
+            fn() => $enemy->equipSecondaryWeapon(),
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            fn(Player $p) => $p->setPosition($pos),
+            fn(Player $p) => $p->suicide(),
+            fn() => $this->assertSame(2, $game->getRoundNumber()),
+            fn(Player $p) => $this->assertFalse($p->isAlive()),
+            $this->waitNTicks(500),
+            fn(Player $p) => $this->assertFalse($p->isAlive()),
+            fn(Player $p) => $this->assertPositionSame($pos, $p->getPositionClone()),
+            function () use ($enemy) {
+                $result = $this->assertPlayerNotHit($enemy->attack());
+                $hits = $result->getHits();
+                $this->assertCount(1, $hits);
+                $wall = $hits[0];
+                $this->assertInstanceOf(Wall::class, $wall);
+                $this->assertPositionSame($enemy->getSightPositionClone()->setX(-1), $result->getBullet()->getPosition());
+            },
+            $this->waitNTicks(500),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertTrue($game->getPlayer(1)->isAlive());
+        $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
+    }
+
+    public function testMultipleRoundsScoreAndEvents(): void
+    {
+        $maxRounds = 4;
+        $gameProperty = $this->createNoPauseGameProperty($maxRounds);
+        $gameProperty->bomb_plant_time_ms = 0;
+        $gameProperty->bomb_defuse_time_ms = 0;
+        $gameProperty->bomb_explode_time_ms = 200;
+        $gameProperty->round_time_ms = 500;
+        $game = $this->createTestGame(null, $gameProperty);
+        $p1 = $game->getPlayer(1);
+        $p2 = new Player(2, Color::BLUE, false);
+        $game->addPlayer($p2);
+        $start = new Point(500, 0, 500);
+        $p2->setPosition($start);
+        $p1->setPosition($p2->getPositionClone());
+        $p1->getSight()->look(0, -90);
+        $p2->getSight()->look(0, -90);
+
+        $eventCounts = [];
+        $eventObjects = [];
+        $game->onEvents(function (array $events) use (&$eventCounts, &$eventObjects): void {
+            foreach ($events as $event) {
+                if (!isset($eventCounts[$event::class])) {
+                    $eventCounts[$event::class] = 0;
+                }
+                $eventCounts[$event::class]++;
+                $eventObjects[$event::class] = $event;
+            }
+        });
+
+        $this->playPlayer($game, [
+            fn() => $this->assertTrue($p1->equip(InventorySlot::SLOT_BOMB)),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
+            fn() => $p1->attack(),
+            fn() => $this->assertPositionSame($start, $p2->getPositionClone()),
+            function () use ($p2) {
+                $p2->moveForward();
+                $p2->use();
+                $this->assertFalse($p2->isMoving());
+            },
+            fn() => $this->assertPositionSame($start, $p2->getPositionClone()),
+            fn() => $this->assertSame(2, $game->getRoundNumber()),
+            fn() => $this->assertTrue($p1->equip(InventorySlot::SLOT_BOMB)),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
+            fn() => $p1->attack(),
+            $this->waitNTicks(220),
+            fn() => $this->assertSame(3, $game->getRoundNumber()),
+            fn() => $p1->setPosition(new Point(500, 0, 500)),
+            fn() => $p2->setPosition(new Point(500, 0, 500)),
+            fn() => $this->assertTrue($p1->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn() => $p1->buyItem(BuyMenuItem::DEFUSE_KIT),
+            fn() => $this->assertTrue($p1->getInventory()->has(InventorySlot::SLOT_KIT->value)),
+            fn() => $p2->buyItem(BuyMenuItem::DEFUSE_KIT),
+            fn() => $this->assertFalse($p2->getInventory()->has(InventorySlot::SLOT_KIT->value)),
+            fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn() => $p1->suicide(),
+            fn() => $this->assertSame(4, $game->getRoundNumber()),
+            function () use ($p1, $p2) {
+                $this->assertFalse($p1->hasDefuseKit());
+                $this->assertFalse($p2->hasDefuseKit());
+                $this->assertFalse($p1->getInventory()->has(InventorySlot::SLOT_BOMB->value));
+                $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_BOMB->value));
+                $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_GRENADE_FLASH->value));
+                $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+                $this->assertFalse($p1->getInventory()->has(InventorySlot::SLOT_GRENADE_FLASH->value));
+            },
+            $this->waitNTicks(800),
+        ]);
+
+        $this->assertNotEmpty($eventCounts);
+        $this->assertSame($maxRounds + 1, $game->getRoundNumber());
+        $this->assertSame($maxRounds + 1, $eventCounts[PauseStartEvent::class]);
+        $this->assertSame($maxRounds, $eventCounts[PauseEndEvent::class]);
+        $this->assertSame($maxRounds, $eventCounts[RoundStartEvent::class]);
+        $this->assertSame($maxRounds, $eventCounts[RoundEndEvent::class]);
+        $this->assertSame(2, $eventCounts[PlantEvent::class]);
+        $this->assertSame($maxRounds - 2, $eventCounts[RoundEndCoolDownEvent::class]);
+        $this->assertTrue($game->getScore()->isTie());
+
+        $expectedScoreBoard = [
+            'score' => [2, 2],
+            'lossBonus' => [1400, 1900],
+            'history' => [
+                1 => [
+                    'attackersWins' => false,
+                    'reason' => 2,
+                    'scoreAttackers' => 0,
+                    'scoreDefenders' => 1,
+                ],
+                2 => [
+                    'attackersWins' => true,
+                    'reason' => 3,
+                    'scoreAttackers' => 1,
+                    'scoreDefenders' => 1,
+                ],
+                3 => [
+                    'attackersWins' => true,
+                    'reason' => 0,
+                    'scoreAttackers' => 2,
+                    'scoreDefenders' => 1,
+                ],
+                4 => [
+                    'attackersWins' => false,
+                    'reason' => 1,
+                    'scoreAttackers' => 2,
+                    'scoreDefenders' => 2,
+                ],
+            ],
+            'firstHalfScore' => [1, 1],
+            'secondHalfScore' => [1, 1],
+            'halfTimeRoundNumber' => 2,
+            'scoreboard' => [
+                [
+                    [
+                        'id' => 1,
+                        'kills' => -1,
+                        'deaths' => 1,
+                        'damage' => 0,
+                    ],
+                ],
+                [
+                    [
+                        'id' => 2,
+                        'kills' => 0,
+                        'deaths' => 0,
+                        'damage' => 0,
+                    ],
+                ],
+            ],
+        ];
+        $this->assertSame($expectedScoreBoard, $game->getScore()->toArray());
+    }
+
+    public function testBombExplodeMoney(): void
+    {
+        $maxRounds = 4;
+        $gameProperty = $this->createNoPauseGameProperty($maxRounds);
+        $gameProperty->bomb_plant_time_ms = 0;
+        $gameProperty->bomb_defuse_time_ms = 0;
+        $gameProperty->bomb_explode_time_ms = 1;
+        $gameProperty->round_time_ms = Bomb::equipReadyTimeMs * 2;
+        $this->assertGreaterThan(1, $gameProperty->round_time_ms);
+        $game = $this->createTestGame(null, $gameProperty);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equip(InventorySlot::SLOT_BOMB),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 500)),
+            fn(Player $p) => $p->attack(),
+            $this->waitNTicks(3000),
+        ]);
+
+        $this->assertSame($maxRounds + 1, $game->getRoundNumber());
+        $this->assertSame(4050, $game->getPlayer(1)->getMoney());
     }
 
 }

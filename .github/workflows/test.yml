@@ -16,7 +16,7 @@ on:
       - 'www/'
 
 jobs:
-  composer-check:
+  server-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,7 +43,7 @@ jobs:
       - name: "Check code coverage min percentage"
         timeout-minutes: 5
         run: |
-          echo '<?php preg_match("~Lines:\s+([\d.]+)%~", stream_get_contents(STDIN), $m);exit((int)((float)$m[1] < 99.0));' > cc.php
+          echo '<?php preg_match("~Lines:\s+([\d.]+)%~", stream_get_contents(STDIN), $m);exit((int)((float)$m[1] < 99.87));' > cc.php
           export XDEBUG_MODE=coverage
           composer unit -- --stderr --no-progress --colors=never \
                 --coverage-xml=www/coverage/coverage-xml --log-junit=www/coverage/junit.xml \
@@ -52,7 +52,7 @@ jobs:
           grep 'Lines: ' cc.txt | php -d error_reporting=E_ALL cc.php
 
       - name: "Check infection mutation framework min percentage"
-        timeout-minutes: 10
+        timeout-minutes: 8
         run: |
           export XDEBUG_MODE=off
           grep '"timeout": 20,' infection.json5

@@ -33,7 +33,10 @@ class BombTest extends BaseTestCase
         $game->getPlayer(1)->setPosition(new Point(500, 0, 500));
         $game->addPlayer(new Player(2, Color::BLUE, true));
         $this->playPlayer($game, [
+            fn() => $this->assertTrue($game->isPaused()),
             fn(Player $p) => $p->equip(InventorySlot::SLOT_BOMB),
+            fn(Player $p) => $p->attack(),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
             fn(Player $p) => $p->attack(),
             $this->waitNTicks(1000),
             fn(Player $p) => $p->jump(),
@@ -94,24 +97,24 @@ class BombTest extends BaseTestCase
         $this->assertLessThan(Util::millisecondsToFrames($properties->round_time_ms), $game->getTickId());
         $this->assertInstanceOf(RoundEndEvent::class, $roundEndEvent);
         $this->assertSame([
-            'roundNumber'    => $roundEndEvent->roundNumberEnded,
+            'roundNumber' => $roundEndEvent->roundNumberEnded,
             'newRoundNumber' => $roundEndEvent->roundNumberEnded + 1,
-            'attackersWins'  => $roundEndEvent->attackersWins,
-            'score'          => $game->getScore()->toArray(),
+            'attackersWins' => $roundEndEvent->attackersWins,
+            'score' => $game->getScore()->toArray(),
         ], $roundEndEvent->serialize());
         $this->assertInstanceOf(KillEvent::class, $killEvent);
         $this->assertSame($game->getPlayer(1), $killEvent->getPlayerDead());
         $this->assertSame($game->getPlayer(1), $killEvent->getPlayerCulprit());
         $this->assertInstanceOf(PlantEvent::class, $plantEvent);
         $this->assertSame([
-            'timeMs'   => 1000,
+            'timeMs' => 1000,
             'position' => (new Point())->toArray(),
         ], $plantEvent->serialize());
         $this->assertSame(1, $plantCount);
         $this->assertSame(RoundEndReason::BOMB_EXPLODED, $roundEndEvent->reason);
         $this->assertSame(
-            Util::millisecondsToFrames($properties->bomb_plant_time_ms) + Util::millisecondsToFrames($properties->bomb_explode_time_ms),
-            $game->getTickId() - 3
+            Util::millisecondsToFrames(Bomb::equipReadyTimeMs) + Util::millisecondsToFrames($properties->bomb_plant_time_ms) + Util::millisecondsToFrames($properties->bomb_explode_time_ms),
+            $game->getTickId() - 4
         );
     }
 
@@ -154,6 +157,8 @@ class BombTest extends BaseTestCase
         if ($shouldDefuse) {
             $this->assertTrue($game->getScore()->defendersIsWinning());
             $this->assertFalse($game->getScore()->attackersIsWinning());
+            $this->assertSame(700, $defender->getMoney());
+            $this->assertFalse($game->isBombActive());
         } else {
             $this->assertTrue($game->getScore()->attackersIsWinning());
             $this->assertFalse($game->getScore()->defendersIsWinning());
@@ -165,6 +170,57 @@ class BombTest extends BaseTestCase
     {
         $this->_testBombPlantRound(false);
         $this->_testBombPlantRound(true);
+    }
+
+    public function testBombPlantReset(): void
+    {
+        $gameProperty = $this->createNoPauseGameProperty();
+        $gameProperty->bomb_plant_time_ms = self::TEST_TICK_RATE * 2;
+        $gameProperty->bomb_explode_time_ms = 100;
+        $game = $this->createTestGame(null, $gameProperty);
+        $start = new Point(321, 0, 300);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition($start),
+            fn(Player $p) => $p->equip(InventorySlot::SLOT_BOMB),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
+            function (Player $p) {
+                $p->moveForward();
+                $p->attack();
+                $this->assertFalse($p->isMoving());
+            },
+            fn(Player $p) => $this->assertPositionSame($start, $p->getPositionClone()),
+            fn(Player $p) => $this->assertFalse($game->isBombActive()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(500),
+            fn(Player $p) => $this->assertFalse($game->isBombActive()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            function (Player $p) use ($game) {
+                $this->assertFalse($game->isBombActive());
+                $p->attack();
+                $this->assertFalse($game->isBombActive());
+            },
+            function (Player $p) use ($game) {
+                $this->assertFalse($game->isBombActive());
+                $p->attack();
+                $this->assertFalse($game->isBombActive());
+            },
+            fn(Player $p) => $p->attack(),
+            fn(Player $p) => $this->assertTrue($game->isBombActive()),
+            fn(Player $p) => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(300),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertSame(1100, $game->getPlayer(1)->getMoney());
+        $score = $game->getScore()->toArray();
+        $history = $score['history'] ?? false;
+        $this->assertIsArray($history);
+        $this->assertSame(RoundEndReason::BOMB_EXPLODED->value, $history[1]['reason'] ?? false);
+        $this->assertSame([0, 1], $score['score'] ?? false);
+        $this->assertSame([0, 1], $score['firstHalfScore'] ?? false);
+        $this->assertSame([], $score['secondHalfScore'] ?? false);
+        $this->assertSame(1100, $game->getPlayer(1)->getMoney());
     }
 
 

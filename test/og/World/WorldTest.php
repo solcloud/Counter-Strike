@@ -80,6 +80,28 @@ class WorldTest extends BaseTestCase
         $this->assertFalse($game->getWorld()->canBeSeen($player, $player->getPositionClone()->setY(-1), 10, 999));
     }
 
+    public function testRandomSpawnPosition(): void
+    {
+        $game = $this->createGame();
+        $map = new TestMap();
+        $game->loadMap($map);
+        $firstSpawnPosition = $map->getSpawnPositionDefender()[0];
+        $this->assertPositionSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, false));
+        $game->getWorld()->roundReset();
+        $this->assertPositionSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, false));
+        $game->getWorld()->roundReset();
+        $this->assertPositionSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, false));
+
+        $game->getWorld()->roundReset();
+        if ($game->getWorld()->getPlayerSpawnPosition(false, true)->equals($firstSpawnPosition)) {
+            $game->getWorld()->roundReset();
+            if ($game->getWorld()->getPlayerSpawnPosition(false, true)->equals($firstSpawnPosition)) {
+                $game->getWorld()->roundReset();
+                $this->assertPositionNotSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, true));
+            }
+        }
+    }
+
     public function testStairCaseUp(): void
     {
         $steps = 20;

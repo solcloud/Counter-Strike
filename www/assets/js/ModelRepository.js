@@ -76,6 +76,7 @@ export class ModelRepository {
         const bomb = this.#models[ItemId.Bomb]
         bomb.children.forEach((root) => root.visible = false)
         bomb.getObjectByName('item').visible = true
+        bomb.rotation.set(0, 0, 0)
         bomb.position.setScalar(0)
         return bomb
     }

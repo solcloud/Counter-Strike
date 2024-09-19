@@ -66,7 +66,7 @@ trait GravityTrait
         $fallHeight = $this->fallHeight - $floorHeight;
         if ($fallHeight > 3 * Setting::playerObstacleOvercomeHeight()) {
             $soundEvent = new SoundEvent($this->getPositionClone()->setY($floorHeight), SoundType::PLAYER_GROUND_TOUCH);
-            $this->world->makeSound($soundEvent->setPlayer($this)->setSurface($floor));
+            $this->world->makeSound($soundEvent->setPlayer($this));
         }
 
         $threshold = Setting::playerFallDamageThreshold();

@@ -72,7 +72,7 @@ trait CrouchTrait
         return ($this->getHeadHeight() !== Setting::playerHeadHeightStand());
     }
 
-    private function canCrouch(): bool
+    public function canCrouch(): bool
     {
         return (!isset($this->events[$this->eventIdCrouch]));
     }

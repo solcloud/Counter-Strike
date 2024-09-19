@@ -36,7 +36,7 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
 
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
-        GameException::notImplementedYet('Should not be called');
+        GameException::invalid('Should not be called');
     }
 
     public function getKillAward(): int

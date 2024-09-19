@@ -16,7 +16,7 @@ use cs\Weapon\PistolGlock;
 use Test\BaseTestCase;
 use Test\TestGame;
 
-class BacktrackTest extends BaseTestCase
+class BacktrackShootingTest extends BaseTestCase
 {
 
     private function _setupGame1(int $backtrackTickCount): TestGame
