@@ -17,7 +17,8 @@ use ReflectionProperty;
 
 abstract class BaseTestCase extends BaseTest
 {
-    private int $testTickRateMs = 10;
+    protected const TEST_TICK_RATE = 10;
+    private int $testTickRateMs = self::TEST_TICK_RATE;
     /** @var array<string,int|float> */
     private array $defaultTestAction = [
         'moveOneMs'                    => 5,

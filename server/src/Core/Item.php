@@ -123,7 +123,7 @@ abstract class Item
     {
         return match ($this->getType()) {
             ItemType::TYPE_WEAPON_PRIMARY, ItemType::TYPE_WEAPON_SECONDARY => true,
-            default => GameException::notImplementedYet('New item? ' . get_class($this)) // @codeCoverageIgnore
+            default => GameException::invalid('New item? ' . get_class($this)) // @codeCoverageIgnore
         };
     }
 

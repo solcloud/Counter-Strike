@@ -11,11 +11,13 @@ use cs\Enum\ItemType;
 class Bomb extends BaseEquipment
 {
 
+    public const equipReadyTimeMs = 80;
     private Point $position;
-    private int $plantTickCount = 0;
+    private int $plantTickStart = 0;
     private int $plantTickCountMax;
-    private int $defuseTickCount = 0;
+    private int $defuseTickStart = 0;
     private int $defuseTickCountMax;
+    private int $tickToDefuseCount;
 
     public function __construct(int $plantTimeMs, int $defuseTimeMs, private int $maxBlastDistance = 1000)
     {
@@ -42,8 +44,8 @@ class Bomb extends BaseEquipment
     public function reset(): void
     {
         parent::reset();
-        $this->plantTickCount = 0;
-        $this->defuseTickCount = 0;
+        $this->plantTickStart = 0;
+        $this->defuseTickStart = 0;
     }
 
     public function unEquip(): void
@@ -52,16 +54,25 @@ class Bomb extends BaseEquipment
         $this->reset();
     }
 
-    public function plant(): bool
+    public function startPlanting(int $tickStart): void
     {
-        $this->plantTickCount++;
-        return ($this->plantTickCount >= $this->plantTickCountMax);
+        $this->plantTickStart = $tickStart;
     }
 
-    public function defuse(bool $hasKit): bool
+    public function isPlanted(int $tickId): bool
     {
-        $this->defuseTickCount += $hasKit ? 2 : 1;
-        return ($this->defuseTickCount >= $this->defuseTickCountMax);
+        return ($tickId - $this->plantTickStart >= $this->plantTickCountMax);
+    }
+
+    public function startDefusing(int $tickId, bool $hasDefuseKit): void
+    {
+        $this->defuseTickStart = $tickId;
+        $this->tickToDefuseCount = $hasDefuseKit ? (int)ceil($this->defuseTickCountMax / 2) : $this->defuseTickCountMax;;
+    }
+
+    public function isDefused(int $tickId): bool
+    {
+        return ($tickId - $this->defuseTickStart >= $this->tickToDefuseCount);
     }
 
     public function setPosition(Point $position): void

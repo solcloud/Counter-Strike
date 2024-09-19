@@ -42,7 +42,7 @@ abstract class Plane extends SolidSurface
         $hit = $point->to2D($this->axis2d);
         if ($hit->x < $this->point2DStart->x || $hit->x > $this->point2DEnd->x
             || $hit->y < $this->point2DStart->y || $hit->y > $this->point2DEnd->y) {
-            throw new GameException("Hit '{$hit}' out of plane boundary '{$this}'");
+            throw new GameException("Hit '{$hit}' ({$point}) out of plane boundary '{$this}'");
         }
 
         $margin = $this->wallBangEdgeMarginDistance;

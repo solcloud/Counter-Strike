@@ -106,6 +106,27 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertPositionNotSame($orig, $candidate);
     }
 
+    public function testBoundaryAbove(): void
+    {
+        $game = $this->createTestGame();
+        $game->getWorld()->addBox(new Box(new Point(), 10, 1000, 10));
+        $start = new Point(1, 1, 1);
+        $game->getWorld()->addBox(new Box($start->clone(), 1, 1, 10));
+        $game->getTestMap()->startPointForNavigationMesh->setFrom($start);
+        $path = $game->getWorld()->buildNavigationMesh(3, 100);
+
+        $candidate = $start->clone()->setY(0);
+        $this->assertNull($path->getGraph()->getNodeById($candidate->hash()));
+
+        $closestCandidate = $candidate->clone();
+        $path->convertToNavMeshNode($closestCandidate);
+        $this->assertNull($path->getGraph()->getNodeById($closestCandidate->hash()));
+
+        $validPoint = $path->findTile($candidate, 1);
+        $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
+        $this->assertSame('2,1,2', $validPoint->hash());
+    }
+
     public function testOneWayDirection(): void
     {
         $game = $this->createTestGame();

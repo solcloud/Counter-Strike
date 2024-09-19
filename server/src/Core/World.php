@@ -48,6 +48,7 @@ final class World
     private Bomb $bomb;
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
+    private int $bombActionTickBuffer = 1;
     private int $playerPotentialDistanceSquared;
     private ?PathFinder $grenadeNavMesh = null;
 
@@ -314,20 +315,21 @@ final class World
             && $this->canBeSeen($player, $this->bomb->getPosition(), self::BOMB_RADIUS, self::BOMB_DEFUSE_MAX_DISTANCE)
         ) {
             $bomb = $this->bomb;
-            if ($this->lastBombActionTick + Util::millisecondsToFrames(50) < $this->getTickId()) {
-                $bomb->reset();
+            $tickId = $this->getTickId();
+            $playerId = $player->getId();
+            if ($playerId !== $this->lastBombPlayerId || $this->lastBombActionTick + $this->bombActionTickBuffer < $tickId) {
                 $player->stop();
+                $bomb->startDefusing($tickId, $player->hasDefuseKit());
                 $soundEvent = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_DEFUSING);
                 $this->makeSound($soundEvent->setPlayer($player)->setItem($bomb));
             }
-            $this->lastBombActionTick = $this->getTickId();
-            $this->lastBombPlayerId = $player->getId();
+            $this->lastBombActionTick = $tickId;
+            $this->lastBombPlayerId = $playerId;
 
-            $defused = $this->bomb->defuse($player->hasDefuseKit());
-            if ($defused) {
-                $this->game->bombDefused($player);
+            if ($bomb->isDefused($tickId)) {
                 $this->lastBombActionTick = -1;
                 $this->lastBombPlayerId = -1;
+                $this->game->bombDefused($player);
             }
             return;
         }
@@ -827,25 +829,24 @@ final class World
         }
     }
 
-    public function tryPlantBomb(Player $player): void
+    public function tryPlantBomb(Player $player, Bomb $bomb): void
     {
         if (!$this->canPlant($player)) {
             return;
         }
 
-        /** @var Bomb $bomb */
-        $bomb = $player->getEquippedItem();
-        if ($this->lastBombActionTick + Util::millisecondsToFrames(200) < $this->getTickId()) {
-            $bomb->reset();
+        $tickId = $this->getTickId();
+        $playerId = $player->getId();
+        if ($playerId !== $this->lastBombPlayerId || $this->lastBombActionTick + $this->bombActionTickBuffer < $tickId) {
             $player->stop();
+            $bomb->startPlanting($tickId);
             $soundEvent = new SoundEvent($player->getPositionClone()->addY(10), SoundType::BOMB_PLANTING);
             $this->makeSound($soundEvent->setPlayer($player)->setItem($bomb));
         }
         $this->lastBombActionTick = $this->getTickId();
-        $this->lastBombPlayerId = $player->getId();
+        $this->lastBombPlayerId = $playerId;
 
-        $planted = $bomb->plant();
-        if ($planted) {
+        if ($bomb->isPlanted($tickId)) {
             $player->equip($player->getInventory()->removeBomb());
             $bomb->setPosition($player->getPositionClone());
             $this->game->bombPlanted($player);
@@ -858,10 +859,7 @@ final class World
 
     public function isPlantingOrDefusing(Player $player): bool
     {
-        return (
-            $this->lastBombPlayerId === $player->getId() &&
-            ($this->lastBombActionTick === $this->getTickId() || $this->lastBombActionTick + 1 === $this->getTickId())
-        );
+        return ($this->lastBombPlayerId === $player->getId() && $this->bombActionTickBuffer >= $this->getTickId() - $this->lastBombActionTick);
     }
 
     public function isWallOrFloorCollision(Point $start, Point $candidate, int $radius): bool
@@ -896,7 +894,7 @@ final class World
             }
 
             if ($collider->collide($point, $radius, $height)) {
-                return $this->game->getPlayer($collider->playerId);
+                return $collider->getPlayer();
             }
         }
 

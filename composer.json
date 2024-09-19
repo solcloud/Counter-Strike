@@ -2,7 +2,7 @@
     "scripts": {
         "stan": "php vendor/bin/phpstan --memory-limit=300M analyze",
         "unit": "php vendor/bin/phpunit -d memory_limit=70M",
-        "infection": "php -d memory_limit=180M vendor/bin/infection --only-covered --threads=6 --min-covered-msi=87",
+        "infection": "php -d memory_limit=180M vendor/bin/infection --only-covered --threads=6 --min-covered-msi=99",
         "infection-cache": "@infection --coverage=www/coverage/",
         "dev": "php cli/server.php 1 8080 --debug & php cli/udp-ws-bridge.php",
         "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",

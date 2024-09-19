@@ -293,6 +293,19 @@ class MolotovGrenadeTest extends BaseTestCase
         $game->getWorld()->addBox(new Box(new Point(), 1000, 2000, 1000));
         $health = 100;
 
+        $flameSpawnEventCount = 0;
+        $flameExtinguishEventCount = 0;
+        $game->onEvents(function (array $events) use (&$flameSpawnEventCount, &$flameExtinguishEventCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::FLAME_SPAWN) {
+                    $flameSpawnEventCount++;
+                }
+                if ($event instanceof SoundEvent && $event->type === SoundType::FLAME_EXTINGUISH) {
+                    $flameExtinguishEventCount++;
+                }
+            }
+        });
+
         $this->playPlayer($game, [
             fn(Player $p) => $p->setPosition(new Point(500, 0, 500)),
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
@@ -316,6 +329,8 @@ class MolotovGrenadeTest extends BaseTestCase
         $this->assertSame(1, $game->getRoundNumber());
         $this->assertSame($health, $game->getPlayer(1)->getHealth());
         $this->assertGreaterThan(72, $game->getPlayer(1)->getHealth());
+        $this->assertGreaterThan(10, $flameSpawnEventCount);
+        $this->assertSame($flameSpawnEventCount, $flameExtinguishEventCount);
     }
 
     public function testSmokeExtinguishFlames(): void
@@ -387,6 +402,19 @@ class MolotovGrenadeTest extends BaseTestCase
         $p3->buyItem(BuyMenuItem::GRENADE_INCENDIARY);
         $game->addPlayer(new Player(4, Color::BLUE, false));
 
+        $smokeSpawnCount = 0;
+        $smokeFadeCount = 0;
+        $game->onEvents(function (array $events) use (&$smokeSpawnCount, &$smokeFadeCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::SMOKE_SPAWN) {
+                    $smokeSpawnCount++;
+                }
+                if ($event instanceof SoundEvent && $event->type === SoundType::SMOKE_FADE) {
+                    $smokeFadeCount++;
+                }
+            }
+        });
+
         $this->playPlayer($game, [
             fn(Player $p) => $p->getSight()->look(0, -90),
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_SMOKE)),
@@ -419,6 +447,8 @@ class MolotovGrenadeTest extends BaseTestCase
         $this->assertFalse($p3->isAlive());
         $this->assertTrue($game->getPlayer(1)->isAlive());
         $this->assertTrue($game->getPlayer(4)->isAlive());
+        $this->assertGreaterThan(10, $smokeSpawnCount);
+        $this->assertSame(1, $smokeFadeCount, 'Smoke fade - single shrink event');
     }
 
 }

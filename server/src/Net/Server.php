@@ -253,6 +253,11 @@ final class Server
         return $this->game->tick($tickId);
     }
 
+    public function getBlockedPlayersCount(): int
+    {
+        return count($this->blockList);
+    }
+
     /**
      * @codeCoverageIgnore
      */

@@ -66,6 +66,21 @@ class SimpleMovementTest extends BaseTestCase
         $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
     }
 
+    public function testPlayerCrouchStand(): void
+    {
+        $game = $this->createOneRoundGame(Setting::tickCountCrouch() * 3);
+        $game->onTick(function (GameState $state): void {
+            $state->getPlayer(1)->crouch();
+            if ($state->getTickId() > Setting::tickCountCrouch()) {
+                $state->getPlayer(1)->stand();
+            }
+        });
+
+        $game->start();
+        $this->assertTrue($game->getPlayer(1)->canCrouch());
+        $this->assertSame(Setting::playerHeadHeightStand(), $game->getPlayer(1)->getHeadHeight());
+    }
+
     public function testPlayerCrouchSpeed(): void
     {
         $game = $this->createTestGame();

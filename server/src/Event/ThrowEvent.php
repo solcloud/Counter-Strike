@@ -27,7 +27,6 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
     private float $time = 0.0;
     private float $timeIncrement;
     private Point $position;
-    private Point $lastEventPosition;
     private Point $floorCandidate;
     private BallCollider $ball;
     private int $bounceCount = 0;
@@ -52,7 +51,6 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 
         $this->id = Sequence::next();
         $this->position = $origin->clone();
-        $this->lastEventPosition = $origin->clone();
         $this->floorCandidate = $origin->clone();
         $this->ball = new BallCollider($this->world, $origin, $radius, $this->angleHorizontal, $this->angleVertical);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
@@ -70,7 +68,6 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
             ->addExtra('id', $this->id)
         ;
         $this->world->makeSound($event);
-        $this->lastEventPosition->setFrom($point);
         return $event;
     }
 

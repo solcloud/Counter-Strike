@@ -108,17 +108,15 @@ class Game
             }
         }
         $this->backtrack->finishState();
-        $this->checkRoundEnd($alivePlayers[0], $alivePlayers[1]);
+        if (!$this->roundEndCoolDown) {
+            $this->checkRoundEnd($alivePlayers[0], $alivePlayers[1]);
+        }
         $this->processEvents($tickId);
         return null;
     }
 
     private function checkRoundEnd(int $defendersAlive, int $attackersAlive): void
     {
-        if ($this->roundEndCoolDown) {
-            return;
-        }
-
         if ($this->playersCountAttackers > 0 && $attackersAlive === 0) {
             $this->roundEnd(false, RoundEndReason::ALL_ENEMIES_ELIMINATED);
             return;
@@ -372,10 +370,6 @@ class Game
 
     public function roundEnd(bool $attackersWins, RoundEndReason $reason): void
     {
-        if ($this->roundEndCoolDown) {
-            return;
-        }
-
         $this->roundEndCoolDown = true;
         $roundEndEvent = new RoundEndEvent($this, $attackersWins, $reason);
         $roundEndEvent->onComplete[] = fn() => $this->endRound($roundEndEvent);
@@ -467,8 +461,7 @@ class Game
                 $amount += match ($roundEndEvent->reason) {
                     RoundEndReason::ALL_ENEMIES_ELIMINATED => 3250,
                     RoundEndReason::BOMB_EXPLODED => 3500,
-                    RoundEndReason::TIME_RUNS_OUT,
-                    RoundEndReason::BOMB_DEFUSED => throw new GameException('Invalid? ' . $roundEndEvent->reason->value), // @codeCoverageIgnore
+                    RoundEndReason::TIME_RUNS_OUT, RoundEndReason::BOMB_DEFUSED => GameException::invalid((string)$roundEndEvent->reason->value), // @codeCoverageIgnore
                 };
             } elseif (!$player->isAlive()) {
                 $amount += $this->score->getMoneyLossBonus(true);
@@ -482,7 +475,7 @@ class Game
             $amount += match ($roundEndEvent->reason) {
                 RoundEndReason::ALL_ENEMIES_ELIMINATED, RoundEndReason::TIME_RUNS_OUT => 3250,
                 RoundEndReason::BOMB_DEFUSED => 3500,
-                RoundEndReason::BOMB_EXPLODED => throw new GameException('Invalid? ' . $roundEndEvent->reason->value), // @codeCoverageIgnore
+                RoundEndReason::BOMB_EXPLODED => GameException::invalid((string)$roundEndEvent->reason->value), // @codeCoverageIgnore
             };
         } else {
             $amount += $this->score->getMoneyLossBonus(false);

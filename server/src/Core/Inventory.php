@@ -39,10 +39,7 @@ class Inventory
             ];
             $this->equippedSlot = InventorySlot::SLOT_SECONDARY->value;
             $this->lastEquippedSlotId = InventorySlot::SLOT_KNIFE->value;
-            $this->lastEquippedGrenadeSlots = [
-                InventorySlot::SLOT_GRENADE_SMOKE->value, InventorySlot::SLOT_GRENADE_MOLOTOV->value, InventorySlot::SLOT_GRENADE_HE->value,
-                InventorySlot::SLOT_GRENADE_FLASH->value, InventorySlot::SLOT_GRENADE_DECOY->value,
-            ];
+            $this->lastEquippedGrenadeSlots = InventorySlot::getGrenadeSlotIds();
         } else {
             foreach ($this->items as $item) {
                 $item->reset();
@@ -52,12 +49,15 @@ class Inventory
             }
         }
 
-        $this->removeBomb();
+        if ($this->has(InventorySlot::SLOT_BOMB->value)) {
+            $this->removeBomb();
+        }
         $this->store->reset($isAttackerSide, $this->items);
     }
 
-    private function updateEquippedSlot(): int
+    private function updateEquippedSlot(Item $item): int
     {
+        $this->tryRemoveLastEquippedGrenade($item);
         if (isset($this->items[$this->equippedSlot])) {
             return $this->equippedSlot;
         }
@@ -72,13 +72,27 @@ class Inventory
 
     public function removeBomb(): InventorySlot
     {
-        unset($this->items[InventorySlot::SLOT_BOMB->value]);
-        return InventorySlot::from($this->updateEquippedSlot());
+        $bomb = $this->items[InventorySlot::SLOT_BOMB->value] ?? null;
+        if ($bomb) {
+            unset($this->items[InventorySlot::SLOT_BOMB->value]);
+            return InventorySlot::from($this->updateEquippedSlot($bomb));
+        }
+
+        GameException::invalid('You do not have bomb!'); // @codeCoverageIgnore
     }
 
     public function getEquipped(): Item
     {
         return $this->items[$this->equippedSlot];
+    }
+
+    private function tryRemoveLastEquippedGrenade(Item $item): void
+    {
+        if ($item instanceof Grenade) {
+            $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);
+            assert(is_int($index));
+            unset($this->lastEquippedGrenadeSlots[$index]);
+        }
     }
 
     public function removeEquipped(): ?Item
@@ -90,10 +104,7 @@ class Inventory
         $item = $this->items[$this->equippedSlot];
         if ($item->getQuantity() === 1) {
             unset($this->items[$this->equippedSlot]);
-            if ($item instanceof Grenade) {
-                unset($this->lastEquippedGrenadeSlots[$this->equippedSlot]);
-            }
-            $this->updateEquippedSlot();
+            $this->updateEquippedSlot($item);
             $item->unEquip();
 
             return $item;
@@ -116,10 +127,7 @@ class Inventory
         }
 
         unset($this->items[$slot]);
-        if ($item instanceof Grenade) {
-            unset($this->lastEquippedGrenadeSlots[$slot]);
-        }
-        $this->updateEquippedSlot();
+        $this->updateEquippedSlot($item);
     }
 
     public function canBuy(Item $item): bool
@@ -176,7 +184,7 @@ class Inventory
         $this->lastEquippedSlotId = $this->equippedSlot;
         $this->equippedSlot = $slot->value;
         if ($item instanceof Grenade) {
-            unset($this->lastEquippedGrenadeSlots[$slot->value]);
+            $this->tryRemoveLastEquippedGrenade($item);
             array_unshift($this->lastEquippedGrenadeSlots, $slot->value);
         }
         return $item->equip();

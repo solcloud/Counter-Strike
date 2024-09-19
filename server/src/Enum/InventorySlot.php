@@ -20,4 +20,16 @@ enum InventorySlot: int
     case SLOT_KEVLAR = 10;
     case SLOT_KIT = 11;
 
+    /** @return list<int> */
+    public static function getGrenadeSlotIds(): array
+    {
+        return [
+            self::SLOT_GRENADE_SMOKE->value,
+            self::SLOT_GRENADE_MOLOTOV->value,
+            self::SLOT_GRENADE_HE->value,
+            self::SLOT_GRENADE_FLASH->value,
+            self::SLOT_GRENADE_DECOY->value,
+        ];
+    }
+
 }

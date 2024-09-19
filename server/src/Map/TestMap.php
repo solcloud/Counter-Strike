@@ -16,10 +16,10 @@ class TestMap extends Map
         $this->setAttackersSpawnPositions([new Point(), new Point(999, 0, 999)]);
         $this->setDefendersSpawnPositions([
             (new Point())->setZ(50),
-            new Point(9999, 0, 9999),
-            new Point(9999, 0, 9999),
-            new Point(9999, 0, 9999),
-            new Point(9999, 0, 9999),
+            new Point(9991, 0, 9991),
+            new Point(9992, 0, 9992),
+            new Point(9993, 0, 9993),
+            new Point(9994, 0, 9994),
         ]);
 
         $this->buyArea = new Box(new Point(), 99999, 999, 99999);
