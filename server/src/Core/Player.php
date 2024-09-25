@@ -271,11 +271,6 @@ final class Player
         return $this->headFloor;
     }
 
-    public function getCentrePoint(): Point
-    {
-        return $this->getPositionClone()->addY((int) ceil($this->headHeight / 2));
-    }
-
     /**
      * @return list<Point>
      */

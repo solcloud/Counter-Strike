@@ -122,7 +122,7 @@ final class PathFinder
             for ($i = 1; $i <= $maxY; $i++) {
                 $yCandidate->addY(1);
                 if ($this->world->findFloorSquare($yCandidate, $radius - 1)) {
-                    break;
+                    return null;
                 }
                 if ($this->getGraph()->getNodeById($navMeshCenter->setY($yCandidate->y)->hash())) {
                     return $navMeshCenter;
@@ -153,14 +153,16 @@ final class PathFinder
                 $prevNavmesh = $navmesh->hash();
                 $navmesh->setFrom($candidate);
                 $this->convertToNavMeshNode($navmesh);
+                if ($prevNavmesh === $navmesh->hash()) {
+                    continue;
+                }
+
                 if ($this->getGraph()->getNodeById($navmesh->hash())) {
                     return $navmesh;
                 }
-                if ($prevNavmesh !== $navmesh->hash()) {
-                    $above = $checkAbove($candidate, $maxY, $radius);
-                    if ($above) {
-                        return $above;
-                    }
+                $above = $checkAbove($candidate, $maxY, $radius);
+                if ($above) {
+                    return $above;
                 }
             }
         }
@@ -201,18 +203,20 @@ final class PathFinder
             if (array_key_exists($currentKey, $this->visited)) {
                 continue;
             }
-            $this->visited[$currentKey] = true;
-            $currentNodeOrNull = $this->graph->getNodeById($currentKey);
-            $currentNode = $currentNodeOrNull ?? new Node($currentKey, $current);
 
-            $hasNeighbour = false;
+            $this->visited[$currentKey] = true;
+            $currentNode = $this->graph->getNodeById($currentKey);
+            if ($currentNode === null) {
+                $currentNode = new Node($currentKey, $current);
+                $this->graph->addNode($currentNode);
+            }
+
             foreach ($this->moves as $angle => $move) {
                 $candidate->setFrom($current);
                 if (!$this->canFullyMoveTo($candidate, $angle, $this->tileSize, $this->tileSizeHalf, $objectHeight)) {
                     continue;
                 }
 
-                $hasNeighbour = true;
                 $newNeighbour = $candidate->clone();
                 $newNode = $this->graph->getNodeById($newNeighbour->hash());
                 if ($newNode === null) {
@@ -221,9 +225,6 @@ final class PathFinder
                 }
                 $this->graph->addEdge(new DirectedEdge($currentNode, $newNode, 1));
                 $queue->enqueue($newNeighbour);
-            }
-            if ($hasNeighbour && $currentNodeOrNull === null) {
-                $this->graph->addNode($currentNode);
             }
             if (++$this->iterationCount === 10_000) {
                 GameException::notImplementedYet('New map, tileSize or bad test (no boundary box, bad starting point)?'); // @codeCoverageIgnore

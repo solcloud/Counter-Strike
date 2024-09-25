@@ -1,4 +1,4 @@
-# Counter-Strike: Football [![Tests](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml/badge.svg)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml) [![Code coverage](https://img.shields.io/badge/Code%20coverage-100%25-green?style=flat)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml)
+# Counter-Strike: Football [![Tests](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml/badge.svg)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml) [![Code coverage](https://img.shields.io/badge/Code%20coverage-100%25-green?style=flat)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml) [![Mutation score](https://img.shields.io/badge/Mutation%20score-100%25-green?style=flat)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml)
 
 Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team.
 

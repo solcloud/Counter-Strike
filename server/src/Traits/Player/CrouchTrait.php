@@ -19,10 +19,11 @@ trait CrouchTrait
         }
 
         $event = new CrouchEvent($directionDown, function (CrouchEvent $event): void {
+            $headHeightCrouch = Setting::playerHeadHeightCrouch();
             if ($event->directionDown) {
                 $this->headHeight -= $event->moveOffset;
-                if ($this->headHeight < Setting::playerHeadHeightCrouch()) {
-                    $this->headHeight = Setting::playerHeadHeightCrouch();
+                if ($this->headHeight < $headHeightCrouch) {
+                    $this->headHeight = $headHeightCrouch;
                 }
             } else {
                 $targetHeadHeight = min(Setting::playerHeadHeightStand(), $this->headHeight + $event->moveOffset);
@@ -35,6 +36,7 @@ trait CrouchTrait
                     }
                     if ($this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $this->getBoundingRadius(), 2)) {
                         $event->restartTimer();
+                        $this->headHeight = $headHeightCrouch;
                         break;
                     }
                     $this->headHeight = $h;

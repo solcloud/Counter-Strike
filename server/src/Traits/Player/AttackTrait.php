@@ -62,6 +62,7 @@ trait AttackTrait
         $item = $this->getEquippedItem();
         if ($item instanceof ScopeItem) {
             $item->scope();
+            return null;
         }
         if (!($item instanceof AttackEnable)) {
             return null; // @codeCoverageIgnore
@@ -76,7 +77,7 @@ trait AttackTrait
             }
         }
 
-        return null; // @codeCoverageIgnore
+        return null;
     }
 
     private function processAttackResult(AttackResult $result): AttackResult
@@ -97,7 +98,7 @@ trait AttackTrait
         return (int)ceil($base);
     }
 
-    protected function createAttackEvent(AttackEnable $item): Attackable
+    private function createAttackEvent(AttackEnable $item): Attackable
     {
         $origin = $this->getSightPositionClone();
 

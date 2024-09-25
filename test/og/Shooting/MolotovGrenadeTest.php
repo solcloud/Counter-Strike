@@ -63,6 +63,12 @@ class MolotovGrenadeTest extends BaseTestCase
                     $p = $game->getPlayer(1);
                     $this->assertSame(100, $p->getHealth());
                     $this->assertTrue($game->getWorld()->activeMolotovExists());
+                    $this->assertNull($event->getPlayerId());
+                    $this->assertNull($event->getItem());
+                    $eventSerialized = $event->serialize();
+                    $this->assertIsArray($eventSerialized);
+                    $this->assertIsArray($eventSerialized['extra']);
+                    $this->assertNotEmpty($eventSerialized['extra']['id'] ?? false);
                     $p->setPosition(new Point(500, 0, 500));
                 }
             }
@@ -439,7 +445,7 @@ class MolotovGrenadeTest extends BaseTestCase
             fn() => $this->assertInstanceOf(Incendiary::class, $p3->getEquippedItem()),
             fn() => $this->assertNotNull($p3->attack()),
             $this->waitNTicks(Incendiary::MAX_TIME_MS),
-            $this->endGame()
+            $this->endGame(),
         ]);
 
         $this->assertSame(1, $game->getRoundNumber());

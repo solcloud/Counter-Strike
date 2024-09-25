@@ -17,8 +17,9 @@ class DropEvent extends Event implements ForOneRoundMax
 {
 
     private string $id;
-    private Point $origin;
+    private Point $dropPosition;
     private DropItem $dropItem;
+    /** @var null|Closure(DropItem):void */
     private ?Closure $onLand = null;
     private float $angleHorizontal;
     private float $angleVertical;
@@ -29,8 +30,8 @@ class DropEvent extends Event implements ForOneRoundMax
     public function __construct(private readonly Player $player, private readonly Item $item, private readonly World $world)
     {
         $this->id = Sequence::next();
-        $this->origin = $this->player->getSightPositionClone();
-        $this->dropItem = new DropItem($this->id, $this->item, $this->origin->clone());
+        $this->dropPosition = $this->player->getSightPositionClone();
+        $this->dropItem = new DropItem($this->id, $this->item, $this->dropPosition);
         $this->angleHorizontal = $player->getSight()->getRotationHorizontal();
         $this->angleVertical = $player->getSight()->getRotationVertical();
         $this->velocity = ($player->isMoving() || $player->isJumping()) ? 30.0 : 20.0;
@@ -41,6 +42,7 @@ class DropEvent extends Event implements ForOneRoundMax
         }
     }
 
+    /** @param Closure(DropItem): void $callback function(DropItem $dropItem):void{} */
     public function onFloorLand(Closure $callback): void
     {
         $this->onLand = $callback;
@@ -53,7 +55,7 @@ class DropEvent extends Event implements ForOneRoundMax
 
     public function process(int $tick): void
     {
-        $dropPosition = $this->dropItem->getPosition();
+        $dropPosition = $this->dropPosition;
         $this->time += $this->timeIncrement;
         $directionX = Util::directionX($this->angleHorizontal);
         $directionZ = Util::directionZ($this->angleHorizontal);
@@ -108,7 +110,7 @@ class DropEvent extends Event implements ForOneRoundMax
                 if ($floorCandidate) {
                     $dropPosition->setFrom($pos);
                     if ($this->onLand) {
-                        call_user_func($this->onLand, $this);
+                        call_user_func($this->onLand, $this->dropItem);
                     }
                     $soundEvent = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_LAND);
                     $this->world->makeSound($soundEvent->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
@@ -124,11 +126,6 @@ class DropEvent extends Event implements ForOneRoundMax
 
         $soundEvent = new SoundEvent($pos->clone(), SoundType::ITEM_DROP_AIR);
         $this->world->makeSound($soundEvent->setPlayer($player)->setItem($item)->addExtra('id', $this->id));
-    }
-
-    public function getDropItem(): DropItem
-    {
-        return $this->dropItem;
     }
 
     /** @codeCoverageIgnore */

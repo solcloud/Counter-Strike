@@ -88,9 +88,7 @@ final class World
 
     public function regenerateNavigationMeshes(): void
     {
-        $key = sprintf('%d-%d', self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
-        $this->grenadeNavMesh = $this->getMap()->getNavigationMesh($key)
-            ?? $this->buildNavigationMesh(self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
+        $this->grenadeNavMesh = $this->buildNavigationMesh(self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
     }
 
     public function addRamp(Ramp $ramp): void
@@ -302,8 +300,8 @@ final class World
     public function dropItem(Player $player, Item $item): void
     {
         $dropEvent = new DropEvent($player, $item, $this);
-        $dropEvent->onFloorLand(function (DropEvent $event): void {
-            $this->dropItems[] = $event->getDropItem();
+        $dropEvent->onFloorLand(function (DropItem $dropItem): void {
+            $this->dropItems[] = $dropItem;
         });
         $this->game->addDropEvent($dropEvent);
     }
@@ -519,7 +517,7 @@ final class World
         $this->game->addSmokeEvent($event);
     }
 
-    public function processFlammableExplosion(Player $thrower, Point $epicentre, Flammable $item): void
+    private function processFlammableExplosion(Player $thrower, Point $epicentre, Flammable $item): void
     {
         if ($this->grenadeNavMesh === null) {
             $this->regenerateNavigationMeshes();
@@ -606,7 +604,7 @@ final class World
                 $damage = $flammableItem->calculateDamage($player->getArmorType() !== ArmorType::NONE);
                 assert($fire->item instanceof Item);
                 $this->playerHit(
-                    $player->getCentrePoint(), $player, $fire->initiator, SoundType::FLAME_PLAYER_HIT,
+                    $player->getCentrePointClone(), $player, $fire->initiator, SoundType::FLAME_PLAYER_HIT,
                     $fire->item, $flame->center, $damage
                 );
                 $player->lowerHealth($damage);
@@ -645,7 +643,7 @@ final class World
             if (!$player->isAlive()) {
                 continue; // @codeCoverageIgnore
             }
-            if (Util::distanceSquared($epicentre, $player->getCentrePoint()) > $maxBlastDistanceSquared) {
+            if (Util::distanceSquared($epicentre, $player->getCentrePointClone()) > $maxBlastDistanceSquared) {
                 continue;
             }
 

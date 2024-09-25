@@ -93,8 +93,7 @@ final class HitBox implements Hittable
             return 0;
         }
 
-        $armorDamage = 0;
-        $armorDamage += ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
+        $armorDamage = ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
         if ($armorType === ArmorType::BODY_AND_HEAD && $hitBoxType === HitBoxType::HEAD) {
             $armorDamage += 30;
         }

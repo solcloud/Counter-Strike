@@ -22,6 +22,7 @@ use cs\Weapon\PistolGlock;
 use SebastianBergmann\Timer\Timer;
 use Test\BaseTest;
 
+/** @coversNothing */
 class PerformanceTest extends BaseTest
 {
     private static float $timeScale;
@@ -245,6 +246,7 @@ class PerformanceTest extends BaseTest
         $timer->start();
         $game->getWorld()->regenerateNavigationMeshes();
         $took = $timer->stop();
+        $this->assertGreaterThan(10, $took->asMilliseconds());
         $this->assertLessThan(120 * self::$timeScale, $took->asMilliseconds());
 
         $player = new Player(1, Color::GREEN, true);
@@ -256,36 +258,25 @@ class PerformanceTest extends BaseTest
         }
         $flammableItem = $player->getEquippedItem();
         $this->assertInstanceOf(Flammable::class, $flammableItem);
+        $player->getSight()->look(0, -90);
 
         $timer->start();
-        $this->assertNotNull($player->attack());
+        $attackResult = $player->attack();
         $took = $timer->stop();
-        $this->assertLessThan(0.6 * self::$timeScale, $took->asMilliseconds());
+        $this->assertNotNull($attackResult);
+        $this->assertLessThan(0.8 * self::$timeScale, $took->asMilliseconds());
 
-        $epicentre = $player->getPositionClone()->addY($flammableItem->getBoundingRadius());
-        $timer->start();
-        $game->getWorld()->processFlammableExplosion($player, $epicentre, $flammableItem);
-        $took = $timer->stop();
-        $this->assertLessThan(0.6 * self::$timeScale, $took->asMilliseconds());
-
-        $samplesCount = 1;
-        $timer->start();
-        foreach (range(1, $samplesCount) as $i) {
+        foreach (range(1, Util::millisecondsToFrames(Molotov::MAX_TIME_MS)) as $i) {
+            $timer->start();
             $game->tick(++$tickId);
-        }
-        $took = $timer->stop();
-        $this->assertLessThan(100, $player->getHealth());
-        $this->assertLessThan(0.3 * self::$timeScale, $took->asMilliseconds() / $samplesCount);
+            $took = $timer->stop();
+            $this->assertLessThan(0.8 * self::$timeScale, $took->asMilliseconds(), "Tick {$tickId}");
 
-        $health = $player->getHealth();
-        $samplesCount = 10;
-        $timer->start();
-        foreach (range(1, $samplesCount) as $i) {
-            $game->tick(++$tickId);
+            if ($game->getRoundNumber() === 2) {
+                break;
+            }
         }
-        $took = $timer->stop();
-        $this->assertLessThan($health, $player->getHealth());
-        $this->assertLessThan(0.4 * self::$timeScale, $took->asMilliseconds() / $samplesCount);
+        $this->assertSame(2, $game->getRoundNumber());
     }
 
     private function createMolotovMap(): Map

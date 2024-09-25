@@ -267,6 +267,48 @@ class RoundTest extends BaseTestCase
         $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
     }
 
+    public function testKillInRoundEndCoolDown(): void
+    {
+        $gameProperty = $this->createNoPauseGameProperty();
+        $gameProperty->start_money = 0;
+        $gameProperty->freeze_time_sec = 1;
+        $gameProperty->round_end_cool_down_sec = 1;
+        $gameProperty->bomb_plant_time_ms = 0;
+        $gameProperty->bomb_defuse_time_ms = 0;
+        $gameProperty->max_rounds = 6;
+        $game = $this->createTestGame(null, $gameProperty);
+        $game->getPlayer(1)->setPosition(new Point(500, 0, 500));
+        $enemy = new Player(2, Color::BLUE, false);
+        $game->addPlayer($enemy);
+        $enemy->setPosition($game->getPlayer(1)->getPositionClone());
+        $enemy->getSight()->look(0, -90);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equip(InventorySlot::SLOT_BOMB),
+            $this->waitNTicks(max(1000, Bomb::equipReadyTimeMs)),
+            fn(Player $p) => $p->attack(),
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            fn() => $this->assertSame(0, $enemy->getMoney()),
+            fn() => $enemy->use(),
+            fn() => $this->assertSame(300, $enemy->getMoney()),
+            fn() => $this->assertSame(2, $game->getRoundNumber()),
+            function () use ($enemy) {
+                $enemy->setPosition($enemy->getPositionClone()->addX(500));
+                $enemy->getSight()->look(-90, 0);
+                $result = $this->assertPlayerHit($enemy->attack());
+                $this->assertCount(2, $result->getHits());
+                $this->assertSame(300, $result->getMoneyAward());
+                $this->assertSame(600, $enemy->getMoney());
+            },
+            $this->waitNTicks(1000),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertSame(300 + 800 + 1400, $game->getPlayer(1)->getMoney());
+        $this->assertSame(300 + 300 + 3500, $game->getPlayer(2)->getMoney());
+    }
+
     public function testMultipleRoundsScoreAndEvents(): void
     {
         $maxRounds = 4;
@@ -350,7 +392,7 @@ class RoundTest extends BaseTestCase
 
         $expectedScoreBoard = [
             'score' => [2, 2],
-            'lossBonus' => [1400, 1900],
+            'lossBonus' => [1400, 1400],
             'history' => [
                 1 => [
                     'attackersWins' => false,
@@ -410,7 +452,7 @@ class RoundTest extends BaseTestCase
         $gameProperty->bomb_defuse_time_ms = 0;
         $gameProperty->bomb_explode_time_ms = 1;
         $gameProperty->round_time_ms = Bomb::equipReadyTimeMs * 2;
-        $this->assertGreaterThan(1, $gameProperty->round_time_ms);
+        $this->assertGreaterThan(Util::$TICK_RATE, $gameProperty->round_time_ms);
         $game = $this->createTestGame(null, $gameProperty);
 
         $this->playPlayer($game, [
@@ -423,6 +465,19 @@ class RoundTest extends BaseTestCase
 
         $this->assertSame($maxRounds + 1, $game->getRoundNumber());
         $this->assertSame(4050, $game->getPlayer(1)->getMoney());
+    }
+
+    public function testNoMoneyForAttackerIfSurvivedRoundWithoutBombPlant(): void
+    {
+        $maxRounds = 4;
+        $game = $this->createNoPauseGame($maxRounds);
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+
+        $game->start();
+
+        $this->assertSame($maxRounds + 1, $game->getRoundNumber());
+        $this->assertSame(4050, $game->getPlayer(1)->getMoney());
+        $this->assertSame(800, $game->getPlayer(2)->getMoney());
     }
 
 }

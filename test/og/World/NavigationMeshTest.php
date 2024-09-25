@@ -3,6 +3,7 @@
 namespace Test\World;
 
 use cs\Core\Box;
+use cs\Core\Floor;
 use cs\Core\GameException;
 use cs\Core\PathFinder;
 use cs\Core\Point;
@@ -125,6 +126,78 @@ final class NavigationMeshTest extends BaseTestCase
         $validPoint = $path->findTile($candidate, 1);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,1,2', $validPoint->hash());
+    }
+
+    public function testNeighboursShareSameNodeReference(): void
+    {
+        $game = $this->createTestGame();
+        $game->getTestMap()->startPointForNavigationMesh->set(1, 0, 1);
+        $game->getWorld()->addBox(new Box(new Point(), 7, 1000, 4));
+        $path = $game->getWorld()->buildNavigationMesh(3, 10);
+        $graph = $path->getGraph();
+        $this->assertSame(2, $graph->getNodesCount());
+        $this->assertSame(2, $graph->getEdgeCount());
+        $node1 = $graph->getNodeById('2,0,2');
+        $this->assertNotNull($node1);
+        $node2 = $graph->getNodeById('5,0,2');
+        $this->assertNotNull($node2);
+        $node1neighbours = $graph->getNeighbors($node1);
+        $node2neighbours = $graph->getNeighbors($node2);
+        $this->assertCount(1, $node1neighbours);
+        $this->assertCount(1, $node2neighbours);
+        $this->assertSame($node1, $node2neighbours[0]);
+        $this->assertSame($node2, $node1neighbours[0]);
+    }
+
+    public function testWallBoundary(): void
+    {
+        $game = $this->createTestGame();
+        $game->getTestMap()->startPointForNavigationMesh->set(1, 0, 1);
+        $game->getWorld()->addBox(new Box(new Point(), 5, 1000, 4));
+        $path = $game->getWorld()->buildNavigationMesh(3, 10);
+        $graph = $path->getGraph();
+        $this->assertSame(1, $graph->getNodesCount());
+        $this->assertSame(0, $graph->getEdgeCount());
+
+        $node = $graph->getNodeById('2,0,2');
+        $this->assertNotNull($node);
+        $this->assertCount(0, $graph->getNeighbors($node));
+    }
+
+    public function testUnderNavMesh(): void
+    {
+        $game = $this->createTestGame();
+        $expectedPoint = new Point(2, 2, 2);
+        $game->getTestMap()->startPointForNavigationMesh->set(1, 2, 1);
+        $game->getWorld()->addBox(new Box(new Point(), 5, 1000, 4));
+        $game->getWorld()->addFloor(new Floor(new Point(2, 2, 0), 10, 10));
+
+        $path = $game->getWorld()->buildNavigationMesh(3, 10);
+        $graph = $path->getGraph();
+
+        $nodes = $graph->getNodes();
+        $this->assertCount(1, $nodes);
+        $node = $graph->getNodeById('2,2,2');
+        $this->assertNotNull($node);
+        $this->assertSame($node, array_shift($nodes));
+        $nodePosition = $node->getData();
+        $this->assertInstanceOf(Point::class, $nodePosition);
+        $this->assertPositionSame($expectedPoint, $nodePosition);
+
+        $tilePoint = $path->findTile(new Point(1, 0, 1), 1);
+        $this->assertPositionSame($expectedPoint, $tilePoint);
+    }
+
+    public function testDeepHole(): void
+    {
+        $game = $this->createTestGame();
+        $game->getTestMap()->startPointForNavigationMesh->set(1, 1000, 1);
+        $game->getWorld()->addBox(new Box(new Point(), 10, 2000, 10));
+        $game->getWorld()->addFloor(new Floor(new Point(1, 1000, 1), 1, 1));
+
+        $path = $game->getWorld()->buildNavigationMesh(3, 10);
+        $this->assertSame(1, $path->getGraph()->getNodesCount());
+        $this->assertSame(0, $path->getGraph()->getEdgeCount());
     }
 
     public function testOneWayDirection(): void

@@ -101,6 +101,7 @@ class ServerTest extends BaseTest
         $gameProperty->half_time_freeze_sec = 0;
         $gameProperty->round_end_cool_down_sec = 0;
         $gameProperty->round_time_ms = $roundTimeMs;
+        $this->assertSame(1, $gameProperty->toArray()[GameProperty::MAX_ROUNDS] ?? false);
 
         $game = new Game($gameProperty);
         $game->loadMap(new TestMap());

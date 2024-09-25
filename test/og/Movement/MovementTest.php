@@ -129,7 +129,7 @@ class MovementTest extends BaseTestCase
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - 1));
 
         $game->getPlayer(1)->setPosition(new Point());
-        $game->getWorld()->addFloor(new Floor(new Point(0, $wall->getCeiling(), $wall->getOther()), 0, Setting::moveDistancePerTick()));
+        $game->getWorld()->addFloor(new Floor(new Point(0, $wall->getCeiling(), $wall->getStart()->z), 0, Setting::moveDistancePerTick()));
         $game->start();
         $this->assertPlayerPosition($game, new Point(0, $wall->getCeiling(), Setting::moveDistancePerTick()));
     }
@@ -242,6 +242,7 @@ class MovementTest extends BaseTestCase
         $this->assertPositionNotSame($start, $p->getPositionClone());
         $this->assertGreaterThan($start->x, $p->getPositionClone()->x);
         $this->assertGreaterThan($start->z, $p->getPositionClone()->z);
+        $this->assertPositionSame(new Point(520, 0, 520), $p->getPositionClone());
     }
 
     public function testPlayerSlowMovementWhenFlying(): void
@@ -453,33 +454,46 @@ class MovementTest extends BaseTestCase
 
     public function testPlayerCrouchingStanding(): void
     {
-        $playerCommands = [
-            function (Player $p) {
-                $this->assertFalse($p->isCrouching());
-            },
+        $this->simulateGame([
+            fn(Player $p) => $this->assertFalse($p->isCrouching()),
             fn(Player $p) => $p->crouch(),
-            function (Player $p) {
-                $this->assertTrue($p->isCrouching());
-            },
+            fn(Player $p) => $this->assertTrue($p->isCrouching()),
             $this->waitXTicks(Setting::tickCountCrouch()),
-            function (Player $p) {
-                $this->assertTrue($p->isCrouching());
-            },
+            fn(Player $p) => $this->assertTrue($p->isCrouching()),
             function (Player $p) {
                 $p->stand();
                 $p->stand();
             },
-            function (Player $p) {
-                $this->assertTrue($p->isCrouching());
-            },
+            fn(Player $p) => $this->assertTrue($p->isCrouching()),
             $this->waitXTicks(Setting::tickCountCrouch()),
-            function (Player $p) {
-                $this->assertFalse($p->isCrouching());
-            },
+            fn(Player $p) => $this->assertFalse($p->isCrouching()),
             $this->endGame(),
-        ];
+        ]);
+    }
 
-        $this->simulateGame($playerCommands);
+    public function testPlayerCrouchingAndCannotStandWhenOtherPlayerChillingOnTop(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->addPlayer(new Player(2, Color::GREEN, false));
+        $p2 = $game->getPlayer(2);
+        $p2->setHeadHeight(2); // for continue/break infection detection in isCollisionWithOtherPlayers
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightStand(), $p->getHeadHeight()),
+            fn(Player $p) => $p->crouch(),
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            fn(Player $p) => $this->assertSame(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
+            function (Player $p) use ($p2) {
+                $p2->setPosition($p->getPositionClone()->addY($p->getHeadHeight() + Setting::crouchDistancePerTick() * 2));
+                $p->stand();
+            },
+            fn(Player $p) => $this->assertGreaterThan(Setting::playerHeadHeightCrouch(), $p->getHeadHeight()),
+            $this->waitXTicks(Setting::tickCountCrouch()),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
+        $this->assertSame(Setting::playerHeadHeightCrouch() + 1, $game->getPlayer(2)->getPositionClone()->y);
     }
 
     public function testPlayerMouseOrthogonalMovement1(): void

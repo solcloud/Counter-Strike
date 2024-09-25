@@ -5,43 +5,66 @@
             "server/src/",
         ],
     },
-    "logs": {
-        "text": "/tmp/infection.log",
-    },
     "timeout": 20,
     "testFramework": "phpunit",
     "mutators": {
         "global-ignoreSourceCodeByRegex": [
             "\\$this->log\\(.*\\);",
             "throw new GameException\\(.+\\);",
+            "GameException::invalid\\(.*\\);",
             "GameException::notImplementedYet\\(.*\\);",
         ],
         "@default": true,
-        "@arithmetic": false,
-        "@boolean": false,
-        "@cast": false,
         "@conditional_boundary": false,
         "@conditional_negotiation": false,
-        "@equal": false,
-        "@function_signature": true,
-        "PublicVisibility": {
-            ignoreSourceCodeByRegex: [
-                "public function processFlammableExplosion\\(.+",
-            ],
-        },
-        "@identical": true,
-        "@number": false,
-        "@operator": false,
-        "@regex": true,
-        "@removal": true,
-        "MatchArmRemoval": {
-            "ignoreSourceCodeByRegex": [
-                ".+GameException::invalid\\(.+",
+        "Break_": false,
+        "CastInt": false,
+        "Continue_": false,
+        "DecrementInteger": false,
+        "FalseValue": false,
+        "IfNegation": false,
+        "Increment": false,
+        "IncrementInteger": false,
+        "InstanceOf_": false,
+        "IntegerNegation": false,
+        "LogicalAnd": false,
+        "LogicalAndAllSubExprNegation": false,
+        "LogicalAndNegation": false,
+        "LogicalAndSingleSubExprNegation": false,
+        "LogicalOrAllSubExprNegation": false,
+        "LogicalOr": false,
+        "Minus": false,
+        "Modulus": false,
+        "MulEqual": false,
+        "Multiplication": false,
+        "Plus": false,
+        "PlusEqual": false,
+        "RoundingFamily": false,
+        "TrueValue": false,
+        "ArrayItem": {
+            "ignore": [
+                "cs\\Event\\*::serialize",
             ],
         },
         "ArrayItemRemoval": {
             "ignore": [
                 "cs\\Event\\*::serialize",
+            ],
+        },
+        "Coalesce": {
+            "ignoreSourceCodeByRegex": [
+                ".+\\(\\$skipPlayerIds\\[\\$playerId\\].+",
+                ".+SpeedMultiplier-\\{\\$itemId\\}.+",
+            ],
+        },
+        "Division": {
+            ignoreSourceCodeByRegex: [
+                ".+rand\\(.+",
+            ],
+        },
+        "MatchArmRemoval": {
+            "ignoreSourceCodeByRegex": [
+                ".+GameException::invalid\\(.+",
             ],
         },
         "MethodCallRemoval": {
@@ -56,13 +79,16 @@
                 "\\$soundEvent->addExtra\\(.+\\);",
                 "\\$this->addSoundEvent\\(.+\\);",
                 "\\$bullet->addPlayerIdSkip\\(\\$playerId\\);",
+                "\\$this->convertToNavMeshNode\\(\\$navmesh\\);",
             ]
         },
-        "@return_value": true,
-        "IntegerNegation": false,
-        "@sort": true,
-        "@unwrap": true,
-        "For_": true,
-        "Foreach_": true,
+        "Ternary": {
+            "ignore": [
+                "cs\\Core\\Player::serialize",
+            ],
+            ignoreSourceCodeByRegex: [
+                ".+rand\\(.+",
+            ],
+        },
     },
 }

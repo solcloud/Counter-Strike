@@ -28,7 +28,8 @@ class ShootTest extends BaseTestCase
             fn(Player $p) => $p->buyItem(BuyMenuItem::RIFLE_AK),
             $this->waitNTicks(RifleAk::equipReadyTimeMs),
             fn(Player $p) => $p->getSight()->lookVertical(-91),
-            fn(Player $p) => $p->attack(),
+            fn(Player $p) => $this->assertNull($p->attackSecondary()),
+            fn(Player $p) => $this->assertPlayerNotHit($p->attack()),
         ];
 
         $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
@@ -277,12 +278,22 @@ class ShootTest extends BaseTestCase
 
         $this->assertCount(2, $game->getAlivePlayers());
         $this->assertSame(-1, $game->getScore()->getPlayerStat(1)->getKills());
+        $this->assertSame(500, $game->getPlayer(1)->getMoney());
     }
 
     public function testDamageLowOnRangeMaxDamage(): void
     {
         $game = $this->createTestGame();
         $game->addPlayer(new Player(2, Color::ORANGE, true));
+
+        $bulletHitHeadShotsCount = 0;
+        $game->onEvents(function (array $events) use (&$bulletHitHeadShotsCount): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::BULLET_HIT_HEADSHOT) {
+                    $bulletHitHeadShotsCount++;
+                }
+            }
+        });
 
         $this->playPlayer($game, [
             fn(Player $p) => $p->setPosition(new Point(500)),
@@ -295,6 +306,7 @@ class ShootTest extends BaseTestCase
         ]);
 
         $this->assertSame(99, $game->getPlayer(2)->getHealth());
+        $this->assertSame(1, $bulletHitHeadShotsCount);
     }
 
 }

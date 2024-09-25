@@ -7,7 +7,6 @@ use cs\Core\Game;
 use cs\Core\GameException;
 use cs\Core\GameState;
 use cs\Core\Point;
-use cs\Core\Point2D;
 use cs\Core\Ramp;
 use cs\Core\Setting;
 use cs\Core\Wall;
@@ -248,8 +247,13 @@ class WallTest extends BaseTestCase
 
         $game->onTick(function (GameState $state) use ($numOfBoxes) {
             $state->getPlayer(1)->moveForward();
-            if ($state->getTickId() === $numOfBoxes) {
+            if ($state->getTickId() === $numOfBoxes + 1) {
                 $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionClone()->y);
+                $this->assertSame(Setting::playerObstacleOvercomeHeight() * $numOfBoxes, $state->getPlayer(1)->getPositionClone()->y);
+            }
+            if ($state->getTickId() === $numOfBoxes + 2) {
+                $this->assertLessThan(Setting::playerObstacleOvercomeHeight() * $numOfBoxes, $state->getPlayer(1)->getPositionClone()->y);
+                $this->assertSame(Setting::playerObstacleOvercomeHeight() * $numOfBoxes - Setting::fallAmountPerTick() - 1, $state->getPlayer(1)->getPositionClone()->y); // test for initial (one-shot) gravity bump
             }
         });
         $game->start();

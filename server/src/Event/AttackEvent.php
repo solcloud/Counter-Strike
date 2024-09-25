@@ -2,14 +2,10 @@
 
 namespace cs\Event;
 
-use cs\Core\Bullet;
-use cs\Core\GameException;
 use cs\Core\Point;
 use cs\Core\World;
 use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
-use cs\Weapon\AmmoBasedWeapon;
-use cs\Weapon\Knife;
 
 final class AttackEvent implements Attackable
 {
@@ -28,7 +24,7 @@ final class AttackEvent implements Attackable
 
     public function fire(): AttackResult
     {
-        $bullet = $this->createBullet();
+        $bullet = $this->item->createBullet();
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide, $this->origin->clone());
         $result = new AttackResult($bullet);
         $checkDistance = $bullet->getDistanceTraveled();
@@ -73,19 +69,6 @@ final class AttackEvent implements Attackable
         }
         $this->world->getBacktrack()->restoreState();
         return $result;
-    }
-
-    private function createBullet(): Bullet
-    {
-        if ($this->item instanceof AmmoBasedWeapon) {
-            return $this->item->createBullet();
-        }
-
-        if ($this->item instanceof Knife) {
-            return $this->item->createBullet();
-        }
-
-        GameException::notImplementedYet("No bullet for item: " . get_class($this->item)); // @codeCoverageIgnore
     }
 
     public function applyRecoil(float $offsetHorizontal, float $offsetVertical): void
