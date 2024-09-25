@@ -16,6 +16,7 @@ class GameFactory
         return new Game($properties);
     }
 
+    /** @infection-ignore-all */
     public static function createDebug(): Game
     {
         $properties = new GameProperty();

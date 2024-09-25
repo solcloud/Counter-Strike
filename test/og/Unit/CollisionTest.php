@@ -12,6 +12,16 @@ use Test\BaseTest;
 class CollisionTest extends BaseTest
 {
 
+    public function testPointWithCircle(): void
+    {
+        $this->assertTrue(Collision::pointWithCircle(10, 10, 10, 10, 1));
+        $this->assertTrue(Collision::pointWithCircle(11, 10, 10, 10, 1));
+        $this->assertTrue(Collision::pointWithCircle(10, 11, 10, 10, 1));
+
+        $this->assertFalse(Collision::pointWithCircle(10, 13, 10, 10, 2));
+        $this->assertFalse(Collision::pointWithCircle(13, 10, 10, 10, 2));
+    }
+
     public function testCircleWithPlaneFalse(): void
     {
         $radius = 2;
@@ -25,6 +35,7 @@ class CollisionTest extends BaseTest
             new Point2D(8, 4),
             new Point2D(8, 4),
             new Point2D(6, 6),
+            new Point2D(-1, 0),
         ];
         foreach ($circles as $circleCenter) {
             $this->assertFalse(Collision::circleWithPlane($circleCenter, $radius, $floor), "Circle: {$circleCenter} x Floor: {$floor}");
@@ -249,6 +260,11 @@ class CollisionTest extends BaseTest
     {
         $this->assertTrue(Collision::pointWithBoxBoundary(new Point(), new Point(-5, 0, -5), new Point(5, 4, 5)));
         $this->assertTrue(Collision::pointWithBoxBoundary(new Point(4, 2, 5), new Point(-5, 0, -5), new Point(5, 4, 5)));
+        $this->assertTrue(Collision::pointWithBoxBoundary(new Point(0, 1, 1), new Point(), new Point(1, 1, 1)));
+        $this->assertTrue(Collision::pointWithBoxBoundary(new Point(0, 1, 1), new Point(), new Point(1, 8, 1)));
+        $this->assertTrue(Collision::pointWithBoxBoundary(new Point(1, 1, 1), new Point(), new Point(1, 8, 1)));
+        $this->assertTrue(Collision::pointWithBoxBoundary(new Point(1, 1, 0), new Point(), new Point(1, 8, 1)));
+
         $this->assertFalse(Collision::pointWithBoxBoundary(new Point(-6), new Point(-5, 0, -5), new Point(5, 4, 5)));
         $this->assertFalse(Collision::pointWithBoxBoundary(new Point(4, 5, 2), new Point(-5, 0, -5), new Point(5, 4, 5)));
         $this->assertFalse(Collision::pointWithBoxBoundary(new Point(4, 2, 6), new Point(-5, 0, -5), new Point(5, 4, 5)));
@@ -256,35 +272,60 @@ class CollisionTest extends BaseTest
 
     public function testBoxWithBox(): void
     {
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5, 0, -5), new Point(5, 4, 5), new Point(1, 0, -1), new Point(3, 3, 1))
-        );
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,4,-1), new Point(3,7,1))
-        );
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,-2,-1), new Point(3,1,1))
-        );
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,2,-3), new Point(3,5,-1))
-        );
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(-3,3,2), new Point(-1,6,4))
-        );
-        $this->assertTrue(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,2,-7), new Point(3,5,-5))
-        );
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 0, -1), new Point(3, 3, 1),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 4, -1), new Point(3, 7, 1),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, -2, -1), new Point(3, 1, 1),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 2, -3), new Point(3, 5, -1),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(-3, 3, 2), new Point(-1, 6, 4),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 2, -7), new Point(3, 5, -5),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(5, 2, -7), new Point(6, 5, -5),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 2, 5), new Point(3, 5, -5),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, -2, 5), new Point(3, 0, -5),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(-6, 0, 5), new Point(-5, 2, -5),
+        ));
 
-        $this->assertFalse(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,5,2), new Point(3,8,4))
-        );
-        $this->assertFalse(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,2,-8), new Point(3,5,-6))
-        );
-        $this->assertFalse(
-            Collision::boxWithBox(new Point(-5,0,-5), new Point(5,4,5), new Point(1,-6,-5), new Point(3,-3,-3))
-        );
 
+        $this->assertFalse(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 5, 2), new Point(3, 8, 4),
+        ));
+        $this->assertFalse(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, 2, -8), new Point(3, 5, -6),
+        ));
+        $this->assertFalse(Collision::boxWithBox(
+            new Point(-5, 0, -5), new Point(5, 4, 5),
+            new Point(1, -6, -5), new Point(3, -3, -3),
+        ));
     }
 
 

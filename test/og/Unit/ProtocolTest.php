@@ -27,6 +27,13 @@ class ProtocolTest extends BaseTest
         }
     }
 
+    public function testInvalidCommandsWhenExtendingMaxCallPerTick(): void
+    {
+        $protocol = new Protocol\TextProtocol();
+        $this->assertSame([['attack']], $protocol->parsePlayerControlCommands(implode($protocol::separator, ['attack'])));
+        $this->assertSame([], $protocol->parsePlayerControlCommands(implode($protocol::separator, ['attack', 'attack'])));
+    }
+
     public function testTextProtocol(): void
     {
         $protocol = new Protocol\TextProtocol();

@@ -55,7 +55,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
         $this->ball = new BallCollider($this->world, $origin, $radius, $this->angleHorizontal, $this->angleVertical);
         $this->needsToLandOnFloor = !($this->item instanceof Flashbang || $this->item instanceof HighExplosive);
         $this->timeIncrement = 1 / $this->timeMsToTick(150); // fixme some good value or velocity or gravity :)
-        $this->tickMax = $this->getTickId() + $this->timeMsToTick($this->needsToLandOnFloor ? 99999 : 1200);
+        $this->tickMax = $this->getTickId() + $this->timeMsToTick($this->needsToLandOnFloor ? 30_000 : 1200);
     }
 
     private function makeEvent(Point $point, SoundType $type): Event
@@ -73,13 +73,13 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 
     private function finishLanding(Point $point): void
     {
-        if (!$this->needsToLandOnFloor) {
+        if ($this->needsToLandOnFloor === false) {
             $this->makeEvent($point, SoundType::GRENADE_LAND);
             $this->runOnCompleteHooks();
             return;
         }
 
-        if ($this->tickMax > 0) {
+        if ($this->tickMax > 0) { // @infection-ignore-all
             $point->addY(-$this->radius);
             $this->tickMax = 0;
         }

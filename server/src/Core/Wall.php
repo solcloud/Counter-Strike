@@ -28,11 +28,6 @@ class Wall extends Plane
         return ($this->widthOnXAxis ? $this->getStart()->z : $this->getStart()->x);
     }
 
-    public function getOther(): int
-    {
-        return ($this->widthOnXAxis ? $this->getStart()->x : $this->getStart()->z);
-    }
-
     public function isWidthOnXAxis(): bool
     {
         return $this->widthOnXAxis;

@@ -35,12 +35,12 @@ class GameProperty
 
     public function __set(string $name, mixed $value): void
     {
-        throw new GameException("Invalid field '{$name}' given");
+        GameException::invalid("Invalid field '{$name}' given");
     }
 
     public function __get(string $name): never
     {
-        throw new GameException("Invalid field '{$name}' given");
+        GameException::invalid("Invalid field '{$name}' given");
     }
 
     /**

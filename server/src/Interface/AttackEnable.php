@@ -2,6 +2,7 @@
 
 namespace cs\Interface;
 
+use cs\Core\Bullet;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemType;
@@ -20,5 +21,7 @@ interface AttackEnable {
     public function getType(): ItemType;
 
     public function getId(): int;
+
+    public function createBullet(): Bullet;
 
 }

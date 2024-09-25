@@ -16,8 +16,10 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemId;
+use cs\Enum\SoundType;
 use cs\Event\AttackResult;
 use cs\Event\KillEvent;
+use cs\Event\SoundEvent;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
@@ -144,6 +146,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(0, $result->getMoneyAward());
         $this->assertSame(1, $game->getRoundNumber());
         $this->assertTrue($player1->isAlive());
+        $this->assertSame(100 - 10 - 30, $player1->getArmorValue());
     }
 
     public function testM4KillPlayerInFourBulletsInChestWithNoKevlar(): void
@@ -390,6 +393,48 @@ class PlayerKillTest extends BaseTestCase
         ], $player2->getId());
     }
 
+    public function testArmorShooting(): void
+    {
+        $game = $this->createTestGame();
+        $p2 = new Player(2, Color::GREEN, false);
+        $game->addPlayer($p2);
+        $p1 = $game->getPlayer(1);
+
+        $p1->getSight()->look(-90, -10);
+        $p1->setPosition(new Point(500, 0, 500));
+
+        $p2->getSight()->look(-90, -90);
+        $p2->setPosition(new Point(300, 0, 500));
+        $p2->buyItem(BuyMenuItem::KEVLAR_BODY);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            function (Player $p) use ($p2) {
+                $this->assertSame(100, $p2->getHealth());
+                $this->assertSame(100, $p2->getArmorValue());
+
+                $result = $this->assertPlayerHit($p->attack());
+                $hits = $result->getHits();
+                $this->assertCount(2, $hits);
+
+                $bodyShot = $hits[0];
+                $this->assertInstanceOf(HitBox::class, $bodyShot);
+                $this->assertSame(HitBoxType::BACK, $bodyShot->getType());
+
+                $this->assertLessThan(100, $p2->getHealth());
+                $this->assertLessThan(100, $p2->getArmorValue());
+                $this->assertTrue($p->isAlive());
+                $this->assertTrue($p2->isAlive());
+            },
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(PistolGlock::recoilResetMs),
+            fn(Player $p) => $p->getSight()->look(-90, 0),
+            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            $this->endGame(),
+        ]);
+    }
+
     public function testPlayerHorizontalVerticalBullet(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
@@ -531,6 +576,8 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(3, $killEventsCount);
         $this->assertSame(3, $game->getScore()->getScoreDefenders());
         $this->assertSame(3 + 1, $game->getRoundNumber());
+        $this->assertSame(6500, $p1->getMoney());
+        $this->assertSame(11450, $player2->getMoney());
     }
 
     public function testPlayerCannotKillDeadPlayer(): void

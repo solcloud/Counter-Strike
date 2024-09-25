@@ -2,6 +2,7 @@
 
 namespace cs\Equipment;
 
+use cs\Core\Bullet;
 use cs\Core\GameException;
 use cs\Enum\ArmorType;
 use cs\Enum\HitBoxType;
@@ -36,7 +37,7 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
 
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
-        GameException::invalid('Should not be called');
+        GameException::invalid();
     }
 
     public function getKillAward(): int
@@ -52,6 +53,11 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
     public function getSpeedMultiplier(): float
     {
         return ($this->primaryAttack ? 1.0 : 0.5);
+    }
+
+    public function createBullet(): Bullet
+    {
+        GameException::invalid(get_class($this));
     }
 
 }

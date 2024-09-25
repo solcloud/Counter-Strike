@@ -28,7 +28,7 @@ final class Server
     private int $countDefenders = 0;
     private int $blockListMax = 500;
     private int $serverLag = 0;
-    private int $tickNanoSeconds;
+    private readonly int $tickNanoSeconds;
 
     /** @var array<string,int> [ipAddress-port => playerId] */
     private array $loggedPlayers = [];
@@ -93,6 +93,7 @@ final class Server
         $this->sendGameStateToClients();
 
         $tickId = 0;
+        $noSleep = ($this->tickNanoSeconds === 0); // no sleep inside tests
         $nextNsGoal = hrtime(true) + $this->tickNanoSeconds;
 
         while (true) {
@@ -105,15 +106,20 @@ final class Server
             $tickId++;
 
             // Sleep time
+            if ($noSleep) {
+                continue;
+            }
+            // @codeCoverageIgnoreStart
             $nsCurrent = hrtime(true);
             $nsDelta = $nextNsGoal - $nsCurrent;
             $nextNsGoal += $this->tickNanoSeconds;
             if ($nsDelta > 1024) {
-                time_nanosleep(0, $nsDelta); // @codeCoverageIgnore
+                time_nanosleep(0, $nsDelta);
             } else {
                 $this->log('Server lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
                 $this->serverLag++;
             }
+            // @codeCoverageIgnoreEnd
         }
 
         return $tickId;
@@ -138,7 +144,7 @@ final class Server
     {
         $playersRequest = [];
         for ($i = 1; $i <= $this->setting->playersMax * 2; $i++) {
-            if (!$this->pollClient($address, $port, $msg)) {
+            if (!$this->pollClient($address, $port, $msg)) { // @infection-ignore-all
                 continue;
             }
 

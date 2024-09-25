@@ -45,8 +45,8 @@ class Score
         $this->scoreAttackers = $this->scoreDefenders;
         $this->scoreDefenders = $attackerScore;
 
-        $this->lossBonusAttackers = 1;
-        $this->lossBonusDefenders = 1;
+        $this->lossBonusAttackers = 0;
+        $this->lossBonusDefenders = 0;
         $this->lastRoundAttackerWins = null;
     }
 
@@ -67,20 +67,9 @@ class Score
                 $this->lossBonusAttackers++;
             }
         } else {
-            if ($this->lastRoundAttackerWins === true && $attackersWins) {
-                $this->lossBonusDefenders++;
-            }
-            if ($this->lastRoundAttackerWins === true && !$attackersWins) {
-                $this->lossBonusDefenders = 0;
-                $this->lossBonusAttackers = 1;
-            }
-            if ($this->lastRoundAttackerWins === false && !$attackersWins) {
-                $this->lossBonusAttackers++;
-            }
-            if ($this->lastRoundAttackerWins === false && $attackersWins) {
-                $this->lossBonusDefenders = 1;
-                $this->lossBonusAttackers = 0;
-            }
+            $attackersOnStreak = ($attackersWins && $this->lastRoundAttackerWins);
+            $this->lossBonusDefenders = $attackersOnStreak ? $this->lossBonusDefenders + 1 : 0;
+            $this->lossBonusAttackers = $attackersOnStreak ? 0 : $this->lossBonusAttackers + 1;
         }
 
         if ($this->secondHalfScore !== []) {
@@ -128,7 +117,10 @@ class Score
 
     public function getMoneyLossBonus(bool $isAttacker): int
     {
-        return $this->lossBonuses[min(count($this->lossBonuses) - 1, $this->getNumberOfLossRoundsInRow($isAttacker))];
+        return $this->lossBonuses[min(
+            count($this->lossBonuses) - 1,
+            max(0, $this->getNumberOfLossRoundsInRow($isAttacker) - 1),
+        )];
     }
 
     public function getNumberOfLossRoundsInRow(bool $isAttacker): int

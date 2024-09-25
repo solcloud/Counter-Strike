@@ -8,7 +8,9 @@ use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
+use cs\Enum\SoundType;
 use cs\Equipment\HighExplosive;
+use cs\Event\SoundEvent;
 use cs\Weapon\PistolGlock;
 use Test\BaseTestCase;
 
@@ -18,7 +20,7 @@ class HighExplosiveGrenadeTest extends BaseTestCase
     public function testOwnDamage(): void
     {
         $game = $this->createNoPauseGame();
-        $game->getPlayer(1)->setPosition(new Point(500,0, 500));
+        $game->getPlayer(1)->setPosition(new Point(500, 0, 500));
         $health = $game->getPlayer(1)->getHealth();
 
         $this->playPlayer($game, [
@@ -174,11 +176,40 @@ class HighExplosiveGrenadeTest extends BaseTestCase
         $this->assertSame(1, $game->getRoundNumber());
         $this->assertCount(3, $game->getAlivePlayers());
         $this->assertLessThan(100, $health);
-        $this->assertLessThan(100,  $game->getPlayer(2)->getHealth());
-        $this->assertLessThan(100,  $game->getPlayer(3)->getHealth());
-        $this->assertGreaterThan($health,  $game->getPlayer(2)->getHealth());
+        $this->assertLessThan(100, $game->getPlayer(2)->getHealth());
+        $this->assertLessThan(100, $game->getPlayer(3)->getHealth());
+        $this->assertGreaterThan($health, $game->getPlayer(2)->getHealth());
         $health = $game->getPlayer(2)->getHealth();
-        $this->assertGreaterThan($health,  $game->getPlayer(3)->getHealth());
+        $this->assertGreaterThan($health, $game->getPlayer(3)->getHealth());
+    }
+
+    public function testExplodeMidAir(): void
+    {
+        $game = $this->createNoPauseGame();
+
+        $landed = false;
+        $game->onEvents(function (array $events) use (&$landed): void {
+            foreach ($events as $event) {
+                if ($event instanceof SoundEvent && $event->type === SoundType::GRENADE_LAND) {
+                    $landed = true;
+                    $this->assertGreaterThan(HighExplosive::boundingRadius * 3, $event->position->y);
+                }
+            }
+        });
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(45, 90),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_HE)),
+            $this->waitNTicks(HighExplosive::equipReadyTimeMs),
+            fn(Player $p) => $this->assertInstanceOf(HighExplosive::class, $p->getEquippedItem()),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(1200),
+            $this->endGame(),
+        ]);
+
+        $this->assertTrue($landed);
+        $this->assertSame(1, $game->getRoundNumber());
+        $this->assertLessThan(100, $game->getPlayer(1)->getHealth());
     }
 
 }

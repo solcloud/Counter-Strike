@@ -451,19 +451,18 @@ class Game
 
     private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int
     {
-        $amount = 0;
         $attackersWins = $roundEndEvent->attackersWins;
 
         // Attacker side checks
         if ($player->isPlayingOnAttackerSide()) {
-            $amount += $this->bombPlanted ? 800 : 0;
+            $amount = $this->bombPlanted ? 800 : 0;
             if ($attackersWins) {
                 $amount += match ($roundEndEvent->reason) {
                     RoundEndReason::ALL_ENEMIES_ELIMINATED => 3250,
                     RoundEndReason::BOMB_EXPLODED => 3500,
                     RoundEndReason::TIME_RUNS_OUT, RoundEndReason::BOMB_DEFUSED => GameException::invalid((string)$roundEndEvent->reason->value), // @codeCoverageIgnore
                 };
-            } elseif (!$player->isAlive()) {
+            } elseif ($this->bombPlanted || !$player->isAlive()) {
                 $amount += $this->score->getMoneyLossBonus(true);
             }
 
@@ -472,16 +471,14 @@ class Game
 
         // Defender side checks
         if (!$attackersWins) {
-            $amount += match ($roundEndEvent->reason) {
+            return match ($roundEndEvent->reason) {
                 RoundEndReason::ALL_ENEMIES_ELIMINATED, RoundEndReason::TIME_RUNS_OUT => 3250,
                 RoundEndReason::BOMB_DEFUSED => 3500,
                 RoundEndReason::BOMB_EXPLODED => GameException::invalid((string)$roundEndEvent->reason->value), // @codeCoverageIgnore
             };
-        } else {
-            $amount += $this->score->getMoneyLossBonus(false);
         }
 
-        return $amount;
+        return $this->score->getMoneyLossBonus(false);
     }
 
     public function getState(): GameState

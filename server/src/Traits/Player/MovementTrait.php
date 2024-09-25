@@ -53,6 +53,11 @@ trait MovementTrait
         return $this->position->clone();
     }
 
+    public function getCentrePointClone(): Point
+    {
+        return $this->getPositionClone()->addY((int) ceil($this->headHeight / 2));
+    }
+
     public function getSightPositionClone(): Point
     {
         return $this->position->clone()->addY($this->getSightHeight());
@@ -225,16 +230,14 @@ trait MovementTrait
                 break;
             }
 
-            $target->setFrom($candidate);
             if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $target, $this->getBoundingRadius())) {
                 $this->setActiveFloor(null);
             }
             if (!$looseFloor && !$this->activeFloor && !$this->isJumping()) { // do initial (one-shot) gravity bump
-                $newY = $this->calculateGravity($target, 1);
-                $candidate->setY($newY);
-                $target->setY($newY);
+                $candidate->setY($this->calculateGravity($candidate, 1));
                 $looseFloor = true;
             }
+            $target->setFrom($candidate);
         }
 
         if ($this->isRunning() && !$this->isCrouching() && !$this->isFlying() && !$orig->equals($target)) {
