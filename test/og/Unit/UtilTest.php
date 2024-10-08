@@ -13,6 +13,12 @@ use Test\BaseTest;
 class UtilTest extends BaseTest
 {
 
+    public function testAssertionsEnabled(): void
+    {
+        $this->expectException('\AssertionError');
+        assert(false); // @phpstan-ignore function.impossibleType
+    }
+
     public function testNegativeTime(): void
     {
         $this->expectExceptionMessage('Negative time given');
@@ -186,13 +192,7 @@ class UtilTest extends BaseTest
         $end = $start->clone();
         $end->addFromArray(Util::movementXYZ($h, $v, $distance));
         [$actualH, $actualV] = Util::worldAngle($end, $start);
-        if (is_float($actualH)) {
-            $actualH = round($actualH);
-        }
-        if (is_float($actualV)) {
-            $actualV = round($actualV);
-        }
-        $this->assertSame([$h, $v], [$actualH, $actualV], "{$start}, angle ({$h},{$v})");
+        $this->assertSame([$h, $v], [$actualH === null ? null : round($actualH), round($actualV)], "{$start}, angle ({$h},{$v})");
     }
 
     public function testAngleNormalize(): void
@@ -252,8 +252,8 @@ class UtilTest extends BaseTest
             'x' => 2,
             'y' => 4,
         ], $point->to2D('zy')->add(-1, 2)->toArray());
-        $point->setFromArray([1,3,2]);
-        $this->assertTrue((new Point(1,3,2))->equals($point));
+        $point->setFromArray([1, 3, 2]);
+        $this->assertTrue((new Point(1, 3, 2))->equals($point));
     }
 
     public function testGamePropertyUnknownFieldGet(): void

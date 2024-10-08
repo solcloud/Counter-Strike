@@ -66,7 +66,6 @@ class MolotovGrenadeTest extends BaseTestCase
                     $this->assertNull($event->getPlayerId());
                     $this->assertNull($event->getItem());
                     $eventSerialized = $event->serialize();
-                    $this->assertIsArray($eventSerialized);
                     $this->assertIsArray($eventSerialized['extra']);
                     $this->assertNotEmpty($eventSerialized['extra']['id'] ?? false);
                     $p->setPosition(new Point(500, 0, 500));
@@ -355,22 +354,15 @@ class MolotovGrenadeTest extends BaseTestCase
             fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_MOLOTOV)),
             $this->waitNTicks(Molotov::equipReadyTimeMs),
             $this->waitNTicks((int)ceil(Smoke::MAX_TIME_MS / 3)),
-            function () use ($game) {
-                $this->assertFalse(
-                    $game->getWorld()->flameCanIgnite(new Column($game->getPlayer(1)->getPositionClone(), 2, 2))
-                );
-                $this->assertFalse(
-                    $game->getWorld()->flameCanIgnite(new Column($game->getPlayer(1)->getPositionClone()->setY(Smoke::MAX_HEIGHT - 100), 2, 2))
-                );
-                $this->assertFalse(
-                    $game->getWorld()->flameCanIgnite(new Column($game->getPlayer(1)->getPositionClone()->setY(Smoke::MAX_HEIGHT), 2, 2))
-                );
-                $this->assertTrue(
-                    $game->getWorld()->flameCanIgnite(new Column($game->getPlayer(1)->getPositionClone()->setY(Smoke::MAX_HEIGHT + 2), 2, 2))
-                );
-                $this->assertFalse(
-                    $game->getWorld()->flameCanIgnite(new Column($game->getPlayer(1)->getPositionClone()->setY(Smoke::MAX_CORNER_HEIGHT), 2, 2))
-                );
+            function (Player $p) use ($game) {
+                $pp = $p->getPositionClone();
+                $this->assertFalse($game->getWorld()->flameCanIgnite(new Column($pp->clone(), 2, 2)));
+                $this->assertFalse($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_HEIGHT - 100), 2, 2)));
+                $this->assertFalse($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_HEIGHT), 2, 2)));
+                $this->assertTrue($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_HEIGHT + 2), 2, 2)));
+                $this->assertFalse($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_CORNER_HEIGHT), 2, 2)));
+                $this->assertFalse($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_CORNER_HEIGHT)->addZ(-200), 2, 2)));
+                $this->assertTrue($game->getWorld()->flameCanIgnite(new Column($pp->clone()->setY(Smoke::MAX_HEIGHT)->addZ(-200), 2, 2)));
             },
             fn(Player $p) => $p->getSight()->look(0, -90),
             fn(Player $p) => $this->assertNotNull($p->attack()),

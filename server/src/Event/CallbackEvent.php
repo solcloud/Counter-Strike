@@ -6,7 +6,8 @@ use Closure;
 
 class CallbackEvent extends Event
 {
-    public function __construct(private Closure $callback)
+    /** @param Closure(static,int):void $callback */
+    public function __construct(private readonly Closure $callback)
     {
     }
 

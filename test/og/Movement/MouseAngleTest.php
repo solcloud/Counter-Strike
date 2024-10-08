@@ -11,6 +11,7 @@ use Test\BaseTestCase;
 
 class MouseAngleTest extends BaseTestCase
 {
+    /** @param Closure(Player):mixed $moveCallback */
     private function runAngle(int $angle, Closure $moveCallback, Point $startPos): Point
     {
         $playerCommands = [

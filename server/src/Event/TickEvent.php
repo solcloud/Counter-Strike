@@ -6,13 +6,10 @@ use Closure;
 
 class TickEvent extends Event
 {
-    protected ?Closure $callback = null;
-    protected int $maxTickCount = 1;
 
-    public function __construct(?Closure $callback = null, int $maxTickCount = 1)
+    /** @param ?Closure(static,int):void $callback */
+    public function __construct(protected ?Closure $callback = null, protected int $maxTickCount = 1)
     {
-        $this->callback = $callback;
-        $this->maxTickCount = $maxTickCount;
     }
 
     final public function process(int $tick): void

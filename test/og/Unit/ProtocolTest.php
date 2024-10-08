@@ -37,6 +37,8 @@ class ProtocolTest extends BaseTest
     public function testTextProtocol(): void
     {
         $protocol = new Protocol\TextProtocol();
+        $this->assertGreaterThan(10, $protocol->getRequestMaxSizeBytes());
+        $this->assertLessThan(2 ** 13, $protocol->getRequestMaxSizeBytes());
 
         $this->assertSame(
             [

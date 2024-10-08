@@ -9,6 +9,7 @@ final class CrouchEvent extends TickEvent
 {
     public readonly int $moveOffset;
 
+    /** @param Closure(static,int):void $callback */
     public function __construct(public bool $directionDown, Closure $callback)
     {
         parent::__construct($callback, Setting::tickCountCrouch());

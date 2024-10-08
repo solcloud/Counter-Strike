@@ -212,8 +212,13 @@ final class Player
 
     public function lowerHealth(int $healthDamage): void
     {
+        assert($healthDamage >= 0);
+        if ($healthDamage <= 0) {
+            return;
+        }
+
         $this->addEvent(new TimeoutEvent(null, 70), $this->eventIdShotSlowdown);
-        $this->health -= abs($healthDamage);
+        $this->health -= $healthDamage;
         if ($this->health <= 0) {
             $this->health = 0;
             $this->onPlayerDied();

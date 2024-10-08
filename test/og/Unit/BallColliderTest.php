@@ -29,6 +29,7 @@ class BallColliderTest extends BaseTest
         $resolutionAngleVertical = 90.0;
         /////
 
+        $world = $this->createWorld();
         $ball = $this->createBall($start, $radius, $world, $angleHorizontal, $angleVertical);
         $world->addBox(new Box(new Point(9), 1, 1, 1));
         $world->addBox(new Box(new Point(10), 1, 1, 1));
@@ -50,6 +51,7 @@ class BallColliderTest extends BaseTest
         $extreme = $start->clone();
         /////
 
+        $world = $this->createWorld();
         $ball = $this->createBall($start, $radius, $world, $angleHorizontal, $angleVertical);
         $this->assertPositionSame($extreme, $ball->getLastExtremePosition());
         $this->assertFalse($ball->hasCollision($start->addPart(-2, 3, 0)));
@@ -152,9 +154,8 @@ class BallColliderTest extends BaseTest
         $this->fail('No collision detected');
     }
 
-    private function createBall(Point $start, int $radius, ?World &$world, float $angleHorizontal, float $angleVertical): BallCollider
+    private function createBall(Point $start, int $radius, World $world, float $angleHorizontal, float $angleVertical): BallCollider
     {
-        $world = $world ?? $this->createWorld();
         return new BallCollider($world, $start, $radius, $angleHorizontal, $angleVertical);
     }
 

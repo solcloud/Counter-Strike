@@ -4,7 +4,7 @@ namespace cs\Event;
 
 use cs\Enum\GameOverReason;
 
-final class GameOverEvent extends TickEvent
+final class GameOverEvent extends NoTickEvent
 {
 
     public function __construct(public readonly GameOverReason $reason)

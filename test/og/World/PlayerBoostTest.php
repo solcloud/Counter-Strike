@@ -149,6 +149,8 @@ class PlayerBoostTest extends BaseTestCase
         $this->assertSame(0, $player1->getPositionClone()->y);
         $this->assertPositionSame($p2pos, $game->getPlayer(2)->getPositionClone());
         $this->assertTrue($player2->canJump());
+        $this->assertTrue($player1->canJump());
+        $this->assertFalse($player1->isJumping());
     }
 
 }

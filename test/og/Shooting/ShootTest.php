@@ -29,6 +29,7 @@ class ShootTest extends BaseTestCase
             $this->waitNTicks(RifleAk::equipReadyTimeMs),
             fn(Player $p) => $p->getSight()->lookVertical(-91),
             fn(Player $p) => $this->assertNull($p->attackSecondary()),
+            fn(Player $p) => $this->assertSame(0, $p->getEquippedItem()->getScopeLevel()),
             fn(Player $p) => $this->assertPlayerNotHit($p->attack()),
         ];
 

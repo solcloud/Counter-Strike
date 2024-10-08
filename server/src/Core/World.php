@@ -719,9 +719,7 @@ final class World
 
     private function playerDiedToFlame(Player $playerCulprit, Player $playerDead, Flammable $item): void
     {
-        if (false === ($item instanceof Grenade)) {
-            throw new GameException("New flammable non grenade type?"); // @codeCoverageIgnore
-        }
+        assert($item instanceof Grenade, "New flammable non grenade type?");
         $this->game->playerGrenadeKilledEvent($playerCulprit, $playerDead, $item);
     }
 

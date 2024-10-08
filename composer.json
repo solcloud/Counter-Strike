@@ -17,6 +17,10 @@
             "@composer dumpautoload --optimize --classmap-authoritative",
             "@stan",
             "@unit"
+        ],
+        "checkfull": [
+            "@check",
+            "@infection"
         ]
     },
     "require": {

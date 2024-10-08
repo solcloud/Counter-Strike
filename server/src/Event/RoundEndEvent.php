@@ -11,6 +11,7 @@ final class RoundEndEvent extends TickEvent
 
     public function __construct(private Game $game, public readonly bool $attackersWins, public readonly RoundEndReason $reason)
     {
+        parent::__construct();
         $this->roundNumberEnded = $game->getRoundNumber();
     }
 

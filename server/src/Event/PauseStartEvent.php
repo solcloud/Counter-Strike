@@ -9,6 +9,7 @@ use cs\Enum\PauseReason;
 final class PauseStartEvent extends TimeoutEvent
 {
 
+    /** @param Closure(static,int):void $callback */
     public function __construct(private Game $game, private PauseReason $reason, Closure $callback, int $timeoutMs)
     {
         parent::__construct($callback, $timeoutMs);

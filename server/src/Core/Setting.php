@@ -17,7 +17,7 @@ final class Setting
         'flyingMovementSpeedMultiplier' => 0.8,
         'throwSpeed'                    => 40,
 
-        'playerVelocity'               => 0,
+        'playerVelocity'               => 100,
         'playerHeadRadius'             => 10,
         'playerBoundingRadius'         => 60,
         'playerJumpHeight'             => 150,
@@ -52,6 +52,8 @@ final class Setting
      */
     private static function fixBackwardCompatible(array &$constants): void
     {
+        // BC code
+        $constants['playerVelocity'] = ($constants['playerVelocity'] ?? 0);
         foreach (self::defaultConstant as $key => $defaultValue) {
             if (isset($constants[$key])) {
                 continue;

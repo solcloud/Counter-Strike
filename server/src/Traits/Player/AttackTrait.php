@@ -60,13 +60,6 @@ trait AttackTrait
     public function attackSecondary(): ?AttackResult
     {
         $item = $this->getEquippedItem();
-        if ($item instanceof ScopeItem) {
-            $item->scope();
-            return null;
-        }
-        if (!($item instanceof AttackEnable)) {
-            return null; // @codeCoverageIgnore
-        }
 
         if ($item instanceof Knife || $item instanceof Grenade) {
             $result = $item->attackSecondary($this->createAttackEvent($item));
@@ -75,6 +68,13 @@ trait AttackTrait
                 $this->world->makeSound($soundEvent->setPlayer($this)->setItem($item));
                 return $this->processAttackResult($result);
             }
+
+            return null;
+        }
+
+        if ($item instanceof ScopeItem) {
+            $item->scope();
+            return null;
         }
 
         return null;
@@ -165,7 +165,7 @@ trait AttackTrait
     public function reload(): void
     {
         $item = $this->getEquippedItem();
-        if (!($item instanceof Reloadable)) {
+        if (!($item instanceof Reloadable)) { // @infection-ignore-all
             return;
         }
 

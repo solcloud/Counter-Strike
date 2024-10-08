@@ -5,7 +5,9 @@ namespace Test;
 use Closure;
 use cs\Core\Game;
 use cs\Core\GameException;
+use cs\Core\GameState;
 use cs\Core\Setting;
+use cs\Event\Event;
 use cs\Map\TestMap;
 use cs\Net\Protocol\TextProtocol;
 
@@ -15,8 +17,11 @@ use cs\Net\Protocol\TextProtocol;
 class TestGame extends Game
 {
     private int $tickMax = 1;
+    /** @var ?Closure(GameState):void */
     private ?Closure $onTickCallback = null;
+    /** @var ?Closure(GameState):void */
     private ?Closure $afterTickCallback = null;
+    /** @var ?Closure(non-empty-list<Event>):void */
     private ?Closure $onEventsCallback = null;
     /** @var array<int,mixed> */
     private array $gameStates = [];
@@ -58,7 +63,7 @@ class TestGame extends Game
     }
 
     /**
-     * @param Closure $callback function(GameState $state):void {}
+     * @param Closure(GameState):void $callback function(GameState $state):void {}
      */
     public function onTick(Closure $callback): void
     {
@@ -66,7 +71,7 @@ class TestGame extends Game
     }
 
     /**
-     * @param Closure $callback function(GameState $state):void {}
+     * @param Closure(GameState):void $callback function(GameState $state):void {}
      */
     public function onAfterTick(Closure $callback): void
     {
@@ -74,7 +79,7 @@ class TestGame extends Game
     }
 
     /**
-     * @param Closure $callback function(array $events):void {foreach($events as $event){}}
+     * @param Closure(non-empty-list<Event>):void $callback function(array $events):void {foreach($events as $event){}}
      */
     public function onEvents(Closure $callback): void
     {
