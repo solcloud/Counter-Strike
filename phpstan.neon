@@ -8,3 +8,4 @@ parameters:
         - server/src/
         - test/
     level: max
+    checkMissingCallableSignature: true

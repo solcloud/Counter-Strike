@@ -17,7 +17,6 @@
         "@default": true,
         "@conditional_boundary": false,
         "@conditional_negotiation": false,
-        "Break_": false,
         "CastInt": false,
         "Continue_": false,
         "DecrementInteger": false,
@@ -25,20 +24,14 @@
         "IfNegation": false,
         "Increment": false,
         "IncrementInteger": false,
-        "InstanceOf_": false,
-        "IntegerNegation": false,
         "LogicalAnd": false,
         "LogicalAndAllSubExprNegation": false,
-        "LogicalAndNegation": false,
-        "LogicalAndSingleSubExprNegation": false,
-        "LogicalOrAllSubExprNegation": false,
         "LogicalOr": false,
+        "LogicalOrAllSubExprNegation": false,
         "Minus": false,
         "Modulus": false,
-        "MulEqual": false,
         "Multiplication": false,
         "Plus": false,
-        "PlusEqual": false,
         "RoundingFamily": false,
         "TrueValue": false,
         "ArrayItem": {
@@ -51,6 +44,11 @@
                 "cs\\Event\\*::serialize",
             ],
         },
+        "Break_": {
+            "ignore": [
+                "cs\\Traits\\Player\\JumpTrait::jump",
+            ],
+        },
         "Coalesce": {
             "ignoreSourceCodeByRegex": [
                 ".+\\(\\$skipPlayerIds\\[\\$playerId\\].+",
@@ -58,8 +56,18 @@
             ],
         },
         "Division": {
-            ignoreSourceCodeByRegex: [
+            "ignoreSourceCodeByRegex": [
                 ".+rand\\(.+",
+            ],
+        },
+        "InstanceOf_": {
+            "ignoreSourceCodeByRegex": [
+                "if\\s*\\(\\$this->ball->getResolutionAngleVertical\\(\\) > 0 && \\(.+",
+            ],
+        },
+        "LogicalAndNegation": {
+            "ignoreSourceCodeByRegex": [
+                "if\\s*\\(\\$count > 10 && \\$count % 2 === 0\\)\\s\\{",
             ],
         },
         "MatchArmRemoval": {
@@ -80,13 +88,13 @@
                 "\\$this->addSoundEvent\\(.+\\);",
                 "\\$bullet->addPlayerIdSkip\\(\\$playerId\\);",
                 "\\$this->convertToNavMeshNode\\(\\$navmesh\\);",
-            ]
+            ],
         },
         "Ternary": {
             "ignore": [
                 "cs\\Core\\Player::serialize",
             ],
-            ignoreSourceCodeByRegex: [
+            "ignoreSourceCodeByRegex": [
                 ".+rand\\(.+",
             ],
         },

@@ -19,6 +19,7 @@ final class SoundEvent extends TickEvent
 
     public function __construct(public readonly Point $position, public readonly SoundType $type)
     {
+        parent::__construct();
     }
 
     public function setItem(?Item $item): self

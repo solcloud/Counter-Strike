@@ -216,6 +216,7 @@ class BombTest extends BaseTestCase
         $score = $game->getScore()->toArray();
         $history = $score['history'] ?? false;
         $this->assertIsArray($history);
+        $this->assertIsArray($history[1] ?? false);
         $this->assertSame(RoundEndReason::BOMB_EXPLODED->value, $history[1]['reason'] ?? false);
         $this->assertSame([0, 1], $score['score'] ?? false);
         $this->assertSame([0, 1], $score['firstHalfScore'] ?? false);

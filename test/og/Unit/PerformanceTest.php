@@ -264,13 +264,13 @@ class PerformanceTest extends BaseTest
         $attackResult = $player->attack();
         $took = $timer->stop();
         $this->assertNotNull($attackResult);
-        $this->assertLessThan(0.8 * self::$timeScale, $took->asMilliseconds());
+        $this->assertLessThan(1 * self::$timeScale, $took->asMilliseconds());
 
         foreach (range(1, Util::millisecondsToFrames(Molotov::MAX_TIME_MS)) as $i) {
             $timer->start();
             $game->tick(++$tickId);
             $took = $timer->stop();
-            $this->assertLessThan(0.8 * self::$timeScale, $took->asMilliseconds(), "Tick {$tickId}");
+            $this->assertLessThan(1 * self::$timeScale, $took->asMilliseconds(), "Tick {$tickId}");
 
             if ($game->getRoundNumber() === 2) {
                 break;

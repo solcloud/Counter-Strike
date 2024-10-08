@@ -20,12 +20,15 @@ class KnifeAttackTest extends BaseTestCase
         $game = $this->createNoPauseGame();
         $this->playPlayer($game, [
             $this->waitNTicks(Knife::equipReadyTimeMs) + 1,
-            function () use ($game) {
-                $knife = $game->getPlayer(1)->getEquippedItem();
+            function (Player $p) use ($game) {
+                $knife = $p->getEquippedItem();
                 $this->assertInstanceOf(Knife::class, $knife);
+                $p->reload();
                 $this->assertTrue($knife->canAttack($game->getTickId()));
                 $this->assertTrue($game->getWorld()->canAttack($game->getPlayer(1)));
-                $attack = $game->getPlayer(1)->attack();
+                $attack = $p->attack();
+                $this->assertNull($p->attack());
+                $this->assertNull($p->attackSecondary());
                 $this->assertInstanceOf(AttackResult::class, $attack);
                 $bullet = $attack->getBullet();
                 $this->assertSame(Knife::stabMaxDistance, $bullet->getDistanceTraveled());
@@ -34,10 +37,10 @@ class KnifeAttackTest extends BaseTestCase
                 $this->assertSame(0, $attack->getMoneyAward());
                 $this->assertCount(0, $attack->getHits());
             },
-            function () use ($game) {
-                $knife = $game->getPlayer(1)->getEquippedItem();
+            function (Player $p) use ($game) {
+                $knife = $p->getEquippedItem();
                 $this->assertFalse($knife->canAttack($game->getTickId()));
-                $this->assertNull($game->getPlayer(1)->attack());
+                $this->assertNull($p->attack());
             },
             $this->endGame(),
         ]);

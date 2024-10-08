@@ -47,7 +47,8 @@ class Bullet
 
     public function lowerDamage(int $amount): void
     {
-        $this->damage -= abs($amount);
+        assert($amount >= 0);
+        $this->damage -= $amount;
     }
 
     public function getDamage(): int

@@ -302,15 +302,19 @@ class CollisionTest extends BaseTest
         ));
         $this->assertTrue(Collision::boxWithBox(
             new Point(-5, 0, -5), new Point(5, 4, 5),
-            new Point(1, 2, 5), new Point(3, 5, -5),
+            new Point(1, 2, -5), new Point(3, 5, 5),
         ));
         $this->assertTrue(Collision::boxWithBox(
             new Point(-5, 0, -5), new Point(5, 4, 5),
-            new Point(1, -2, 5), new Point(3, 0, -5),
+            new Point(1, -2, -5), new Point(3, 0, 5),
         ));
         $this->assertTrue(Collision::boxWithBox(
             new Point(-5, 0, -5), new Point(5, 4, 5),
-            new Point(-6, 0, 5), new Point(-5, 2, -5),
+            new Point(-6, 0, -5), new Point(-5, 2, 5),
+        ));
+        $this->assertTrue(Collision::boxWithBox(
+            new Point(2, 0, 1), new Point(5, 4, 5),
+            new Point(-1, -1, 5), new Point(2, 2, 5),
         ));
 
 

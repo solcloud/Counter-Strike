@@ -10,7 +10,7 @@ abstract class Event implements NetSerializable
 {
     protected int $tickCount = 0;
     public int $customId = 0;
-    /** @var Closure[] function(Event $event):void{} */
+    /** @var list<Closure(static):void> function(Event $event):void{} */
     public array $onComplete = [];
 
     abstract public function process(int $tick): void;

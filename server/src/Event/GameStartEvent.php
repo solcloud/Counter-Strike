@@ -6,13 +6,13 @@ use cs\Core\GameProperty;
 use cs\Core\Player;
 use cs\Net\ServerSetting;
 
-final class GameStartEvent extends TickEvent
+final class GameStartEvent extends NoTickEvent
 {
 
     public function __construct(
-        private Player        $player,
-        private ServerSetting $setting,
-        private GameProperty  $gameSetting,
+        private readonly Player        $player,
+        private readonly ServerSetting $setting,
+        private readonly GameProperty  $gameSetting,
     )
     {
     }

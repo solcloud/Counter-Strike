@@ -14,6 +14,7 @@ final class KillEvent extends TickEvent
         private bool   $headShot,
     )
     {
+        parent::__construct();
     }
 
     public function getPlayerDead(): Player

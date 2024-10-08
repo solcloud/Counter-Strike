@@ -179,6 +179,10 @@ class Collision
 
     public static function pointWithBoxBoundary(Point $point, Point $boxMin, Point $boxMax): bool
     {
+        assert($boxMin->x <= $boxMax->x);
+        assert($boxMin->y <= $boxMax->y);
+        assert($boxMin->z <= $boxMax->z);
+
         if ($point->y > $boxMax->y || $point->y < $boxMin->y) {
             return false;
         }
@@ -194,20 +198,24 @@ class Collision
 
     public static function boxWithBox(Point $boundaryAMin, Point $boundaryAMax, Point $boundaryBMin, Point $boundaryBMax): bool
     {
+        assert($boundaryAMin->x <= $boundaryAMax->x);
+        assert($boundaryAMin->y <= $boundaryAMax->y);
+        assert($boundaryAMin->z <= $boundaryAMax->z);
+
+        assert($boundaryBMin->x <= $boundaryBMax->x);
+        assert($boundaryBMin->y <= $boundaryBMax->y);
+        assert($boundaryBMin->z <= $boundaryBMax->z);
+
+        if ($boundaryAMin->x > $boundaryBMax->x || $boundaryBMin->x > $boundaryAMax->x) {
+            return false;
+        }
         if ($boundaryAMin->y > $boundaryBMax->y || $boundaryBMin->y > $boundaryAMax->y) {
             return false;
         }
-
-        if (
-            $boundaryAMax->x >= $boundaryBMin->x
-            && $boundaryAMin->x <= $boundaryBMax->x
-            && $boundaryAMax->z >= $boundaryBMin->z
-            && $boundaryAMin->z <= $boundaryBMax->z
-        ) {
-            return true;
+        if ($boundaryAMin->z > $boundaryBMax->z || $boundaryBMin->z > $boundaryAMax->z) {
+            return false;
         }
-
-        return false;
+        return true;
     }
 
 }

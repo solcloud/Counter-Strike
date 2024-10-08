@@ -19,7 +19,7 @@ final class Server
 
     /** @var Client[] [playerId => Client] */
     private array $clients = [];
-    /** @var array<int,callable> [playerId => fn(PlayerControl $control):void {} */
+    /** @var array<int,callable(PlayerControl):void> [playerId => fn(PlayerControl $control):void {} */
     private array $tickCommands = [];
     private LoggerInterface $logger;
 

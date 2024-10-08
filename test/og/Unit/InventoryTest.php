@@ -18,7 +18,12 @@ final class InventoryTest extends BaseTest
         $lastGrenadeEquippedSlots = $inventory->getLastEquippedGrenadeSlots();
         $this->assertSame(InventorySlot::SLOT_GRENADE_SMOKE->value, array_shift($lastGrenadeEquippedSlots));
 
-        $this->assertTrue($inventory->pickup(new Incendiary()));
+        $incendiary = new Incendiary();
+        $this->assertSame(1, $incendiary->getMaxQuantity());
+        $this->assertSame(1, $incendiary->getMaxBuyCount());
+        $this->assertSame(1, $incendiary->getQuantity());
+
+        $this->assertTrue($inventory->pickup($incendiary));
         $this->assertNotNull($inventory->equip(InventorySlot::SLOT_GRENADE_MOLOTOV));
         $lastGrenadeEquippedSlots = $inventory->getLastEquippedGrenadeSlots();
         $this->assertNotSame(InventorySlot::getGrenadeSlotIds(), $lastGrenadeEquippedSlots);

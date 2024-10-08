@@ -3,6 +3,7 @@
 namespace cs\Traits\Player;
 
 use cs\Core\Setting;
+use cs\Event\Event;
 use cs\Event\JumpEvent;
 
 trait JumpTrait
@@ -22,24 +23,26 @@ trait JumpTrait
             return;
         }
 
-        $event = new JumpEvent(function (JumpEvent $jumpEvent): void {
+        $event = new JumpEvent(function (Event $jumpEvent): void {
+            assert($jumpEvent instanceof JumpEvent);
             $targetYPosition = min($jumpEvent->maxYPosition, $this->position->y + Setting::jumpDistancePerTick());
-            $candidate = $this->position->clone();
-            for ($y = $this->position->y + 1; $y <= $targetYPosition; $y++) {
-                $floorCandidate = $this->world->findFloorSquare($candidate->setY($y), $this->playerBoundingRadius);
+            $candidate = $this->position->clone()->addY($this->headHeight);
+            for ($y = $this->position->y; $y < $targetYPosition; $y++) {
+                $candidate->addY(1);
+                $floorCandidate = $this->world->findFloorSquare($candidate, $this->playerBoundingRadius);
                 if ($floorCandidate) {
-                    $targetYPosition = $y - 1;
+                    $this->removeEvent($this->eventIdJump);
                     break;
                 }
-                if ($this->world->isCollisionWithOtherPlayers($this->id, $candidate, $this->playerBoundingRadius, $this->headHeight)) {
-                    $targetYPosition = $y - 1;
+                if ($this->world->isCollisionWithOtherPlayers($this->id, $candidate, $this->playerBoundingRadius, 2)) {
+                    $this->removeEvent($this->eventIdJump);
                     break;
                 }
             }
 
-            if ($this->position->y !== $targetYPosition) {
+            if ($this->position->y !== $y) {
                 $this->setActiveFloor(null);
-                $this->position->setY($targetYPosition);
+                $this->position->setY($y);
             }
         }, Setting::tickCountJump());
         $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();

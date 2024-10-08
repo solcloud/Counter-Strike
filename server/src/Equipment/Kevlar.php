@@ -31,7 +31,8 @@ class Kevlar extends BaseEquipment
 
     public function lowerArmor(int $armorDamage): void
     {
-        $this->armor -= abs($armorDamage);
+        assert($armorDamage >= 0);
+        $this->armor -= $armorDamage;
         if ($this->armor <= 0) {
             $this->armor = 0;
             $this->type = ArmorType::NONE;

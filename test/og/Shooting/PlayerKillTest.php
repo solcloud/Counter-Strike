@@ -16,10 +16,8 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\HitBoxType;
 use cs\Enum\ItemId;
-use cs\Enum\SoundType;
 use cs\Event\AttackResult;
 use cs\Event\KillEvent;
-use cs\Event\SoundEvent;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\PistolUsp;
 use cs\Weapon\RifleAk;
@@ -311,7 +309,8 @@ class PlayerKillTest extends BaseTestCase
             $this->waitNTicks(RifleAWP::equipReadyTimeMs),
             function (Player $p) {
                 $p->getSight()->look(45, 0);
-                $p->attackSecondary();
+                $this->assertNull($p->attackSecondary());
+                $this->assertSame(1, $p->getEquippedItem()->getScopeLevel());
                 $ar = $p->attack();
                 $this->assertInstanceOf(AttackResult::class, $ar);
                 $this->assertTrue($ar->somePlayersWasHit());
@@ -407,6 +406,10 @@ class PlayerKillTest extends BaseTestCase
         $p2->setPosition(new Point(300, 0, 500));
         $p2->buyItem(BuyMenuItem::KEVLAR_BODY);
 
+        $game->addPlayer(new Player(3, Color::ORANGE, false));
+        $game->getPlayer(3)->setPosition(new Point(350, 0, 500));
+        $game->getPlayer(3)->suicide();
+
         $this->playPlayer($game, [
             fn(Player $p) => $p->equipSecondaryWeapon(),
             $this->waitNTicks(PistolGlock::equipReadyTimeMs),
@@ -430,7 +433,7 @@ class PlayerKillTest extends BaseTestCase
             fn() => $this->assertSame(1, $game->getRoundNumber()),
             $this->waitNTicks(PistolGlock::recoilResetMs),
             fn(Player $p) => $p->getSight()->look(-90, 0),
-            fn(Player $p) => $this->assertPlayerHit($p->attack()),
+            fn(Player $p) => $this->assertCount(2, $this->assertPlayerHit($p->attack())->getHits()),
             $this->endGame(),
         ]);
     }

@@ -46,7 +46,7 @@ abstract class BaseTestCase extends BaseTest
     }
 
     /**
-     * @param array<Closure|int|false> $commands
+     * @param list<Closure(Player):mixed|int|false> $commands
      * @param array<string,int|string> $gameProperties
      */
     protected function simulateGame(array $commands, array $gameProperties = []): TestGame
@@ -138,7 +138,7 @@ abstract class BaseTestCase extends BaseTest
     }
 
     /**
-     * @param array<Closure|int|false> $commands
+     * @param list<Closure(Player):mixed|int|false> $commands
      */
     protected function playPlayerDebug(TestGame $game, array $commands, int $playerId = 1): void
     {
@@ -146,7 +146,7 @@ abstract class BaseTestCase extends BaseTest
     }
 
     /**
-     * @param array<Closure|int|false> $commands
+     * @param list<Closure(Player):mixed|int|false> $commands
      */
     protected function playPlayer(TestGame $game, array $commands, int $playerId = 1, bool $debug = false): void
     {

@@ -28,6 +28,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y \
             composer
+          sudo sh -c 'echo "zend.assertions = 1" >> /etc/php/8.1/cli/php.ini'
 
       - name: "Install Composer dependencies"
         timeout-minutes: 1

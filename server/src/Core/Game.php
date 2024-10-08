@@ -42,7 +42,7 @@ class Game
     private array $players = [];
     /** @var Event[] */
     private array $events = [];
-    /** @var Event[] */
+    /** @var list<Event> */
     private array $tickEvents = [];
 
     protected int $tick = 0;
@@ -228,7 +228,7 @@ class Game
     }
 
     /**
-     * @return Event[]
+     * @return list<Event>
      */
     public function consumeTickEvents(): array
     {

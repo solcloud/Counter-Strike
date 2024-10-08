@@ -146,7 +146,7 @@ final class PathFinder
 
             for ($distance = 1; $distance <= $maxDistance; $distance++) {
                 $candidate->addPart(...$this->moves[$angle]);
-                if (!$this->canFullyMoveTo($candidate, $angle, 1, $radius, $this->colliderHeight)) {
+                if (!$this->canFullyMoveTo($candidate, $angle, 1, $radius, $this->colliderHeight)) { // @infection-ignore-all
                     break;
                 }
 

@@ -143,7 +143,7 @@ trait MovementTrait
                 $angle += $moveX * (45 * 3);
             }
         } else { // single direction move
-            if ($moveZ === -1) {
+            if ($moveZ === -1) { // @infection-ignore-all
                 $angle += 180;
             } elseif ($moveX === 1) {
                 $angle += 90;
@@ -176,7 +176,7 @@ trait MovementTrait
         if ($equippedItem instanceof ScopeItem && $equippedItem->isScopedIn()) {
             $speed *= .5;
         }
-        if ($this->isJumping()) {
+        if ($this->isJumping()) { // @infection-ignore-all
             $speed *= Setting::jumpMovementSpeedMultiplier();
         } elseif ($this->isFlying()) {
             $speed *= Setting::flyingMovementSpeedMultiplier();

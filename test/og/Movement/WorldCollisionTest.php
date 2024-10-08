@@ -241,9 +241,30 @@ class WorldCollisionTest extends BaseTestCase
         $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionClone());
     }
 
+    public function testPlayerJumpIntoWallCancelGoingUpInstantly(): void
+    {
+        $game = $this->createTestGame();
+        $this->assertGreaterThan(Setting::jumpDistancePerTick(), Setting::fallAmountPerTick());
+        $maxY = (int)ceil(Setting::jumpDistancePerTick() / 2);
+        $baseY = 123;
+        $game->getWorld()->addFloor(new Floor(new Point(0, $baseY, 0), 1000, 1000));
+        $game->getWorld()->addFloor(new Floor(new Point(0, $baseY + Setting::playerHeadHeightStand() + $maxY, 0), 1000, 1000));
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500, $baseY, 500)),
+            fn(Player $p) => $p->jump(),
+            function (Player $p) use ($baseY) {
+                $this->assertSame($baseY, $p->getPositionClone()->y);
+                $this->assertFalse($p->isFlying());
+                $this->assertFalse($p->isJumping());
+            },
+            $this->endGame(),
+        ]);
+    }
+
     public function testPlayerJumpCeiling(): void
     {
-        $ceiling = new Floor(new Point(0, Setting::playerJumpHeight() / 2, 0));
+        $ceiling = new Floor(new Point(0, Setting::playerHeadHeightStand() + Setting::playerJumpHeight() - (Setting::jumpDistancePerTick() / 2), 0));
         $game = $this->createOneRoundGame(Setting::tickCountJump());
         $game->getWorld()->addFloor($ceiling);
         $game->getPlayer(1)->jump();

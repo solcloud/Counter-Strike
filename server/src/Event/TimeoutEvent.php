@@ -6,12 +6,11 @@ use Closure;
 
 class TimeoutEvent extends Event
 {
-    protected int $tickCountTimeout = 0;
-    protected ?Closure $callback = null;
+    protected int $tickCountTimeout;
 
-    public function __construct(?Closure $callback, protected int $timeoutMs)
+    /** @param ?Closure(static,int):void $callback */
+    public function __construct(protected ?Closure $callback, protected int $timeoutMs)
     {
-        $this->callback = $callback;
         $this->tickCountTimeout = $this->timeMsToTick($this->timeoutMs);
     }
 
