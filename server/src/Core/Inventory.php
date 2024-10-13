@@ -90,8 +90,9 @@ class Inventory
     {
         if ($item instanceof Grenade) {
             $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);
-            assert(is_int($index));
-            unset($this->lastEquippedGrenadeSlots[$index]);
+            if (is_int($index)) {
+                unset($this->lastEquippedGrenadeSlots[$index]);
+            }
         }
     }
 
