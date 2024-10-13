@@ -8,6 +8,7 @@ use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
+use cs\Enum\Color;
 use cs\Enum\InventorySlot;
 use cs\Enum\SoundType;
 use cs\Equipment\Decoy;
@@ -462,6 +463,29 @@ class GrenadeTest extends BaseTestCase
         ]);
 
         $this->assertGreaterThan(1, $bounceCount);
+    }
+
+    public function testBuyGrenadeMultipleSurvivedRounds(): void
+    {
+        $game = $this->createNoPauseGame(6);
+        $p2 = new Player(2, Color::GREEN, false);
+        $game->addPlayer($p2);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(100),
+            fn() => $p2->suicide(),
+            fn(Player $p) => $this->assertFalse($p->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(100),
+            $this->endGame(),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
     }
 
 }
