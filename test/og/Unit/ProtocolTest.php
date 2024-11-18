@@ -153,7 +153,7 @@ class ProtocolTest extends BaseTest
                     "bomb_explode_time_ms": 40000,
                     "bomb_plant_time_ms": 3200,
                     "buy_time_sec": 20,
-                    "freeze_time_sec": 15,
+                    "freeze_time_sec": 10,
                     "half_time_freeze_sec": 15,
                     "loss_bonuses": [
                         1400,
@@ -162,7 +162,7 @@ class ProtocolTest extends BaseTest
                         2900,
                         3400
                     ],
-                    "max_rounds": 30,
+                    "max_rounds": 24,
                     "randomize_spawn_position": true,
                     "round_end_cool_down_sec": 4,
                     "round_time_ms": 115000,
