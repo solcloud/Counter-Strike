@@ -17,7 +17,7 @@ Attackers win round by:
 
 If attackers deploy graffiti bomb before round time ends, then round clock countdown is set to 40 sec and defenders has 30 sec (or 35 sec in case of using defuse kit) to defuse bomb.
 
-_This is low violence game so there is no red blood, animal killing or similar violence visuals._
+_This is low violence game so there is no red blood, chickens killing or similar violence visuals._
 
 ## Setup
 
