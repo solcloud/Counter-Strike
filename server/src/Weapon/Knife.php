@@ -14,9 +14,9 @@ use cs\Interface\AttackEnable;
 
 final class Knife extends BaseWeapon implements AttackEnable
 {
-    public const killAward = 1500;
-    public const stabMaxDistance = 140;
-    public const equipReadyTimeMs = 500;
+    public const int killAward = 1500;
+    public const int stabMaxDistance = 140;
+    public const int equipReadyTimeMs = 500;
     private bool $primaryAttack = true;
     private int $lastAttackTick = 0;
 
@@ -30,11 +30,13 @@ final class Knife extends BaseWeapon implements AttackEnable
         return InventorySlot::SLOT_KNIFE;
     }
 
+    #[\Override]
     public function isUserDroppable(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function canAttack(int $tickId): bool
     {
         if (!$this->equipped) {

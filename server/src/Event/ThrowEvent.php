@@ -60,10 +60,8 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
 
     private function makeEvent(Point $point, SoundType $type): Event
     {
-        /** @var Item $item */
-        $item = $this->item;
         $event = (new SoundEvent($point->clone(), $type))
-            ->setItem($item)
+            ->setItem($this->item)
             ->setPlayer($this->player)
             ->addExtra('id', $this->id)
         ;
@@ -206,6 +204,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
     }
 
     /** @codeCoverageIgnore */
+    #[\Override]
     public function serialize(): array
     {
         return [

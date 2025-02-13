@@ -15,6 +15,7 @@ final class RoundEndEvent extends TickEvent
         $this->roundNumberEnded = $game->getRoundNumber();
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

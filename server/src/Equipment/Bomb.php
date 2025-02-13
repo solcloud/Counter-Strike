@@ -11,7 +11,7 @@ use cs\Enum\ItemType;
 class Bomb extends BaseEquipment
 {
 
-    public const equipReadyTimeMs = 80;
+    public const int equipReadyTimeMs = 80;
     private Point $position;
     private int $plantTickStart = 0;
     private int $plantTickCountMax;
@@ -41,6 +41,7 @@ class Bomb extends BaseEquipment
         return InventorySlot::SLOT_BOMB;
     }
 
+    #[\Override]
     public function reset(): void
     {
         parent::reset();
@@ -48,6 +49,7 @@ class Bomb extends BaseEquipment
         $this->defuseTickStart = 0;
     }
 
+    #[\Override]
     public function unEquip(): void
     {
         parent::unEquip();

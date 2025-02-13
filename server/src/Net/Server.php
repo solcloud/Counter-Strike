@@ -136,7 +136,7 @@ final class Server
     private function clientsLogin(): void
     {
         if ($this->pollClient($clientIp, $clientPort, $clientRequest)) {
-            $this->loginPlayer($clientIp, $clientPort, $clientRequest);
+            $this->loginPlayer($clientIp, $clientPort, $clientRequest); // @phpstan-ignore-line
         }
     }
 
@@ -147,6 +147,10 @@ final class Server
             if (!$this->pollClient($address, $port, $msg)) { // @infection-ignore-all
                 continue;
             }
+
+            /** @var string $address */
+            /** @var int $port */
+            /** @var string $msg */
 
             if (isset($this->loggedPlayers["{$address}-{$port}"])) {
                 $playerId = $this->loggedPlayers["{$address}-{$port}"];
@@ -292,7 +296,7 @@ final class Server
             'actionData' => Setting::getDataArray(),
             'protocol'   => get_class($this->protocol),
             'properties' => $this->game->getProperties()->toArray(),
-            'players'    => array_map(fn(Player $p) => $p->toArray(), $this->game->getPlayers()),
+            'players'    => array_map(fn(Player $p): array => $p->toArray(), $this->game->getPlayers()),
             'map'        => $this->game->getWorld()->getMap()->toArray(),
         ], JSON_THROW_ON_ERROR));
     }

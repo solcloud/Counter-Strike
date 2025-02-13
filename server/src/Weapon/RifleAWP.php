@@ -9,14 +9,14 @@ use cs\Interface\ScopeItem;
 class RifleAWP extends AmmoBasedWeapon implements ScopeItem
 {
 
-    public const reloadTimeMs = 3700;
-    public const equipReadyTimeMs = 1100;
-    public const magazineCapacity = 5;
-    public const reserveAmmo = 30;
-    public const killAward = 100;
-    public const fireRateMs = 1463;
-    public const damage = 350;
-    public const armorPenetration = 90;
+    public const int reloadTimeMs = 3700;
+    public const int equipReadyTimeMs = 1100;
+    public const int magazineCapacity = 5;
+    public const int reserveAmmo = 30;
+    public const int killAward = 100;
+    public const int fireRateMs = 1463;
+    public const int damage = 350;
+    public const int armorPenetration = 90;
 
     protected bool $isWeaponPrimary = true;
     protected int $price = 4750;
@@ -32,6 +32,7 @@ class RifleAWP extends AmmoBasedWeapon implements ScopeItem
         };
     }
 
+    #[\Override]
     protected function getSpreadOffsets(): array
     {
         if ($this->scopeLevel === 0) {

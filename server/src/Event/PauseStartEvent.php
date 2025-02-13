@@ -15,6 +15,7 @@ final class PauseStartEvent extends TimeoutEvent
         parent::__construct($callback, $timeoutMs);
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

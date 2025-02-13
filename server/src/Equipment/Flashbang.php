@@ -17,11 +17,13 @@ class Flashbang extends Grenade
         return InventorySlot::SLOT_GRENADE_FLASH;
     }
 
+    #[\Override]
     public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
         return ($this->getQuantity() < 2);
     }
 
+    #[\Override]
     public function getQuantity(): int
     {
         return $this->quantity;
@@ -34,22 +36,26 @@ class Flashbang extends Grenade
         return $clone;
     }
 
+    #[\Override]
     public function getMaxQuantity(): int
     {
         return 2;
     }
 
+    #[\Override]
     public function getMaxBuyCount(): int
     {
         return 2;
     }
 
+    #[\Override]
     public function decrementQuantity(): void
     {
         assert($this->quantity > 1);
         $this->quantity--;
     }
 
+    #[\Override]
     public function incrementQuantity(): void
     {
         $this->quantity++;

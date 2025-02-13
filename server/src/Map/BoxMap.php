@@ -14,6 +14,7 @@ abstract class BoxMap extends Map
         $this->boxes[] = $box;
     }
 
+    #[\Override]
     public function getFloors(): array
     {
         $floors = parent::getFloors();
@@ -23,6 +24,7 @@ abstract class BoxMap extends Map
         return $floors;
     }
 
+    #[\Override]
     public function getWalls(): array
     {
         $walls = parent::getWalls();

@@ -8,7 +8,7 @@ use cs\Enum\SoundType;
 
 final class GrillEvent extends VolumetricEvent
 {
-    public const DAMAGE_COOL_DOWN_TIME_MS = 100;
+    public const int DAMAGE_COOL_DOWN_TIME_MS = 100;
 
     /** @var array<int,int> [playerId => tick] */
     private array $playerTickHits = [];
@@ -19,6 +19,7 @@ final class GrillEvent extends VolumetricEvent
         $this->damageCoolDownTickCount = $this->timeMsToTick(self::DAMAGE_COOL_DOWN_TIME_MS);
     }
 
+    #[\Override]
     protected function onProcess(int $tick): void
     {
         $this->world->checkFlameDamage($this, $tick);

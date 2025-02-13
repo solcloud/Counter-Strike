@@ -10,7 +10,7 @@
         "dev3c": "@php cli/server.php 3 8080 --debug & @php cli/udp-ws-bridge.php & sleep 1 ; @php cli/client.php acode 8080 & @php cli/client.php acode 8080",
         "coverage": [
             "@putenv XDEBUG_MODE=coverage",
-            "@unit --coverage-html www/coverage --coverage-xml=www/coverage/coverage-xml --log-junit=www/coverage/junit.xml"
+            "@unit --coverage-text --only-summary-for-coverage-text --coverage-html www/coverage --coverage-xml=www/coverage/coverage-xml --log-junit=www/coverage/junit.xml"
         ],
         "check": [
             "@putenv PROJECT_CHECK=true",

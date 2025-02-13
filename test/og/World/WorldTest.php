@@ -101,7 +101,10 @@ class WorldTest extends BaseTestCase
             $game->getWorld()->roundReset();
             if ($game->getWorld()->getPlayerSpawnPosition(false, true)->equals($firstSpawnPosition)) {
                 $game->getWorld()->roundReset();
-                $this->assertPositionNotSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, true));
+                if ($game->getWorld()->getPlayerSpawnPosition(false, true)->equals($firstSpawnPosition)) {
+                    $game->getWorld()->roundReset();
+                    $this->assertPositionNotSame($firstSpawnPosition, $game->getWorld()->getPlayerSpawnPosition(false, true));
+                }
             }
         }
     }

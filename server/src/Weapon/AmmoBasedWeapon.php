@@ -33,6 +33,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->reset();
     }
 
+    #[\Override]
     public function unEquip(): void
     {
         parent::unEquip();
@@ -40,6 +41,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->resetRecoil();
     }
 
+    #[\Override]
     public function reset(): void
     {
         parent::reset();
@@ -50,6 +52,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
         $this->resetRecoil();
     }
 
+    #[\Override]
     public function canAttack(int $tickId): bool
     {
         if (!$this->equipped) {
@@ -101,7 +104,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
             $this->resetRecoil($tickId);
         }
 
-        [$offsetHorizontal, $offsetVertical] = static::recoilPattern[$this->lastRecoilBulletCount - 1] ?? [0, 0];
+        [$offsetHorizontal, $offsetVertical] = static::recoilPattern[$this->lastRecoilBulletCount - 1] ?? [0.0, 0.0];
         if ($this->lastRecoilTick + $this->fireRateTicks >= $tickId) { // maximum (full spraying) recoil
             $event->applyRecoil($offsetHorizontal, $offsetVertical);
         } else { // partial recoil
@@ -153,7 +156,7 @@ abstract class AmmoBasedWeapon extends BaseWeapon implements Reloadable, AttackE
     protected function createReloadEvent(): ReloadEvent
     {
         if ($this->eventReload === null) {
-            $this->eventReload = new ReloadEvent(function () {
+            $this->eventReload = new ReloadEvent(function (): void {
                 if ($this->ammoReserve >= static::magazineCapacity) {
                     $this->ammoReserve -= (static::magazineCapacity - $this->ammo);
                     $newAmmo = static::magazineCapacity;

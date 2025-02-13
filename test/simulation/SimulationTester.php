@@ -4,16 +4,12 @@ namespace Test\Simulation;
 
 use cs\Core\Game;
 use cs\Core\GameState;
+use cs\Core\Point;
 use cs\Event\Event;
-use Test\BaseTest;
+use PHPUnit\Framework\Assert;
 
-abstract class SimulationTester extends BaseTest
+abstract class SimulationTester extends Assert
 {
-
-    public function __construct()
-    {
-        parent::__construct(get_class($this));
-    }
 
     public function onGameStart(Game $game): void
     {
@@ -41,6 +37,11 @@ abstract class SimulationTester extends BaseTest
     public function onGameEnd(Game $game): void
     {
         // empty hook
+    }
+
+    public function assertPositionSame(Point $expected, Point $actual, string $extraMsg = ''): void
+    {
+        self::assertTrue($expected->equals($actual), "Expected: {$expected} <> {$actual} actual." . $extraMsg);
     }
 
 }

@@ -6,6 +6,6 @@
     },
     "devDependencies": {
         "electron": "*",
-        "electron-packager": "*"
+        "@electron/packager": "*"
     }
 }

@@ -46,6 +46,7 @@ final class SoundEvent extends TickEvent
         return $this;
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

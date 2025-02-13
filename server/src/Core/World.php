@@ -20,13 +20,13 @@ use cs\Map\Map;
 
 final class World
 {
-    private const WALL_X = 'zy';
-    private const WALL_Z = 'xy';
-    private const BOMB_RADIUS = 90;
-    private const BOMB_DEFUSE_MAX_DISTANCE = 300;
-    private const ITEM_PICK_MAX_DISTANCE = 370;
-    public const GRENADE_NAVIGATION_MESH_TILE_SIZE = 31;
-    public const GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT = 80;
+    private const string WALL_X = 'zy';
+    private const string WALL_Z = 'xy';
+    private const int BOMB_RADIUS = 90;
+    private const int BOMB_DEFUSE_MAX_DISTANCE = 300;
+    private const int ITEM_PICK_MAX_DISTANCE = 370;
+    public const int GRENADE_NAVIGATION_MESH_TILE_SIZE = 31;
+    public const int GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT = 80;
 
     private ?Map $map = null;
     /** @var PlayerCollider[] */
@@ -482,7 +482,7 @@ final class World
 
     public function throw(ThrowEvent $event): void
     {
-        $event->onComplete[] = function (ThrowEvent $event) {
+        $event->onComplete[] = function (ThrowEvent $event): void {
             if ($event->item instanceof HighExplosive) {
                 $this->processHighExplosiveBlast($event->getPlayer(), $event->getPositionClone(), $event->item);
             }
@@ -510,7 +510,7 @@ final class World
             $initiator, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
             $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
         );
-        $event->onComplete[] = function (SmokeEvent $event) {
+        $event->onComplete[] = function (SmokeEvent $event): void {
             unset($this->activeSmokes[$event->id]);
         };
         $this->activeSmokes[$event->id] = $event;
@@ -531,7 +531,7 @@ final class World
             $thrower, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
             $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
         );
-        $event->onComplete[] = function (GrillEvent $event) {
+        $event->onComplete[] = function (GrillEvent $event): void {
             unset($this->activeMolotovs[$event->id]);
         };
         $this->activeMolotovs[$event->id] = $event;
@@ -797,7 +797,7 @@ final class World
         }
     }
 
-    public function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, Item $item, int $damage): void
+    private function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, Item $item, int $damage): void
     {
         $soundEvent = new SoundEvent($hitPoint, SoundType::BULLET_HIT);
         $soundEvent->setItem($item);
@@ -922,8 +922,8 @@ final class World
     public function getWalls(): array
     {
         $output = [];
-        foreach ($this->walls as $_groupIndex => $wallGroup) {
-            foreach ($wallGroup as $_baseCoordinate => $walls) {
+        foreach ($this->walls as $wallGroup) {
+            foreach ($wallGroup as $walls) {
                 foreach ($walls as $wall) {
                     $output[] = $wall->toArray();
                 }
@@ -942,7 +942,7 @@ final class World
     public function getFloors(): array
     {
         $output = [];
-        foreach ($this->floors as $_yCoordinate => $floors) {
+        foreach ($this->floors as $floors) {
             foreach ($floors as $floor) {
                 $output[] = $floor->toArray();
             }

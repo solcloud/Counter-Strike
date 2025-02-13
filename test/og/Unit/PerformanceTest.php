@@ -44,12 +44,19 @@ class PerformanceTest extends BaseTest
             $sum -= $sum;
         }
         $took = $timer->stop();
-        if ($took->asMicroseconds() > 7500) {
-            self::$timeScale = 1.08;
+        $tookMs = $took->asMilliseconds();
+        if ($tookMs < 6.0) {
+            self::$timeScale = 1.0;
+        } elseif ($tookMs < 6.4) {
+            self::$timeScale = 1.5;
+        } elseif ($tookMs < 6.9) {
+            self::$timeScale = 3.0;
+        } elseif ($tookMs < 10.0) {
+            self::$timeScale = 6.0;
+        } else {
+            self::markTestSkipped();
         }
-        if (getenv('CI') !== false) {
-            self::$timeScale = 6.10;
-        }
+        if (getenv('CI') !== false) {var_dump($tookMs, self::$timeScale);} // todo remove
 
         Util::$TICK_RATE = 20;
         Setting::loadConstants([

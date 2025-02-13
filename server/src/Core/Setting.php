@@ -6,7 +6,7 @@ final class Setting
 {
 
     /** @var array<string,int|float> */
-    public const defaultConstant = [
+    public const array defaultConstant = [
         'moveOneMs'                     => 0.60,
         'moveWalkOneMs'                 => 0.34,
         'moveCrouchOneMs'               => 0.20,
@@ -48,7 +48,7 @@ final class Setting
     }
 
     /**
-     * @param array<string,int> $constants
+     * @param array<string,int|float> $constants
      */
     private static function fixBackwardCompatible(array &$constants): void
     {

@@ -21,6 +21,7 @@ $ws = new Server([
 
 while (true) {
     $clientMsg = $ws->receive();
+    assert(is_string($clientMsg));
     if ($clientMsg !== '') {
         if ($clientMsg === 'CLOSE') {
             break;

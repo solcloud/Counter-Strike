@@ -75,19 +75,22 @@ class ServerTest extends BaseTest
         $gameStartMsg = $serverResponses[0];
         $gameStartEvent = json_decode($gameStartMsg, true);
         $this->assertIsArray($gameStartEvent);
-        $this->assertCount(0, $gameStartEvent['players'] ?? false);
+        $this->assertIsArray($gameStartEvent['players']);
+        $this->assertCount(0, $gameStartEvent['players']);
+        $this->assertIsArray($gameStartEvent['events']);
         $this->assertCount(1, $gameStartEvent['events']);
-        $this->assertSame(EventList::map[GameStartEvent::class], $gameStartEvent['events'][0]['code'] ?? false);
-        $this->assertSame($game->getProperties()->max_rounds, $gameStartEvent['events'][0]['data']['setting']['max_rounds'] ?? false);
-        $this->assertSame(2, $gameStartEvent['events'][0]['data']['playersCount'] ?? false);
+        $this->assertSame(EventList::map[GameStartEvent::class], $gameStartEvent['events'][0]['code'] ?? false); // @phpstan-ignore-line
+        $this->assertSame($game->getProperties()->max_rounds, $gameStartEvent['events'][0]['data']['setting']['max_rounds'] ?? false); // @phpstan-ignore-line
+        $this->assertSame(2, $gameStartEvent['events'][0]['data']['playersCount'] ?? false); // @phpstan-ignore-line
 
         $gameOverMsg = $serverResponses[1];
         $gameOverEvent = json_decode($gameOverMsg, true);
         $this->assertIsArray($gameOverEvent);
-        $this->assertCount(1, $gameOverEvent['players'] ?? false);
+        $this->assertCount(1, $gameOverEvent['players'] ?? false); // @phpstan-ignore-line
+        $this->assertIsArray($gameOverEvent['events'] ?? false);
         $this->assertCount(1, $gameOverEvent['events']);
-        $this->assertSame(EventList::map[GameOverEvent::class], $gameOverEvent['events'][0]['code'] ?? false);
-        $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED->value, $gameOverEvent['events'][0]['data']['reason'] ?? false);
+        $this->assertSame(EventList::map[GameOverEvent::class], $gameOverEvent['events'][0]['code'] ?? false); // @phpstan-ignore-line
+        $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED->value, $gameOverEvent['events'][0]['data']['reason'] ?? false); // @phpstan-ignore-line
     }
 
     public function testServerGameOver(): void

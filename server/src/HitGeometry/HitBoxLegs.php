@@ -37,6 +37,7 @@ class HitBoxLegs extends SphereGroupHitBox
         }
     }
 
+    #[\Override]
     public function getParts(Player $player): array
     {
         return $this->headHeightParts[$player->getHeadHeight()];

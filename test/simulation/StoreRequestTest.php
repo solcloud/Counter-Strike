@@ -31,7 +31,7 @@ class StoreRequestTest extends BaseTest
 
     /**
      * @param array{actionData: array<string,int>, tickMs: int,
-     *     protocol: string, players: array<mixed>, properties: array<string,string|int|bool>, map: array<mixed>
+     *     protocol: string, players: array<mixed>, properties: array<string,string|int|bool>, map: array<string,mixed>
      * } $meta
      */
     private function _testRequest(SimulationTester $tester, array $meta, string &$data): void
@@ -48,7 +48,7 @@ class StoreRequestTest extends BaseTest
             $tickId = (int)$tickId;
             $playerRequests[$tickId][(int)$playerId] = $protocol->parsePlayerControlCommands($request);
         }
-        $this->assertNotEmpty($playerRequests);
+        $this->assertNotEmpty($playerRequests); // @phpstan-ignore method.alreadyNarrowedType
         $this->assertGreaterThan(0, $tickId);
 
         $game = $this->createGame($tickId, GameProperty::fromArray($meta['properties']));

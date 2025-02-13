@@ -47,7 +47,7 @@ abstract class BaseTestCase extends BaseTest
 
     /**
      * @param list<Closure(Player):mixed|int|false> $commands
-     * @param array<string,int|string> $gameProperties
+     * @param array<string,int|string|bool> $gameProperties
      */
     protected function simulateGame(array $commands, array $gameProperties = []): TestGame
     {
@@ -64,7 +64,7 @@ abstract class BaseTestCase extends BaseTest
     }
 
     /**
-     * @param array<string,int|string> $gameProperties
+     * @param array<string,int|string|bool> $gameProperties
      * @deprecated use createTestGame() instead, this only set playerBoundingRadius() to 0
      */
     protected function createOneRoundGame(int $tickMax = 1, array $gameProperties = []): TestGame
@@ -129,7 +129,7 @@ abstract class BaseTestCase extends BaseTest
     }
 
     /**
-     * @param array<string,int|string> $gameProperties
+     * @param array<string,int|string|bool> $gameProperties
      * @deprecated rather use createTestGame() maybe
      */
     protected function createGame(array $gameProperties = []): TestGame

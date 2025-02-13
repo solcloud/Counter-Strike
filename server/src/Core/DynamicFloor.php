@@ -12,11 +12,13 @@ final class DynamicFloor extends Floor
         $this->pointReference = $player->getReferenceToPosition();
     }
 
+    #[\Override]
     public function getY(): int
     {
         return $this->pointReference->y + $this->player->getHeadHeight() + 1;
     }
 
+    #[\Override]
     public function intersect(Point $point, int $radius = 0): bool
     {
         return (
@@ -34,6 +36,7 @@ final class DynamicFloor extends Floor
     /**
      * @codeCoverageIgnore
      */
+    #[\Override]
     public function getHitAntiForce(Point $point): int
     {
         return 0;
@@ -42,6 +45,7 @@ final class DynamicFloor extends Floor
     /**
      * @codeCoverageIgnore
      */
+    #[\Override]
     public function getPlane(): string
     {
         return 'xz';

@@ -54,21 +54,25 @@ class Kevlar extends BaseEquipment
         return InventorySlot::SLOT_KEVLAR;
     }
 
+    #[\Override]
     public function canBeEquipped(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function isUserDroppable(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function getMaxBuyCount(): int
     {
         return 5;
     }
 
+    #[\Override]
     public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
         /** @var self $newSlotItem */
@@ -78,6 +82,7 @@ class Kevlar extends BaseEquipment
         return ($this->type === ArmorType::BODY && $newSlotItem->type === ArmorType::BODY_AND_HEAD);
     }
 
+    #[\Override]
     public function getPrice(?Item $alreadyHaveSlotItem = null): int
     {
         /** @var ?self $alreadyHaveSlotItem */

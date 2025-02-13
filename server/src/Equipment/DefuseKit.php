@@ -20,16 +20,19 @@ class DefuseKit extends BaseEquipment
         return InventorySlot::SLOT_KIT;
     }
 
+    #[\Override]
     public function canBeEquipped(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function isUserDroppable(): bool
     {
         return false;
     }
 
+    #[\Override]
     public function canPurchaseMultipleTime(Item $newSlotItem): bool
     {
         return false;
