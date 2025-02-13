@@ -99,11 +99,11 @@ abstract class Map
     public function toArray(): array
     {
         return [
-            'floors'                 => array_map(fn(Floor $o) => $o->toArray(), $this->getFloors()),
-            'walls'                  => array_map(fn(Wall $o) => $o->toArray(), $this->getWalls()),
-            'spawnAttackers'         => array_map(fn(Point $o) => $o->toArray(), $this->getSpawnPositionAttacker()),
-            'spawnDefenders'         => array_map(fn(Point $o) => $o->toArray(), $this->getSpawnPositionDefender()),
-            'startingPointsNavMesh'  => array_map(fn(Point $p) => $p->toArray(), $this->getStartingPointsForNavigationMesh()),
+            'floors'                 => array_map(fn(Floor $o): array => $o->toArray(), $this->getFloors()),
+            'walls'                  => array_map(fn(Wall $o): array => $o->toArray(), $this->getWalls()),
+            'spawnAttackers'         => array_map(fn(Point $o): array => $o->toArray(), $this->getSpawnPositionAttacker()),
+            'spawnDefenders'         => array_map(fn(Point $o): array => $o->toArray(), $this->getSpawnPositionDefender()),
+            'startingPointsNavMesh'  => array_map(fn(Point $p): array => $p->toArray(), $this->getStartingPointsForNavigationMesh()),
             'buyAreaAttackers'       => $this->getBuyArea(true)->toArray(),
             'buyAreaDefenders'       => $this->getBuyArea(false)->toArray(),
             'plantArea'              => $this->getPlantArea()->toArray(),

@@ -15,8 +15,8 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
 {
 
     private bool $primaryAttack = true;
-    public const equipReadyTimeMs = 100;
-    public const boundingRadius = 10;
+    public const int equipReadyTimeMs = 100;
+    public const int boundingRadius = 10;
 
     public function getType(): ItemType
     {

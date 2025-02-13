@@ -5,7 +5,7 @@ namespace cs\Core;
 final class Util
 {
 
-    public const GRAVITY = 9.8;
+    public const float GRAVITY = 9.8;
     public static int $TICK_RATE = 20;
 
     public static function millisecondsToFrames(int $timeMs): int

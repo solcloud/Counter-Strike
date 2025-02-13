@@ -8,16 +8,16 @@ use cs\Enum\HitBoxType;
 final class PistolP250 extends AmmoBasedWeapon
 {
 
-    public const reloadTimeMs = 2200;
-    public const equipReadyTimeMs = 400;
-    public const magazineCapacity = 13;
-    public const reserveAmmo = 26;
-    public const killAward = 300;
-    public const fireRateMs = 150;
-    public const damage = 130;
-    public const rangeMaxDamage = 3000;
-    public const recoilResetMs = 400;
-    public const recoilPattern = [
+    public const int reloadTimeMs = 2200;
+    public const int equipReadyTimeMs = 400;
+    public const int magazineCapacity = 13;
+    public const int reserveAmmo = 26;
+    public const int killAward = 300;
+    public const int fireRateMs = 150;
+    public const int damage = 130;
+    public const int rangeMaxDamage = 3000;
+    public const int recoilResetMs = 400;
+    public const array recoilPattern = [
         [0, 0],
         [-0.12, +0.21],
         [+0.40, +0.46],

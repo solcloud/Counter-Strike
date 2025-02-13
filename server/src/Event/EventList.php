@@ -5,7 +5,7 @@ namespace cs\Event;
 final class EventList
 {
 
-    public const map = [
+    public const array map = [
         'unknown'                    => 0,
         GameOverEvent::class         => 1,
         PauseStartEvent::class       => 2,

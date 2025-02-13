@@ -280,7 +280,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
         $this->assertCount(4, $bounceEvents);
         $bounceEvent = array_pop($bounceEvents);
-        $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
+        $this->assertInstanceOf(SoundEvent::class, $bounceEvent); // @phpstan-ignore-line
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
         $this->assertPositionSame(new Point(0, $floorY + Decoy::boundingRadius, 0), $landEvent->position, "FloorY: {$floorY}");
         $this->assertPositionSame($bounceEvent->position, $landEvent->position);
@@ -362,14 +362,16 @@ class GrenadeTest extends BaseTestCase
         $floor = new Floor(new Point(500, 600, 500), 10, 10);
         $game->getWorld()->addFloor($floor);
 
-        $test = new \stdClass();
-        $test->goingUp = true;
-        $test->mid = false;
-        $test->lastPosition = null;
-        $test->bounceCount = 0;
-        $test->bounceX = 0;
-        $test->airCount = 0;
-        $test->land = null;
+        $test = new class {
+            public bool $goingUp = true;
+            public bool $mid = false;
+            public ?Point $lastPosition = null;
+            public int $bounceCount = 0;
+            public int $bounceX = 0;
+            public int $airCount = 0;
+            public ?Point $land = null;
+        };
+
         $game->onEvents(function (array $events) use (&$test): void {
             foreach ($events as $event) {
                 if (false === ($event instanceof SoundEvent)) {

@@ -26,6 +26,7 @@ class TestMap extends Map
         $this->startPointForNavigationMesh = new Point(100, 0, 100);
     }
 
+    #[\Override]
     public function getStartingPointsForNavigationMesh(): array
     {
         return [$this->startPointForNavigationMesh];

@@ -322,7 +322,7 @@ class Game
         }
 
         /** @var Player[] $attackers */
-        $attackers = array_values(array_filter($this->players, fn(Player $player) => $player->isPlayingOnAttackerSide()));
+        $attackers = array_values(array_filter($this->players, fn(Player $player): bool => $player->isPlayingOnAttackerSide()));
         $bombCarrier = $attackers[rand(0, count($attackers) - 1)];
         $bombCarrier->getInventory()->pickup($this->bomb);
     }
@@ -506,7 +506,7 @@ class Game
      */
     public function getAlivePlayers(): array
     {
-        return array_filter($this->players, fn(Player $player) => $player->isAlive());
+        return array_filter($this->players, fn(Player $player): bool => $player->isAlive());
     }
 
     /**

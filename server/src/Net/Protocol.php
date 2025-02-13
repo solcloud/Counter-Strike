@@ -9,7 +9,7 @@ abstract class Protocol
 {
 
     /** @var array<string,positive-int> [methodName => maxCallCountPerTick] */
-    public const playerControlMethods = [
+    public const array playerControlMethods = [
         'attack'   => 1,
         'attack2'  => 1,
         'backward' => 1,
@@ -30,7 +30,7 @@ abstract class Protocol
     ];
 
     /** @var array<string,non-negative-int> [methodName => paramCount] */
-    public const playerControlMethodParamCount = [
+    public const array playerControlMethodParamCount = [
         'attack'   => 0,
         'attack2'  => 0,
         'backward' => 0,
@@ -51,7 +51,7 @@ abstract class Protocol
     ];
 
     /** @var array<string,array<int,bool>> [methodName => [paramNumber => true]] */
-    public const methodParamFloat = [
+    public const array methodParamFloat = [
         'look' => [
             1 => true,
             2 => true,
@@ -59,7 +59,7 @@ abstract class Protocol
     ];
 
     /** @var array<string,non-negative-int> [methodName => methodNumber] */
-    public const playerMethodByName = [
+    public const array playerMethodByName = [
         'attack'   => 0,
         'attack2'  => 1,
         'backward' => 2,
@@ -80,7 +80,7 @@ abstract class Protocol
     ];
 
     /** @var array<non-negative-int,string> [methodNumber => methodName] */
-    public const playerMethodByNumber = [
+    public const array playerMethodByNumber = [
         0  => 'attack',
         1  => 'attack2',
         2  => 'backward',

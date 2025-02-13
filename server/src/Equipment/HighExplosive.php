@@ -7,9 +7,9 @@ use cs\Enum\InventorySlot;
 class HighExplosive extends Grenade
 {
 
-    protected const DAMAGE = 20;
-    protected const MAX_BLAST_RADIUS = 400;
-    protected const MAX_BLAST_RADIUS_SQUARED = self::MAX_BLAST_RADIUS * self::MAX_BLAST_RADIUS;
+    protected const int DAMAGE = 20;
+    protected const int MAX_BLAST_RADIUS = 400;
+    protected const int MAX_BLAST_RADIUS_SQUARED = self::MAX_BLAST_RADIUS * self::MAX_BLAST_RADIUS;
 
     protected int $price = 300;
 

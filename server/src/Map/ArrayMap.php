@@ -10,8 +10,6 @@ use cs\Core\Wall;
 class ArrayMap extends Map
 {
 
-    /** @var array<string,mixed> */
-    private array $data;
     /** @var Wall[] */
     private array $walls;
     /** @var Floor[] */
@@ -22,49 +20,52 @@ class ArrayMap extends Map
     /**
      * @param array<string,mixed> $data
      */
-    public function __construct(array $data)
+    public function __construct(private array $data)
     {
-        $this->data = $data;
-
-        foreach ($data['spawnAttackers'] as $spawnData) { // @phpstan-ignore-line
+        foreach ($this->data['spawnAttackers'] as $spawnData) { // @phpstan-ignore-line
             $this->spawnPositionAttacker[] = Point::fromArray($spawnData); // @phpstan-ignore-line
         }
-        foreach ($data['spawnDefenders'] as $spawnData) { // @phpstan-ignore-line
+        foreach ($this->data['spawnDefenders'] as $spawnData) { // @phpstan-ignore-line
             $this->spawnPositionDefender[] = Point::fromArray($spawnData); // @phpstan-ignore-line
         }
-        foreach ($data['floors'] as $floorData) { // @phpstan-ignore-line
+        foreach ($this->data['floors'] as $floorData) { // @phpstan-ignore-line
             $this->floors[] = Floor::fromArray($floorData); // @phpstan-ignore-line
         }
-        foreach ($data['walls'] as $wallData) { // @phpstan-ignore-line
+        foreach ($this->data['walls'] as $wallData) { // @phpstan-ignore-line
             $this->walls[] = Wall::fromArray($wallData); // @phpstan-ignore-line
         }
 
-        foreach($data['startingPointsNavMesh'] ?? [] as $pointData) { // @phpstan-ignore-line
+        foreach($this->data['startingPointsNavMesh'] ?? [] as $pointData) { // @phpstan-ignore-line
             $this->startingPointsForNavigationMesh[] = Point::fromArray($pointData); // @phpstan-ignore-line
         }
         $this->startingPointsForNavigationMesh ??= parent::getStartingPointsForNavigationMesh();
     }
 
+    #[\Override]
     public function getStartingPointsForNavigationMesh(): array
     {
         return $this->startingPointsForNavigationMesh;
     }
 
+    #[\Override]
     public function getWalls(): array
     {
         return $this->walls;
     }
 
+    #[\Override]
     public function getFloors(): array
     {
         return $this->floors;
     }
 
+    #[\Override]
     public function getSpawnRotationAttacker(): int
     {
         return $this->data['spawnRotationAttackers']; // @phpstan-ignore-line
     }
 
+    #[\Override]
     public function getSpawnRotationDefender(): int
     {
         return $this->data['spawnRotationDefenders']; // @phpstan-ignore-line

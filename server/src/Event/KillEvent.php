@@ -37,6 +37,7 @@ final class KillEvent extends TickEvent
         return $this->attackItemId;
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

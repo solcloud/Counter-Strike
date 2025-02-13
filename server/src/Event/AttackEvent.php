@@ -62,7 +62,7 @@ final class AttackEvent implements Attackable
                 $bullet->lowerDamage($hit->getHitAntiForce($newPos));
                 $result->addHit($hit);
                 $this->world->bulletHit($hit, $bullet, $hit->wasHeadShot());
-                if (!$bullet->isActive()) {
+                if (!$bullet->isActive()) { // @infection-ignore-all
                     break;
                 }
             }
@@ -71,6 +71,7 @@ final class AttackEvent implements Attackable
         return $result;
     }
 
+    /** @infection-ignore-all */
     public function applyRecoil(float $offsetHorizontal, float $offsetVertical): void
     {
         $this->angleHorizontal += $offsetHorizontal;

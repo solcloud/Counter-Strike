@@ -32,6 +32,7 @@ class PlayerKillTest extends BaseTestCase
     {
         $startMoney = 6000;
         $player2Commands = [
+            fn(Player $p) => $p->getInventory()->earnMoney(6000 - 800),
             fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::RIFLE_M4A4)),
             fn(Player $p) => $p->getSight()->lookHorizontal(180),
             $this->waitNTicks(RifleAk::equipReadyTimeMs) - 2,
@@ -39,7 +40,7 @@ class PlayerKillTest extends BaseTestCase
         ];
         $player2 = new Player(2, Color::GREEN, false);
 
-        $game = $this->createGame([GameProperty::START_MONEY => $startMoney]);
+        $game = $this->createTestGame();
         $game->addPlayer($player2);
         $game->getPlayer(1)->setPosition(new Point(300, 0, 300));
         $player2->setPosition(new Point(300, 0, 500));
@@ -61,7 +62,6 @@ class PlayerKillTest extends BaseTestCase
         $this->assertGreaterThan(0, $wall->getHitAntiForce(new Point()));
 
         $playerOne = $headHit->getPlayer();
-        $this->assertInstanceOf(Player::class, $playerOne);
         $this->assertFalse($playerOne->isAlive());
         $this->assertNull($player2->attack());
         $this->assertTrue($headHit->getType() === HitBoxType::HEAD);
@@ -101,7 +101,6 @@ class PlayerKillTest extends BaseTestCase
         $this->assertInstanceOf(Wall::class, $hits[2]);
 
         $playerOne = $headHit->getPlayer();
-        $this->assertInstanceOf(Player::class, $playerOne);
         $this->assertFalse($playerOne->isAlive());
         $this->assertNull($player2->attack());
         $this->assertTrue($headHit->getType() === HitBoxType::HEAD);
@@ -390,6 +389,37 @@ class PlayerKillTest extends BaseTestCase
             },
             $this->endGame(),
         ], $player2->getId());
+    }
+
+    public function testHitTwoPlayersSharingSamePosition(): void
+    {
+        $p2 = new Player(2, Color::GREEN, false);
+        $p3 = new Player(3, Color::GREEN, false);
+
+        $game = $this->createTestGame();
+
+        $game->addPlayer($p2);
+        $game->addPlayer($p3);
+        $p2->setPosition(new Point(300, 0, 300));
+        $p3->setPosition($p2->getPositionClone());
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->setPosition(new Point(500, 0, 300)),
+            fn(Player $p) => $p->getSight()->look(-90, 0),
+            fn(Player $p) => $p->equipSecondaryWeapon(),
+            $this->waitNTicks(PistolGlock::equipReadyTimeMs),
+            function (Player $p) {
+                $result = $p->attack();
+                $this->assertNotNull($result);
+
+                $hits = $result->getHits();
+                $this->assertCount(3, $hits);
+                $this->assertInstanceOf(HitBox::class, $hits[0]);
+                $this->assertInstanceOf(HitBox::class, $hits[1]);
+                $this->assertInstanceOf(Wall::class, $hits[2]);
+            },
+            $this->endGame(),
+        ]);
     }
 
     public function testArmorShooting(): void

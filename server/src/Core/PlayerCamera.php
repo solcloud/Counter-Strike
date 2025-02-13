@@ -53,7 +53,7 @@ class PlayerCamera
     /**
      * @return array<string,float>
      */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'horizontal' => $this->getRotationHorizontal(),

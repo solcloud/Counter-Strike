@@ -5,7 +5,7 @@ namespace cs\Core;
 abstract class Plane extends SolidSurface
 {
 
-    public const MAX_HIT_ANTI_FORCE = 99999;
+    public const int MAX_HIT_ANTI_FORCE = 99999;
 
     protected bool $penetrable = true;
     protected int $hitAntiForce = 25123;
@@ -59,8 +59,11 @@ abstract class Plane extends SolidSurface
     public function intersect(Point $point, int $radius = 0): bool
     {
         return Collision::circleWithRect(
-            $point->{$this->axis2d[0]}, $point->{$this->axis2d[1]}, $radius,
-            $this->point2DStart->x, $this->point2DEnd->x, $this->point2DStart->y, $this->point2DEnd->y
+            $point->{$this->axis2d[0]}, // @phpstan-ignore argument.type
+            $point->{$this->axis2d[1]}, // @phpstan-ignore argument.type
+            $radius,
+            $this->point2DStart->x, $this->point2DEnd->x,
+            $this->point2DStart->y, $this->point2DEnd->y
         );
     }
 

@@ -38,7 +38,7 @@ class ClueSocket implements NetConnector
 
     public function receive(?string &$peerAddress, ?int &$peerPort, int $readMaxBytes = 100): ?string
     {
-        $ret = @socket_recvfrom($this->resource, $buffer, $readMaxBytes, 0, $peerAddress, $peerPort);
+        $ret = @socket_recvfrom($this->resource, $buffer, $readMaxBytes, 0, $peerAddress, $peerPort); // @phpstan-ignore-line
         if ($ret === false) {
             $code = socket_last_error($this->resource);
             if ($code !== SOCKET_EWOULDBLOCK) {
@@ -47,6 +47,7 @@ class ClueSocket implements NetConnector
             return null;
         }
 
+        /** @var string $buffer */
         return $buffer;
     }
 

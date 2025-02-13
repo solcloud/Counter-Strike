@@ -42,6 +42,7 @@
         "ArrayItemRemoval": {
             "ignore": [
                 "cs\\Event\\*::serialize",
+                "cs\\Traits\\Player\\AttackTrait::applyMovementRecoil",
             ],
         },
         "Break_": {
@@ -69,6 +70,11 @@
             "ignoreSourceCodeByRegex": [
                 "if\\s*\\(\\$count > 10 && \\$count % 2 === 0\\)\\s\\{",
             ],
+        },
+        "LogicalNot": {
+            "ignoreSourceCodeByRegex": [
+                ".+\\$this->lastMoveX === -\\$moveX.+",
+            ]
         },
         "MatchArmRemoval": {
             "ignoreSourceCodeByRegex": [

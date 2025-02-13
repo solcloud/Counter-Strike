@@ -59,7 +59,7 @@ class GameProperty
     /**
      * @return array<string,string|int|bool|int[]>
      */
-    public function toArray()
+    public function toArray(): array
     {
         return (array)$this;
     }

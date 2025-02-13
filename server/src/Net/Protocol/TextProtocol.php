@@ -12,7 +12,7 @@ use cs\Net\ServerSetting;
 class TextProtocol extends Protocol
 {
 
-    public const separator = '|';
+    public const string separator = '|';
 
     /** @inheritDoc */
     public function getRequestMaxSizeBytes(): int
@@ -33,8 +33,8 @@ class TextProtocol extends Protocol
     public function serialize(array $players, array $events): string
     {
         return json_encode([
-            "players" => array_map(fn(Player $p) => $p->serialize(), $players, []),
-            "events"  => array_map(fn(Event $e) => ['code' => $e->getCode(), 'data' => $e->serialize()], $events),
+            "players" => array_map(fn(Player $p): array => $p->serialize(), $players, []),
+            "events"  => array_map(fn(Event $e): array => ['code' => $e->getCode(), 'data' => $e->serialize()], $events),
         ], JSON_THROW_ON_ERROR);
     }
 

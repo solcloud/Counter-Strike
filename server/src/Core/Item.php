@@ -9,11 +9,10 @@ use cs\Event\EquipEvent;
 
 abstract class Item
 {
-    public const equipReadyTimeMs = 0;
+    public const int equipReadyTimeMs = 0;
 
     private int $id;
     private int $skinId;
-    protected bool $equipped = false;
     /** @var non-negative-int */
     protected int $price = 9999;
     /** @var non-negative-int */
@@ -22,9 +21,8 @@ abstract class Item
     /** @var array<string,int> */
     public readonly array $toArrayCache;
 
-    public function __construct(bool $instantlyEquip = false)
+    public function __construct(protected bool $equipped = false)
     {
-        $this->equipped = $instantlyEquip;
         $this->id = ItemId::$map[get_class($this)];
         $this->toArrayCache = [
             'id'   => $this->id,
@@ -134,7 +132,7 @@ abstract class Item
         }
 
         if ($this->eventEquip === null) {
-            $this->eventEquip = new EquipEvent(function () {
+            $this->eventEquip = new EquipEvent(function (): void {
                 $this->equipped = true;
             }, static::equipReadyTimeMs);
         }

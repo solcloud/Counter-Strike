@@ -13,6 +13,7 @@ final class RoundStartEvent extends TickEvent
         parent::__construct($callback);
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

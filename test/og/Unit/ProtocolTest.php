@@ -30,8 +30,10 @@ class ProtocolTest extends BaseTest
     public function testInvalidCommandsWhenExtendingMaxCallPerTick(): void
     {
         $protocol = new Protocol\TextProtocol();
-        $this->assertSame([['attack']], $protocol->parsePlayerControlCommands(implode($protocol::separator, ['attack'])));
-        $this->assertSame([], $protocol->parsePlayerControlCommands(implode($protocol::separator, ['attack', 'attack'])));
+        $separator = $protocol::separator;
+
+        $this->assertSame([['attack']], $protocol->parsePlayerControlCommands(implode($separator, ['attack'])));
+        $this->assertSame([], $protocol->parsePlayerControlCommands(implode($separator, ['attack', 'attack'])));
     }
 
     public function testTextProtocol(): void
@@ -39,6 +41,7 @@ class ProtocolTest extends BaseTest
         $protocol = new Protocol\TextProtocol();
         $this->assertGreaterThan(10, $protocol->getRequestMaxSizeBytes());
         $this->assertLessThan(2 ** 13, $protocol->getRequestMaxSizeBytes());
+        $separator = $protocol::separator;
 
         $this->assertSame(
             [
@@ -49,7 +52,7 @@ class ProtocolTest extends BaseTest
                 ['right'],
             ],
             $protocol->parsePlayerControlCommands(implode(
-                    $protocol::separator,
+                    $separator,
                     [
                         "forward", "left", "equip 42", "look -45 124", "right",
                     ]

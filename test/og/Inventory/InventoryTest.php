@@ -47,7 +47,7 @@ class InventoryTest extends BaseTestCase
         $this->assertInstanceOf(Knife::class, $game->getPlayer(1)->getEquippedItem());
         $game->getPlayer(1)->equip(InventorySlot::SLOT_KIT);
         $game->getPlayer(1)->equip(InventorySlot::SLOT_TASER);
-        $this->assertInstanceOf(Knife::class, $game->getPlayer(1)->getEquippedItem());
+        $this->assertInstanceOf(Knife::class, $game->getPlayer(1)->getEquippedItem()); // @phpstan-ignore-line
     }
 
     public function testPlayerInventorySlots(): void
@@ -336,9 +336,17 @@ class InventoryTest extends BaseTestCase
         $game->getPlayer(2)->setPosition(new Point(150, 0, 150));
 
         $pickEvent = null;
-        $game->onEvents(function (array $events) use (&$pickEvent): void {
+        $dropAirCount = 0;
+        $game->onEvents(function (array $events) use (&$pickEvent, &$dropAirCount): void {
             foreach ($events as $event) {
-                if ($event instanceof SoundEvent && $event->type === SoundType::ITEM_PICKUP) {
+                if (false === ($event instanceof SoundEvent)) {
+                    return;
+                }
+
+                if ($event->type === SoundType::ITEM_DROP_AIR) {
+                    $dropAirCount++;
+                }
+                if ($event->type === SoundType::ITEM_PICKUP) {
                     $this->assertNull($pickEvent);
                     $pickEvent = $event;
                     $this->assertSame(1, $event->getPlayerId());
@@ -364,6 +372,7 @@ class InventoryTest extends BaseTestCase
 
         $this->assertTrue($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_PRIMARY->value));
         $this->assertNotNull($pickEvent);
+        $this->assertSame(10, $dropAirCount);
     }
 
     public function testDropWallCollision(): void

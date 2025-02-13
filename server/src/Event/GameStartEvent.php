@@ -17,6 +17,7 @@ final class GameStartEvent extends NoTickEvent
     {
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

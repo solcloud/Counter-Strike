@@ -4,6 +4,7 @@ namespace Test\Shooting;
 
 use cs\Core\GameState;
 use cs\Core\Point;
+use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\RifleAk;
@@ -19,6 +20,7 @@ class RecoilTest extends BaseTestCase
         $game->getPlayer(1)->getInventory()->earnMoney(16000);
         $game->getPlayer(1)->buyItem(BuyMenuItem::RIFLE_AK);
         $game->getPlayer(1)->setPosition(new Point(500, 0, 500));
+        $game->getPlayer(1)->getSight()->look(180, 0);
         $ak = $game->getPlayer(1)->getEquippedItem();
         $this->assertInstanceOf(RifleAk::class, $ak);
 
@@ -44,6 +46,7 @@ class RecoilTest extends BaseTestCase
     public function testRifleMovementRecoil(): void
     {
         $game = $this->createNoPauseGame();
+        $game->getWorld()->addWall(new Wall(new Point(0, 0, 900), true, 99999));
         $player = $game->getPlayer(1);
         $player->setPosition($player->getPositionClone()->addZ($player->getBoundingRadius()));
         $player->getInventory()->earnMoney(16000);

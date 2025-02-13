@@ -15,7 +15,7 @@ use cs\Weapon\PistolUsp;
 class Inventory
 {
 
-    /** @var Item[] [slotId => Item] */
+    /** @var array<int,Item> [slotId => Item] */
     private array $items = [];
     private int $dollars = 0;
     private int $equippedSlot;
@@ -88,11 +88,9 @@ class Inventory
 
     private function tryRemoveLastEquippedGrenade(Item $item): void
     {
-        if ($item instanceof Grenade) {
-            $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);
-            if (is_int($index)) {
-                unset($this->lastEquippedGrenadeSlots[$index]);
-            }
+        $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);
+        if (is_int($index)) {
+            unset($this->lastEquippedGrenadeSlots[$index]);
         }
     }
 

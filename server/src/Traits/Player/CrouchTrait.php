@@ -7,7 +7,7 @@ use cs\Event\CrouchEvent;
 
 trait CrouchTrait
 {
-    protected function createCrouchEvent(bool $directionDown): void
+    private function createCrouchEvent(bool $directionDown): void
     {
         if (isset($this->eventsCache[$this->eventIdCrouch])) {
             /** @var CrouchEvent $event */

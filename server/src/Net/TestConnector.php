@@ -10,17 +10,14 @@ class TestConnector implements NetConnector
 
     private int $iterator = 0;
     /** @var string[] */
-    private array $requests;
-    /** @var string[] */
     private array $responses = [];
     private bool $expectReceive = true;
 
     /**
      * @param string[] $requests
      */
-    public function __construct(array $requests)
+    public function __construct(private array $requests)
     {
-        $this->requests = $requests;
     }
 
     public function receive(?string &$peerAddress, ?int &$peerPort, int $readMaxBytes = 100): ?string

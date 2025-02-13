@@ -8,18 +8,18 @@ use cs\Enum\HitBoxType;
 final class RifleAk extends AmmoBasedWeapon
 {
 
-    public const reloadTimeMs = 2400;
-    public const equipReadyTimeMs = 800;
-    public const magazineCapacity = 30;
-    public const reserveAmmo = 90;
-    public const killAward = 300;
-    public const runningSpeed = 215;
-    public const fireRateMs = 100;
-    public const damage = 190;
-    public const armorPenetration = 77;
-    public const recoilResetMs = 330;
-    public const recoilPattern = [
-        [0, 0],
+    public const int reloadTimeMs = 2400;
+    public const int equipReadyTimeMs = 800;
+    public const int magazineCapacity = 30;
+    public const int reserveAmmo = 90;
+    public const int killAward = 300;
+    public const int runningSpeed = 215;
+    public const int fireRateMs = 100;
+    public const int damage = 190;
+    public const int armorPenetration = 77;
+    public const int recoilResetMs = 330;
+    public const array recoilPattern = [
+        [0.0, 0.0],
         [+0.10, +0.19],
         [-0.01, +0.70],
         [+0.06, +1.50],

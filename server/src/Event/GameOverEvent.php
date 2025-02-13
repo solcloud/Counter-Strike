@@ -11,6 +11,7 @@ final class GameOverEvent extends NoTickEvent
     {
     }
 
+    #[\Override]
     public function serialize(): array
     {
         return [

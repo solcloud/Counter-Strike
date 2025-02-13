@@ -7,7 +7,7 @@ use cs\Interface\Flammable;
 
 class Molotov extends Grenade implements Flammable
 {
-    public const MAX_TIME_MS = 7_000;
+    public const int MAX_TIME_MS = 7_000;
 
     protected int $price = 400;
 

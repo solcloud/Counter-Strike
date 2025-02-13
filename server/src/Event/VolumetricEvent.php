@@ -174,6 +174,7 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
     }
 
     /** @codeCoverageIgnore */
+    #[\Override]
     public function serialize(): array
     {
         return [

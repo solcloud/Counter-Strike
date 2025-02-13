@@ -129,6 +129,7 @@ class DropEvent extends Event implements ForOneRoundMax
     }
 
     /** @codeCoverageIgnore */
+    #[\Override]
     public function serialize(): array
     {
         return [

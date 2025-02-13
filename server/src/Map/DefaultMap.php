@@ -65,16 +65,19 @@ class DefaultMap extends BoxMap
         $this->buyArea[1] = new Box(new Point(0, $y, 0), 43 * $scale, 2 * $heightStand, 6 * $scale);
     }
 
+    #[\Override]
     public function getStartingPointsForNavigationMesh(): array
     {
         return array_merge(parent::getStartingPointsForNavigationMesh(), $this->navmeshPoints);
     }
 
+    #[\Override]
     public function getSpawnRotationDefender(): int
     {
         return 180;
     }
 
+    #[\Override]
     public function getBombMaxBlastDistance(): int
     {
         return 1500;
