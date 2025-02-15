@@ -40,12 +40,11 @@ class TestGame extends Game
             $protocol = new TextProtocol();
             $this->gameStates[0] = json_decode($protocol->serializeGameState($this));
         }
-        for ($tickId = 0; $tickId < $this->tickMax; $tickId++) {
-            $this->tick = $tickId;
+        while ($this->tick < $this->tickMax) {
             if ($this->onTickCallback) {
                 call_user_func($this->onTickCallback, $this->getState());
             }
-            $gameOverEventOrNull = $this->tick($tickId);
+            $gameOverEventOrNull = $this->tick();
             $events = $this->consumeTickEvents();
             if ($this->onEventsCallback && $events !== []) {
                 call_user_func($this->onEventsCallback, $events);
@@ -54,7 +53,7 @@ class TestGame extends Game
                 call_user_func($this->afterTickCallback, $this->getState());
             }
             if ($debug) {
-                $this->gameStates[$tickId + 1] = json_decode($protocol->serialize($this->getPlayers(), $events));
+                $this->gameStates[$this->tick + 1] = json_decode($protocol->serialize($this->getPlayers(), $events));
             }
             if ($gameOverEventOrNull) {
                 break;

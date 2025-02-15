@@ -229,9 +229,8 @@ class PlayerKillTest extends BaseTestCase
         $this->assertTrue($player1->isAlive());
         $this->assertTrue($player2->isAlive());
 
-        $tickId = $game->getTickId();
         for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
-            $game->tick(++$tickId);
+            $game->tick();
         }
         $this->assertNotNull($player2->attack());
         $this->assertTrue($player1->isAlive());
@@ -239,7 +238,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(1, $game->getRoundNumber());
 
         for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
-            $game->tick(++$tickId);
+            $game->tick();
         }
         $this->assertNotNull($player2->attack());
         $this->assertFalse($player1->isAlive());
@@ -247,7 +246,7 @@ class PlayerKillTest extends BaseTestCase
         $this->assertSame(1, $game->getRoundNumber());
 
         for ($i = 1; $i <= Util::millisecondsToFrames(PistolUsp::fireRateMs + PistolUsp::recoilResetMs); $i++) {
-            $game->tick(++$tickId);
+            $game->tick();
         }
         $this->assertFalse($game->getScore()->attackersIsWinning());
         $this->assertSame(0, $game->getScore()->getScoreAttackers());
@@ -269,7 +268,7 @@ class PlayerKillTest extends BaseTestCase
         $game->getPlayer(1)->crouch();
 
         for ($i = 1; $i <= Setting::tickCountCrouch(); $i++) {
-            $game->tick($i);
+            $game->tick();
         }
         $this->assertSame(Setting::playerHeadHeightCrouch(), $game->getPlayer(1)->getHeadHeight());
         $this->assertSame(Setting::playerHeadHeightStand(), $player2->getHeadHeight());

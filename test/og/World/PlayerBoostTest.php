@@ -76,7 +76,7 @@ class PlayerBoostTest extends BaseTestCase
 
         for ($i = $game->getTickId(); $i <= 150; $i++) {
             $player1->moveForward();
-            $game->tick($i);
+            $game->tick();
         }
         $this->assertPositionSame($p2pos->clone()->setY(0), $player2->getPositionClone());
         $this->assertGreaterThan($p2pos->z, $player1->getPositionClone()->z);
@@ -101,7 +101,7 @@ class PlayerBoostTest extends BaseTestCase
         $player1->crouch();
         $startTickId = $game->getTickId();
         for ($i = $startTickId; $i <= $startTickId + Setting::tickCountCrouch(); $i++) {
-            $game->tick($i);
+            $game->tick();
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightCrouch());
         $this->assertPositionSame($p2pos->clone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
@@ -110,7 +110,7 @@ class PlayerBoostTest extends BaseTestCase
         $player2->jump();
         $startTickId = $game->getTickId();
         for ($i = $startTickId; $i <= $startTickId + max(Setting::tickCountJump(), Setting::tickCountCrouch()); $i++) {
-            $game->tick($i);
+            $game->tick();
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightStand());
         $this->assertPositionSame($player2->getPositionClone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
@@ -128,7 +128,7 @@ class PlayerBoostTest extends BaseTestCase
         $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
         $player2->moveRight();
-        $game->tick($game->getTickId() + 1);
+        $game->tick();
         $this->assertPositionNotSame($p2pos, $game->getPlayer(2)->getPositionClone());
         $this->assertTrue($player2->canJump());
     }
@@ -145,7 +145,7 @@ class PlayerBoostTest extends BaseTestCase
         $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
         $player1->jump();
-        $game->tick($game->getTickId() + 1);
+        $game->tick();
         $this->assertSame(0, $player1->getPositionClone()->y);
         $this->assertPositionSame($p2pos, $game->getPlayer(2)->getPositionClone());
         $this->assertTrue($player2->canJump());

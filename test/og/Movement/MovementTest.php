@@ -128,6 +128,9 @@ class MovementTest extends BaseTestCase
         $this->assertGreaterThan(0, $wall->getBase());
         $this->assertPlayerPosition($game, new Point(0, 0, $wall->getBase() - 1));
 
+        $game = $this->createOneRoundGame();
+        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
+        $game->getWorld()->addWall($wall);
         $game->getPlayer(1)->setPosition(new Point());
         $game->getWorld()->addFloor(new Floor(new Point(0, $wall->getCeiling(), $wall->getStart()->z), 0, Setting::moveDistancePerTick()));
         $game->start();

@@ -13,7 +13,7 @@ return new class extends SimulationTester {
         if ($tick === 1) {
             $this->assertPositionSame(new Point(1261, 0, 533), $pp);
         }
-        if ($tick === 70) {
+        if ($tick === 71) {
             $this->assertPositionSame(new Point(1261, 0, 534), $pp);
         }
 

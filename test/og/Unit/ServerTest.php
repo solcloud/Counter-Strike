@@ -52,7 +52,7 @@ class ServerTest extends BaseTest
         $server = new Server($game, $setting, $testNet);
         $this->assertSame(0, $server->getBlockedPlayersCount());
         $server->start();
-        $gameOver = $game->tick($game->getTickId() + 1);
+        $gameOver = $game->tick();
         $this->assertInstanceOf(GameOverEvent::class, $gameOver);
         $this->assertSame(GameOverReason::REASON_NOT_ALL_PLAYERS_CONNECTED, $gameOver->reason);
         $this->assertSame(1, $server->getBlockedPlayersCount());

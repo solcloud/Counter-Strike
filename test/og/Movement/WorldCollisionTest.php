@@ -287,7 +287,7 @@ class WorldCollisionTest extends BaseTestCase
             $state->getPlayer(1)->jump();
         });
         $game->start();
-        $this->assertSame(1, $game->getTickId());
+        $this->assertSame(2, $game->getTickId());
         $this->assertPlayerPosition($game, new Point(2 * Setting::moveDistancePerTick(), 2 * Setting::jumpDistancePerTick(), 0));
     }
 

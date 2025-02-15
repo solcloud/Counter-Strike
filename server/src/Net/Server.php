@@ -92,18 +92,16 @@ final class Server
     {
         $this->sendGameStateToClients();
 
-        $tickId = 0;
         $noSleep = ($this->tickNanoSeconds === 0); // no sleep inside tests
         $nextNsGoal = hrtime(true) + $this->tickNanoSeconds;
 
         while (true) {
             $this->receiveClientsCommands();
-            $gameOverEvent = $this->gameTick($tickId);
+            $gameOverEvent = $this->gameTick();
             $this->sendGameStateToClients();
             if ($gameOverEvent) {
                 break;
             }
-            $tickId++;
 
             // Sleep time
             if ($noSleep) {
@@ -116,13 +114,13 @@ final class Server
             if ($nsDelta > 1024) {
                 time_nanosleep(0, $nsDelta);
             } else {
-                $this->log('Server lag detected on tick ' . ($tickId - 1), LogLevel::WARNING);
+                $this->log('Server lag detected on tick ' . ($this->game->getTickId()), LogLevel::WARNING);
                 $this->serverLag++;
             }
             // @codeCoverageIgnoreEnd
         }
 
-        return $tickId;
+        return $this->game->getTickId();
     }
 
     private function sendGameStateToClients(): void
@@ -254,13 +252,13 @@ final class Server
         return new PlayerControl($player, $this->game->getState());
     }
 
-    private function gameTick(int $tickId): ?GameOverEvent
+    private function gameTick(): ?GameOverEvent
     {
         foreach ($this->tickCommands as $playerId => $callback) {
             call_user_func($callback, $this->clients[$playerId]->playerControl);
         }
         $this->tickCommands = [];
-        return $this->game->tick($tickId);
+        return $this->game->tick();
     }
 
     public function getBlockedPlayersCount(): int
