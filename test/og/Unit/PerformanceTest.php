@@ -115,9 +115,9 @@ class PerformanceTest extends BaseTest
         foreach ($players as $player) {
             $attackResults[] = $player->attack();
         }
-        $game->tick(0);
+        $game->tick();
         $took = $timer->stop();
-        $this->assertSame(0, $game->getTickId());
+        $this->assertSame(1, $game->getTickId());
 
         foreach ($players as $player) {
             $glock = $player->getEquippedItem();
@@ -160,7 +160,7 @@ class PerformanceTest extends BaseTest
         foreach ($players as $player) {
             $player->attack();
         }
-        $game->tick(0);
+        $game->tick();
         $took = $timer->stop();
 
         foreach ($players as $player) {
@@ -202,10 +202,10 @@ class PerformanceTest extends BaseTest
                 $player->jump();
                 $player->moveForward();
             }
-            $game->tick($i);
+            $game->tick();
         }
         $took = $timer->stop();
-        $this->assertSame($tickCount - 1, $game->getTickId());
+        $this->assertSame($tickCount, $game->getTickId());
 
         foreach ($players as $player) {
             $this->assertGreaterThan(50, $player->getPositionClone()->z);
@@ -259,9 +259,8 @@ class PerformanceTest extends BaseTest
         $player = new Player(1, Color::GREEN, true);
         $game->addPlayer($player);
         $this->assertTrue($player->buyItem(BuyMenuItem::GRENADE_MOLOTOV));
-        $tickId = $game->getTickId();
         foreach (range(0, Util::millisecondsToFrames(Molotov::equipReadyTimeMs)) as $i) {
-            $game->tick(++$tickId);
+            $game->tick();
         }
         $flammableItem = $player->getEquippedItem();
         $this->assertInstanceOf(Flammable::class, $flammableItem);
@@ -275,9 +274,9 @@ class PerformanceTest extends BaseTest
 
         foreach (range(1, Util::millisecondsToFrames(Molotov::MAX_TIME_MS)) as $i) {
             $timer->start();
-            $game->tick(++$tickId);
+            $game->tick();
             $took = $timer->stop();
-            $this->assertLessThan(1 * self::$timeScale, $took->asMilliseconds(), "Tick {$tickId}");
+            $this->assertLessThan(1 * self::$timeScale, $took->asMilliseconds(), "Tick {$game->getTickId()}");
 
             if ($game->getRoundNumber() === 2) {
                 break;

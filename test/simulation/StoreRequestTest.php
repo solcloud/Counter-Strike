@@ -86,7 +86,7 @@ class StoreRequestTest extends BaseTest
         $tester->onGameStart($game);
         $game->start();
         $tester->onGameEnd($game);
-        $this->assertSame($tickId, $game->getTickId());
+        $this->assertSame($tickId + 1, $game->getTickId());
     }
 
     protected function createGame(int $tickMax, GameProperty $properties): TestGame

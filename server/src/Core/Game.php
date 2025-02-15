@@ -85,10 +85,8 @@ class Game
         $this->addEvent($this->startRoundFreezeTime);
     }
 
-    public function tick(int $tickId): ?GameOverEvent
+    public function tick(): ?GameOverEvent
     {
-        $this->tick = $tickId;
-
         if ($this->gameOver) {
             $this->tickEvents = [$this->gameOver];
             return $this->gameOver;
@@ -101,7 +99,7 @@ class Game
                 continue;
             }
 
-            $player->onTick($tickId);
+            $player->onTick($this->tick);
             if ($player->isAlive()) {
                 $alivePlayers[(int)$player->isPlayingOnAttackerSide()]++;
                 $this->backtrack->addStateData($player);
@@ -111,7 +109,8 @@ class Game
         if (!$this->roundEndCoolDown) {
             $this->checkRoundEnd($alivePlayers[0], $alivePlayers[1]);
         }
-        $this->processEvents($tickId);
+        $this->processEvents();
+        $this->tick++;
         return null;
     }
 
@@ -148,7 +147,7 @@ class Game
         unset($this->events[$eventId]);
     }
 
-    private function processEvents(int $tickId): void
+    private function processEvents(): void
     {
         if ($this->events === []) {
             $this->eventId = 0;
@@ -156,7 +155,7 @@ class Game
         }
 
         foreach ($this->events as $event) {
-            $event->process($tickId);
+            $event->process($this->tick);
         }
     }
 

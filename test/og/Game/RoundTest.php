@@ -122,7 +122,7 @@ class RoundTest extends BaseTestCase
         ];
 
         $game = $this->simulateGame($playerCommands, [GameProperty::START_MONEY => 16000]);
-        $this->assertSame(12, $game->getTickId());
+        $this->assertSame(13, $game->getTickId());
         $this->assertTrue($called);
     }
 
@@ -141,7 +141,7 @@ class RoundTest extends BaseTestCase
             GameProperty::FREEZE_TIME_SEC => 0,
         ]);
         $this->assertTrue($game->isPaused());
-        $game->tick(0);
+        $game->tick();
         $this->assertFalse($game->isPaused());
         $events = $game->consumeTickEvents();
         $this->assertCount(3, $events);
@@ -156,13 +156,11 @@ class RoundTest extends BaseTestCase
             GameProperty::FREEZE_TIME_SEC => 1,
         ]);
 
-        $tickId = false;
         foreach (range(0, (int)(1000 / Util::$TICK_RATE)) as $tickId) {
             $this->assertTrue($game->isPaused(), "Tick: {$tickId}");
-            $game->tick($tickId);
+            $game->tick();
         }
-        $this->assertIsInt($tickId);
-        $game->tick($tickId++);
+        $game->tick();
         $this->assertFalse($game->isPaused());
     }
 
@@ -557,7 +555,7 @@ class RoundTest extends BaseTestCase
         $this->assertSame($maxRounds + 1, $game->getRoundNumber());
         $this->assertSame(4050, $game->getPlayer(1)->getMoney());
 
-        $gameOver = $game->tick($game->getTickId() + 1);
+        $gameOver = $game->tick();
         $this->assertInstanceOf(GameOverEvent::class, $gameOver);
         $this->assertSame(GameOverReason::DEFENDERS_WINS, $gameOver->reason);
     }
