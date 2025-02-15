@@ -38,7 +38,7 @@ foreach ($collider->getHitBoxes() as $box) {
         throw new Exception("Unknown geometry '" . get_class($geometry) . "' given");
     }
 
-    $modifier = $point->setScalar(0)->addY($geometry->usePlayerHeight ? $player->getHeadHeight() : 0);
+    $modifier = $point->setScalar(0)->addY($geometry->relativeToPlayerHighestPoint ? $player->getHeadHeight() : 0);
     foreach ($geometry->getParts($player) as $part) {
         $playerParts[$box->getType()->value][] = [
             "center" => $part->calculateWorldCoordinate($player, $modifier)->toArray(),

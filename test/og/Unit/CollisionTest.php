@@ -12,6 +12,36 @@ use Test\BaseTest;
 class CollisionTest extends BaseTest
 {
 
+    public function testBoxWithSegment(): void
+    {
+        $data = [
+            // boxMin | boxMax | segmentStart | segmentEnd | isCollision
+            [[-1, -1, -1], [1, 1, 1], [-10, 0, 0], [10, 0, 0], true],
+            [[-1, -1, -1], [1, 1, 1], [-10, -1, 0], [10, 1, 0], true],
+            [[-1, -1, -1], [1, 1, 1], [-1, -1, -1], [1, 1, 1], true],
+            [[-1, -1, -1], [1, 1, 1], [-1, -1, -1], [0, 0, 0], true],
+            [[-1, -1, -1], [1, 1, 1], [-1, 0, -1], [-1, 0, -1], true],
+            [[-1, -1, -1], [1, 1, 1], [-1, 1, 1], [7, -2, 2], false],
+            [[-1, -1, -1], [1, 1, 1], [-10, -2, -2], [-10, 10, -4], false],
+            [[-1, -1, -1], [1, 1, 1], [-10, -2, 0], [10, -4, 0], false],
+            [[-1, -1, -1], [1, 1, 1], [-10, 0, 0], [10, -4, 0], false],
+            [[-1, -1, -1], [1, 1, 1], [-10, 1, 0], [10, -4, 0], false],
+            [[-1, -1, -1], [1, 1, 1], [-10, 2, 0], [10, -4, 0], true],
+            [[-1, -1, -1], [1, 1, 1], [-10, 2, 0], [10, -4, 2], true],
+            [[-1, -1, -1], [1, 1, 1], [-10, 3, 0], [10, -4, 2], true],
+            [[-1, -1, -1], [1, 1, 1], [-10, 3, 0], [6, -4, 2], false],
+            [[5, 5, 5], [20, 20, 20], [0, 0, 0], [30, 30, 30], true],
+            [[5, 5, 5], [20, 20, 20], [10, 10, 10], [15, 15, 15], true],
+            [[5, 5, 5], [20, 20, 20], [10, 10, 26], [30, 15, 15], false],
+        ];
+        foreach ($data as $row) {
+            $this->assertSame($row[4], Collision::boxWithSegment(
+                new Point(...$row[0]), new Point(...$row[1]),
+                new Point(...$row[2]), new Point(...$row[3]),
+            ), (string)json_encode($row));
+        }
+    }
+
     public function testPointWithCircle(): void
     {
         $this->assertTrue(Collision::pointWithCircle(10, 10, 10, 10, 1));
@@ -314,7 +344,7 @@ class CollisionTest extends BaseTest
         ));
         $this->assertTrue(Collision::boxWithBox(
             new Point(2, 0, 1), new Point(5, 4, 5),
-            new Point(-1, -1, 5), new Point(2, 2, 5),
+            new Point(-1, -1, 5), new Point(2, 2, 6),
         ));
 
 

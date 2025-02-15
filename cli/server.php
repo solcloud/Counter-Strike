@@ -30,7 +30,7 @@ $net = new ClueSocket($bindAddress);
 $server = new Server($game, $settings, $net);
 $server->setLogger($logger);
 if ($debug) {
-    $server->storeRequests();
+    $server->storeRequests(sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cs.server.req');
 }
 
 $server->start();

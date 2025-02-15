@@ -5,6 +5,46 @@ namespace cs\Core;
 class Collision
 {
 
+    public static function boxWithSegment(Point $boxMin, Point $boxMax, Point $segmentStart, Point $segmentEnd): bool
+    {
+        assert($boxMin->x < $boxMax->x);
+        assert($boxMin->y < $boxMax->y);
+        assert($boxMin->z < $boxMax->z);
+
+        $tMin = 0;
+        $tMax = INF;
+        $aabbMin = [$boxMin->x, $boxMin->y, $boxMin->z];
+        $aabbMax = [$boxMax->x, $boxMax->y, $boxMax->z];
+        $lineStart = [$segmentStart->x, $segmentStart->y, $segmentStart->z];
+        $lineEnd = [$segmentEnd->x, $segmentEnd->y, $segmentEnd->z];
+
+        for ($i = 0; $i < 3; $i++) {
+            $direction = $lineEnd[$i] - $lineStart[$i];
+            if ($direction === 0) {
+                if ($lineStart[$i] < $aabbMin[$i] || $lineStart[$i] > $aabbMax[$i]) {
+                    return false;
+                }
+            } else {
+                $inverseDirection = 1.0 / $direction;
+                $t0 = ($aabbMin[$i] - $lineStart[$i]) * $inverseDirection;
+                $t1 = ($aabbMax[$i] - $lineStart[$i]) * $inverseDirection;
+
+                if ($inverseDirection < 0.0) {
+                    [$t0, $t1] = [$t1, $t0];
+                }
+
+                $tMin = max($tMin, $t0);
+                $tMax = min($tMax, $t1);
+
+                if ($tMax <= $tMin) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     public static function pointWithCircle(int $pointX, int $pointY, int $circleCenterX, int $circleCenterY, int $circleRadius): bool
     {
         $a = $pointX - $circleCenterX;
@@ -179,9 +219,9 @@ class Collision
 
     public static function pointWithBoxBoundary(Point $point, Point $boxMin, Point $boxMax): bool
     {
-        assert($boxMin->x <= $boxMax->x);
-        assert($boxMin->y <= $boxMax->y);
-        assert($boxMin->z <= $boxMax->z);
+        assert($boxMin->x < $boxMax->x);
+        assert($boxMin->y < $boxMax->y);
+        assert($boxMin->z < $boxMax->z);
 
         if ($point->y > $boxMax->y || $point->y < $boxMin->y) {
             return false;
@@ -198,13 +238,13 @@ class Collision
 
     public static function boxWithBox(Point $boundaryAMin, Point $boundaryAMax, Point $boundaryBMin, Point $boundaryBMax): bool
     {
-        assert($boundaryAMin->x <= $boundaryAMax->x);
-        assert($boundaryAMin->y <= $boundaryAMax->y);
-        assert($boundaryAMin->z <= $boundaryAMax->z);
+        assert($boundaryAMin->x < $boundaryAMax->x);
+        assert($boundaryAMin->y < $boundaryAMax->y);
+        assert($boundaryAMin->z < $boundaryAMax->z);
 
-        assert($boundaryBMin->x <= $boundaryBMax->x);
-        assert($boundaryBMin->y <= $boundaryBMax->y);
-        assert($boundaryBMin->z <= $boundaryBMax->z);
+        assert($boundaryBMin->x < $boundaryBMax->x);
+        assert($boundaryBMin->y < $boundaryBMax->y);
+        assert($boundaryBMin->z < $boundaryBMax->z);
 
         if ($boundaryAMin->x > $boundaryBMax->x || $boundaryBMin->x > $boundaryAMax->x) {
             return false;

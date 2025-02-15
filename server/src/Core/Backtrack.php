@@ -9,14 +9,31 @@ final class Backtrack
     private array $saveState = [];
     /** @var array<int,array<string,mixed>> */
     private array $newestState = [];
-    /** @var array<int,array<int,array<string,mixed>>> */
+    /** @var list<array<int,array<string,mixed>>> */
     private array $states = [];
+    private Point $point;
 
     public function __construct(private Game $game, public readonly int $numberOfHistoryStates)
     {
         if ($numberOfHistoryStates < 0) {
             throw new GameException("Variable '{$numberOfHistoryStates}' needs to be bigger or equal zero"); // @codeCoverageIgnore
         }
+        $this->point = new Point();
+    }
+
+    /**
+     * @return list<array{int, int, int}>
+     */
+    public function getAllPlayerPositions(int $playerId): array
+    {
+        $output = [];
+        foreach ($this->states as $state) {
+            if (isset($state[$playerId])) {
+                $output[] = $state[$playerId]['a'];
+            }
+        }
+
+        return $output; // @phpstan-ignore return.type
     }
 
     public function startState(): void
@@ -31,7 +48,7 @@ final class Backtrack
         }
 
         $this->newestState[$alivePlayer->getId()] = [
-            'a' => $alivePlayer->getPositionClone(),
+            'a' => $alivePlayer->getReferenceToPosition()->toFlatArray(),
             'b' => $alivePlayer->getSight()->getRotationHorizontal(),
             'c' => $alivePlayer->getSight()->getRotationVertical(),
             'd' => $alivePlayer->getHeadHeight(),
@@ -58,7 +75,7 @@ final class Backtrack
 
         foreach ($this->game->getPlayers() as $player) {
             $this->saveState[$player->getId()] = [
-                'a' => $player->getPositionClone(),
+                'a' => $player->getReferenceToPosition()->toFlatArray(),
                 'b' => $player->getSight()->getRotationHorizontal(),
                 'c' => $player->getSight()->getRotationVertical(),
                 'd' => $player->getHeadHeight(),
@@ -74,7 +91,7 @@ final class Backtrack
 
         foreach ($this->saveState as $playerId => $playerData) {
             $player = $this->game->getPlayer($playerId);
-            $player->setPosition($playerData['a']); // @phpstan-ignore-line
+            $player->setPosition($this->point->set(...$playerData['a'])); // @phpstan-ignore-line
             $player->getSight()->look($playerData['b'], $playerData['c']); // @phpstan-ignore-line
             $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
         }
@@ -92,7 +109,7 @@ final class Backtrack
         }
 
         $player = $this->game->getPlayer($playerId);
-        $player->setPosition($playerData['a']); // @phpstan-ignore-line
+        $player->setPosition($this->point->set(...$playerData['a'])); // @phpstan-ignore-line
         $player->getSight()->look($playerData['b'], $playerData['c']); // @phpstan-ignore-line
         $player->setHeadHeight($playerData['d']); // @phpstan-ignore-line
     }

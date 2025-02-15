@@ -261,8 +261,10 @@ class PlayerKillTest extends BaseTestCase
     public function testPlayerCanDodgeBulletByCrouch(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createGame();
+        $game = $this->createTestGame();
+        $game->getPlayer(1)->setPosition(new Point(500, 0, 250));
         $game->addPlayer($player2);
+        $player2->setPosition(new Point(500, 0, 500));
         $player2->getSight()->look(180, 0);
         $game->getPlayer(1)->crouch();
 

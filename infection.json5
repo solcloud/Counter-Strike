@@ -94,6 +94,7 @@
                 "\\$this->addSoundEvent\\(.+\\);",
                 "\\$bullet->addPlayerIdSkip\\(\\$playerId\\);",
                 "\\$this->convertToNavMeshNode\\(\\$navmesh\\);",
+                ".+max\\(\\$boxMax->x, \\$xyz\\[0\\]\\).+",
             ],
         },
         "Ternary": {

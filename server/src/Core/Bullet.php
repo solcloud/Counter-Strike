@@ -16,7 +16,7 @@ class Bullet
     /** @var array<int,true> [playerId => true] */
     private array $playerSkipIds = [];
 
-    public function __construct(private AttackEnable $item, private int $distanceMax = 1)
+    public function __construct(private readonly AttackEnable $item, public readonly int $distanceMax = 1)
     {
         $this->distanceTraveled = Setting::playerHeadRadius(); // shooting from center of player head so lets start on head edge
     }
