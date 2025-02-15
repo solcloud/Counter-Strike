@@ -49,13 +49,10 @@ final class World
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
     private int $bombActionTickBuffer = 1;
-    private int $playerPotentialDistanceSquared;
     private ?PathFinder $grenadeNavMesh = null;
 
     public function __construct(private Game $game)
     {
-        $this->playerPotentialDistanceSquared = ($game->getBacktrack()->numberOfHistoryStates + 2) * pow(Setting::moveDistancePerTick(), 2)
-            + pow(Setting::playerBoundingRadius(), 2); // fixme: more tests to know if it is reliable heuristic value, also test with further backtrack
     }
 
     public function roundReset(): void
@@ -403,34 +400,32 @@ final class World
         return false;
     }
 
-    public function optimizeBulletHitCheck(Bullet $bullet): void
+    public function optimizeBulletHitCheck(Bullet $bullet, Point $maxDestination): void
     {
-        $skipPlayerIds = $bullet->getPlayerSkipIds();
-        if (count($this->playersColliders) === count($skipPlayerIds)) {
-            return;
-        }
-
-        $test = new Point();
-        $bo = $bullet->getOrigin();
-        $bp = $bullet->getPosition();
-        $headCrouch = Setting::playerHeadHeightCrouch();
+        $boxMin = new Point();
+        $boxMax = new Point();
         foreach ($this->game->getPlayers() as $playerId => $player) {
-            if ($skipPlayerIds[$playerId] ?? false) {
-                continue;
-            }
             if (!$player->isAlive()) {
                 $bullet->addPlayerIdSkip($playerId);
                 continue;
             }
 
-            $test->setFrom($player->getReferenceToPosition());
-            $distanceSquared = Util::distanceSquared($test->addY($headCrouch), $bp);
-            if ($distanceSquared < $this->playerPotentialDistanceSquared) { // to close to reliably decide
-                continue;
+            $playerRadius = $player->getBoundingRadius();
+            $boxMin->setFrom($player->getReferenceToPosition());
+            $boxMax->setFrom($boxMin);
+            foreach ($this->getBacktrack()->getAllPlayerPositions($playerId) as $xyz) {
+                $boxMin->set(
+                    min($boxMin->x, $xyz[0]), min($boxMin->y, $xyz[1]), min($boxMin->z, $xyz[2])
+                );
+                $boxMax->set(
+                    max($boxMax->x, $xyz[0]), max($boxMax->y, $xyz[1]), max($boxMax->z, $xyz[2])
+                );
             }
-            if ($distanceSquared - $this->playerPotentialDistanceSquared > Util::distanceSquared($test, $bo)) {
-                $bullet->addPlayerIdSkip($playerId); // distance is bigger than bullet origin so hit should not be possible
-                continue;
+            $boxMin->addPart(-$playerRadius, 0, -$playerRadius);
+            $boxMax->addPart($playerRadius, Setting::playerHeadHeightStand(), $playerRadius);
+
+            if (!Collision::boxWithSegment($boxMin, $boxMax, $bullet->getOrigin(), $maxDestination)) {
+                $bullet->addPlayerIdSkip($playerId);
             }
         }
     }

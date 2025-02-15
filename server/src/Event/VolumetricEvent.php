@@ -61,10 +61,11 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
         $this->maxPartCount = (int)ceil($this->item->getMaxAreaMetersSquared() / $partArea);
 
         $this->setup();
-        $this->boundaryMin = $start->clone();
-        $this->boundaryMax = $start->clone();
         $this->queue = new SplQueue();
         $this->queue->enqueue($startNode);
+
+        $this->boundaryMin = $start->clone();
+        $this->boundaryMax = $start->clone()->addPart(1, 1, 1);
     }
 
     protected abstract function setup(): void;
@@ -96,8 +97,8 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
 
     public function process(int $tick): void
     {
-        if ($this->startedTickId + 1 === $tick) {
-            $this->expand($this->world->getTickId());
+        if ($this->startedTickId + 1 === $tick) { // initial expand on "first" tick so we get base event fired first (in constructor started tick)
+            $this->expand($tick);
         }
         if ([] === $this->parts) {
             $this->runOnCompleteHooks();

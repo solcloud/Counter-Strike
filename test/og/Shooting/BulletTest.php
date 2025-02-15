@@ -11,6 +11,7 @@ use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Event\AttackResult;
 use cs\Weapon\RifleAk;
+use ReflectionProperty;
 use Test\BaseTestCase;
 
 class BulletTest extends BaseTestCase
@@ -35,6 +36,8 @@ class BulletTest extends BaseTestCase
         $this->playPlayer($game, $playerCommands);
 
         $player = $game->getPlayer(1);
+        $boundingRadius = new ReflectionProperty($player, 'playerBoundingRadius');
+        $boundingRadius->setValue($player, 1);
         $result = $player->attack();
         $this->assertInstanceOf(AttackResult::class, $result, "Angles [{$angleHorizontal},{$angleVertical}]");
         $this->assertCount(1, $result->getHits(), "Angles [{$angleHorizontal},{$angleVertical}]");

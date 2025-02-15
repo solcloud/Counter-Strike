@@ -13,14 +13,14 @@ class SphereGroupHitBox implements HitIntersect
     private array $parts = [];
     private Point $point;
 
-    public function __construct(public readonly bool $usePlayerHeight)
+    public function __construct(public readonly bool $relativeToPlayerHighestPoint)
     {
         $this->point = new Point();
     }
 
     public function intersect(Player $player, Point $point): bool
     {
-        $this->point->setScalar(0)->addY($this->usePlayerHeight ? $player->getHeadHeight() : 0);
+        $this->point->setScalar(0)->addY($this->relativeToPlayerHighestPoint ? $player->getHeadHeight() : 0);
         foreach ($this->getParts($player) as $part) {
             if (Collision::pointWithSphere($point, $part->calculateWorldCoordinate($player, $this->point), $part->radius)) {
                 return true;

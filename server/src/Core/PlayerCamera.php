@@ -7,11 +7,6 @@ class PlayerCamera
     private float $rotationHorizontal = 0.0;
     private float $rotationVertical = 0.0;
 
-    public function reset(): void
-    {
-        $this->rotationVertical = $this->rotationHorizontal = 0.0;
-    }
-
     public function look(float $angleHorizontal, float $angleVertical): void
     {
         $this->lookHorizontal($angleHorizontal);

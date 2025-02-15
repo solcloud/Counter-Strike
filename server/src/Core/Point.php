@@ -160,4 +160,12 @@ class Point
         ];
     }
 
+    /**
+     * @return array{int, int, int}
+     */
+    public function toFlatArray(): array
+    {
+        return [$this->x, $this->y, $this->z];
+    }
+
 }

@@ -3,6 +3,7 @@
 namespace cs\Event;
 
 use cs\Core\Point;
+use cs\Core\Util;
 use cs\Core\World;
 use cs\Interface\Attackable;
 use cs\Interface\AttackEnable;
@@ -27,7 +28,11 @@ final class AttackEvent implements Attackable
         $bullet = $this->item->createBullet();
         $bullet->setOriginPlayer($this->playerId, $this->playingOnAttackerSide, $this->origin->clone());
         $result = new AttackResult($bullet);
-        $checkDistance = $bullet->getDistanceTraveled();
+
+        $maxDestination = $bullet->getOrigin()->clone()->addPart(
+            ...Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $bullet->distanceMax)
+        );
+        $this->world->optimizeBulletHitCheck($bullet, $maxDestination);
 
         // OPTIMIZATION_1: Precalculate sin/cos
         $sinV = sin(deg2rad($this->angleVertical));
@@ -53,10 +58,6 @@ final class AttackEvent implements Attackable
 
             $prevPos->setFrom($newPos);
             $bullet->move($newPos);
-            if ($distance > $checkDistance) {
-                $checkDistance *= 3;
-                $this->world->optimizeBulletHitCheck($bullet);
-            }
 
             foreach ($this->world->calculateHits($bullet, $newPos) as $hit) {
                 $bullet->lowerDamage($hit->getHitAntiForce($newPos));

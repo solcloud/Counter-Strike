@@ -65,6 +65,7 @@ final class Player
     {
         $this->health = 100;
         $this->isWalking = false;
+        $this->isAttacking = false;
         $this->headHeight = Setting::playerHeadHeightStand();
 
         $this->events = [];
@@ -265,8 +266,6 @@ final class Player
 
     public function roundReset(): void
     {
-        $this->resetTickStates();
-        $this->getSight()->reset();
         $this->inventory->reset($this->isPlayingOnAttackerSide, !$this->isAlive());
         $this->initialize();
     }
