@@ -69,13 +69,13 @@ $slots = [
             }
         }
     </script>
-    <script src="./assets/js/utils.js"></script>
 </head>
 <body style="margin:0">
 <script type="module">
     import * as THREE from 'three'
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
     import {ModelRepository} from "./assets/js/ModelRepository.js";
+    import {Utils} from "./assets/js/Utils.js";
 
     let camera, scene, renderer, controls;
 
@@ -154,7 +154,7 @@ $slots = [
         })
     }
     if (opacityPlayer > 0) {
-        player.rotation.y = serverHorizontalRotationToThreeRadian(<?= $player->getSight()->getRotationHorizontal() ?>)
+        player.rotation.y = Utils.serverHorizontalRotationToThreeRadian(<?= $player->getSight()->getRotationHorizontal() ?>)
         scene.add(player)
     }
 
