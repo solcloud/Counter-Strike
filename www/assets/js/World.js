@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import * as Enum from "./Enums.js"
 import {RGBELoader} from "three/addons/loaders/RGBELoader.js"
 import {ModelRepository} from "./ModelRepository.js"
+import {Utils} from "./Utils.js";
 
 export class World {
     #scene
@@ -182,8 +183,8 @@ export class World {
     }
 
     spawnFlame(size, height) {
-        const coneDetail = randomInt(5, 7)
-        const lightnessValue = randomInt(30, 80)
+        const coneDetail = Utils.randomInt(5, 7)
+        const lightnessValue = Utils.randomInt(30, 80)
         const geometry = this.loadCache(`flame-geo-c-${coneDetail}`, () => new THREE.ConeGeometry(1, 1, coneDetail))
         const material = this.loadCache(`flame-mat-${lightnessValue}`, () => new THREE.MeshPhongMaterial({
             color: new THREE.Color(`hsl(53, 100%, ${lightnessValue}%, 1)`)
@@ -211,9 +212,9 @@ export class World {
         )
         hit.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
         if (surface.plane === 'zy') {
-            hit.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), degreeToRadian(90))
+            hit.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Utils.degreeToRadian(90))
         } else if (surface.plane === 'xy') {
-            hit.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), degreeToRadian(90))
+            hit.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Utils.degreeToRadian(90))
         }
         hit.position.set(position.x + 0.1, position.y + 0.1, -position.z + 0.1)
 

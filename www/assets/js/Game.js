@@ -4,6 +4,7 @@ import {EventProcessor} from "./EventProcessor.js"
 import {Player} from "./Player.js"
 import {InventorySlot, SoundType} from "./Enums.js"
 import {SoundRepository} from "./SoundRepository.js"
+import {Utils} from "./Utils.js";
 
 export class Game {
     #world
@@ -72,7 +73,7 @@ export class Game {
         this.players.forEach(function (player) {
             if (player.getId() === game.playerMe.getId()) { // reset spectate camera to our player
                 const camera = game.#world.getCamera()
-                camera.rotation.set(0, serverHorizontalRotationToThreeRadian(player.data.look.horizontal), 0)
+                camera.rotation.set(0, Utils.serverHorizontalRotationToThreeRadian(player.data.look.horizontal), 0)
                 if (game.#pointer) {
                     game.#pointer.reset()
                 }
@@ -148,8 +149,8 @@ export class Game {
             camera.getWorldPosition(cameraPosition)
             cameraPosition.z = Math.abs(cameraPosition.z)
 
-            const angleHit = radianToDegree(Math.atan2(data.extra.origin.x - cameraPosition.x, data.extra.origin.z - cameraPosition.z))
-            const delta = smallestDeltaAngle(anglePlayer, angleHit)
+            const angleHit = Utils.radianToDegree(Math.atan2(data.extra.origin.x - cameraPosition.x, data.extra.origin.z - cameraPosition.z))
+            const delta = Utils.smallestDeltaAngle(anglePlayer, angleHit)
             this.#hud.spectatorHit(
                 (delta < -30 && delta > -150),
                 (delta > 30 && delta < 150),
@@ -158,7 +159,7 @@ export class Game {
             )
 
             // Update hit position for better audio feedback
-            const rotate = rotatePointY(angleHit, 0, 10)
+            const rotate = Utils.rotatePointY(angleHit, 0, 10)
             data.position.x = cameraPosition.x + rotate[0]
             data.position.y = cameraPosition.y + (Math.sign(data.extra.origin.y - cameraPosition.y) * 3)
             data.position.z = cameraPosition.z + rotate[1]
@@ -323,11 +324,11 @@ export class Game {
 
     spawnFlame(point, height, fireId, partId) {
         const size = this.#volumetrics[fireId]['size']
-        height = lerp(height, randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#volumetrics[fireId]).length) / randomInt(7, 9), 1))
+        height = Utils.lerp(height, Utils.randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#volumetrics[fireId]).length) / Utils.randomInt(7, 9), 1))
         const flame = this.#world.spawnFlame(size, height)
         this.#volumetrics[fireId][partId] = flame
         flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
-        flame.rotation.x = randomInt(-10, 10) / 100
+        flame.rotation.x = Utils.randomInt(-10, 10) / 100
         flame.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
     }
 
@@ -347,7 +348,7 @@ export class Game {
     spawnSmoke(point, height, smokeId, partId) {
         const size = this.#volumetrics[smokeId]['size']
         const offset = Math.max(2, Math.ceil(size / 4));
-        const geo = new THREE.CylinderGeometry(size - randomInt(0, offset), size, height - randomInt(0, offset), randomInt(5, 22))
+        const geo = new THREE.CylinderGeometry(size - Utils.randomInt(0, offset), size, height - Utils.randomInt(0, offset), Utils.randomInt(5, 22))
         geo.translate(point.x, point.y + (geo.parameters.height / 2), -point.z)
         this.#volumetrics[smokeId]['geometries'].push(geo)
 
@@ -431,7 +432,7 @@ export class Game {
 
     gameStart(options) {
         this.#options = options
-        window._csfGlobal.tickMs = options.tickMs
+        Utils.tickMs = options.tickMs
         this.#roundHalfTime = Math.floor(options.setting.max_rounds / 2) + 1
         this.#hud.startWarmup(options.warmupSec * 1000)
 
@@ -595,12 +596,12 @@ export class Game {
 
     updateOtherPlayersModels(player, data) {
         const playerObject = player.get3DObject()
-        playerObject.rotation.y = serverHorizontalRotationToThreeRadian(data.look.horizontal)
-        playerObject.getObjectByName('sight').rotation.x = serverVerticalRotationToThreeRadian(data.look.vertical)
+        playerObject.rotation.y = Utils.serverHorizontalRotationToThreeRadian(data.look.horizontal)
+        playerObject.getObjectByName('sight').rotation.x = Utils.serverVerticalRotationToThreeRadian(data.look.vertical)
 
         const hand = playerObject.getObjectByName('hand')
         if (hand.children.length) {
-            hand.children[0].rotation.y = serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50)) // cap hand item vertical look rotation
+            hand.children[0].rotation.y = Utils.serverVerticalRotationToThreeRadian(Math.max(Math.min(data.look.vertical, 50), -50)) // cap hand item vertical look rotation
         }
 
         player.animate()
@@ -666,7 +667,7 @@ export class Game {
             const isNotScopedIn = (scopeLevel === 0)
             this.#world.getCamera().getObjectByName('pov-item').visible = isNotScopedIn
             this.#hud.updateCrossHair(scopeLevel)
-            this.#world.updateCameraZoom(scopeLevelToZoom(scopeLevel))
+            this.#world.updateCameraZoom(Utils.scopeLevelToZoom(scopeLevel))
             if (this.meIsAlive()) {
                 this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
             }
@@ -699,7 +700,7 @@ export class Game {
     }
 
     getPlayerMeRotation() {
-        return threeRotationToServer(this.#pointer.getObject().rotation)
+        return Utils.threeRotationToServer(this.#pointer.getObject().rotation)
     }
 
     getPlayerSpectateRotation() {

@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import {ItemId} from "./Enums.js";
+import {Utils} from "./Utils.js";
 
 export class ModelRepository {
     #gltfLoader
@@ -144,31 +145,31 @@ export class ModelRepository {
             knifeSlot.position.y += 5.7
             knifeSlot.position.x += 3.8
             knifeSlot.position.z += -3.5
-            knifeSlot.rotateY(degreeToRadian(-70))
-            knifeSlot.rotateX(degreeToRadian(-4))
+            knifeSlot.rotateY(Utils.degreeToRadian(-70))
+            knifeSlot.rotateX(Utils.degreeToRadian(-4))
             const belt = model.scene.getObjectByName('belt')
             const slot4 = new THREE.Object3D()
             slot4.name = 'slot-4'
-            slot4.rotation.x = degreeToRadian(90)
+            slot4.rotation.x = Utils.degreeToRadian(90)
             slot4.position.set(16, 131, -5)
             const slot5 = new THREE.Object3D()
             slot5.name = 'slot-5'
-            slot5.rotation.x = degreeToRadian(90)
+            slot5.rotation.x = Utils.degreeToRadian(90)
             slot5.position.set(-14, 114, -9)
             const slot6 = new THREE.Object3D()
             slot6.name = 'slot-6'
-            slot6.rotation.x = degreeToRadian(90)
+            slot6.rotation.x = Utils.degreeToRadian(90)
             slot6.position.set(-19, 114, 3)
             const slot7 = new THREE.Object3D()
             slot7.name = 'slot-7'
-            slot7.rotation.x = degreeToRadian(90)
+            slot7.rotation.x = Utils.degreeToRadian(90)
             slot7.position.set(16.5, 130, 1)
             const slot8 = new THREE.Object3D()
             slot8.name = 'slot-8'
             slot8.position.set(-18, 112, -4)
             const slot9 = new THREE.Object3D()
             slot9.name = 'slot-9'
-            slot9.rotation.x = degreeToRadian(90)
+            slot9.rotation.x = Utils.degreeToRadian(90)
             slot9.position.set(13, 110, -8)
             belt.add(slot4, slot5, slot6, slot7, slot8, slot9)
 

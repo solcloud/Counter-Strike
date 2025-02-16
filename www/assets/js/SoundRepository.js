@@ -1,4 +1,5 @@
 import {InventorySlot, SoundType, ItemId, GrenadeSlots} from "./Enums.js";
+import {Utils} from "./Utils.js";
 
 export class SoundRepository {
     #alwaysInHeadTypes = [
@@ -30,13 +31,13 @@ export class SoundRepository {
     #getSoundName(type, item, playerId, surface, playerSpectateId, tickId) {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
-                if (tickId > this.#lastSpectatorMoveSoundTick + msToTick(400)) {
+                if (tickId > this.#lastSpectatorMoveSoundTick + Utils.msToTick(400)) {
                     this.#lastSpectatorMoveSoundTick = tickId
                     return '422990__dkiller2204__sfxrunground1.wav'
                 }
                 return null
             }
-            if (tickId > this.#lastOtherPlayerMoveSoundTick + msToTick(300)) {
+            if (tickId > this.#lastOtherPlayerMoveSoundTick + Utils.msToTick(300)) {
                 this.#lastOtherPlayerMoveSoundTick = tickId
                 return '221626__moodpie__body-impact.wav'
             }

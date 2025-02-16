@@ -65,7 +65,6 @@ $frameIdEnd = null;
             }
         }
     </script>
-    <script src="./assets/js/utils.js"></script>
 </head>
 <body>
 <script>
@@ -102,6 +101,7 @@ $frameIdEnd = null;
 <script type="module">
     import * as THREE from 'three'
     import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
+    import {Utils} from "./assets/js/Utils.js";
 
     const renderer = {
         gl: null,
@@ -148,7 +148,7 @@ $frameIdEnd = null;
                     new THREE.PlaneGeometry(floor.e.x - floor.s.x, floor.e.z - floor.s.z, 4, 4),
                     materialFloor
                 )
-                mesh.rotateX(degreeToRadian(-90))
+                mesh.rotateX(Utils.degreeToRadian(-90))
                 mesh.position.set(floor.s.x, floor.s.y, -floor.s.z)
                 mesh.translateX(mesh.geometry.parameters.width / 2)
                 mesh.translateY(mesh.geometry.parameters.height / 2)
@@ -164,7 +164,7 @@ $frameIdEnd = null;
                 if (wall.p === 'xy') {
                     // no rotation needed
                 } else if (wall.p === 'zy') {
-                    mesh.rotateY(degreeToRadian(90))
+                    mesh.rotateY(Utils.degreeToRadian(90))
                 } else {
                     throw new Error("Bad wall axis: " + wall.p)
                 }
@@ -218,7 +218,7 @@ $frameIdEnd = null;
                 new THREE.CircleGeometry(radiusBody, 16),
                 new THREE.MeshBasicMaterial({color, side: THREE.DoubleSide})
             );
-            boundingRadius.rotateX(degreeToRadian(90))
+            boundingRadius.rotateX(Utils.degreeToRadian(90))
 
             const player = new THREE.Object3D();
             player.rotation.reorder("YXZ")
@@ -306,9 +306,9 @@ $frameIdEnd = null;
 
                 console.debug(frameId, playerState.id, playerState.position, playerState.health)
                 player.getObjectByName('head').position.y = playerState.sight
-                player.getObjectByName('head').rotation.x = degreeToRadian(playerState.look.vertical - 90)
+                player.getObjectByName('head').rotation.x = Utils.degreeToRadian(playerState.look.vertical - 90)
                 player.position.set(playerState.position.x, playerState.position.y, -1 * (playerState.position.z))
-                player.rotation.y = serverHorizontalRotationToThreeRadian(playerState.look.horizontal)
+                player.rotation.y = Utils.serverHorizontalRotationToThreeRadian(playerState.look.horizontal)
             })
         }
     }
