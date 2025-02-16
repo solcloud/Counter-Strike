@@ -40,8 +40,8 @@ final class PistolUsp extends AmmoBasedWeapon
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 70 : 140,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 17 : 34,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 22 : 43,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 17 : 34,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 22 : 43,
             HitBoxType::LEG => 26,
         };
     }

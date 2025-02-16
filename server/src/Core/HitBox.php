@@ -43,7 +43,7 @@ final class HitBox implements Hittable
             return 50;
         }
 
-        if ($this->player->getArmorType()->hasArmor()) {
+        if ($this->player->getArmorType()->hasArmorBody()) {
             return 60;
         }
 
@@ -86,15 +86,15 @@ final class HitBox implements Hittable
 
     private function calculateArmorDamage(BaseWeapon $shootItem, ArmorType $armorType, HitBoxType $hitBoxType): int
     {
-        if ($armorType === ArmorType::NONE || $hitBoxType === HitBoxType::LEG) {
+        if ($armorType->hasNoArmor() || $hitBoxType === HitBoxType::LEG) {
             return 0;
         }
-        if ($hitBoxType === HitBoxType::HEAD && $armorType === ArmorType::BODY) {
+        if ($hitBoxType === HitBoxType::HEAD && $armorType->hasArmorBody()) {
             return 0;
         }
 
         $armorDamage = ($shootItem->getType() === ItemType::TYPE_WEAPON_PRIMARY ? 20 : 10);
-        if ($armorType === ArmorType::BODY_AND_HEAD && $hitBoxType === HitBoxType::HEAD) {
+        if ($armorType->hasArmorHead() && $hitBoxType === HitBoxType::HEAD) {
             $armorDamage += 30;
         }
 

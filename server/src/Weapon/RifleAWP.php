@@ -26,8 +26,8 @@ class RifleAWP extends AmmoBasedWeapon implements ScopeItem
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 448 : 459,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 112 : 115,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 140 : 143,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 112 : 115,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 140 : 143,
             HitBoxType::LEG => 85,
         };
     }

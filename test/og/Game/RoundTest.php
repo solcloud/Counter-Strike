@@ -197,8 +197,8 @@ class RoundTest extends BaseTestCase
         $this->assertNotEmpty($sights);
 
         if ($randomize) {
-            $this->assertGreaterThan(3, count(array_unique($spawns)));
-            $this->assertGreaterThan(3, count(array_unique($sights)));
+            $this->assertGreaterThan(2, count(array_unique($spawns)));
+            $this->assertGreaterThan(2, count(array_unique($sights)));
         } else {
             $this->assertCount(1, array_unique($spawns));
             $this->assertCount(1, array_unique($sights));

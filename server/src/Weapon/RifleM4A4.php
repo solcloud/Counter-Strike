@@ -59,8 +59,8 @@ final class RifleM4A4 extends AmmoBasedWeapon
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 92 : 131,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 23 : 32,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 28 : 41,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 23 : 32,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 28 : 41,
             HitBoxType::LEG => 24,
         };
     }

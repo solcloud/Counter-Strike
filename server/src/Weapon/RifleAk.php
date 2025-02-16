@@ -59,8 +59,8 @@ final class RifleAk extends AmmoBasedWeapon
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 111 : 143,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 27 : 35,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 34 : 44,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 27 : 35,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 34 : 44,
             HitBoxType::LEG => 26,
         };
     }

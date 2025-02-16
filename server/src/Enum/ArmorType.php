@@ -14,9 +14,14 @@ enum ArmorType: int
         return ($this === self::BODY_AND_HEAD);
     }
 
-    public function hasArmor(): bool
+    public function hasArmorBody(): bool
     {
         return ($this === self::BODY);
+    }
+
+    public function hasNoArmor(): bool
+    {
+        return ($this === self::NONE);
     }
 
 }

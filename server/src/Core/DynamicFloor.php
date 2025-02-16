@@ -7,7 +7,7 @@ final class DynamicFloor extends Floor
 
     private Point $pointReference;
 
-    public function __construct(private Player $player)
+    public function __construct(private readonly Player $player)
     {
         $this->pointReference = $player->getReferenceToPosition();
     }
@@ -39,7 +39,7 @@ final class DynamicFloor extends Floor
     #[\Override]
     public function getHitAntiForce(Point $point): int
     {
-        return 0;
+        GameException::invalid();
     }
 
     /**
@@ -48,7 +48,7 @@ final class DynamicFloor extends Floor
     #[\Override]
     public function getPlane(): string
     {
-        return 'xz';
+        GameException::invalid();
     }
 
 }

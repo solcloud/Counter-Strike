@@ -2,7 +2,7 @@
 
 namespace cs\Core;
 
-class GameState
+readonly class GameState
 {
 
     public function __construct(private Game $game)
