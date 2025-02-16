@@ -46,9 +46,9 @@ final class Player
     private int $eventIdLast = 6; // last
 
     public function __construct(
-        private int   $id,
-        private Color $color,
-        private bool  $isPlayingOnAttackerSide,
+        private readonly int   $id,
+        private readonly Color $color,
+        private bool           $isPlayingOnAttackerSide,
     )
     {
         $this->inventory = new Inventory($this->isPlayingOnAttackerSide);
@@ -247,11 +247,7 @@ final class Player
 
     public function getArmorValue(): int
     {
-        $kevlar = $this->inventory->getKevlar();
-        if ($kevlar) {
-            return $kevlar->getArmor();
-        }
-        return 0;
+        return ($this->inventory->getKevlar()?->getArmor() ?? 0);
     }
 
     public function hasDefuseKit(): bool

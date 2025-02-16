@@ -11,14 +11,13 @@ class Bullet
     private Point $position;
     private int $originPlayerId;
     private bool $originPlayerIsAttacker;
-    private int $distanceTraveled;
+    private int $distanceTraveled = 1;
     private int $damage = 1;
     /** @var array<int,true> [playerId => true] */
     private array $playerSkipIds = [];
 
     public function __construct(private readonly AttackEnable $item, public readonly int $distanceMax = 1)
     {
-        $this->distanceTraveled = Setting::playerHeadRadius(); // shooting from center of player head so lets start on head edge
     }
 
     public function setProperties(int $damage): void

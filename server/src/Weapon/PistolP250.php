@@ -41,8 +41,8 @@ final class PistolP250 extends AmmoBasedWeapon
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 96 : 151,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 24 : 37,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 30 : 47,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 24 : 37,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 30 : 47,
             HitBoxType::LEG => 28,
         };
     }

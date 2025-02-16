@@ -21,19 +21,9 @@ final class Backtrack
         $this->point = new Point();
     }
 
-    /**
-     * @return list<array{int, int, int}>
-     */
-    public function getAllPlayerPositions(int $playerId): array
+    public function reset(): void
     {
-        $output = [];
-        foreach ($this->states as $state) {
-            if (isset($state[$playerId])) {
-                $output[] = $state[$playerId]['a'];
-            }
-        }
-
-        return $output; // @phpstan-ignore return.type
+        $this->states = [];
     }
 
     public function startState(): void
@@ -130,6 +120,21 @@ final class Backtrack
             return [0];
         }
         return $states;
+    }
+
+    /**
+     * @return list<array{int, int, int}>
+     */
+    public function getAllPlayerPositions(int $playerId): array
+    {
+        $output = [];
+        foreach ($this->states as $state) {
+            if (isset($state[$playerId])) {
+                $output[] = $state[$playerId]['a'];
+            }
+        }
+
+        return $output; // @phpstan-ignore return.type
     }
 
 }

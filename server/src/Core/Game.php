@@ -93,7 +93,7 @@ class Game
         }
 
         $alivePlayers = [0, 0];
-        $this->backtrack->startState();
+        !$this->isPaused() && $this->backtrack->startState();
         foreach ($this->players as $player) {
             if (!$player->isAlive()) {
                 continue;
@@ -102,10 +102,10 @@ class Game
             $player->onTick($this->tick);
             if ($player->isAlive()) {
                 $alivePlayers[(int)$player->isPlayingOnAttackerSide()]++;
-                $this->backtrack->addStateData($player);
+                !$this->isPaused() && $this->backtrack->addStateData($player);
             }
         }
-        $this->backtrack->finishState();
+        !$this->isPaused() && $this->backtrack->finishState();
         if (!$this->roundEndCoolDown) {
             $this->checkRoundEnd($alivePlayers[0], $alivePlayers[1]);
         }
@@ -430,11 +430,13 @@ class Game
     private function roundReset(bool $firstRound, RoundEndEvent $roundEndEvent): void
     {
         $this->world->roundReset();
+
         foreach ($this->events as $event) {
             if ($event instanceof ForOneRoundMax) {
                 $this->removeEvent($event->customId);
             }
         }
+
         $randomizeSpawn = $this->properties->randomize_spawn_position;
         foreach ($this->players as $player) {
             if (!$firstRound) {
@@ -446,6 +448,7 @@ class Game
             $player->setPosition($spawnPosition);
         }
         $this->spawnBomb();
+        $this->backtrack->reset();
     }
 
     private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int

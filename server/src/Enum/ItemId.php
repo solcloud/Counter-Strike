@@ -9,12 +9,12 @@ use cs\Weapon;
 class ItemId
 {
 
-    public const SOLID_SURFACE = 0;
-    public const BOMB = 50;
+    public const int SOLID_SURFACE = 0;
+    public const int BOMB = 50;
 
     /** @var array<string,int> */
     public static array $map = [
-        SolidSurface::class => 0,
+        SolidSurface::class => self::SOLID_SURFACE,
 
         Weapon\Knife::class       => 1,
         Weapon\PistolGlock::class => 2,
@@ -32,7 +32,7 @@ class ItemId
         Equipment\Molotov::class       => 35,
         Equipment\Smoke::class         => 36,
 
-        Equipment\Bomb::class      => 50,
+        Equipment\Bomb::class      => self::BOMB,
         Equipment\DefuseKit::class => 51,
     ];
 

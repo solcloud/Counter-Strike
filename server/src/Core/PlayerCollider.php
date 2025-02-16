@@ -57,7 +57,7 @@ class PlayerCollider
         return null;
     }
 
-    public function collide(Point $point, int $radius, int $height): bool
+    public function isBoundaryCollision(Point $point, int $radius, int $height): bool
     {
         return (
             $this->player->isAlive() &&

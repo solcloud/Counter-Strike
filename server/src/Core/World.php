@@ -884,7 +884,7 @@ final class World
                 continue;
             }
 
-            if ($collider->collide($point, $radius, $height)) {
+            if ($collider->isBoundaryCollision($point, $radius, $height)) {
                 return $collider->getPlayer();
             }
         }

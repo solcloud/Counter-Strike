@@ -76,9 +76,9 @@ final class Knife extends BaseWeapon implements AttackEnable
     {
         if ($hitBox === HitBoxType::BACK) {
             if ($this->primaryAttack) {
-                return $armor->hasArmor() ? 76 : 90;
+                return $armor->hasArmorBody() ? 76 : 90;
             }
-            return $armor->hasArmor() ? 153 : 180;
+            return $armor->hasArmorBody() ? 153 : 180;
         }
 
         if ($hitBox === HitBoxType::HEAD) {
@@ -89,9 +89,9 @@ final class Knife extends BaseWeapon implements AttackEnable
         }
 
         if ($this->primaryAttack) {
-            return $armor->hasArmor() ? 34 : 40;
+            return $armor->hasArmorBody() ? 34 : 40;
         }
-        return $armor->hasArmor() ? 55 : 65;
+        return $armor->hasArmorBody() ? 55 : 65;
     }
 
     public function getKillAward(): int

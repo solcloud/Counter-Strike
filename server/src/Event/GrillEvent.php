@@ -4,6 +4,7 @@ namespace cs\Event;
 
 use cs\Core\Column;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Enum\SoundType;
 
 final class GrillEvent extends VolumetricEvent
@@ -34,6 +35,7 @@ final class GrillEvent extends VolumetricEvent
 
     protected function expandPart(Point $center): Column
     {
+        assert($this->partHeight < Setting::playerHeadHeightCrouch());
         $flame = new Column($center, $this->partRadius, $this->partHeight);
         if ($this->world->flameCanIgnite($flame)) {
             $soundEvent = new SoundEvent($flame->center, SoundType::FLAME_SPAWN);

@@ -9,7 +9,7 @@ use cs\Event\EquipEvent;
 
 abstract class Item
 {
-    public const int equipReadyTimeMs = 0;
+    public const int equipReadyTimeMs = PHP_INT_MAX;
 
     private int $id;
     private int $skinId;
@@ -17,7 +17,7 @@ abstract class Item
     protected int $price = 9999;
     /** @var non-negative-int */
     protected int $scopeLevel = 0;
-    private ?EquipEvent $eventEquip = null;
+    private EquipEvent $eventEquip;
     /** @var array<string,int> */
     public readonly array $toArrayCache;
 
@@ -28,6 +28,10 @@ abstract class Item
             'id'   => $this->id,
             'slot' => $this->getSlot()->value,
         ];
+
+        $this->eventEquip = new EquipEvent(function (): void {
+            $this->equipped = true;
+        }, static::equipReadyTimeMs);
     }
 
     public function canAttack(int $tickId): bool
@@ -129,12 +133,6 @@ abstract class Item
     {
         if (!$this->canBeEquipped()) {
             return null;
-        }
-
-        if ($this->eventEquip === null) {
-            $this->eventEquip = new EquipEvent(function (): void {
-                $this->equipped = true;
-            }, static::equipReadyTimeMs);
         }
 
         $this->eventEquip->reset();

@@ -192,4 +192,34 @@ class BacktrackShootingTest extends BaseTestCase
         $this->assertNotNull($deadSound);
     }
 
+    public function testBacktrackResetOnRoundEnd(): void
+    {
+        $property = $this->createNoPauseGameProperty(100);
+        $property->backtrack_history_tick_count = 100;
+        $game = $this->createTestGame(null, $property);
+        $player = $game->getPlayer(1);
+        $player->setPosition(new Point(500, 1500, 500));
+
+        $bt = $game->getBacktrack();
+        $this->assertEmpty($bt->getAllPlayerPositions(1));
+
+        $game->onTick(function(GameState $state) use ($game, $player, $bt): void {
+            if ($state->getTickId() === 2) {
+                $this->assertCount(1, $bt->getAllPlayerPositions(1));
+            }
+            if ($state->getTickId() === 9) {
+                $positions = array_map(fn(array $xyz) => implode(',', $xyz), $bt->getAllPlayerPositions(1));
+                $this->assertCount(8, $positions);
+                $this->assertCount(8, array_unique($positions));
+            }
+            if ($player->getReferenceToPosition()->hash() === '0,0,0') {
+                $this->assertEmpty($bt->getAllPlayerPositions(1));
+                $game->quit(GameOverReason::ATTACKERS_SURRENDER);
+            }
+        });
+        $game->start();
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertEmpty($bt->getAllPlayerPositions(1));
+    }
+
 }

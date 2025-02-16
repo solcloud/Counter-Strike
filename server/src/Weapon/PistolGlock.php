@@ -40,8 +40,8 @@ final class PistolGlock extends AmmoBasedWeapon
     {
         return match ($hitBox) {
             HitBoxType::HEAD => $armor->hasArmorHead() ? 56 : 119,
-            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmor() ? 14 : 29,
-            HitBoxType::STOMACH => $armor->hasArmor() ? 17 : 37,
+            HitBoxType::CHEST, HitBoxType::BACK => $armor->hasArmorBody() ? 14 : 29,
+            HitBoxType::STOMACH => $armor->hasArmorBody() ? 17 : 37,
             HitBoxType::LEG => 22,
         };
     }

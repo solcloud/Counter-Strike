@@ -5,6 +5,7 @@ namespace cs\Core;
 use cs\Enum\ArmorType;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\InventorySlot;
+use cs\Enum\ItemType;
 use cs\Equipment\Grenade;
 use cs\Equipment\Kevlar;
 use cs\Event\EquipEvent;
@@ -90,6 +91,7 @@ class Inventory
     {
         $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);
         if (is_int($index)) {
+            assert($item->getType() === ItemType::TYPE_GRENADE);
             unset($this->lastEquippedGrenadeSlots[$index]);
         }
     }

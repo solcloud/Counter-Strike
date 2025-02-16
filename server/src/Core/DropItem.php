@@ -4,7 +4,7 @@ namespace cs\Core;
 
 use cs\Enum\ItemType;
 
-class DropItem
+final readonly class DropItem
 {
     private int $radius;
     private int $height;
