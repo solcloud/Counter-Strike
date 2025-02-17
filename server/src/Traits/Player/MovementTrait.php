@@ -8,7 +8,7 @@ use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Enum\ItemType;
 use cs\Enum\SoundType;
-use cs\Event\PlayerMovementEvent;
+use cs\Event\CallbackEvent;
 use cs\Event\SoundEvent;
 use cs\Interface\ScopeItem;
 
@@ -102,10 +102,10 @@ trait MovementTrait
         $this->moveZ = -1;
     }
 
-    protected function createMovementEvent(): PlayerMovementEvent
+    protected function createMovementEvent(): CallbackEvent
     {
         $this->velocityPermil = 0;
-        return new PlayerMovementEvent(function (): void {
+        return new CallbackEvent(function (): void {
             if (!$this->isMoving()) {
                 $this->velocityPermil = 0;
                 return;

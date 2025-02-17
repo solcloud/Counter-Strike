@@ -16,7 +16,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerCanStandOnTopOfOtherPlayer(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
@@ -30,7 +30,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerCanJumpOverHighWallUsingOtherPlayer(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(Setting::tickCountCrouch() * 5);
+        $game = $this->createTestGameNoPause(Setting::tickCountCrouch() * 5);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addZ(Setting::moveDistancePerTick() * 3));
@@ -61,7 +61,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerFallDownWhenBoosterMoveAway(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
@@ -85,7 +85,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerFallDownWhenBoosterCrouchAndGoUpWhenHeJumpAndBoosterStand(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
@@ -119,7 +119,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerCanMoveAfterStandingOnTopOfOtherPlayer(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
@@ -136,7 +136,7 @@ class PlayerBoostTest extends BaseTestCase
     public function testPlayerCannotJumpWhenOtherPlayerStandingOnThem(): void
     {
         $player2 = new Player(2, Color::GREEN, false);
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));

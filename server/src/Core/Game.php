@@ -429,6 +429,7 @@ class Game
 
     private function roundReset(bool $firstRound, RoundEndEvent $roundEndEvent): void
     {
+        $this->backtrack->reset();
         $this->world->roundReset();
 
         foreach ($this->events as $event) {
@@ -448,7 +449,6 @@ class Game
             $player->setPosition($spawnPosition);
         }
         $this->spawnBomb();
-        $this->backtrack->reset();
     }
 
     private function calculateRoundMoneyAward(RoundEndEvent $roundEndEvent, Player $player): int

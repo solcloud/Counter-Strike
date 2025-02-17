@@ -707,6 +707,11 @@ final class World
         return $this->game->getTickId();
     }
 
+    public function isPaused(): bool
+    {
+        return $this->game->isPaused();
+    }
+
     public function playerDiedToFallDamage(Player $playerDead): void
     {
         $this->game->playerFallDamageKilledEvent($playerDead);

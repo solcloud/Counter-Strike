@@ -5,6 +5,7 @@ namespace Test\Shooting;
 use cs\Core\GameState;
 use cs\Core\Player;
 use cs\Core\Point;
+use cs\Core\Setting;
 use cs\Core\Util;
 use cs\Core\Wall;
 use cs\Enum\Color;
@@ -204,8 +205,17 @@ class BacktrackShootingTest extends BaseTestCase
         $this->assertEmpty($bt->getAllPlayerPositions(1));
 
         $game->onTick(function(GameState $state) use ($game, $player, $bt): void {
+            if ($state->getTickId() === 1) {
+                $this->assertEmpty($bt->getAllPlayerPositions(1));
+            }
             if ($state->getTickId() === 2) {
-                $this->assertCount(1, $bt->getAllPlayerPositions(1));
+                $this->assertSame([[500, 1500 - 1 * Setting::fallAmountPerTick(), 500]], $bt->getAllPlayerPositions(1));
+            }
+            if ($state->getTickId() === 3) {
+                $this->assertSame([
+                    [500, 1500 - 2 * Setting::fallAmountPerTick(), 500],
+                    [500, 1500 - 1 * Setting::fallAmountPerTick(), 500],
+                ], $bt->getAllPlayerPositions(1));
             }
             if ($state->getTickId() === 9) {
                 $positions = array_map(fn(array $xyz) => implode(',', $xyz), $bt->getAllPlayerPositions(1));

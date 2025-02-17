@@ -36,7 +36,7 @@ class FloorTest extends BaseTestCase
     public function testPlayerCanFallDownThroughFloor(): void
     {
         $floorHeight = 20;
-        $game = $this->createTestGame(Setting::moveDistancePerTick() / 2);
+        $game = $this->createTestGameNoPause(Setting::moveDistancePerTick() / 2);
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 2, $p->getBoundingRadius()));
 
@@ -58,7 +58,7 @@ class FloorTest extends BaseTestCase
     public function testPlayerCannotFallDownThroughBoxFloor(): void
     {
         $floorHeight = 20;
-        $game = $this->createTestGame(Setting::moveDistancePerTick() / 2);
+        $game = $this->createTestGameNoPause(Setting::moveDistancePerTick() / 2);
         $p = $game->getPlayer(1);
         $p->setPosition(new Point($p->getBoundingRadius() * 4, $floorHeight * 4, $p->getBoundingRadius()));
 
@@ -107,7 +107,7 @@ class FloorTest extends BaseTestCase
     public function testPlayerMakeNoiseWhenFallingOnFloorEdgeBoundingRadiusSerialize(): void
     {
         $floor = new Floor(new Point(500, 10, 500));
-        $game = $this->createTestGame(5);
+        $game = $this->createTestGameNoPause(5);
         $game->getWorld()->addFloor($floor);
 
         $player = $game->getPlayer(1);

@@ -321,7 +321,8 @@ class MovementTest extends BaseTestCase
 
     public function testPlayerMultiJump(): void
     {
-        $pc = [
+        $game = $this->createNoPauseGame();
+        $this->playPlayer($game, [
             fn(Player $p) => $this->assertFalse($p->isJumping()),
             fn(Player $p) => $this->assertTrue($p->canJump()),
             fn(Player $p) => $p->jump(),
@@ -334,8 +335,8 @@ class MovementTest extends BaseTestCase
             },
             fn(Player $p) => $p->jump(),
             $this->waitXTicks(Setting::tickCountJump() * 2),
-        ];
-        $game = $this->simulateGame($pc);
+            $this->endGame(),
+        ]);
         $this->assertSame(0, $game->getPlayer(1)->getPositionClone()->y);
         $this->assertFalse($game->getPlayer(1)->isFlying());
         $this->assertFalse($game->getPlayer(1)->isJumping());
@@ -366,7 +367,7 @@ class MovementTest extends BaseTestCase
 
     public function testPlayerCornerFloorCatch(): void
     {
-        $game = $this->createTestGame(20);
+        $game = $this->createTestGameNoPause(20);
         $p = $game->getPlayer(1);
         $p->setPosition(new Point(100, 700, 100));
         $radius = $p->getBoundingRadius();

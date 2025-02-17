@@ -6,7 +6,7 @@ use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Enum\SoundType;
-use cs\Event\PlayerGravityEvent;
+use cs\Event\CallbackEvent;
 use cs\Event\SoundEvent;
 
 trait GravityTrait
@@ -14,14 +14,14 @@ trait GravityTrait
 
     private int $fallHeight = 0;
 
-    protected function createGravityEvent(): PlayerGravityEvent
+    protected function createGravityEvent(): CallbackEvent
     {
-        return new PlayerGravityEvent(fn() => $this->processGravity($this->position));
+        return new CallbackEvent(fn() => $this->processGravity($this->position));
     }
 
     private function processGravity(Point $point): void
     {
-        if ($this->isJumping() || $this->activeFloor) {
+        if ($this->isJumping() || $this->activeFloor || $this->world->isPaused()) {
             return;
         }
 

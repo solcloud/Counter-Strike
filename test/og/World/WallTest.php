@@ -226,7 +226,7 @@ class WallTest extends BaseTestCase
     public function testPlayerRunningStairsToDeathBoundingRadius(): void
     {
         $numOfBoxes = 40;
-        $game = $this->createTestGame($numOfBoxes + 40);
+        $game = $this->createTestGameNoPause($numOfBoxes + 40);
         $player = $game->getPlayer(1);
         $this->assertTrue($player->isAlive());
 
