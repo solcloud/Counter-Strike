@@ -1,7 +1,6 @@
 name: "Tests"
 on:
   push:
-    branches: [master]
     paths-ignore:
       - '**.md'
       - 'cli/'
@@ -33,26 +32,11 @@ jobs:
       - name: "Install Composer dependencies"
         timeout-minutes: 1
         run: |
-          composer install -o
+          composer install
 
-      - name: "Run Composer check"
-        timeout-minutes: 1
+      - name: "Run Composer check-full"
+        timeout-minutes: 8
         run: |
-          export XDEBUG_MODE=off
-          composer check
-
-      - name: "Check code coverage min percentage"
-        timeout-minutes: 4
-        run: |
-          export XDEBUG_MODE=coverage
-          composer coverage -- --stderr --no-progress --colors=never 2> cc.txt
-          grep 'Lines:' cc.txt | grep '100.00%'
-
-      - name: "Check infection mutation framework min percentage"
-        timeout-minutes: 5
-        run: |
-          export XDEBUG_MODE=off
           grep '"timeout": 20,' infection.json5
           sed -i 's/"timeout": 20,/"timeout": 40,/' infection.json5
-          composer infection-cache -- --threads=$(($(nproc) + 1)) \
-                --only-covering-test-cases --skip-initial-tests
+          composer check-full

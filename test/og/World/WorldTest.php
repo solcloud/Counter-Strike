@@ -114,7 +114,7 @@ class WorldTest extends BaseTestCase
         $steps = 20;
         $ramp = new Ramp(new Point(Setting::playerBoundingRadius() + 10, 0, 0), RampDirection::GROW_TO_POSITIVE_X, $steps + 1, 250, true, Setting::moveDistancePerTick());
 
-        $game = $this->createTestGame($steps);
+        $game = $this->createTestGameNoPause($steps);
         $game->getWorld()->addRamp($ramp);
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
 
@@ -136,7 +136,7 @@ class WorldTest extends BaseTestCase
             Setting::playerObstacleOvercomeHeight()
         );
 
-        $game = $this->createTestGame($steps);
+        $game = $this->createTestGameNoPause($steps);
         $game->getWorld()->addRamp($ramp);
         $player = $game->getPlayer(1);
         $player->setPosition($player->getPositionClone()->addY($startY));

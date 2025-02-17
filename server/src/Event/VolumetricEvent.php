@@ -17,15 +17,16 @@ use SplQueue;
 abstract class VolumetricEvent extends Event implements ForOneRoundMax
 {
     public readonly string $id;
-    /** @var Column[] */
-    public array $parts = [];
-    private int $startedTickId;
-    private int $lastPartSpawnTickId;
-    private int $spawnTickCount;
-    private int $spawnPartCount;
-    private int $maxTicksCount;
+    private readonly int $startedTickId;
+    private readonly int $spawnTickCount;
+    private readonly int $spawnPartCount;
+    private readonly int $maxTicksCount;
     private readonly int $partSize;
     private readonly int $maxPartCount;
+
+    /** @var Column[] */
+    public array $parts = [];
+    private int $lastPartSpawnTickId;
 
     public readonly Point $boundaryMin;
     public readonly Point $boundaryMax;

@@ -65,7 +65,7 @@ abstract class BaseTestCase extends BaseTest
 
     /**
      * @param array<string,int|string|bool> $gameProperties
-     * @deprecated use createTestGame() instead, this only set playerBoundingRadius() to 0
+     * @deprecated use createTestGameNoPause() instead, this only set playerBoundingRadius() to 0
      */
     protected function createOneRoundGame(int $tickMax = 1, array $gameProperties = []): TestGame
     {
@@ -108,6 +108,25 @@ abstract class BaseTestCase extends BaseTest
         $game->addPlayer($testPlayer);
 
         return $game;
+    }
+
+    /** @param array<string,int|string|bool> $gameProperties */
+    protected function createTestGameNoPause(?int $tickMax = null, array $gameProperties = []): TestGame
+    {
+        return $this->createTestGame(
+            $tickMax,
+            GameProperty::fromArray([
+                ...[
+                    GameProperty::MAX_ROUNDS => 1,
+                    GameProperty::START_MONEY => 0,
+                    GameProperty::FREEZE_TIME_SEC => 0,
+                    GameProperty::ROUND_END_COOL_DOWN_SEC => 0,
+                    GameProperty::RANDOMIZE_SPAWN_POSITION => false,
+                    GameProperty::ROUND_TIME_MS => 1000,
+                ],
+                ...$gameProperties,
+            ]),
+        );
     }
 
     protected function createNoPauseGame(int $maxRounds = 1): TestGame

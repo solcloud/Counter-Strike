@@ -16,6 +16,7 @@ use cs\Enum\SoundType;
 use cs\Equipment\Incendiary;
 use cs\Equipment\Molotov;
 use cs\Equipment\Smoke;
+use cs\Event\GrillEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\SoundEvent;
 use Test\BaseTestCase;
@@ -298,11 +299,20 @@ class MolotovGrenadeTest extends BaseTestCase
         $game->getWorld()->addBox(new Box(new Point(), 1000, 2000, 1000));
         $health = 100;
 
+        $grillEventTickId = null;
         $flameSpawnEventCount = 0;
         $flameExtinguishEventCount = 0;
-        $game->onEvents(function (array $events) use (&$flameSpawnEventCount, &$flameExtinguishEventCount): void {
+        $game->onEvents(function (array $events) use ($game, &$grillEventTickId, &$flameSpawnEventCount, &$flameExtinguishEventCount): void {
             foreach ($events as $event) {
+                if ($event instanceof GrillEvent) {
+                    $this->assertNull($grillEventTickId);
+                    $grillEventTickId = $game->getTickId();
+                }
                 if ($event instanceof SoundEvent && $event->type === SoundType::FLAME_SPAWN) {
+                    if ($flameSpawnEventCount === 0) {
+                        $this->assertNotNull($grillEventTickId);
+                        $this->assertSame($grillEventTickId + 1, $game->getTickId());
+                    }
                     $flameSpawnEventCount++;
                 }
                 if ($event instanceof SoundEvent && $event->type === SoundType::FLAME_EXTINGUISH) {
@@ -336,6 +346,7 @@ class MolotovGrenadeTest extends BaseTestCase
         $this->assertGreaterThan(72, $game->getPlayer(1)->getHealth());
         $this->assertGreaterThan(10, $flameSpawnEventCount);
         $this->assertSame($flameSpawnEventCount, $flameExtinguishEventCount);
+        $this->assertNotNull($grillEventTickId);
     }
 
     public function testSmokeExtinguishFlames(): void

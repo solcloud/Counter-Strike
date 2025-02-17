@@ -94,13 +94,13 @@ class WorldCollisionTest extends BaseTestCase
     public function testPlayerDieOnFallDamage(): void
     {
         $yStart = Setting::playerHeadHeightStand() * 6;
-        $playerCommands = [
+        $game = $this->createNoPauseGame();
+
+        $this->playPlayer($game, [
             fn(Player $p) => $p->setPosition(new Point(500, $yStart, 500)),
             $this->waitXTicks((int)ceil($yStart / Setting::fallAmountPerTick())),
-            $this->endGame(),
-        ];
+        ]);
 
-        $game = $this->simulateGame($playerCommands);
         $this->assertFalse($game->getPlayer(1)->isAlive());
         $this->assertSame(-1, $game->getScore()->getPlayerStat(1)->getKills());
         $this->assertSame(1, $game->getScore()->getPlayerStat(1)->getDeaths());
@@ -197,7 +197,7 @@ class WorldCollisionTest extends BaseTestCase
         $floorYPos = 2;
         $spawnPosition = new Point(0, $floorYPos + 10, 0);
 
-        $game = $this->createTestGame(4);
+        $game = $this->createTestGameNoPause(4);
         $game->getWorld()->addFloor(new Floor(new Point(0, $floorYPos, 0)));
         $game->getPlayer(1)->setPosition($spawnPosition);
 
@@ -210,7 +210,7 @@ class WorldCollisionTest extends BaseTestCase
         $floorYPos = 2;
         $spawnPosition = new Point(0, $floorYPos + 10, 0);
 
-        $game = $this->createTestGame(4);
+        $game = $this->createTestGameNoPause(4);
         $game->getWorld()->addFloor(new Floor(new Point(0, $floorYPos, 0), 20, 20));
         $game->getPlayer(1)->setPosition($spawnPosition);
 
@@ -220,7 +220,8 @@ class WorldCollisionTest extends BaseTestCase
 
     public function testPlayerJump(): void
     {
-        $playerCommands = [
+        $game = $this->createNoPauseGame();
+        $this->playPlayer($game,  [
             function (Player $p): void {
                 $this->assertTrue($p->canJump());
                 $this->assertFalse($p->isJumping());
@@ -236,14 +237,14 @@ class WorldCollisionTest extends BaseTestCase
             function (Player $p): void {
                 $this->assertTrue($p->canJump());
             },
-        ];
-        $game = $this->simulateGame($playerCommands);
+            $this->endGame(),
+        ]);
         $this->assertPositionSame(new Point(), $game->getPlayer(1)->getPositionClone());
     }
 
     public function testPlayerJumpIntoWallCancelGoingUpInstantly(): void
     {
-        $game = $this->createTestGame();
+        $game = $this->createTestGameNoPause();
         $this->assertGreaterThan(Setting::jumpDistancePerTick(), Setting::fallAmountPerTick());
         $maxY = (int)ceil(Setting::jumpDistancePerTick() / 2);
         $baseY = 123;
@@ -314,7 +315,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testCanJumpOnBoxBoundingRadius(): void
     {
         $tickCount = Setting::tickCountJump() * 2 + 4;
-        $game = $this->createTestGame($tickCount);
+        $game = $this->createTestGameNoPause($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();
@@ -334,7 +335,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testCanJumpOverWall(): void
     {
         $tickCount = Setting::tickCountJump() * 2;
-        $game = $this->createTestGame($tickCount + 2);
+        $game = $this->createTestGameNoPause($tickCount + 2);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();
@@ -356,7 +357,7 @@ class WorldCollisionTest extends BaseTestCase
     public function testCanJumpOverWallBoundingRadius(): void
     {
         $tickCount = Setting::tickCountJump() * 2 + 2;
-        $game = $this->createTestGame($tickCount);
+        $game = $this->createTestGameNoPause($tickCount);
         $game->onTick(function (GameState $state): void {
             if ($state->getTickId() === 1) {
                 $state->getPlayer(1)->jump();

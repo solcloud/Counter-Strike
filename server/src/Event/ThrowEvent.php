@@ -4,7 +4,6 @@ namespace cs\Event;
 
 use cs\Core\Bullet;
 use cs\Core\GameException;
-use cs\Core\Item;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Sequence;
