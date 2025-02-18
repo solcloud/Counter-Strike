@@ -85,11 +85,11 @@ class TestGame extends Game
         $this->onEventsCallback = $callback;
     }
 
-    public function startDebug(string $path = '/tmp/cs.demo.json'): void
+    public function startDebug(?string $path = null): void
     {
         $this->start(true);
         file_put_contents(
-            $path,
+            $path ?? sys_get_temp_dir() . DIRECTORY_SEPARATOR . '/cs.demo.json',
             json_encode([
                 'player' => [
                     'head'   => Setting::playerHeadRadius(),
