@@ -11,7 +11,7 @@ use cs\Event\SoundEvent;
 use cs\Event\ThrowEvent;
 
 ////////
-$data = @file_get_contents('/tmp/cs.demo.json');
+$data = @file_get_contents(sys_get_temp_dir() . DIRECTORY_SEPARATOR . '/cs.demo.json');
 ////////
 
 if ($data === false) {
