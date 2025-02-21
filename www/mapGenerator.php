@@ -28,9 +28,26 @@ $spawnDefenders = [];
 foreach ($map->getSpawnPositionDefender() as $point) {
     $spawnDefenders[] = $point->toArray();
 }
-$boxes = [];
-foreach ($map->getBoxes() as $box) {
-    $boxes[] = $box->toArray();
+$planes = [];
+foreach ($map->getWalls() as $plane) {
+    $planes[] = [
+        'x' => $plane->getStart()->x,
+        'y' => $plane->getStart()->y,
+        'z' => $plane->getStart()->z,
+        'width' => $plane->width,
+        'height' => $plane->height,
+        'plane' => $plane->getPlane(),
+    ];
+}
+foreach ($map->getFloors() as $plane) {
+    $planes[] = [
+        'x' => $plane->getStart()->x,
+        'y' => $plane->getStart()->y,
+        'z' => $plane->getStart()->z,
+        'width' => $plane->width,
+        'height' => $plane->depth,
+        'plane' => $plane->getPlane(),
+    ];
 }
 ?>
 <!Doctype html>
@@ -57,8 +74,11 @@ foreach ($map->getBoxes() as $box) {
 
     const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
     let camera, scene, renderer, controls, map, extra;
-    const worldMaterial = new THREE.MeshLambertMaterial({color: 0x9f998e})
-    const material = new THREE.MeshStandardMaterial({color: 0x664b17})
+    const material = new THREE.MeshLambertMaterial({
+        color: 0x9f998e,
+        wireframe: <?= ((bool)($_GET['solid'] ?? false) ? 'false' : 'true') ?>,
+        side: THREE.DoubleSide
+    })
 
     function init() {
         scene = new THREE.Scene();
@@ -69,88 +89,47 @@ foreach ($map->getBoxes() as $box) {
         } else {
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
-        if (!forRadar) {
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        }
         document.body.appendChild(renderer.domElement);
 
         if (forRadar) {
             camera = new THREE.OrthographicCamera(-400, 400, 400, -400, 1, 9000)
         } else {
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(10), new THREE.MeshBasicMaterial({color: 0x000000, transparent: true, opacity: 0.8})))
         }
-        camera.position.y = 4000
+        camera.position.y = 1000
 
         controls = new OrbitControls(camera, renderer.domElement);
     }
 
-    function createRamp(startX = 1507.1, startY = 0, endX = 1676, endY = 140.1, depth = 80) {
-        const shape = new THREE.Shape();
-        shape.moveTo(startX, startY);
-        shape.lineTo(endX, startY);
-        shape.lineTo(endX, endY);
-        shape.lineTo(startX, startY);
-
-        return new THREE.Mesh(new THREE.ExtrudeGeometry(shape, {steps: 2, depth: depth,}), material);
-    }
-
     function object() {
-        const json = '<?= json_encode($boxes, JSON_THROW_ON_ERROR) ?>';
+        const json = '<?= json_encode($planes, JSON_THROW_ON_ERROR) ?>';
         const data = JSON.parse(json);
         extra = new THREE.Group()
         extra.name = 'extra'
         map = new THREE.Group()
         map.name = 'map'
 
-        let first = true, center, maxHeight
-        data.forEach(function (box) {
+        data.forEach(function (plane) {
             let mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(box.width, box.height, box.depth),
+                new THREE.PlaneGeometry(plane.width, plane.height),
                 material,
             )
-            mesh.position.set(box.x, box.y, -1 * box.z)
-            mesh.translateX(box.width / 2)
-            mesh.translateY(box.height / 2)
-            mesh.translateZ(box.depth / -2)
-            mesh.castShadow = true
-            mesh.receiveShadow = true
 
-            if (first) {
-                maxHeight = box.height - 1
-                center = new THREE.Object3D()
-                center.name = "center"
-                center.position.set(box.width / 2, box.height / 2, box.depth / -2)
-                center.visible = false
-                map.add(center)
-                if (!forRadar) {
-                    camera.position.x = center.position.x;
-                    camera.position.z = center.position.z;
-                    camera.lookAt(camera.position.x, 0, camera.position.z)
-                    controls.update()
-                }
-
-                mesh.castShadow = false
-                mesh.material = worldMaterial
-                mesh.material.side = THREE.BackSide
-                mesh.name = "world"
-                first = false
+            if (plane.plane === 'zy') {
+                mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.PI / 2)
+            } else if (plane.plane === 'xz') {
+                mesh.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Math.PI / -2)
             }
+            mesh.position.set(plane.x, plane.y, -1 * plane.z)
+            mesh.translateX(plane.width / 2)
+            mesh.translateY(plane.height / 2)
+
             map.add(mesh)
         })
 
-        const s1 = new THREE.SpotLight(0xFFFFFF, 5_000_000)
-        s1.castShadow = true
-        s1.shadow.mapSize.width = 2048
-        s1.shadow.mapSize.height = 2048
-        s1.shadow.camera.near = 1
-        s1.shadow.camera.far = maxHeight * 10
-        s1.position.set(center.position.x, maxHeight * 2.5, center.position.z)
-        s1.target = center
         const d1 = new THREE.DirectionalLight(0xf0eadf, 5);
         const a1 = new THREE.AmbientLight(0xDADADA, 1)
-        extra.add(s1, d1, a1);
+        extra.add(d1, a1);
 
         scene.add(map, extra)
     }
