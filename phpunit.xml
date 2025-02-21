@@ -7,6 +7,10 @@
         colors="true"
         cacheResult="false"
         executionOrder="random"
+        failOnWarning="true"
+        failOnNotice="true"
+        failOnDeprecation="true"
+        failOnRisky="true"
 >
     <testsuites>
         <testsuite name="OG tests">
