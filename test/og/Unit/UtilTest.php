@@ -360,4 +360,120 @@ class UtilTest extends BaseTest
         $this->assertSame([183, 183, 105123], $test);
     }
 
+    public function testContinuousPointsBetween(): void
+    {
+        $this->assertSame([
+            [0, 0, 0],
+            [1, 0, 0],
+            [1, 1, 0],
+            [2, 1, 0],
+            [2, 2, 0],
+            [3, 2, 0],
+            [3, 3, 0],
+        ], Util::continuousPointsBetween(new Point(), new Point(3, 3, 0)));
+        $this->assertSame([
+            [-0, -0, -0],
+            [-1, -0, -0],
+            [-1, -1, -0],
+            [-2, -1, -0],
+            [-2, -2, -0],
+            [-3, -2, -0],
+            [-3, -3, -0],
+        ], Util::continuousPointsBetween(new Point(), new Point(-3, -3, 0)));
+        $this->assertSame([
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 2, 0],
+            [0, 3, 0],
+            [1, 3, 0],
+            [1, 4, 0],
+            [2, 4, 0],
+            [2, 5, 0],
+        ], Util::continuousPointsBetween(new Point(), new Point(2, 5, 0)));
+    }
+
+    public function testContinuousPointsBetweenJaggedness(): void
+    {
+        $this->assertSame([
+            [0, 0, 0],
+            [1, 0, 0],
+            [2, 0, 0],
+            [3, 0, 0],
+            [3, 1, 0],
+            [3, 2, 0],
+            [3, 3, 0],
+        ], Util::continuousPointsBetween(new Point(), new Point(3, 3, 0), 3.1));
+        $this->assertNotSame(
+            Util::continuousPointsBetween(new Point(), new Point(3, 3, 0), 3.1),
+            Util::continuousPointsBetween(new Point(), new Point(3, 3, 0), 0.1)
+        );
+        $this->assertSame([
+            [0, 0, 0],
+            [0, 1, 0],
+            [0, 2, 0],
+            [1, 2, 0],
+            [2, 2, 0],
+            [3, 2, 0],
+            [3, 3, 0],
+        ], Util::continuousPointsBetween(new Point(), new Point(3, 3, 0), 0.1));
+    }
+
+    public function testContinuousPointsSamePosition(): void
+    {
+        $this->assertSame([], Util::continuousPointsBetween(new Point(), new Point()));
+    }
+
+    public function testStepsAndIncrementsSamePosition(): void
+    {
+        $this->assertSame([0, 0, 0, 0], Util::stepsAndIncrements(new Point(), new Point()));
+    }
+
+    public function testContinuousPointsBetweenFullVertical(): void
+    {
+        $this->assertSame([
+            [1, 2, 3],
+            [1, 3, 3],
+            [1, 4, 3],
+            [1, 5, 3],
+        ], Util::continuousPointsBetween(new Point(1, 2, 3), new Point(1, 5, 3), 2.3));
+    }
+
+    private function _testContentiousness(float $jaggedness): void
+    {
+        $start = new Point(rand(-10, 1), rand(-10, 1), rand(-10, 1));
+        $end = new Point(rand(100, 300), rand(100, 300), rand(100, 300));
+
+        $prev = $start->toFlatArray();
+        $sf = $start->toFlatArray();
+        $ef = $end->toFlatArray();
+        $points = Util::continuousPointsBetween($start, $end, $jaggedness);
+        $expectedCount = abs($start->x - $end->x) + abs($start->y - $end->y) + abs($start->z - $end->z);
+        foreach ($points as $xyz) {
+            foreach (range(0, 2) as $ai) {
+                $msg = sprintf(
+                    'Start [%s]; End [%s]; Jag: [%s]; Prev [%s]; Cur [%s]',
+                    $start->hash(), $end->hash(), $jaggedness,
+                    implode(', ', $prev), implode(', ', $xyz)
+                );
+                $this->assertTrue($xyz[$ai] >= $sf[$ai] && $xyz[$ai] <= $ef[$ai], $msg);
+                if (false === ($prev[$ai] === $xyz[$ai] || $prev[$ai] + 1 === $xyz[$ai])) {
+                    $this->fail($msg);
+                }
+            }
+
+            $prev = $xyz;
+        }
+        $this->assertCount($expectedCount + 1, $points);
+    }
+
+    public function testContentiousness(): void
+    {
+        $this->_testContentiousness(0.1);
+        $this->_testContentiousness(0.7);
+        $this->_testContentiousness(1.0);
+        $this->_testContentiousness(2.4);
+        $this->_testContentiousness(4.3);
+        $this->_testContentiousness(rand(1, 40) / 10);
+    }
+
 }
