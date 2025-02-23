@@ -4,6 +4,7 @@ namespace Test\World;
 
 use cs\Core\Box;
 use cs\Core\Floor;
+use cs\Core\GameException;
 use cs\Core\GameState;
 use cs\Core\Point;
 use cs\Core\Setting;
@@ -13,6 +14,18 @@ use Test\BaseTestCase;
 
 class FloorTest extends BaseTestCase
 {
+
+    public function testZeroFloorWidth(): void
+    {
+        $this->expectException(GameException::class);
+        new Floor(new Point(), 0, 0);
+    }
+
+    public function testZeroFloorDepth(): void
+    {
+        $this->expectException(GameException::class);
+        new Floor(new Point(), 1, 0);
+    }
 
     public function testPlayerCannotFallDownThroughFloor(): void
     {

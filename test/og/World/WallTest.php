@@ -114,6 +114,12 @@ class WallTest extends BaseTestCase
         ], $wall->serialize(new Point(1, 50, 50)));
     }
 
+    public function testZeroWallWidth(): void
+    {
+        $this->expectException(GameException::class);
+        new Wall(new Point(), true, 0, 1);
+    }
+
     public function testZeroWallHeight(): void
     {
         $this->expectException(GameException::class);
