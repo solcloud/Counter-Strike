@@ -79,6 +79,11 @@ final class Util
         return ($angleHorizontal === 0.0 || $angleHorizontal === 180.0) ? 0 : ($angleHorizontal > 0 && $angleHorizontal < 180 ? +1 : -1);
     }
 
+    public static function directionY(float $angleVertical): int
+    {
+        return ($angleVertical === 0.0) ? 0 : ($angleVertical > 0 ? +1 : -1);
+    }
+
     public static function directionZ(float $angleHorizontal): int
     {
         return ($angleHorizontal === 90.0 || $angleHorizontal === 270.0) ? 0 : ($angleHorizontal > 270 || $angleHorizontal < 90 ? +1 : -1);
@@ -129,6 +134,84 @@ final class Util
             self::lerpInt($start->y, $end->y, $percentage),
             self::lerpInt($start->z, $end->z, $percentage)
         );
+    }
+
+    /** @return list<array{int, int, int}> */
+    public static function continuousPointsBetween(Point $start, Point $end, float $jaggedness = 1.0): array
+    {
+        [$angleH, $angleV] = Util::worldAngle($end, $start);
+        if ($angleH === null && $angleV === 0.0) {
+            return [];
+        }
+
+        $x = $start->x;
+        $y = $start->y;
+        $z = $start->z;
+
+        if ($angleH === null) {
+            $output = [];
+            foreach (range($start->y, $end->y) as $y) {
+                $output[] = [$x, $y, $z];
+            }
+
+            return $output;
+        }
+
+        $output = [[$x, $y, $z]];
+        $distances = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
+        $directions = [Util::directionX($angleH), Util::directionY($angleV), Util::directionZ($angleH)];
+
+        if ($jaggedness !== 1.0) {
+            $maxDistance = max($distances);
+            foreach ($distances as $axisIndex => $distance) {
+                if ($distance === $maxDistance) {
+                    $mainAxisIndex = $axisIndex;
+                    break;
+                }
+            }
+        }
+
+        $i = 1;
+        $maxCount = array_sum($distances);
+        while (++$i <= $maxCount) {
+            $steps = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
+            if ($jaggedness !== 1.0) {
+                assert(isset($mainAxisIndex));
+                $steps[$mainAxisIndex] = (int)ceil($steps[$mainAxisIndex] * $jaggedness);
+            }
+            arsort($steps, SORT_NUMERIC);
+            $axisMove = array_key_first($steps);
+
+            assert($steps[$axisMove] > 0 && $directions[$axisMove] !== 0);
+            $x += ($axisMove === 0 ? $directions[0] : 0); // @phpstan-ignore-line
+            $y += ($axisMove === 1 ? $directions[1] : 0); // @phpstan-ignore-line
+            $z += ($axisMove === 2 ? $directions[2] : 0); // @phpstan-ignore-line
+
+            $output[] = [$x, $y, $z];
+        }
+
+        $output[] = [$end->x, $end->y, $end->z];
+        return $output;
+    }
+
+    /** @return array{int, int, int, int} [$steps, $xIncrement, $yIncrement, $zIncrement] */
+    public static function stepsAndIncrements(Point $start, Point $end, float $precision = 1.0): array
+    {
+        $dx = $end->x - $start->x;
+        $dy = $end->y - $start->y;
+        $dz = $end->z - $start->z;
+
+        // todo precision boundary check
+        $steps = (int)ceil(max(abs($dx), abs($dy), abs($dz)) * $precision);
+        if ($steps === 0) {
+            return [0, 0, 0, 0];
+        }
+
+        $xIncrement = $dx / $steps;
+        $yIncrement = $dy / $steps;
+        $zIncrement = $dz / $steps;
+
+        return [$steps, $xIncrement, $yIncrement, $zIncrement];
     }
 
     /**
