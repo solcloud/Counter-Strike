@@ -13,6 +13,7 @@
             "throw new GameException\\(.+\\);",
             "GameException::invalid\\(.*\\);",
             "GameException::notImplementedYet\\(.*\\);",
+            "assert\\(.+?\\);",
         ],
         "@default": true,
         "@conditional_boundary": false,
@@ -96,6 +97,11 @@
                 "\\$this->convertToNavMeshNode\\(\\$navmesh\\);",
                 ".+max\\(\\$boxMax->x, \\$xyz\\[0\\]\\).+",
             ],
+        },
+        "OneZeroFloat": {
+            "ignoreSourceCodeByRegex": [
+                "if \\(\\$jaggedness !== 1.0\\) \\{",
+            ]
         },
         "Ternary": {
             "ignore": [

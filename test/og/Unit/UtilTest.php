@@ -360,6 +360,13 @@ class UtilTest extends BaseTest
         $this->assertSame([183, 183, 105123], $test);
     }
 
+    public function testDirectionY(): void
+    {
+        $this->assertSame(1, Util::directionY(12.3));
+        $this->assertSame(0, Util::directionY(0.0));
+        $this->assertSame(-1, Util::directionY(-32.1));
+    }
+
     public function testContinuousPointsBetween(): void
     {
         $this->assertSame([
