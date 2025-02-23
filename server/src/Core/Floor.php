@@ -7,6 +7,9 @@ class Floor extends Plane
 
     public function __construct(Point $start, public readonly int $width = 1, public readonly int $depth = 1)
     {
+        if ($width <= 0 || $depth <= 0) {
+            throw new GameException("Width and depth cannot be lower than or equal zero");
+        }
         parent::__construct($start, new Point($start->x + $width, $start->y, $start->z + $depth), 'xz');
     }
 
