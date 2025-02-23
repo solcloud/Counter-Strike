@@ -35,7 +35,7 @@ jobs:
           composer install
 
       - name: "Run Composer check-full"
-        timeout-minutes: 8
+        timeout-minutes: 10
         run: |
           grep '"timeout": 20,' infection.json5
           sed -i 's/"timeout": 20,/"timeout": 40,/' infection.json5

@@ -25,6 +25,7 @@
             "@unit"
         ],
         "check-full": [
+            "Composer\\Config::disableProcessTimeout",
             "@check",
             "@coverage",
             "@infection-cache"

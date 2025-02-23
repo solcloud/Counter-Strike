@@ -161,6 +161,7 @@ final class Util
         $distances = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
         $directions = [Util::directionX($angleH), Util::directionY($angleV), Util::directionZ($angleH)];
 
+        $mainAxisIndex = null;
         if ($jaggedness !== 1.0) {
             $maxDistance = max($distances);
             foreach ($distances as $axisIndex => $distance) {
@@ -175,8 +176,7 @@ final class Util
         $maxCount = array_sum($distances);
         while (++$i <= $maxCount) {
             $steps = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
-            if ($jaggedness !== 1.0) {
-                assert(isset($mainAxisIndex));
+            if (null !== $mainAxisIndex) {
                 $steps[$mainAxisIndex] = (int)ceil($steps[$mainAxisIndex] * $jaggedness);
             }
             arsort($steps, SORT_NUMERIC);
