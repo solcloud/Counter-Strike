@@ -23,7 +23,6 @@ use cs\Event\RoundEndCoolDownEvent;
 use cs\Event\RoundEndEvent;
 use cs\Event\RoundStartEvent;
 use cs\Event\SoundEvent;
-use cs\Map\DefaultMap;
 use cs\Weapon\PistolGlock;
 use cs\Weapon\RifleAk;
 use Test\BaseTestCase;
@@ -282,12 +281,11 @@ class RoundTest extends BaseTestCase
     public function testOnlyOneAttackerHasBombInInventory(): void
     {
         $gameProperty = $this->createNoPauseGameProperty();
-        $gameProperty->max_rounds = 6;
+        $gameProperty->max_rounds = 60;
+        $gameProperty->round_time_ms = 200;
 
-        $game = $this->createTestGame(null ,$gameProperty);
-        $game->loadMap(new DefaultMap());
+        $game = $this->createTestGame(null, $gameProperty);
         $game->addPlayer(new Player(2, Color::BLUE, true));
-        $game->addPlayer(new Player(3, Color::BLUE, true));
 
         $bombCount = 0;
         foreach ($game->getPlayers() as $player) {
@@ -295,7 +293,8 @@ class RoundTest extends BaseTestCase
         }
         $this->assertSame(1, $bombCount);
 
-        $game->onEvents(function (array $events) use ($game): void {
+        $assertCount = 0;
+        $game->onEvents(function (array $events) use ($game, &$assertCount): void {
             if (!$game->getPlayer(1)->isPlayingOnAttackerSide()) {
                 $game->quit(GameOverReason::ATTACKERS_SURRENDER);
                 return;
@@ -308,11 +307,13 @@ class RoundTest extends BaseTestCase
                         $bombCount += (int)$player->getInventory()->has(InventorySlot::SLOT_BOMB->value);
                     }
                     $this->assertSame(1, $bombCount);
+                    $assertCount++;
                 }
             }
         });
         $game->start();
-        $this->assertSame(4, $game->getRoundNumber());
+        $this->assertSame(31, $game->getRoundNumber());
+        $this->assertSame(30, $assertCount);
     }
 
     public function testRoundEndCoolDown(): void
