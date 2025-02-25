@@ -73,9 +73,22 @@ class PlaneBuilderTest extends BaseTest
         $planes = $pb->fromTriangle(
             new Point(2, 1, 3),
             new Point(4, 3, 5),
-            new Point(6, 2, 1)
+            new Point(6, 2, 1),
         );
-        $this->assertCount(39, $planes);
+        $this->assertCount(21, $planes);
+    }
+
+    public function testTriangleVoxelSize(): void
+    {
+        $pb = new PlaneBuilder();
+        $planes = $pb->create(
+            new Point(6, 3, 9),
+            new Point(12, 18, 15),
+            new Point(18, 12, 3),
+            null,
+            3.9,
+        );
+        $this->assertCount(9, $planes);
     }
 
     public function testTriangleBoundary(): void
@@ -84,7 +97,37 @@ class PlaneBuilderTest extends BaseTest
         $planes = $pb->create(
             new Point(2, 1, 6),
             new Point(12, 4, 22),
-            new Point(5, 11, -1)
+            new Point(5, 11, -1),
+        );
+        $this->assertCount(426, $planes);
+
+        $boundaryMin = (new Point())->setScalar(PHP_INT_MAX);
+        $boundaryMax = (new Point())->setScalar(PHP_INT_MIN);
+        foreach ($planes as $plane) {
+            $boundaryMin->set(
+                min($boundaryMin->x, $plane->getStart()->x),
+                min($boundaryMin->y, $plane->getStart()->y),
+                min($boundaryMin->z, $plane->getStart()->z),
+            );
+            $boundaryMax->set(
+                max($boundaryMax->x, $plane->getEnd()->x),
+                max($boundaryMax->y, $plane->getEnd()->y),
+                max($boundaryMax->z, $plane->getEnd()->z),
+            );
+        }
+        $this->assertPositionSame(new Point(2, 1, 0), $boundaryMin);
+        $this->assertPositionSame(new Point(12, 11, 22), $boundaryMax);
+    }
+
+    public function testTriangleBoundaryNegative(): void
+    {
+        $pb = new PlaneBuilder();
+        $planes = $pb->create(
+            new Point(2, 1, 6),
+            new Point(12, 4, 22),
+            new Point(5, 11, -1),
+            null,
+            -1.0,
         );
         $this->assertCount(438, $planes);
 

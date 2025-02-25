@@ -11,21 +11,30 @@ final class PlaneBuilder
     public function create(Point $a, Point $b, Point $c, ?Point $d = null, float $jaggedness = 1.0): array
     {
         if ($d === null) {
-            return $this->fromTriangle($a, $b, $c);
+            return $this->fromTriangle($a, $b, $c, $jaggedness);
         }
 
         return $this->fromQuad($a, $b, $c, $d, $jaggedness);
     }
 
     /** @return list<Plane> */
-    public function fromTriangle(Point $a, Point $b, Point $c): array
+    public function fromTriangle(Point $a, Point $b, Point $c, float $voxelSizeDotThreshold = 1.0): array
     {
+        $voxelSize = (int)$voxelSizeDotThreshold;
+        $voxelThreshold = max(1, intval(str_replace('0.', '', abs($voxelSizeDotThreshold - $voxelSize)))); // @phpstan-ignore argument.type
+        if ($voxelSize > 0) {
+            $voxelSize = max(1, $voxelSize);
+            $matchSize = true;
+        } else {
+            $voxelSize = max(1, abs($voxelSize));
+            $matchSize = false;
+        }
+
         $planes = [];
-        foreach ($this->voxelizeTriangle($a, $b, $c) as $voxelPoint) {
-            // new Box($voxelPoint, 1, 1, 1); todo check
-            $planes[] = new Wall($voxelPoint, true, 1, 1);
-            $planes[] = new Wall($voxelPoint, false, 1, 1);
-            $planes[] = new Floor($voxelPoint, 1, 1);
+        foreach ($this->voxelizeTriangle($a, $b, $c, $voxelSize, $voxelThreshold, $matchSize) as $voxelPoint) {
+            $planes[] = new Wall($voxelPoint, true, $voxelSize, $voxelSize);
+            $planes[] = new Wall($voxelPoint, false, $voxelSize, $voxelSize);
+            $planes[] = new Floor($voxelPoint->clone()->addY($voxelSize), $voxelSize, $voxelSize);
         }
         return $planes;
     }
@@ -193,8 +202,12 @@ final class PlaneBuilder
         return $planes;
     }
 
-    /** @return array<string,Point> */
-    private function voxelizeTriangle(Point $a, Point $b, Point $c): array
+    /**
+     * @param positive-int $voxelSize
+     * @param positive-int $voxelThreshold
+     * @return list<Point>
+     */
+    private function voxelizeTriangle(Point $a, Point $b, Point $c, int $voxelSize, int $voxelThreshold, bool $matchTriangleSize): array
     {
         $this->voxels = [];
         $this->voxelizeLine($a, $b);
@@ -217,7 +230,52 @@ final class PlaneBuilder
             }
         }
 
-        return $this->voxels;
+        $bbMin = new Point(
+            min($a->x, $b->x, $c->x),
+            min($a->y, $b->y, $c->y),
+            min($a->z, $b->z, $c->z),
+        );
+        $bbMax = new Point(
+            max($a->x, $b->x, $c->x) - ($matchTriangleSize ? $voxelSize : 0),
+            max($a->y, $b->y, $c->y) - ($matchTriangleSize ? $voxelSize : 0),
+            max($a->z, $b->z, $c->z) - ($matchTriangleSize ? $voxelSize : 0),
+        );
+
+        $data = [];
+        for ($y = $bbMin->y; $y <= $bbMax->y; $y++) {
+            for ($x = $bbMin->x; $x <= $bbMax->x; $x++) {
+                for ($z = $bbMin->z; $z <= $bbMax->z; $z++) {
+                    if (!isset($this->voxels["$x,$y,$z"])) {
+                        continue;
+                    }
+
+                    $key = implode(',', [
+                        (int)ceil(($x - $bbMin->x) / $voxelSize),
+                        (int)ceil(($y - $bbMin->y) / $voxelSize),
+                        (int)ceil(($z - $bbMin->z) / $voxelSize),
+                    ]);
+                    if (!isset($data[$key])) {
+                        $data[$key] = 0;
+                    }
+                    $data[$key]++;
+                }
+            }
+        }
+
+        $startPoints = [];
+        foreach ($data as $key => $hits) {
+            if ($hits < $voxelThreshold) {
+                continue;
+            }
+
+            $sizeIncrements = explode(',', $key);
+            $startPoints[] = $bbMin->clone()->addPart(
+                $voxelSize * (int)$sizeIncrements[0],
+                $voxelSize * (int)$sizeIncrements[1],
+                $voxelSize * (int)$sizeIncrements[2],
+            );
+        }
+        return $startPoints;
     }
 
     private function voxelizeLine(Point $start, Point $end): void
@@ -227,7 +285,7 @@ final class PlaneBuilder
         $z = $start->z;
 
         [$steps, $xIncrement, $yIncrement, $zIncrement] = Util::stepsAndIncrements($start, $end);
-        for ($i = 0; $i <= $steps; $i++) {
+        for ($step = 0; $step <= $steps; $step++) {
             $this->addVoxel((int)round($x), (int)round($y), (int)round($z));
             $x += $xIncrement;
             $y += $yIncrement;
