@@ -5,13 +5,9 @@ namespace cs\Core;
 class Box
 {
 
-    /**
-     * @var Wall[]
-     */
+    /** @var list<Wall> */
     private array $walls = [];
-    /**
-     * @var Floor[]
-     */
+    /** @var list<Floor> */
     private array $floors = [];
 
     public const SIDE_FRONT = 0xF00000;
@@ -64,17 +60,13 @@ class Box
         }
     }
 
-    /**
-     * @return Floor[]
-     */
+    /** @return list<Floor> */
     public function getFloors(): array
     {
         return $this->floors;
     }
 
-    /**
-     * @return Wall[]
-     */
+    /** @return list<Wall> */
     public function getWalls(): array
     {
         return $this->walls;
