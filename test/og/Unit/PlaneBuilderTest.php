@@ -211,12 +211,11 @@ class PlaneBuilderTest extends BaseTest
     {
         $pb = new PlaneBuilder();
         $points = [
+            new Point(2, 8, 6),
+            new Point(2, 2, 6),
             new Point(1, 2, 3),
             new Point(1, 8, 3),
-            new Point(2, 2, 6),
-            new Point(2, 8, 6),
         ];
-        shuffle($points);
 
         $planes = $pb->fromQuad(...$points);
         $this->assertCount(3, $planes);

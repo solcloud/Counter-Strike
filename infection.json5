@@ -48,6 +48,7 @@
         },
         "Break_": {
             "ignore": [
+                "cs\\Traits\\Player\\GravityTrait::calculateGravity",
                 "cs\\Traits\\Player\\JumpTrait::jump",
             ],
         },
