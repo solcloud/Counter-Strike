@@ -26,7 +26,6 @@
             "@unit"
         ],
         "check-full": [
-            "Composer\\Config::disableProcessTimeout",
             "@check",
             "@coverage",
             "@infection-cache"
@@ -61,6 +60,7 @@
         "platform": {
             "php": "8.3"
         },
+        "process-timeout": 720,
         "allow-plugins": {
             "infection/extension-installer": false
         }
