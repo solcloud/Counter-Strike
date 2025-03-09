@@ -1,6 +1,7 @@
 <?php
 
 use cs\Core\Game;
+use cs\Core\Point;
 use cs\Core\Setting;
 use cs\Map;
 
@@ -8,46 +9,46 @@ require __DIR__ . '/../vendor/autoload.php';
 
 ////////
 $map = new Map\DefaultMap();
+$generateMapJson = (isset($_GET['generate']));
+$showNavigationMesh = (isset($_GET['navmesh']));
+$showWireframe = (isset($_GET['solid']));
+$showFloors = (isset($_GET['floors']));
+$showWalls = (isset($_GET['walls']));
 ////////
 
 $game = new Game();
 $game->loadMap($map);
-$world = $game->getWorld();
 
-$radarMapGenerator = (isset($_GET['radar']));
-$showNavigationMesh = (isset($_GET['navmesh']));
 $buyAreas = [
     $map->getBuyArea(false)->toArray(),
     $map->getBuyArea(true)->toArray(),
 ];
-$spawnAttackers = [];
-foreach ($map->getSpawnPositionAttacker() as $point) {
-    $spawnAttackers[] = $point->toArray();
-}
-$spawnDefenders = [];
-foreach ($map->getSpawnPositionDefender() as $point) {
-    $spawnDefenders[] = $point->toArray();
-}
+$spawnAttackers = array_map(fn(Point $point) => $point->toArray(), $map->getSpawnPositionAttacker());
+$spawnDefenders = array_map(fn(Point $point) => $point->toArray(), $map->getSpawnPositionDefender());
 $planes = [];
-foreach ($map->getWalls() as $plane) {
-    $planes[] = [
-        'x' => $plane->getStart()->x,
-        'y' => $plane->getStart()->y,
-        'z' => $plane->getStart()->z,
-        'width' => $plane->width,
-        'height' => $plane->height,
-        'plane' => $plane->getPlane(),
-    ];
+if (!$showFloors) {
+    foreach ($map->getWalls() as $plane) {
+        $planes[] = [
+            'x' => $plane->getStart()->x,
+            'y' => $plane->getStart()->y,
+            'z' => $plane->getStart()->z,
+            'width' => $plane->width,
+            'height' => $plane->height,
+            'plane' => $plane->getPlane(),
+        ];
+    }
 }
-foreach ($map->getFloors() as $plane) {
-    $planes[] = [
-        'x' => $plane->getStart()->x,
-        'y' => $plane->getStart()->y,
-        'z' => $plane->getStart()->z,
-        'width' => $plane->width,
-        'height' => $plane->depth,
-        'plane' => $plane->getPlane(),
-    ];
+if (!$showWalls) {
+    foreach ($map->getFloors() as $plane) {
+        $planes[] = [
+            'x' => $plane->getStart()->x,
+            'y' => $plane->getStart()->y,
+            'z' => $plane->getStart()->z,
+            'width' => $plane->width,
+            'height' => $plane->depth,
+            'plane' => $plane->getPlane(),
+        ];
+    }
 }
 ?>
 <!Doctype html>
@@ -64,39 +65,28 @@ foreach ($map->getFloors() as $plane) {
         }
     </script>
 </head>
-<body style="margin:0">
-<div style="position:absolute;<?= $radarMapGenerator ? 'display:none;' : '' ?>">
-    <textarea class="map">Generating...</textarea>
-</div>
+<body style="margin:0;background:#000000;color:#FFFFFF">
 <script type="module">
     import * as THREE from 'three'
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+    import {OrbitControls} from 'three/addons/controls/OrbitControls.js'
 
-    const forRadar = <?= ($radarMapGenerator ? 'true' : 'false') ?>;
-    let camera, scene, renderer, controls, map, extra;
+    let camera, scene, renderer, controls, map;
     const material = new THREE.MeshLambertMaterial({
         color: 0x9f998e,
-        wireframe: <?= ((bool)($_GET['solid'] ?? false) ? 'false' : 'true') ?>,
-        side: THREE.DoubleSide
+        wireframe: <?= ($showWireframe ? 'false' : 'true') ?>,
+        side: THREE.DoubleSide,
     })
 
     function init() {
         scene = new THREE.Scene();
 
-        renderer = new THREE.WebGLRenderer({antialias: true});
-        if (forRadar) {
-            renderer.setSize(800, 800);
-        } else {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-        document.body.appendChild(renderer.domElement);
+        renderer = new THREE.WebGLRenderer({antialias: true})
+        renderer.setSize(window.innerWidth, window.innerHeight)
+        renderer.domElement.style.zIndex = -1
+        document.body.appendChild(renderer.domElement)
 
-        if (forRadar) {
-            camera = new THREE.OrthographicCamera(-400, 400, 400, -400, 1, 9000)
-        } else {
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999);
-        }
-        camera.position.y = 1000
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 99999)
+        camera.position.y = 11000
 
         controls = new OrbitControls(camera, renderer.domElement);
     }
@@ -104,10 +94,7 @@ foreach ($map->getFloors() as $plane) {
     function object() {
         const json = '<?= json_encode($planes, JSON_THROW_ON_ERROR) ?>';
         const data = JSON.parse(json);
-        extra = new THREE.Group()
-        extra.name = 'extra'
         map = new THREE.Group()
-        map.name = 'map'
 
         data.forEach(function (plane) {
             let mesh = new THREE.Mesh(
@@ -129,14 +116,13 @@ foreach ($map->getFloors() as $plane) {
 
         const d1 = new THREE.DirectionalLight(0xf0eadf, 5);
         const a1 = new THREE.AmbientLight(0xDADADA, 1)
-        extra.add(d1, a1);
 
-        scene.add(map, extra)
+        scene.add(map, d1, a1)
     }
 
     function spawns() {
-        const spawnMaterialAttackers = new THREE.MeshStandardMaterial({color: 0xFF0000, wireframe: true, transparent: true, opacity: 0.1})
-        const spawnMaterialDefenders = new THREE.MeshStandardMaterial({color: 0x0000FF, wireframe: true, transparent: true, opacity: 0.1})
+        const spawnMaterialAttackers = new THREE.MeshBasicMaterial({color: 0xFF0000, wireframe: true, transparent: true, opacity: 0.1})
+        const spawnMaterialDefenders = new THREE.MeshBasicMaterial({color: 0x0000FF, wireframe: true, transparent: true, opacity: 0.1})
         const spawnAttackersJson = '<?= json_encode($spawnAttackers, JSON_THROW_ON_ERROR) ?>';
         const spawnDefendersJson = '<?= json_encode($spawnDefenders, JSON_THROW_ON_ERROR) ?>';
         const spawnAttackers = JSON.parse(spawnAttackersJson);
@@ -162,73 +148,62 @@ foreach ($map->getFloors() as $plane) {
 
     function buyAreas() {
         const buyAreas = JSON.parse('<?= json_encode($buyAreas) ?>');
-
-        let box = buyAreas[0];
-        const areaDefenders = new THREE.Mesh(
-            new THREE.BoxGeometry(box.width, box.height, box.depth),
-            new THREE.MeshStandardMaterial({color: 0x0000DD, wireframe: true, transparent: true, opacity: 0.1})
-        );
-        areaDefenders.position.set(box.x, box.y, -1 * box.z)
-        areaDefenders.translateX(box.width / 2)
-        areaDefenders.translateY(box.height / 2)
-        areaDefenders.translateZ(box.depth / -2)
-
-        box = buyAreas[1];
-        const areaAttackers = new THREE.Mesh(
-            new THREE.BoxGeometry(box.width, box.height, box.depth),
-            new THREE.MeshStandardMaterial({color: 0xDD0000, wireframe: true, transparent: true, opacity: 0.1})
-        );
-        areaAttackers.position.set(box.x, box.y, -1 * box.z)
-        areaAttackers.translateX(box.width / 2)
-        areaAttackers.translateY(box.height / 2)
-        areaAttackers.translateZ(box.depth / -2)
-
-        scene.add(areaDefenders, areaAttackers);
+        buyAreas.forEach(function (sideAreas, teamIndex) {
+            let material = new THREE.MeshBasicMaterial({
+                color: teamIndex === 0 ? 0x0000DD : 0xDD0000,
+                wireframe: true, transparent: true, opacity: 0.1,
+            })
+            sideAreas.forEach(function (box) {
+                const area = new THREE.Mesh(
+                    new THREE.BoxGeometry(box.width, box.height, box.depth),
+                    material,
+                )
+                area.position.set(box.x, box.y, -1 * box.z)
+                area.translateX(box.width / 2)
+                area.translateY(box.height / 2)
+                area.translateZ(box.depth / -2)
+                scene.add(area)
+            })
+        });
     }
 
     function plants() {
-        const box = JSON.parse('<?= json_encode($map->getPlantArea()->toArray()) ?>');
+        let material = new THREE.MeshBasicMaterial({color: 0xFF6600})
+        const boxes = JSON.parse('<?= json_encode($map->getPlantArea()->toArray()) ?>');
+        boxes.forEach(function (box) {
+            const area = new THREE.Mesh(
+                new THREE.BoxGeometry(box.width, box.height, box.depth),
+                material,
+            )
 
-        const area = new THREE.Mesh(
-            new THREE.BoxGeometry(box.width, box.height, box.depth),
-            new THREE.MeshStandardMaterial({color: 0xFF6600})
-        );
+            area.position.set(box.x, box.y - 0.1, -1 * box.z)
+            area.translateX(box.width / 2)
+            area.translateY(box.height / 2)
+            area.translateZ(box.depth / -2)
+            scene.add(area)
+        })
 
-        area.position.set(box.x, box.y - 0.1, -1 * box.z)
-        area.translateX(box.width / 2)
-        area.translateY(box.height / 2)
-        area.translateZ(box.depth / -2)
-        scene.add(area);
-
-        <?php if ($showNavigationMesh): ?>
+<?php if ($showNavigationMesh): ?>
         <?php
-            $tileSize = $world::GRENADE_NAVIGATION_MESH_TILE_SIZE;
-            $path = $world->buildNavigationMesh($tileSize, $world::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
-            $navmesh = [];
-            foreach ($path->getGraph()->internalGetGeneratedNeighbors() as $nodeId => $ids) {
-                $navmesh[] = $nodeId;
-            }
+        $world = $game->getWorld();
+        $tileSize = $world::GRENADE_NAVIGATION_MESH_TILE_SIZE;
+        $navmesh = [];
+        $navigationMesh = $map->getNavigationMesh($map->generateNavigationMeshKey($tileSize, $world::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT));
+        foreach ($navigationMesh->getData() as $nodeId => $ids) {
+            $navmesh[] = $nodeId;
+        }
         ?>
-        let mesh = null;
         const navMeshGeometry = new THREE.BoxGeometry(<?= $tileSize ?>, .5, <?= $tileSize ?>);
         const navMeshMaterial = new THREE.MeshStandardMaterial({color: 0xD024A3})
-        <?php foreach ($navmesh as $coords): ?>
+        let mesh
+    <?php foreach ($navmesh as $coords): ?>
         mesh = new THREE.Mesh(navMeshGeometry, navMeshMaterial)
         mesh.translateY(navMeshGeometry.parameters.height / 2)
         mesh.position.set(<?= $coords ?>)
         mesh.position.z *= -1
         scene.add(mesh);
-        <?php endforeach; ?>
-        if (false) {
-            mesh = new THREE.Mesh(
-                new THREE.BoxGeometry(20, 20, 20),
-                new THREE.MeshStandardMaterial({color: 0xFF0000, transparent: true, opacity: .8})
-            )
-            mesh.position.set(1902, 20, -2550)
-            mesh.translateY(mesh.geometry.parameters.height / 2)
-            scene.add(mesh)
-        }
-        <?php endif; ?>
+    <?php endforeach; ?>
+<?php endif; ?>
     }
 
     function animate() {
@@ -238,13 +213,13 @@ foreach ($map->getFloors() as $plane) {
 
     init()
     object()
-    if (!forRadar) {
-        spawns()
-        buyAreas()
-    }
+    spawns()
+    buyAreas()
     plants()
-    renderer.render(scene, camera);
-    document.querySelector('textarea.map').innerText = JSON.stringify(map.toJSON())
+    <?php if ($generateMapJson) : ?>
+    renderer.render(scene, camera)
+    console.log(JSON.stringify(map.toJSON()))
+    <?php endif; ?>
     animate()
 </script>
 </body>
