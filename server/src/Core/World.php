@@ -49,7 +49,8 @@ final class World
     private int $lastBombActionTick = -1;
     private int $lastBombPlayerId = -1;
     private int $bombActionTickBuffer = 1;
-    private ?PathFinder $grenadeNavMesh = null;
+    private ?NavigationMesh $grenadeNavigationMesh = null;
+    private ?PathFinder $grenadePathFinder = null;
 
     public function __construct(private Game $game)
     {
@@ -85,7 +86,16 @@ final class World
 
     public function regenerateNavigationMeshes(): void
     {
-        $this->grenadeNavMesh = $this->buildNavigationMesh(self::GRENADE_NAVIGATION_MESH_TILE_SIZE, self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT);
+        $tileSize = self::GRENADE_NAVIGATION_MESH_TILE_SIZE;
+        $colliderHeight = self::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT;
+        $this->grenadeNavigationMesh = $this->getMap()->getNavigationMesh(
+            $this->getMap()->generateNavigationMeshKey($tileSize, $colliderHeight)
+        );
+        if ($this->grenadeNavigationMesh === null) {
+            $pathFinder = $this->buildNavigationMesh($tileSize, $colliderHeight);
+            $this->grenadePathFinder = $pathFinder;
+            $this->grenadeNavigationMesh = $pathFinder->getNavigationMesh();
+        }
     }
 
     public function addRamp(Ramp $ramp): void
@@ -475,6 +485,7 @@ final class World
         $this->game->addSoundEvent($soundEvent);
     }
 
+    /** @infection-ignore-all */
     public function throw(ThrowEvent $event): void
     {
         $event->onComplete[] = function (ThrowEvent $event): void {
@@ -482,28 +493,36 @@ final class World
                 $this->processHighExplosiveBlast($event->getPlayer(), $event->getPositionClone(), $event->item);
             }
             if ($event->item instanceof Flammable) {
-                $this->processFlammableExplosion($event->getPlayer(), $event->getPositionClone(), $event->item);
+                $start = $this->getVolumetricStartPoint($event->getPositionClone(), $event->item->getBoundingRadius());
+                $start && $this->processFlammableExplosion($event->getPlayer(), $start, $event->item);
             }
             if ($event->item instanceof Smoke) {
-                $this->processSmokeExpansion($event->getPlayer(), $event->getPositionClone(), $event->item);
+                $start = $this->getVolumetricStartPoint($event->getPositionClone(), $event->item->getBoundingRadius());
+                $start && $this->processSmokeExpansion($event->getPlayer(), $start, $event->item);
             }
         };
         $this->game->addThrowEvent($event);
     }
 
-    private function processSmokeExpansion(Player $initiator, Point $epicentre, Smoke $item): void
+    /** @infection-ignore-all */
+    private function getVolumetricStartPoint(Point $epicentre, int $radius): ?Point
     {
-        if ($this->grenadeNavMesh === null) {
-            $this->regenerateNavigationMeshes();
+        $this->grenadeNavigationMesh === null && $this->regenerateNavigationMeshes();
+        $this->grenadePathFinder ??= new PathFinder($this, $this->getGrenadeNavigationMesh());
+
+        $epicentreFloor = $epicentre->clone()->addY(-$radius);
+        $floorNavmeshPoint = $this->grenadePathFinder->findTile($epicentreFloor, $radius);
+        if ($floorNavmeshPoint && !$this->getGrenadeNavigationMesh()->has($floorNavmeshPoint->hash())) {
+            throw new GameException("No node for start point: " . $floorNavmeshPoint); // @codeCoverageIgnore
         }
-        assert($this->grenadeNavMesh !== null);
 
-        $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
-        $floorNavmeshPoint = $this->grenadeNavMesh->findTile($epicentreFloor, $item->getBoundingRadius());
+        return $floorNavmeshPoint;
+    }
 
+    private function processSmokeExpansion(Player $initiator, Point $start, Smoke $item): void
+    {
         $event = new SmokeEvent(
-            $initiator, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
-            $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
+            $initiator, $item, $this, $this->getGrenadeNavigationMesh(), $start,
         );
         $event->onComplete[] = function (SmokeEvent $event): void {
             unset($this->activeSmokes[$event->id]);
@@ -512,19 +531,10 @@ final class World
         $this->game->addSmokeEvent($event);
     }
 
-    private function processFlammableExplosion(Player $thrower, Point $epicentre, Flammable $item): void
+    private function processFlammableExplosion(Player $thrower, Point $start, Flammable $item): void
     {
-        if ($this->grenadeNavMesh === null) {
-            $this->regenerateNavigationMeshes();
-        }
-        assert($this->grenadeNavMesh !== null);
-
-        $epicentreFloor = $epicentre->clone()->addY(-$item->getBoundingRadius());
-        $floorNavmeshPoint = $this->grenadeNavMesh->findTile($epicentreFloor, $item->getBoundingRadius());
-
         $event = new GrillEvent(
-            $thrower, $item, $this, $this->grenadeNavMesh->tileSizeHalf,
-            $this->grenadeNavMesh->colliderHeight, $this->grenadeNavMesh->getGraph(), $floorNavmeshPoint,
+            $thrower, $item, $this, $this->getGrenadeNavigationMesh(), $start,
         );
         $event->onComplete[] = function (GrillEvent $event): void {
             unset($this->activeMolotovs[$event->id]);
@@ -690,7 +700,7 @@ final class World
             return false;
         }
 
-        return Collision::pointWithBox($player->getReferenceToPosition(), $this->getMap()->getPlantArea());
+        return $this->getMap()->getPlantArea()->contains($player->getReferenceToPosition());
     }
 
     public function canBuy(Player $player): bool
@@ -699,7 +709,7 @@ final class World
             return false;
         }
 
-        return Collision::pointWithBox($player->getReferenceToPosition(), $this->getMap()->getBuyArea($player->isPlayingOnAttackerSide()));
+        return $this->getMap()->getBuyArea($player->isPlayingOnAttackerSide())->contains($player->getReferenceToPosition());
     }
 
     public function getTickId(): int
@@ -730,7 +740,7 @@ final class World
             throw new GameException('Tile size should be decently lower than player bounding radius.'); // @codeCoverageIgnore
         }
 
-        $pathFinder = new PathFinder($this, $tileSize, $objectHeight);
+        $pathFinder = new PathFinder($this, new NavigationMesh($tileSize, $objectHeight));
         $startPoints = $this->getMap()->getStartingPointsForNavigationMesh();
         if ([] === $startPoints) {
             throw new GameException('No starting point for navigation defined!'); // @codeCoverageIgnore
@@ -739,7 +749,8 @@ final class World
             $pathFinder->buildNavigationMesh($point, $objectHeight);
         }
 
-        return $pathFinder->saveAndClear();
+        $pathFinder->saveAndClear();
+        return $pathFinder;
     }
 
     public function checkXSideWallCollision(Point $bottomCenter, int $height, int $radius): ?Wall
@@ -976,6 +987,11 @@ final class World
     public function activeMolotovExists(): bool
     {
         return ([] !== $this->activeMolotovs);
+    }
+
+    private function getGrenadeNavigationMesh(): NavigationMesh
+    {
+        return $this->grenadeNavigationMesh ?? GameException::invalid();
     }
 
 }

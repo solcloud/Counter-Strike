@@ -11,25 +11,17 @@ final class PathFinder
     private Graph $graph;
     /** @var array<string,bool> */
     private array $visited = [];
-    /** @var array<int,array{int,int,int}> */
-    private readonly array $moves;
     private readonly int $obstacleOvercomeHeight;
-    private int $iterationCount = 0;
-    public readonly int $tileSizeHalf;
+    /** @var array<int,array{int,int,int}> */
+    private static array $moves = [
+        90 => [+1, +0, +0],
+        0 => [+0, +0, +1],
+        270 => [-1, +0, +0],
+        180 => [+0, +0, -1],
+    ];
 
-    public function __construct(private readonly World $world, public readonly int $tileSize, public readonly int $colliderHeight)
+    public function __construct(private World $world, private NavigationMesh $navigationMesh)
     {
-        if ($this->tileSize < 3 || $tileSize % 2 !== 1) {
-            throw new GameException('Tile size should be odd and greater than 1.'); // @codeCoverageIgnore
-        }
-
-        $this->tileSizeHalf = (int)ceil(($this->tileSize - 1) / 2);
-        $this->moves = [
-            90 => [+1, +0, +0],
-            0 => [+0, +0, +1],
-            270 => [-1, +0, +0],
-            180 => [+0, +0, -1],
-        ];
         $this->graph = new Graph();
         $this->obstacleOvercomeHeight = Setting::playerObstacleOvercomeHeight();
     }
@@ -42,7 +34,7 @@ final class PathFinder
 
         $looseFloor = false;
         for ($distance = 1; $distance <= $targetDistance; $distance++) {
-            $candidate->addPart(...$this->moves[$angle]);
+            $candidate->addPart(...self::$moves[$angle]);
             if (!$this->canMoveTo($candidate, $angle, $radius)) {
                 return false;
             }
@@ -74,12 +66,12 @@ final class PathFinder
         $xWallMaxHeight = 0;
         if ($angle === 90 || $angle === 270) {
             $baseX = $start->clone()->addX(($angle === 90) ? $radius : -$radius);
-            $xWallMaxHeight = $this->world->findHighestWall($baseX, $this->colliderHeight, $radius, $maxWallCeiling, true);
+            $xWallMaxHeight = $this->world->findHighestWall($baseX, $this->navigationMesh->colliderHeight, $radius, $maxWallCeiling, true);
         }
         $zWallMaxHeight = 0;
         if ($angle === 0 || $angle === 180) {
             $baseZ = $start->clone()->addZ(($angle === 0) ? $radius : -$radius);
-            $zWallMaxHeight = $this->world->findHighestWall($baseZ, $this->colliderHeight, $radius, $maxWallCeiling, false);
+            $zWallMaxHeight = $this->world->findHighestWall($baseZ, $this->navigationMesh->colliderHeight, $radius, $maxWallCeiling, false);
         }
         if ($xWallMaxHeight === 0 && $zWallMaxHeight === 0) { // no walls
             return true;
@@ -105,15 +97,15 @@ final class PathFinder
         return false;
     }
 
-    public function findTile(Point $pointOnFloor, int $radius): Point
+    public function findTile(Point $pointOnFloor, int $radius): ?Point
     {
         $floorNavmeshPoint = $pointOnFloor->clone();
         $this->convertToNavMeshNode($floorNavmeshPoint);
-        if ($this->getGraph()->getNodeById($floorNavmeshPoint->hash())) {
+        if ($this->navigationMesh->has($floorNavmeshPoint->hash())) {
             return $floorNavmeshPoint;
         }
 
-        $maxDistance = $this->tileSize * 2;
+        $maxDistance = $this->navigationMesh->tileSize * 2;
         $maxY = $this->obstacleOvercomeHeight * 2;
         $checkAbove = function (Point $start, int $maxY, int $radius): ?Point {
             $yCandidate = $start->clone();
@@ -124,7 +116,7 @@ final class PathFinder
                 if ($this->world->findFloorSquare($yCandidate, $radius - 1)) {
                     return null;
                 }
-                if ($this->getGraph()->getNodeById($navMeshCenter->setY($yCandidate->y)->hash())) {
+                if ($this->navigationMesh->has($navMeshCenter->setY($yCandidate->y)->hash())) {
                     return $navMeshCenter;
                 }
             }
@@ -141,12 +133,12 @@ final class PathFinder
         // try neighbour tiles
         $candidate = $pointOnFloor->clone();
         $navmesh = $pointOnFloor->clone();
-        foreach ($this->moves as $angle => $move) {
+        foreach (self::$moves as $angle => $move) {
             $candidate->setFrom($pointOnFloor);
 
             for ($distance = 1; $distance <= $maxDistance; $distance++) {
-                $candidate->addPart(...$this->moves[$angle]);
-                if (!$this->canFullyMoveTo($candidate, $angle, 1, $radius, $this->colliderHeight)) { // @infection-ignore-all
+                $candidate->addPart(...self::$moves[$angle]);
+                if (!$this->canFullyMoveTo($candidate, $angle, 1, $radius, $this->navigationMesh->colliderHeight)) { // @infection-ignore-all
                     break;
                 }
 
@@ -157,7 +149,7 @@ final class PathFinder
                     continue;
                 }
 
-                if ($this->getGraph()->getNodeById($navmesh->hash())) {
+                if ($this->navigationMesh->has($navmesh->hash())) {
                     return $navmesh;
                 }
                 $above = $checkAbove($candidate, $maxY, $radius);
@@ -167,25 +159,15 @@ final class PathFinder
             }
         }
 
-        GameException::notImplementedYet('Should always find something? ' . $pointOnFloor->hash()); // @codeCoverageIgnore
+        return null;
     }
 
     public function convertToNavMeshNode(Point $point): void
     {
-        if ($point->x < 1 || $point->z < 1) {
-            throw new GameException('World start from 1'); // @codeCoverageIgnore
-        }
-
-        $fmodX = fmod($point->x, $this->tileSize);
-        $fmodZ = fmod($point->z, $this->tileSize);
-
-        $x = ((int)floor(($point->x + ($fmodX == 0 ? -1 : +0)) / $this->tileSize) * $this->tileSize) + 1 + $this->tileSizeHalf;
-        $point->x = $x;
-        $z = ((int)floor(($point->z + ($fmodZ == 0 ? -1 : +0)) / $this->tileSize) * $this->tileSize) + 1 + $this->tileSizeHalf;
-        $point->z = $z;
+        $this->navigationMesh->convertToNavMeshNode($point);
     }
 
-    public function buildNavigationMesh(Point $start, int $objectHeight): void
+    public function buildNavigationMesh(Point $start, int $objectHeight, int $maxNodeCount = 2_000): void
     {
         $startPoint = $start->clone();
         $this->convertToNavMeshNode($startPoint);
@@ -197,6 +179,8 @@ final class PathFinder
         $queue = new SplQueue();
         $queue->enqueue($startPoint);
         $candidate = new Point();
+
+        $nodeCount = 0;
         while (!$queue->isEmpty()) {
             $current = $queue->dequeue();
             $currentKey = $current->hash();
@@ -211,9 +195,9 @@ final class PathFinder
                 $this->graph->addNode($currentNode);
             }
 
-            foreach ($this->moves as $angle => $move) {
+            foreach (self::$moves as $angle => $move) {
                 $candidate->setFrom($current);
-                if (!$this->canFullyMoveTo($candidate, $angle, $this->tileSize, $this->tileSizeHalf, $objectHeight)) {
+                if (!$this->canFullyMoveTo($candidate, $angle, $this->navigationMesh->tileSize, $this->navigationMesh->tileSizeHalf, $objectHeight)) {
                     continue;
                 }
 
@@ -226,22 +210,26 @@ final class PathFinder
                 $this->graph->addEdge(new DirectedEdge($currentNode, $newNode, 1));
                 $queue->enqueue($newNeighbour);
             }
-            if (++$this->iterationCount === 10_000) {
-                GameException::notImplementedYet('New map, tileSize or bad test (no boundary box, bad starting point)?'); // @codeCoverageIgnore
+            if (++$nodeCount === $maxNodeCount) {
+                GameException::notImplementedYet('MaxNodeCount hit - new map, tileSize or bad test (no boundary box, bad starting point)?'); // @codeCoverageIgnore
             }
         }
     }
 
-    public function saveAndClear(): self
+    public function saveAndClear(): void
     {
         $this->visited = [];
-        $this->graph->generateNeighbors();
-        return $this;
+        $this->navigationMesh->setData($this->getGraph()->generateNeighbors());
     }
 
     public function getGraph(): Graph
     {
         return $this->graph;
+    }
+
+    public function getNavigationMesh(): NavigationMesh
+    {
+        return $this->navigationMesh;
     }
 
 }

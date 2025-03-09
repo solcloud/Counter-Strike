@@ -3,6 +3,7 @@
 namespace cs\Map;
 
 use cs\Core\Box;
+use cs\Core\BoxGroup;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Wall;
@@ -10,11 +11,11 @@ use cs\Core\Wall;
 class ArrayMap extends Map
 {
 
-    /** @var Wall[] */
+    /** @var list<Wall> */
     private array $walls;
-    /** @var Floor[] */
+    /** @var list<Floor> */
     private array $floors;
-    /** @var Point[] */
+    /** @var list<Point> */
     private array $startingPointsForNavigationMesh;
 
     /**
@@ -71,17 +72,17 @@ class ArrayMap extends Map
         return $this->data['spawnRotationDefenders']; // @phpstan-ignore-line
     }
 
-    public function getBuyArea(bool $forAttackers): Box
+    public function getBuyArea(bool $forAttackers): BoxGroup
     {
         if ($forAttackers) {
-            return Box::fromArray($this->data['buyAreaAttackers']); // @phpstan-ignore-line
+            return BoxGroup::fromArray($this->data['buyAreaAttackers']); // @phpstan-ignore-line
         }
-        return Box::fromArray($this->data['buyAreaDefenders']); // @phpstan-ignore-line
+        return BoxGroup::fromArray($this->data['buyAreaDefenders']); // @phpstan-ignore-line
     }
 
-    public function getPlantArea(): Box
+    public function getPlantArea(): BoxGroup
     {
-        return Box::fromArray($this->data['plantArea']); // @phpstan-ignore-line
+        return BoxGroup::fromArray($this->data['plantArea']); // @phpstan-ignore-line
     }
 
 }

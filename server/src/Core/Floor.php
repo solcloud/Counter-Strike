@@ -4,6 +4,7 @@ namespace cs\Core;
 
 class Floor extends Plane
 {
+    public bool $supportNavmesh = true;
 
     public function __construct(Point $start, public readonly int $width = 1, public readonly int $depth = 1)
     {

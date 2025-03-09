@@ -3,12 +3,13 @@
 namespace cs\Map;
 
 use cs\Core\Box;
+use cs\Core\BoxGroup;
 use cs\Core\Point;
 
 class TestMap extends Map
 {
 
-    private Box $buyArea;
+    private BoxGroup $buyArea;
     public Point $startPointForNavigationMesh;
 
     public function __construct()
@@ -22,7 +23,7 @@ class TestMap extends Map
             new Point(9994, 0, 9994),
         ]);
 
-        $this->buyArea = new Box(new Point(), 99999, 999, 99999);
+        $this->buyArea = new BoxGroup([new Box(new Point(), 99999, 999, 99999)]);
         $this->startPointForNavigationMesh = new Point(100, 0, 100);
     }
 
@@ -32,12 +33,12 @@ class TestMap extends Map
         return [$this->startPointForNavigationMesh];
     }
 
-    public function getBuyArea(bool $forAttackers): Box
+    public function getBuyArea(bool $forAttackers): BoxGroup
     {
         return $this->buyArea;
     }
 
-    public function getPlantArea(): Box
+    public function getPlantArea(): BoxGroup
     {
         return $this->buyArea;
     }
