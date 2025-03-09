@@ -246,7 +246,7 @@ trait MovementTrait
                 break;
             }
 
-            if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $candidate, $this->getBoundingRadius())) {
+            if ($this->activeFloor && !$this->world->isPlayerOnFloor($this, $this->activeFloor)) {
                 $this->setActiveFloor(null);
             }
             if (!$looseFloor && !$this->activeFloor && !$this->isJumping()) { // do initial (one-shot) gravity bump
@@ -308,7 +308,7 @@ trait MovementTrait
             $highestWallCeiling = $xWallMaxHeight;
         }
         if ($highestWallCeiling !== null) {
-            $floor = $this->world->findFloor($candidate->clone()->setY($highestWallCeiling), $radius);
+            $floor = $this->world->findFloorSquare($candidate->clone()->setY($highestWallCeiling), $radius);
             if ($floor) {
                 $candidateY = $candidate->clone()->setY($floor->getY());
                 if (!$this->collisionWithPlayer($candidateY, $radius)) {
@@ -341,7 +341,7 @@ trait MovementTrait
 
         if ($wallCeiling > 0) { // wall we can try step over
             $oneSideCandidate->setY($wallCeiling);
-            $floor = $this->world->findFloor($oneSideCandidate, $radius);
+            $floor = $this->world->findFloorSquare($oneSideCandidate, $radius);
             if (!$floor || $this->collisionWithPlayer($oneSideCandidate, $radius)) { // no floor or player
                 return false;
             }
