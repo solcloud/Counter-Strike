@@ -39,9 +39,10 @@ trait AttackTrait
         if (!($item instanceof AttackEnable)) {
             return null; // @codeCoverageIgnore
         }
-        if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0) {
+        if ($item instanceof AmmoBasedWeapon && $item->getAmmo() === 0 && !$item->isReloading()) {
             $soundEvent = new SoundEvent($this->getSightPositionClone(), SoundType::ATTACK_NO_AMMO);
             $this->world->makeSound($soundEvent->setPlayer($this)->setItem($item));
+            $this->reload();
             return null;
         }
         if (!$item->canAttack($this->world->getTickId())) {
