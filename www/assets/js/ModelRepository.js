@@ -18,7 +18,6 @@ export class ModelRepository {
     #textures = {
         cap: {}
     }
-    #mapObjects = [];
 
     constructor() {
         this.#gltfLoader = new GLTFLoader()
@@ -33,28 +32,13 @@ export class ModelRepository {
         return this.#textureLoader.loadAsync(url)
     }
 
-    getMapObjects() {
-        return this.#mapObjects
-    }
-
     loadMap(mapName) {
-        const self = this
-        self.#mapObjects = []
         return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
-                    self.#mapObjects.push(object)
-                    if (object.name !== 'world') {
-                        object.castShadow = true
-                    }
-                    if (object.name === 'floor') {
-                        object.material.envMapIntensity = .08
-                        object.castShadow = false
-                        object.material.polygonOffset = true
-                        object.material.polygonOffsetFactor = -1
-                    }
                     object.receiveShadow = true
                     object.matrixAutoUpdate = false
+                    object.layers.enable(Utils.LAYER_WORLD)
                 }
             })
 
@@ -135,6 +119,7 @@ export class ModelRepository {
                 if (object.isMesh) {
                     object.castShadow = true
                     object.receiveShadow = true
+                    object.layers.enable(Utils.LAYER_PLAYERS)
                 }
             })
 
@@ -201,6 +186,7 @@ export class ModelRepository {
                 item.traverse(function (object) {
                     if (object.isMesh) {
                         object.castShadow = true
+                        object.layers.enable(Utils.LAYER_ITEMS)
                     }
                 })
                 item.visible = true
@@ -212,6 +198,7 @@ export class ModelRepository {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
                     object.castShadow = true
+                    object.layers.enable(Utils.LAYER_ITEMS)
                 }
             })
 

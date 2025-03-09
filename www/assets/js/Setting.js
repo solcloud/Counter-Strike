@@ -7,6 +7,7 @@ export class Setting {
             fov: 70,
             volume: 20,
             radarZoom: 0.9,
+            radarAlwaysCentered: false,
             sensitivity: 1.0,
             inScopeSensitivity: 0.5,
             sprayTriggerDeltaMs: 80,
@@ -116,6 +117,10 @@ export class Setting {
 
     getRadarZoom() {
         return this.#setting.base.radarZoom ?? 0.9
+    }
+
+    getRadarAlwaysCentered() {
+        return this.#setting.base.radarAlwaysCentered ?? false
     }
 
     getFieldOfView() {

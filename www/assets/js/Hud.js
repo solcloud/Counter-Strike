@@ -393,11 +393,11 @@ export class HUD {
         const self = this
         const radarImage = new Image()
         radarImage.onload = function () {
-            const radarCanvas = elementHud.querySelector('#radar-canvas')
-            radarCanvas.width = this.width
-            radarCanvas.height = this.height
-            self.#radar = new Radar(radarCanvas, radarImage, map, game, setting.getRadarZoom())
-            setting.addUpdateCallback('radarZoom', (newValue) => self.#radar.setZoom(newValue))
+            const radarSquareCanvas = elementHud.querySelector('#radar-canvas')
+            radarSquareCanvas.width = radarSquareCanvas.height = this.width
+            self.#radar = new Radar(radarSquareCanvas, radarImage, map, game)
+            setting.addUpdateCallback('radarZoom', (newValue) => self.#radar.setZoom(parseFloat(newValue), setting.getRadarAlwaysCentered()))
+            setting.update('radarZoom', setting.getRadarZoom())
         }
         radarImage.src = `./resources/map/${map}.png`
 

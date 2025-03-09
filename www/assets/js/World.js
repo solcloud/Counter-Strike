@@ -31,7 +31,7 @@ export class World {
         promises.push(this.#modelRepository.loadAll())
         promises.push(this.#modelRepository.loadMap(mapName).then((model) => scene.add(model)))
 
-        const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 4999)
+        const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 19999)
         camera.rotation.reorder("YXZ")
         const listener = new THREE.AudioListener()
         const povItem = new THREE.Group()
@@ -56,9 +56,10 @@ export class World {
         renderer.toneMappingExposure = setting.getExposure()
         renderer.setSize(window.innerWidth, window.innerHeight)
         if (!setting.shouldPreferPerformance()) {
-            new RGBELoader().load('./resources/img/orlando_stadium_1k.hdr', function (texture) {
+            new RGBELoader().load('./resources/img/kloofendal_48d_partly_cloudy_puresky_1k.hdr', function (texture) {
                 texture.mapping = THREE.EquirectangularReflectionMapping
                 texture.toneMapped = true
+                scene.background = texture
                 scene.environment = texture
                 scene.environmentIntensity = 0.4
             })
@@ -143,8 +144,8 @@ export class World {
         return model
     }
 
-    getMapObjects() {
-        return this.#modelRepository.getMapObjects()
+    getScene() {
+        return this.#scene
     }
 
     itemAttack(player, item, isSpectator) {

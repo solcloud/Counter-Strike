@@ -280,7 +280,9 @@ export class Game {
             }
 
             const ray = new THREE.Raycaster(sightPosition, direction)
-            const intersects = ray.intersectObjects([grenade, ...this.getMapObjects()], false)
+            ray.layers.set(Utils.LAYER_WORLD)
+            grenade.layers.set(Utils.LAYER_WORLD)
+            const intersects = ray.intersectObjects([grenade, this.getScene()])
             if (intersects.length >= 1 && intersects[0].object === grenade) {
                 this.#hud.showFlashBangScreen()
             }
@@ -498,10 +500,12 @@ export class Game {
         const player = this.players[playerId]
         player.get3DObject().getObjectByName('sight').add(camera)
         player.get3DObject().getObjectByName('figure').visible = false
+
         if (this.playerSpectate.isAlive()) {
             this.playerSpectate.get3DObject().getObjectByName('figure').visible = true
         }
         this.playerSpectate = player
+
         this.equip(player.getEquippedSlotId())
         this.#hud.changeSpectatePlayer(player)
     }
@@ -550,8 +554,8 @@ export class Game {
         this.#world.clearDecals()
     }
 
-    getMapObjects() {
-        return this.#world.getMapObjects()
+    getScene() {
+        return this.#world.getScene()
     }
 
     tick(state) {
@@ -726,7 +730,7 @@ export class Game {
 
     #render() {
         if (this.#started && --this.#hudDebounceTicks === 0) {
-            this.#hudDebounceTicks = 4
+            this.#hudDebounceTicks = Utils.msToTick(40)
             this.#hud.updateHud(this.playerSpectate.data)
         }
         if (this.#shouldRenderInsideTick) {
