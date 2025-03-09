@@ -12,8 +12,8 @@ trait CrouchTrait
         if (isset($this->eventsCache[$this->eventIdCrouch])) {
             /** @var CrouchEvent $event */
             $event = $this->eventsCache[$this->eventIdCrouch];
-            $event->directionDown = $directionDown;
             $event->reset();
+            $event->directionDown = $directionDown;
             $this->addEvent($event, $this->eventIdCrouch);
             return;
         }
@@ -25,22 +25,23 @@ trait CrouchTrait
                 if ($this->headHeight < $headHeightCrouch) {
                     $this->headHeight = $headHeightCrouch;
                 }
-            } else {
-                $targetHeadHeight = min(Setting::playerHeadHeightStand(), $this->headHeight + $event->moveOffset);
-                $candidate = $this->position->clone();
-                for ($h = $this->headHeight + 1; $h <= $targetHeadHeight; $h++) {
-                    $candidate->setY($this->position->y + $h);
-                    if ($this->world->findFloor($candidate, $this->getBoundingRadius())) {
-                        $event->restartTimer();
-                        break;
-                    }
-                    if ($this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $this->getBoundingRadius(), 2)) {
-                        $event->restartTimer();
-                        $this->headHeight = $headHeightCrouch;
-                        break;
-                    }
-                    $this->headHeight = $h;
+                return;
+            }
+
+            $targetHeadHeight = min(Setting::playerHeadHeightStand(), $this->headHeight + $event->moveOffset);
+            $candidate = $this->position->clone();
+            for ($h = $this->headHeight + 1; $h <= $targetHeadHeight; $h++) {
+                $candidate->setY($this->position->y + $h);
+                if ($this->world->findFloor($candidate, $this->getBoundingRadius())) {
+                    $event->restartTimer();
+                    break;
                 }
+                if ($this->world->isCollisionWithOtherPlayers($this->getId(), $candidate, $this->getBoundingRadius(), 2)) {
+                    $event->restartTimer();
+                    $this->headHeight = $headHeightCrouch;
+                    break;
+                }
+                $this->headHeight = $h;
             }
         });
 
