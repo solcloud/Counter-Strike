@@ -55,7 +55,7 @@ trait MovementTrait
 
     public function getCentrePointClone(): Point
     {
-        return $this->getPositionClone()->addY((int) ceil($this->headHeight / 2));
+        return $this->getPositionClone()->addY((int)ceil($this->headHeight / 2));
     }
 
     public function getSightPositionClone(): Point
@@ -118,7 +118,8 @@ trait MovementTrait
         });
     }
 
-    private function updateVelocity(): void {
+    private function updateVelocity(): void
+    {
         if ($this->velocityPermil === 1000) {
             return;
         }
@@ -130,12 +131,9 @@ trait MovementTrait
         $this->velocityPermil = min(1000, $this->velocityPermil + $this->velocity);
     }
 
-    private function getMoveAngle(): float
+    /** @infection-ignore-all */
+    private function getMoveAngle(int $moveX, int $moveZ, float $angle): float
     {
-        $moveX = $this->moveX;
-        $moveZ = $this->moveZ;
-        $angle = $this->sight->getRotationHorizontal();
-
         if ($moveX !== 0 && $moveZ !== 0) { // diagonal move
             if ($moveZ === 1) {
                 $angle += $moveX * 45;
@@ -143,7 +141,7 @@ trait MovementTrait
                 $angle += $moveX * (45 * 3);
             }
         } else { // single direction move
-            if ($moveZ === -1) { // @infection-ignore-all
+            if ($moveZ === -1) {
                 $angle += 180;
             } elseif ($moveX === 1) {
                 $angle += 90;
@@ -155,6 +153,7 @@ trait MovementTrait
         return $angle;
     }
 
+    /** @infection-ignore-all */
     private function getMoveSpeed(): int
     {
         if ($this->isCrouching()) {
@@ -176,7 +175,7 @@ trait MovementTrait
         if ($equippedItem instanceof ScopeItem && $equippedItem->isScopedIn()) {
             $speed *= .5;
         }
-        if ($this->isJumping()) { // @infection-ignore-all
+        if ($this->isJumping()) {
             $speed *= Setting::jumpMovementSpeedMultiplier();
         } elseif ($this->isFlying()) {
             $speed *= Setting::flyingMovementSpeedMultiplier();
@@ -196,8 +195,7 @@ trait MovementTrait
             return $current;
         }
 
-        $distanceTarget = $this->getMoveSpeed();
-        $angle = Util::normalizeAngle($this->getMoveAngle());
+        $angle = Util::normalizeAngle($this->getMoveAngle($this->moveX, $this->moveZ, $this->sight->getRotationHorizontal()));
         $angleInt = Util::nearbyInt($angle);
 
         if ($this->isFlying()) {
@@ -211,10 +209,22 @@ trait MovementTrait
         }
         $this->lastAngle = $angleInt;
 
-        $looseFloor = false;
-        $orig = $current->clone();
+        $target = $this->move($current->clone(), $this->getMoveSpeed(), $angle, false);
+
+        if ($this->isRunning() && !$this->isCrouching() && !$this->isFlying() && !$current->equals($target)) {
+            $soundEvent = new SoundEvent($target, SoundType::PLAYER_STEP);
+            $this->world->makeSound($soundEvent->setPlayer($this));
+        }
+
+        return $target;
+    }
+
+    private function move(Point $orig, int $distanceTarget, float $angle, bool $looseFloor): Point
+    {
         $target = $orig->clone();
         $candidate = $target->clone();
+        $angleInt = Util::nearbyInt($angle);
+
         for ($i = 1; $i <= $distanceTarget; $i++) {
             [$x, $z] = Util::movementXZ($angle, $i);
             $candidate->setX($orig->x + $x)->setZ($orig->z + $z);
@@ -225,24 +235,25 @@ trait MovementTrait
             $canMove = $this->canMoveTo($target, $candidate, $angleInt);
             if (!$canMove) {
                 if ($canMove === null) { // if move is possible in one axis at least
+                    $targetAngle = (int)round(Util::normalizeAngle($this->getMoveAngle($candidate->x <=> $target->x, $candidate->z <=> $target->z, 0)));
+                    $delta = abs(Util::smallestDeltaAngle($angleInt, $targetAngle));
+                    if ($delta < 90 && $distanceTarget - $i > 1) {
+                        $newDistanceTarget = Util::mapRange(20, 80, $distanceTarget - $i, 1, $delta);
+                        $candidate = $this->move($candidate, $newDistanceTarget - 1, $angle, $looseFloor);
+                    }
                     $target->setFrom($candidate);
                 }
                 break;
             }
 
-            if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $target, $this->getBoundingRadius())) {
+            if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $candidate, $this->getBoundingRadius())) {
                 $this->setActiveFloor(null);
             }
             if (!$looseFloor && !$this->activeFloor && !$this->isJumping()) { // do initial (one-shot) gravity bump
                 $candidate->setY($this->calculateGravity($candidate, 1));
-                $looseFloor = true;
+                $looseFloor = (null === $this->activeFloor); // @phpstan-ignore identical.alwaysTrue
             }
             $target->setFrom($candidate);
-        }
-
-        if ($this->isRunning() && !$this->isCrouching() && !$this->isFlying() && !$orig->equals($target)) {
-            $soundEvent = new SoundEvent($target, SoundType::PLAYER_STEP);
-            $this->world->makeSound($soundEvent->setPlayer($this));
         }
 
         return $target;
