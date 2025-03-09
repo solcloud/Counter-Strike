@@ -127,6 +127,14 @@ final class Util
         return (int)round($start + $percentage * ($end - $start));
     }
 
+    public static function mapRange(int $fromMin, int $fromMax, int $toMin, int $toMax, int $value, bool $clamp = true): int
+    {
+        if ($clamp) {
+            $value = min($fromMax, max($fromMin, $value));
+        }
+        return (int)round(($value - $fromMin) * ($toMax - $toMin) / ($fromMax - $fromMin) + $toMin);
+    }
+
     public static function lerpPoint(Point $start, Point $end, float $percentage): Point
     {
         return new Point(
@@ -160,6 +168,8 @@ final class Util
         $output = [[$x, $y, $z]];
         $distances = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
         $directions = [Util::directionX($angleH), Util::directionY($angleV), Util::directionZ($angleH)];
+        $maxCount = array_sum($distances);
+        $stepAvg = (int)ceil($maxCount / ($maxCount / 3));
 
         $mainAxisIndex = null;
         if ($jaggedness !== 1.0) {
@@ -173,9 +183,20 @@ final class Util
         }
 
         $i = 1;
-        $maxCount = array_sum($distances);
+        $target = $mainAxisIndex === null ? new Point() : $end;
         while (++$i <= $maxCount) {
-            $steps = [abs($end->x - $x), abs($end->y - $y), abs($end->z - $z)];
+            if (null === $mainAxisIndex) { // try match the closest diagonal path
+                if ($i + 2 < $maxCount && ($i === 2 || $i % $stepAvg === 0)) {
+                    $target->set($x, $y, $z);
+                    $currentDistance = 1 + (int)ceil(sqrt(self::distanceSquared($start, $target)));
+                    $target->setFrom($start);
+                    $target->addPart(...self::movementXYZ($angleH, $angleV, $currentDistance));
+                } else {
+                    $target->setFrom($end);
+                }
+            }
+
+            $steps = [abs($target->x - $x), abs($target->y - $y), abs($target->z - $z)];
             if (null !== $mainAxisIndex) {
                 $steps[$mainAxisIndex] = (int)ceil($steps[$mainAxisIndex] * $jaggedness);
             }

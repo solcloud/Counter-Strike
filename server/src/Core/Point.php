@@ -9,6 +9,12 @@ class Point
     {
     }
 
+    public static function fromHash(string $hash): self
+    {
+        [$x, $y, $z] = explode(',', $hash);
+        return new self((int)$x, (int)$y, (int)$z);
+    }
+
     public function equals(self $point): bool
     {
         return ($this->x === $point->x && $this->y === $point->y && $this->z === $point->z);
@@ -84,7 +90,7 @@ class Point
 
     public function __toString(): string
     {
-        return "Point({$this->x},{$this->y},{$this->z})";
+        return "Point({$this->x}, {$this->y}, {$this->z})";
     }
 
     public function clone(): self
