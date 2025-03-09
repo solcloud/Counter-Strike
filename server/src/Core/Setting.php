@@ -20,11 +20,11 @@ final class Setting
         'playerVelocity'               => 100,
         'playerHeadRadius'             => 10,
         'playerBoundingRadius'         => 60,
-        'playerJumpHeight'             => 150,
+        'playerJumpHeight'             => 170,
         'playerHeadHeightStand'        => 190,
         'playerHeadHeightCrouch'       => 140,
-        'playerObstacleOvercomeHeight' => 20,
-        'playerFallDamageThreshold'    => 570,
+        'playerObstacleOvercomeHeight' => 30,
+        'playerFallDamageThreshold'    => 500,
     ];
 
     /** @var array<string,int|float> */
