@@ -1,19 +1,12 @@
 # License
 
-#### orlando_stadium_1k.hdr (CC0)
+#### kloofendal_48d_partly_cloudy_puresky_1k.hdr (CC0)
 
-by **Dimitrios Savva** (photo) and **Greg Zaal** (processing) from https://polyhaven.com/a/orlando_stadium
+by **Greg Zaal** (original) and **Jarod Guest** (Sky edits) from https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky
 
 ### locker_room.jpg (CC2)
 
 by **flattop341** from https://www.flickr.com/photos/flattop341/463244252/in/photolist-r2qEU-GWfnS/
-
-### various textures inside models
-
-https://ambientcg.com/view?id=Grass001
-https://ambientcg.com/view?id=Grass004
-https://ambientcg.com/view?id=Plaster001
-https://ambientcg.com/view?id=Bark012
 
 # Acknowledgement
 

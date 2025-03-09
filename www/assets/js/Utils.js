@@ -1,6 +1,10 @@
 export class Utils {
 
     static tickMs = 0
+    static LAYER_ALL = 0
+    static LAYER_WORLD = 1
+    static LAYER_ITEMS = 2
+    static LAYER_PLAYERS = 3
 
     static degreeToRadian(degree) {
         return degree * Math.PI / 180
@@ -37,8 +41,14 @@ export class Utils {
         if (!scopeLevel) {
             return 1
         }
+        if (scopeLevel === 1) {
+            return 4
+        }
+        if (scopeLevel === 2) {
+            return 15
+        }
 
-        return scopeLevel * 2.2
+        return 99
     }
 
     static randomInt(start, end) {
