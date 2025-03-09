@@ -1,5 +1,6 @@
 /electron/build/
 /electron/node_modules/
 /electron/package-lock.json
+/server/src/Map/data/
 /vendor/
 /www/coverage/

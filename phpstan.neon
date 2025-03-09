@@ -9,3 +9,7 @@ parameters:
         - test/
     level: max
     checkMissingCallableSignature: true
+    ignoreErrors:
+        -
+            message: '~If condition is always true.~'
+            path: server/src/Map/*Map.php

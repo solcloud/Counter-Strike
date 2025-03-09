@@ -2,44 +2,43 @@
 
 namespace cs\Map;
 
-use cs\Core\Box;
+use cs\Core\BoxGroup;
 use cs\Core\Floor;
+use cs\Core\NavigationMesh;
 use cs\Core\Point;
 use cs\Core\Wall;
+use ReflectionClass;
 
 abstract class Map
 {
 
-    /** @var Point[] */
+    /** @var list<Point> */
     protected array $spawnPositionAttacker = [];
-    /** @var Point[] */
+    /** @var list<Point> */
     protected array $spawnPositionDefender = [];
 
-    /**
-     * @param Point[] $positions
-     */
+    /** @param list<Point> $positions */
     public function setAttackersSpawnPositions(array $positions): void
     {
         $this->spawnPositionAttacker = $positions;
     }
 
-    /**
-     * @param Point[] $positions
-     */
+    /** @param list<Point> $positions */
     public function setDefendersSpawnPositions(array $positions): void
     {
         $this->spawnPositionDefender = $positions;
     }
 
-    /** @return Point[] */
+    /** @return list<Point> */
     public function getStartingPointsForNavigationMesh(): array
     {
-        return array_merge($this->getSpawnPositionAttacker(), $this->getSpawnPositionDefender());
+        return array_merge(
+            array_slice($this->getSpawnPositionAttacker(), 0, 1),
+            array_slice($this->getSpawnPositionDefender(), 0, 1),
+        );
     }
 
-    /**
-     * @return Wall[]
-     */
+    /** @return list<Wall> */
     public function getWalls(): array
     {
         return [
@@ -48,9 +47,7 @@ abstract class Map
         ];
     }
 
-    /**
-     * @return Floor[]
-     */
+    /** @return list<Floor> */
     public function getFloors(): array
     {
         return [
@@ -58,17 +55,13 @@ abstract class Map
         ];
     }
 
-    /**
-     * @return Point[]
-     */
+    /** @return list<Point> */
     public function getSpawnPositionAttacker(): array
     {
         return $this->spawnPositionAttacker;
     }
 
-    /**
-     * @return Point[]
-     */
+    /** @return list<Point> */
     public function getSpawnPositionDefender(): array
     {
         return $this->spawnPositionDefender;
@@ -89,9 +82,34 @@ abstract class Map
         return 1000;
     }
 
-    public abstract function getBuyArea(bool $forAttackers): Box;
+    public function getName(): string
+    {
+        return strtolower(str_replace('Map', '', (new ReflectionClass($this))->getShortName()));
+    }
 
-    public abstract function getPlantArea(): Box;
+    public function generateNavigationMeshKey(int $tileSize, int $colliderHeight): string
+    {
+        return "{$tileSize}-{$colliderHeight}";
+    }
+
+    public function getNavigationMeshPath(string $key): string
+    {
+        return __DIR__ . "/data/{$this->getName()}.navmesh.{$key}.bin";
+    }
+
+    public function getNavigationMesh(string $key): ?NavigationMesh
+    {
+        $path = $this->getNavigationMeshPath($key);
+        if (file_exists($path)) {
+            return NavigationMesh::unserialize(file_get_contents($path)); // @phpstan-ignore argument.type
+        }
+
+        return null;
+    }
+
+    public abstract function getBuyArea(bool $forAttackers): BoxGroup;
+
+    public abstract function getPlantArea(): BoxGroup;
 
     /**
      * @return array<string,mixed>

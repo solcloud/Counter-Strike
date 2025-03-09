@@ -3,15 +3,13 @@
 namespace cs\Event;
 
 use cs\Core\Column;
-use cs\Core\GameException;
-use cs\Core\Graph;
+use cs\Core\NavigationMesh;
 use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Sequence;
 use cs\Core\World;
 use cs\Interface\ForOneRoundMax;
 use cs\Interface\Volumetric;
-use GraphPHP\Node\Node;
 use SplQueue;
 
 abstract class VolumetricEvent extends Event implements ForOneRoundMax
@@ -28,31 +26,29 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
     public array $parts = [];
     private int $lastPartSpawnTickId;
 
+    protected readonly int $partRadius;
+    protected readonly int $partHeight;
+
     public readonly Point $boundaryMin;
     public readonly Point $boundaryMax;
 
-    /** @var SplQueue<Node> $queue */
+    /** @var SplQueue<string> $queue */
     private SplQueue $queue;
     /** @var array<string,bool> */
     private array $visited = [];
 
     public function __construct(
-        public readonly Player     $initiator,
-        public readonly Volumetric $item,
-        protected readonly World   $world,
-        protected readonly int     $partRadius,
-        protected readonly int     $partHeight,
-        private readonly Graph     $graph,
-        private readonly Point     $start,
+        public readonly Player          $initiator,
+        public readonly Volumetric      $item,
+        protected readonly World        $world,
+        private readonly NavigationMesh $navmesh,
+        private readonly Point          $start,
     )
     {
-        $startNode = $this->graph->getNodeById($start->hash());
-        if (null === $startNode) {
-            throw new GameException("No node for start point: " . $start->hash()); // @codeCoverageIgnore
-        }
-
         $this->id = Sequence::next();
+        $this->partRadius = $this->navmesh->tileSizeHalf;
         $this->partSize = $this->partRadius * 2 + 1;
+        $this->partHeight = $this->navmesh->colliderHeight;
         $this->startedTickId = $this->world->getTickId();
         $this->spawnTickCount = $this->timeMsToTick(20);
         $this->maxTicksCount = $this->timeMsToTick($this->item->getMaxTimeMs());
@@ -63,7 +59,7 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
 
         $this->setup();
         $this->queue = new SplQueue();
-        $this->queue->enqueue($startNode);
+        $this->queue->enqueue($start->hash());
 
         $this->boundaryMin = $start->clone();
         $this->boundaryMax = $start->clone()->addPart(1, 1, 1);
@@ -151,19 +147,16 @@ abstract class VolumetricEvent extends Event implements ForOneRoundMax
 
         $output = [];
         while (!$this->queue->isEmpty() && count($output) < min($this->spawnPartCount, $loadCount)) {
-            $current = $this->queue->dequeue();
-            $currentKey = $current->getId();
+            $currentKey = $this->queue->dequeue();
             if (array_key_exists($currentKey, $this->visited)) {
                 continue;
             }
 
             $this->visited[$currentKey] = true;
-            /** @var Point $point */
-            $point = $current->getData();
-            $output[] = $point;
+            $output[] = Point::fromHash($currentKey);
 
-            foreach ($this->graph->getGeneratedNeighbors($currentKey) as $node) {
-                $this->queue->enqueue($node);
+            foreach ($this->navmesh->getGeneratedNeighbors($currentKey) as $nodeKey) {
+                $this->queue->enqueue($nodeKey);
             }
         }
 
