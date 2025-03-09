@@ -355,6 +355,32 @@ class RoundTest extends BaseTestCase
         $this->assertTrue($game->getPlayer(1)->isPlayingOnAttackerSide());
     }
 
+    public function testAttackersWinsWhenThereIsBombPlantedNotDefusedAndNoAttackerIsAlive(): void
+    {
+        $gameProperty = $this->createNoPauseGameProperty();
+        $gameProperty->bomb_plant_time_ms = 1;
+        $gameProperty->bomb_explode_time_ms = 500;
+        $game = $this->createTestGame(null, $gameProperty);
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->equip(InventorySlot::SLOT_BOMB),
+            $this->waitNTicks(Bomb::equipReadyTimeMs),
+            fn() => $this->assertFalse($game->isBombActive()),
+            fn(Player $p) => $p->attack(),
+            fn(Player $p) => $p->attack(),
+            fn() => $this->assertTrue($game->isBombActive()),
+            fn(Player $p) => $p->suicide(),
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(300),
+            fn() => $this->assertTrue($game->isBombActive()),
+            fn() => $this->assertSame(1, $game->getRoundNumber()),
+            $this->waitNTicks(300),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertTrue($game->getScore()->attackersIsWinning());
+    }
+
     public function testKillInRoundEndCoolDown(): void
     {
         $gameProperty = $this->createNoPauseGameProperty();

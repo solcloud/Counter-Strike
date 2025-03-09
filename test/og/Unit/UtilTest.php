@@ -25,6 +25,11 @@ class UtilTest extends BaseTest
         Util::millisecondsToFrames(-1);
     }
 
+    public function testPointHash(): void
+    {
+        $this->assertSame('1,2,3', (new Point(1, 2, 3))->hash());
+    }
+
     public function testPlayerCameraAngles(): void
     {
         $camera = new PlayerCamera();
@@ -241,6 +246,24 @@ class UtilTest extends BaseTest
         $this->assertPositionSame(new Point(10, 14, 22), Util::lerpPoint(new Point(2, 7, 9), new Point(11, 15, 23), .9));
     }
 
+    public function testMapRange(): void
+    {
+        $this->assertSame(20, Util::mapRange(0, 10, 20, 30,0, false));
+        $this->assertSame(25, Util::mapRange(0, 10, 20, 30,5, false));
+        $this->assertSame(35, Util::mapRange(0, 10, 20, 30,15, false));
+        $this->assertSame(30, Util::mapRange(0, 10, 20, 30,15, true));
+        $this->assertSame(78, Util::mapRange(30, 80, 50, 1,1, false));
+        $this->assertSame(50, Util::mapRange(30, 80, 50, 1,1, true));
+        $this->assertSame(50, Util::mapRange(30, 80, 50, 1,5, true));
+        $this->assertSame(50, Util::mapRange(30, 80, 50, 1,30, true));
+        $this->assertSame(40, Util::mapRange(30, 80, 50, 1,40, true));
+        $this->assertSame(21, Util::mapRange(30, 80, 50, 1,60, true));
+        $this->assertSame(11, Util::mapRange(30, 80, 50, 1,70, true));
+        $this->assertSame(1, Util::mapRange(30, 80, 50, 1,80, true));
+        $this->assertSame(1, Util::mapRange(30, 80, 50, 1,85, true));
+        $this->assertSame(-4, Util::mapRange(30, 80, 50, 1,85, false));
+    }
+
     public function testPoint(): void
     {
         $point = new Point();
@@ -390,13 +413,14 @@ class UtilTest extends BaseTest
         $this->assertSame([
             [0, 0, 0],
             [0, 1, 0],
-            [0, 2, 0],
-            [0, 3, 0],
+            [1, 1, 0],
+            [1, 2, 0],
             [1, 3, 0],
             [1, 4, 0],
             [2, 4, 0],
             [2, 5, 0],
         ], Util::continuousPointsBetween(new Point(), new Point(2, 5, 0)));
+        $this->assertSame([[12, 32, 6]], array_slice(Util::continuousPointsBetween(new Point(), new Point(30, 50, 20)), 50, 1));
     }
 
     public function testContinuousPointsBetweenJaggedness(): void
