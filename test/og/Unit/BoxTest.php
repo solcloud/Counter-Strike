@@ -3,6 +3,7 @@
 namespace Test\Unit;
 
 use cs\Core\Box;
+use cs\Core\BoxGroup;
 use cs\Core\Floor;
 use cs\Core\GameException;
 use cs\Core\Point;
@@ -62,6 +63,25 @@ class BoxTest extends BaseTest
             'y'      => $point->y,
             'z'      => $point->z,
         ], $box->toArray());
+
+        $boxGroup = new BoxGroup();
+        $this->assertFalse($boxGroup->contains(new Point()));
+        $boxGroup->add($box);
+        $this->assertTrue($boxGroup->contains(new Point(10, 20, 50)));
+        $this->assertTrue($boxGroup->contains(new Point(11, 21, 51)));
+        $this->assertFalse($boxGroup->contains(new Point(9, 19, 49)));
+        $this->assertSame([
+            [
+                'width' => $width,
+                'height' => $height,
+                'depth' => $depth,
+                'x' => $point->x,
+                'y' => $point->y,
+                'z' => $point->z,
+            ],
+        ], $boxGroup->toArray());
+        $boxGroup->add(new Box(new Point(), 1, 2, 3));
+        $this->assertFalse($boxGroup->contains(new Point(5, 10, 20)));
     }
 
     public function testBoxPenetrableParamPropagation(): void

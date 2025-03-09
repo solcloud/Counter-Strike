@@ -62,13 +62,19 @@ class ShootTest extends BaseTestCase
                 $noAmmoTickId = $state->getTickId();
             }
         });
-        $game->onEvents(function (array $events) use (&$noAmmoTickId): void {
+        $autoReloadFired = false;
+        $game->onEvents(function (array $events) use (&$noAmmoTickId, &$autoReloadFired): void {
             foreach ($events as $event) {
                 if (!($event instanceof SoundEvent)) {
                     continue;
                 }
 
-                if ($event->type === SoundType::ATTACK_NO_AMMO && $noAmmoTickId > 0) {
+                if ($event->type === SoundType::ITEM_RELOAD) {
+                    $this->assertFalse($autoReloadFired);
+                    $autoReloadFired = true;
+                }
+                if ($event->type === SoundType::ATTACK_NO_AMMO) {
+                    $this->assertGreaterThan(0, $noAmmoTickId);
                     $noAmmoTickId = -1;
                 }
             }
@@ -76,6 +82,7 @@ class ShootTest extends BaseTestCase
 
         $game->start();
         $this->assertSame(-1, $noAmmoTickId);
+        $this->assertTrue($autoReloadFired);
     }
 
     public function testVerticalShooting(): void

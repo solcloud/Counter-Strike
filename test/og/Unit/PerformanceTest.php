@@ -3,6 +3,7 @@
 namespace Test\Unit;
 
 use cs\Core\Box;
+use cs\Core\BoxGroup;
 use cs\Core\GameFactory;
 use cs\Core\Player;
 use cs\Core\Point;
@@ -288,20 +289,21 @@ class PerformanceTest extends BaseTest
     private function createMolotovMap(): Map
     {
         return new class() extends BoxMap {
-            private Box $boundary;
+            private BoxGroup $boundary;
 
             public function __construct()
             {
-                $this->boundary = new Box(new Point(11, 12, 13), 1000, 2000, 1000);
-                $this->addBox($this->boundary);
+                $box = new Box(new Point(11, 12, 13), 1000, 2000, 1000);
+                $this->boundary = new BoxGroup([$box]);
+                $this->addBox($box);
             }
 
-            public function getBuyArea(bool $forAttackers): Box
+            public function getBuyArea(bool $forAttackers): BoxGroup
             {
                 return $this->boundary;
             }
 
-            public function getPlantArea(): Box
+            public function getPlantArea(): BoxGroup
             {
                 return $this->boundary;
             }
@@ -316,24 +318,25 @@ class PerformanceTest extends BaseTest
     private function createMap(int $depth = 2000): Map
     {
         return new class($depth) extends BoxMap {
-            private Box $boundary;
+            private BoxGroup $boundary;
 
             public function __construct(private int $depth)
             {
-                $this->boundary = new Box(new Point(1, 1, 1), 1100, 1500, $depth);
-                $this->addBox($this->boundary);
+                $boundaryBox = new Box(new Point(1, 1, 1), 1100, 1500, $depth);
+                $this->addBox($boundaryBox);
+                $this->boundary = new BoxGroup([$boundaryBox]);
                 for ($i = 100; $i <= $depth; $i += 100) {
                     $this->addBox(new Box(new Point(10, 1, $i), 10, 1400, 90));
                     $this->addBox(new Box(new Point(1090, 10, $i), 10, 1400, 90));
                 }
             }
 
-            public function getBuyArea(bool $forAttackers): Box
+            public function getBuyArea(bool $forAttackers): BoxGroup
             {
                 return $this->boundary;
             }
 
-            public function getPlantArea(): Box
+            public function getPlantArea(): BoxGroup
             {
                 return $this->boundary;
             }

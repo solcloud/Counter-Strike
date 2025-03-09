@@ -4,7 +4,7 @@ namespace Test\World;
 
 use cs\Core\Box;
 use cs\Core\Floor;
-use cs\Core\GameException;
+use cs\Core\NavigationMesh;
 use cs\Core\PathFinder;
 use cs\Core\Point;
 use cs\Core\World;
@@ -40,7 +40,7 @@ final class NavigationMeshTest extends BaseTestCase
         ];
         $world = new World($this->createTestGame());
         foreach ($data as $tileSize => $tests) {
-            $finder = new PathFinder($world, $tileSize, 10);
+            $finder = new PathFinder($world, new NavigationMesh($tileSize, 10));
             foreach ($tests as [$expected, $point]) {
                 $msg = "Size {$tileSize} point {$point->hash()}";
                 $finder->convertToNavMeshNode($point);
@@ -63,14 +63,10 @@ final class NavigationMeshTest extends BaseTestCase
         $path->convertToNavMeshNode($start);
         $startNode = $path->getGraph()->getNodeById($start->hash());
         $this->assertNotNull($startNode);
-        $this->assertCount(3, $path->getGraph()->getNeighbors($startNode));
-        $path->getGraph()->generateNeighbors();
-        $this->assertCount(3, $path->getGraph()->getGeneratedNeighbors($startNode->getId()));
-        foreach ($path->getGraph()->getGeneratedNeighbors($startNode->getId()) as $neighbor) {
-            $path->getGraph()->removeNodeById($neighbor->getId());
-        }
-        $this->expectException(GameException::class);
-        $path->getGraph()->getGeneratedNeighbors($startNode->getId());
+        $this->assertCount(3, $path->getNavigationMesh()->getGeneratedNeighbors($startNode->getId()));
+        $neighbors = $path->getGraph()->generateNeighbors();
+        $this->assertCount(9, $neighbors);
+        $this->assertCount(3, $neighbors[$startNode->getId()]);
     }
 
     public function testBoundary(): void
@@ -90,6 +86,7 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertNull($path->getGraph()->getNodeById($closestCandidate->hash()));
 
         $validPoint = $path->findTile($candidate, 1);
+        $this->assertNotNull($validPoint);
         $this->assertLessThan($closestCandidate->x, $validPoint->x);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,0,5', $validPoint->hash());
@@ -97,6 +94,7 @@ final class NavigationMeshTest extends BaseTestCase
         $orig = $candidate->clone();
         $candidate->addX(-1);
         $validPoint = $path->findTile($candidate, 1);
+        $this->assertNotNull($validPoint);
         $this->assertLessThan($closestCandidate->x, $validPoint->x);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,0,5', $validPoint->hash());
@@ -124,6 +122,7 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertNull($path->getGraph()->getNodeById($closestCandidate->hash()));
 
         $validPoint = $path->findTile($candidate, 1);
+        $this->assertNotNull($validPoint);
         $this->assertNotNull($path->getGraph()->getNodeById($validPoint->hash()));
         $this->assertSame('2,1,2', $validPoint->hash());
     }
@@ -169,14 +168,15 @@ final class NavigationMeshTest extends BaseTestCase
         $game = $this->createTestGame();
         $expectedPoint = new Point(2, 2, 2);
         $game->getTestMap()->startPointForNavigationMesh->set(1, 2, 1);
-        $game->getWorld()->addBox(new Box(new Point(), 5, 1000, 4));
+        $game->getWorld()->addBox(new Box(new Point(), 5, 1000, 7));
         $game->getWorld()->addFloor(new Floor(new Point(2, 2, 0), 10, 10));
 
         $path = $game->getWorld()->buildNavigationMesh(3, 10);
         $graph = $path->getGraph();
 
         $nodes = $graph->getNodes();
-        $this->assertCount(1, $nodes);
+        $this->assertCount(2, $nodes);
+        $this->assertSame(2, $graph->getEdgeCount());
         $node = $graph->getNodeById('2,2,2');
         $this->assertNotNull($node);
         $this->assertSame($node, array_shift($nodes));
@@ -185,7 +185,9 @@ final class NavigationMeshTest extends BaseTestCase
         $this->assertPositionSame($expectedPoint, $nodePosition);
 
         $tilePoint = $path->findTile(new Point(1, 0, 1), 1);
+        $this->assertNotNull($tilePoint);
         $this->assertPositionSame($expectedPoint, $tilePoint);
+        $this->assertNull($path->findTile(new Point(20, 0, 1), 1));
     }
 
     public function testDeepHole(): void
