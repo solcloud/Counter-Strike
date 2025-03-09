@@ -16,8 +16,8 @@ abstract class BaseWeapon extends Item
     public const int recoilResetMs = 0;
     public const int damage = 0;
     public const int armorPenetration = 0;
-    public const int range = 5123;
-    public const int rangeMaxDamage = 5123;
+    public const int range = 20123;
+    public const int rangeMaxDamage = 20123;
     /** @var list<array{float,float}> */
     public const array recoilPattern = [];
 

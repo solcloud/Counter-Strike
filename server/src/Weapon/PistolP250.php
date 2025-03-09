@@ -15,7 +15,7 @@ final class PistolP250 extends AmmoBasedWeapon
     public const int killAward = 300;
     public const int fireRateMs = 150;
     public const int damage = 130;
-    public const int rangeMaxDamage = 3000;
+    public const int rangeMaxDamage = 13123;
     public const int recoilResetMs = 400;
     public const array recoilPattern = [
         [0, 0],
