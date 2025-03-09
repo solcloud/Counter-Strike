@@ -14,41 +14,36 @@ trait JumpTrait
             return;
         }
 
-        if (isset($this->eventsCache[$this->eventIdJump])) {
-            /** @var JumpEvent $event */
-            $event = $this->eventsCache[$this->eventIdJump];
-            $event->reset();
-            $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();
-            $this->addEvent($event, $this->eventIdJump);
-            return;
+        if (!isset($this->eventsCache[$this->eventIdJump])) {
+            $this->eventsCache[$this->eventIdJump] = new JumpEvent(function (Event $jumpEvent): void {
+                assert($jumpEvent instanceof JumpEvent);
+                $targetYPosition = min($jumpEvent->maxYPosition, $this->position->y + Setting::jumpDistancePerTick());
+                $candidate = $this->position->clone()->addY($this->headHeight);
+                for ($y = $this->position->y; $y < $targetYPosition; $y++) {
+                    $candidate->addY(1);
+                    $floorCandidate = $this->world->findFloorSquare($candidate, $this->playerBoundingRadius);
+                    if ($floorCandidate) {
+                        $this->removeEvent($this->eventIdJump);
+                        break;
+                    }
+                    if ($this->world->isCollisionWithOtherPlayers($this->id, $candidate, $this->playerBoundingRadius, 2)) {
+                        $this->removeEvent($this->eventIdJump);
+                        break;
+                    }
+                }
+
+                if ($this->position->y !== $y) {
+                    $this->setActiveFloor(null);
+                    $this->position->setY($y);
+                }
+            }, Setting::tickCountJump());
         }
 
-        $event = new JumpEvent(function (Event $jumpEvent): void {
-            assert($jumpEvent instanceof JumpEvent);
-            $targetYPosition = min($jumpEvent->maxYPosition, $this->position->y + Setting::jumpDistancePerTick());
-            $candidate = $this->position->clone()->addY($this->headHeight);
-            for ($y = $this->position->y; $y < $targetYPosition; $y++) {
-                $candidate->addY(1);
-                $floorCandidate = $this->world->findFloorSquare($candidate, $this->playerBoundingRadius);
-                if ($floorCandidate) {
-                    $this->removeEvent($this->eventIdJump);
-                    break;
-                }
-                if ($this->world->isCollisionWithOtherPlayers($this->id, $candidate, $this->playerBoundingRadius, 2)) {
-                    $this->removeEvent($this->eventIdJump);
-                    break;
-                }
-            }
-
-            if ($this->position->y !== $y) {
-                $this->setActiveFloor(null);
-                $this->position->setY($y);
-            }
-        }, Setting::tickCountJump());
+        /** @var JumpEvent $event */
+        $event = $this->eventsCache[$this->eventIdJump];
+        $event->reset();
         $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();
-
         $this->addEvent($event, $this->eventIdJump);
-        $this->eventsCache[$this->eventIdJump] = $event;
     }
 
     public function isJumping(): bool

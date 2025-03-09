@@ -5,6 +5,7 @@ namespace cs\Traits\Player;
 use cs\Core\Floor;
 use cs\Core\Point;
 use cs\Core\Setting;
+use cs\Core\Util;
 use cs\Enum\SoundType;
 use cs\Event\CallbackEvent;
 use cs\Event\SoundEvent;
@@ -74,22 +75,7 @@ trait GravityTrait
             return;
         }
 
-        // @codeCoverageIgnoreStart
-        if ($fallHeight < $threshold + 15) {
-            $this->lowerHealth(10);
-        } elseif ($fallHeight < $threshold + 30) {
-            $this->lowerHealth(20);
-        } elseif ($fallHeight < $threshold + 60) {
-            $this->lowerHealth(40);
-        } elseif ($fallHeight < $threshold + 90) {
-            $this->lowerHealth(60);
-        } elseif ($fallHeight < $threshold + 120) {
-            $this->lowerHealth(90);
-        // @codeCoverageIgnoreEnd
-        } else {
-            $this->lowerHealth(999);
-        }
-
+        $this->lowerHealth(Util::mapRange($threshold, 2 * $threshold, 1, 180, $fallHeight));
         if (!$this->isAlive()) {
             $this->world->playerDiedToFallDamage($this);
         }
