@@ -210,17 +210,16 @@ class WallTest extends BaseTestCase
 
         $base = new Point(-1);
         for ($i = 1; $i <= $numOfBoxes; $i++) {
-            $game->getWorld()->addBox(
-                new Box(
-                    $base->clone()->setZ($i * Setting::moveDistancePerTick()),
-                    20,
-                    Setting::playerObstacleOvercomeHeight(),
-                    Setting::moveDistancePerTick()
-                )
+            $box = new Box(
+                $base->clone()->setZ($i * Setting::moveDistancePerTick()),
+                20,
+                Setting::playerObstacleOvercomeHeight(),
+                Setting::moveDistancePerTick()
             );
+            $game->getWorld()->addBox($box);
             $base->addY(Setting::playerObstacleOvercomeHeight());
         }
-        $box = new Box(new Point(-5, 0, Setting::moveDistancePerTick() * ($numOfBoxes + 2)), 10, $base->y, 10);
+        $box = new Box($box->getBase()->clone()->addZ($box->depthZ + Setting::moveDistancePerTick() + 2)->setY(0), 20, $box->getBase()->y + $box->heightY, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveForward());
@@ -238,26 +237,25 @@ class WallTest extends BaseTestCase
 
         $base = new Point(-1);
         for ($i = 1; $i <= $numOfBoxes; $i++) {
-            $game->getWorld()->addBox(
-                new Box(
-                    $base->clone()->setZ($i * Setting::moveDistancePerTick()),
-                    20,
-                    Setting::playerObstacleOvercomeHeight(),
-                    Setting::moveDistancePerTick()
-                )
+            $box = new Box(
+                $base->clone()->setZ($i * Setting::moveDistancePerTick()),
+                20,
+                Setting::playerObstacleOvercomeHeight(),
+                Setting::moveDistancePerTick()
             );
+            $game->getWorld()->addBox($box);
             $base->addY(Setting::playerObstacleOvercomeHeight());
         }
-        $box = new Box(new Point(-5, 0, Setting::moveDistancePerTick() * ($numOfBoxes + 2) + $player->getBoundingRadius()), 10, $base->y, 10);
+        $box = new Box($box->getBase()->clone()->addZ($box->depthZ + Setting::moveDistancePerTick() + Setting::playerBoundingRadius() + 2)->setY(0), 10, $box->getBase()->y + $box->heightY, 10);
         $game->getWorld()->addBox($box);
 
         $game->onTick(function (GameState $state) use ($numOfBoxes) {
             $state->getPlayer(1)->moveForward();
-            if ($state->getTickId() === $numOfBoxes + 1) {
+            if ($state->getTickId() === $numOfBoxes + 2) {
                 $this->assertGreaterThan(0, $state->getPlayer(1)->getPositionClone()->y);
                 $this->assertSame(Setting::playerObstacleOvercomeHeight() * $numOfBoxes, $state->getPlayer(1)->getPositionClone()->y);
             }
-            if ($state->getTickId() === $numOfBoxes + 2) {
+            if ($state->getTickId() === $numOfBoxes + 3) {
                 $this->assertLessThan(Setting::playerObstacleOvercomeHeight() * $numOfBoxes, $state->getPlayer(1)->getPositionClone()->y);
                 $this->assertSame(Setting::playerObstacleOvercomeHeight() * $numOfBoxes - Setting::fallAmountPerTick() - 1, $state->getPlayer(1)->getPositionClone()->y); // test for initial (one-shot) gravity bump
             }

@@ -557,4 +557,49 @@ class MovementTest extends BaseTestCase
         $this->assertPositionSame($origin, $game->getPlayer(1)->getPositionClone());
     }
 
+    public function testPlayerCanClimbUpWallDiagonallyCircleSquareDistance(): void
+    {
+        $game = $this->createTestGameNoPause(6);
+        $p = $game->getPlayer(1);
+        $br = $p->getBoundingRadius();
+        $p->setPosition(new Point($br, 0, $br));
+        $p->getSight()->look(-15, -10);
+
+        $height = 10;
+        $this->assertLessThan(Setting::playerObstacleOvercomeHeight(), $height);
+        $box = new Box(new Point((int)ceil(-$br / 2), 0, $p->getPositionClone()->z + $br + 10), $br, $height, 2500);
+        $game->getWorld()->addBox($box);
+
+        $game->onTick(fn() => $p->moveForward());
+        $game->start();
+        $this->assertGreaterThan(0, $p->getPositionClone()->y);
+        $this->assertSame($box->heightY, $p->getPositionClone()->y);
+        $this->assertPositionSame(new Point(44, $height, 248), $p->getPositionClone());
+
+        $world = $game->getWorld();
+        $floor = new Floor(new Point(0, 2, 0), 1, 1);
+
+        $p->setPosition(new Point(-$br, 2, $br));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point($br, 2, $br));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point(1, 2, 1));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point($br + 1, 2, 1));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point(1, 2, $br + 1));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point(1, 2, $br + 1));
+        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
+
+        $p->setPosition(new Point($br + 2, 2, 1));
+        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point(-$br - 2, 2, 1));
+        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point($br + 2, 2, $br + 2));
+        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
+        $p->setPosition(new Point(1, 2, $br + 2));
+        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
+    }
+
 }

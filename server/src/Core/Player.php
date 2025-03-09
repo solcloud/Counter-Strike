@@ -75,7 +75,7 @@ final class Player
 
     public function onTick(int $tick): void
     {
-        if ($this->activeFloor && !$this->world->isOnFloor($this->activeFloor, $this->position, $this->playerBoundingRadius)) {
+        if ($this->activeFloor && !$this->world->isPlayerOnFloor($this, $this->activeFloor)) {
             $this->setActiveFloor(null);
         }
 

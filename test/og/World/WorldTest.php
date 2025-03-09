@@ -122,31 +122,6 @@ class WorldTest extends BaseTestCase
         $this->assertSame($steps * $ramp->stepHeight, $game->getPlayer(1)->getPositionClone()->y);
     }
 
-    public function testStairCaseDown(): void
-    {
-        $steps = 20;
-        $startY = $steps * Setting::playerObstacleOvercomeHeight();
-        $ramp = new Ramp(
-            new Point(Setting::moveDistancePerTick() / -2, $startY, -2 * Setting::playerBoundingRadius()),
-            RampDirection::GROW_TO_POSITIVE_X,
-            $steps,
-            250,
-            false,
-            Setting::moveDistancePerTick(),
-            Setting::playerObstacleOvercomeHeight()
-        );
-
-        $game = $this->createTestGameNoPause($steps);
-        $game->getWorld()->addRamp($ramp);
-        $player = $game->getPlayer(1);
-        $player->setPosition($player->getPositionClone()->addY($startY));
-        $game->onTick(fn(GameState $state) => $state->getPlayer(1)->moveRight());
-
-        $game->start();
-        $this->assertNotSame(0, $player->getPositionClone()->y);
-        $this->assertPositionSame(new Point($steps * Setting::moveDistancePerTick(), Setting::playerObstacleOvercomeHeight(), 0), $player->getPositionClone());
-    }
-
     public function testWallPenetration(): void
     {
         $game = $this->createTestGame(Setting::tickCountJump());

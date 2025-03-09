@@ -237,11 +237,19 @@ final class World
         return $highestWallCeiling;
     }
 
-    public function isOnFloor(Floor $floor, Point $position, int $radius): bool
+    public function isPlayerOnFloor(Player $player, Floor $floor): bool
     {
+        $point = $player->getReferenceToPosition();
+        $radius = $player->getBoundingRadius();
+        if ($floor instanceof DynamicFloor) {
+            return $floor->intersect($point, $radius);
+        }
+
         return (
-            $floor->getY() === $position->y
-            && $floor->intersect($position, $radius)
+            $floor->getY() === $point->y && Collision::planeWithPlane(
+                $floor->getPoint2DStart(), $floor->width, $floor->depth,
+                $point->x - $radius, $point->z - $radius, 2 * $radius, 2 * $radius,
+            )
         );
     }
 
