@@ -16,7 +16,7 @@ $ws = new Server([
     'filter'        => ['text'],
     'fragment_size' => '8192',
     'port'          => $portWs,
-    'timeout'       => 8,
+    'timeout'       => 15,
 ]);
 
 while (true) {

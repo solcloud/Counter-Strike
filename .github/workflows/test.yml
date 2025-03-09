@@ -23,16 +23,16 @@ jobs:
           persist-credentials: false
 
       - name: "Install Linux dependencies"
-        timeout-minutes: 1
+        timeout-minutes: 2
         run: |
           sudo apt-get update && sudo apt-get install -y \
             composer
           sudo bash -c "echo 'zend.assertions = 1' >> /etc/php/*/cli/php.ini"
 
       - name: "Install Composer dependencies"
-        timeout-minutes: 1
+        timeout-minutes: 2
         run: |
-          composer install
+          composer install --no-scripts
 
       - name: "Run Composer check-full"
         timeout-minutes: 10
