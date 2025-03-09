@@ -15,7 +15,7 @@ final class PistolGlock extends AmmoBasedWeapon
     public const int killAward = 300;
     public const int fireRateMs = 150;
     public const int damage = 110;
-    public const int rangeMaxDamage = 2600;
+    public const int rangeMaxDamage = 8123;
     public const int recoilResetMs = 300;
     public const array recoilPattern = [
         [0, 0],
