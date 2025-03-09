@@ -116,7 +116,7 @@ class Game
 
     private function checkRoundEnd(int $defendersAlive, int $attackersAlive): void
     {
-        if ($this->playersCountAttackers > 0 && $attackersAlive === 0) {
+        if ($this->playersCountAttackers > 0 && $attackersAlive === 0 && !$this->bombPlanted) {
             $this->roundEnd(false, RoundEndReason::ALL_ENEMIES_ELIMINATED);
             return;
         }
