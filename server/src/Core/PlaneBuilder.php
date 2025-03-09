@@ -8,17 +8,17 @@ final class PlaneBuilder
     private array $voxels = [];
 
     /** @return list<Plane> */
-    public function create(Point $a, Point $b, Point $c, ?Point $d = null, float $jaggedness = 1.0): array
+    public function create(Point $a, Point $b, Point $c, ?Point $d = null, ?float $jaggedness = null): array
     {
         if ($d === null) {
-            return $this->fromTriangle($a, $b, $c, $jaggedness);
+            return $this->fromTriangle($a, $b, $c, $jaggedness ?? 10.0);
         }
 
         return $this->fromQuad($a, $b, $c, $d, $jaggedness);
     }
 
     /** @return list<Plane> */
-    public function fromTriangle(Point $a, Point $b, Point $c, float $voxelSizeDotThreshold = 1.0): array
+    public function fromTriangle(Point $a, Point $b, Point $c, float $voxelSizeDotThreshold): array
     {
         $voxelSize = (int)$voxelSizeDotThreshold;
         $voxelThreshold = max(1, intval(str_replace('0.', '', abs($voxelSizeDotThreshold - $voxelSize)))); // @phpstan-ignore argument.type
@@ -34,13 +34,14 @@ final class PlaneBuilder
         foreach ($this->voxelizeTriangle($a, $b, $c, $voxelSize, $voxelThreshold, $matchSize) as $voxelPoint) {
             $planes[] = new Wall($voxelPoint, true, $voxelSize, $voxelSize);
             $planes[] = new Wall($voxelPoint, false, $voxelSize, $voxelSize);
+            $planes[] = new Wall($voxelPoint->clone()->addX($voxelSize), false, $voxelSize, $voxelSize);
             $planes[] = new Floor($voxelPoint->clone()->addY($voxelSize), $voxelSize, $voxelSize);
         }
         return $planes;
     }
 
     /** @return list<Plane> */
-    public function fromQuad(Point $a, Point $b, Point $c, Point $d, float $jaggedness = 1.0): array
+    public function fromQuad(Point $a, Point $b, Point $c, Point $d, ?float $jaggedness = null): array
     {
         $minX = min($a->x, $b->x, $c->x, $d->x);
         $maxX = max($a->x, $b->x, $c->x, $d->x);
@@ -77,11 +78,13 @@ final class PlaneBuilder
         $wallRotated = [];
         $isWallRotatedCheck = [];
         $isStairs = [];
+        $isRamp = [];
         foreach ([$a, $b, $c, $d] as $point) {
             $yIndex = ($point->y === $minY || $point->y === $maxY ? 0 : 1);
             $wallRotated[$point->x][] = $point;
             $isWallRotatedCheck[$yIndex]["{$point->x}|{$point->z}"][] = $point;
-            $isStairs[$point->x][$point->z][] = $point;
+            $isStairs[$point->y][] = $point;
+            $isRamp[$point->x][$point->z][] = $point;
         }
 
         // Rotated wall
@@ -91,13 +94,16 @@ final class PlaneBuilder
             $start = $wallRotated[$xCoordinates[0]][0];
             $end = $wallRotated[$xCoordinates[1]][0];
 
-            return $this->rotatedWall($start->setY($minY), $end->setY($minY), $maxY - $minY, $jaggedness);
+            return $this->rotatedWall($start->setY($minY), $end->setY($minY), $maxY - $minY, $jaggedness ?? 1.0);
         }
 
         // Ramp
-        if (count($isStairs[$minX][$minZ]) === 1 && count($isStairs[$minX][$maxZ]) === 1) {
-            $min = $isStairs[$minX][$minZ][0];
-            $max = $isStairs[$minX][$maxZ][0];
+        $minXKeys = array_keys($isRamp[$minX]);
+        if (count($isRamp[$minX][$minZ] ?? []) === 1 && count($isRamp[$minX][$maxZ] ?? []) === 1
+            && count($minXKeys) === 2 && isset($isRamp[$maxX][$minXKeys[0]]) && isset($isRamp[$maxX][$minXKeys[1]])
+        ) {
+            $min = $isRamp[$minX][$minZ][0];
+            $max = $isRamp[$minX][$maxZ][0];
 
             $rampDirectionOnX = ($min->y === $max->y);
             $width = ($rampDirectionOnX ? $maxZ - $minZ : $maxX - $minX);
@@ -106,7 +112,24 @@ final class PlaneBuilder
             }
 
             $max->setY($min->y === $minY ? $maxY : $minY);
-            return $this->ramp($min, $max, $width, $jaggedness);
+            return $this->ramp($min, $max, $width, $jaggedness ?? 1.0);
+        }
+
+        // Stairs maybe
+        if (count($isStairs[$minY] ?? []) === 2 && count($isStairs[$maxY] ?? []) === 2) {
+            [$baseA, $baseB] = $isStairs[$minY];
+            [$topA, $topB] = $isStairs[$maxY];
+            $onX = ($baseA->z === $baseB->z);
+            $base = ($onX ? $baseA->x < $baseB->x : $baseA->z < $baseB->z) ? $baseA : $baseB;
+            $top = ($onX ? $topA->x < $topB->x : $topA->z < $topB->z) ? $topA : $topB;
+            $topSize = abs($onX ? $topA->x - $topB->x : $topA->z - $topB->z);
+
+            // Stairs
+            if ($topSize > 0) {
+                $stepHeight = (int)($jaggedness ?? 15);
+
+                return $this->stairs($base, $top, $topSize, $stepHeight, $onX);
+            }
         }
 
         GameException::notImplementedYet(); // @codeCoverageIgnore
@@ -197,6 +220,53 @@ final class PlaneBuilder
 
             $previous->set($current[0], $current[1], $current[2]);
             $isFloor = !$isFloor;
+        }
+
+        return $planes;
+    }
+
+    /** @return list<Plane> */
+    private function stairs(Point $base, Point $top, int $topSize, int $stepHeight, bool $onX): array
+    {
+        assert($topSize > 0);
+        assert($stepHeight > 0);
+        $fullHeight = $top->y - $base->y;
+        assert($fullHeight > 1 && $fullHeight > $stepHeight);
+        $stepCount = (int)ceil($fullHeight / $stepHeight);
+
+        $previous = $base->clone();
+        $width = abs($top->x - $base->x);
+        $depth = abs($top->z - $base->z);
+        $stepWidth = (int)floor($width / $stepCount);
+        $stepDepth = (int)floor($depth / $stepCount);
+
+        [$angleH, $angleV] = Util::worldAngle($top, $base);
+        assert($angleH !== null && $angleV > 0);
+
+        $negativeZ = (Util::directionZ($angleH) === -1);
+        $negativeX = (Util::directionX($angleH) === -1);
+        if ($negativeX || $negativeZ) {
+            $previous->addPart($negativeX ? -$width : 0, 0, $negativeZ ? -$depth : 0);
+        }
+
+        $planes = [];
+        for ($step = 1; $step <= $stepCount; $step++) {
+            if ($step === $stepCount) {
+                $stepHeight = $top->y - $previous->y;
+            }
+
+            $box = new Box($previous->clone(), $onX ? 2 * $width + $topSize : $width, $stepHeight, $onX ? $depth : 2 * $depth + $topSize, Box::SIDE_ALL ^ Box::SIDE_BOTTOM);
+            foreach (array_merge($box->getWalls(), $box->getFloors()) as $plane) {
+                $planes[] = $plane;
+            }
+
+            $width = max(1, $width - $stepWidth);
+            $depth = max(1, $depth - $stepDepth);
+            $previous->addPart(
+                $negativeX ? 0 : ($width === 1 ? 0 : $stepWidth),
+                $stepHeight,
+                $negativeZ ? 0 : ($depth === 1 ? 0 : $stepDepth),
+            );
         }
 
         return $planes;

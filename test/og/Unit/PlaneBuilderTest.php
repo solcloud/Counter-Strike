@@ -74,8 +74,9 @@ class PlaneBuilderTest extends BaseTest
             new Point(2, 1, 3),
             new Point(4, 3, 5),
             new Point(6, 2, 1),
+            1.0,
         );
-        $this->assertCount(21, $planes);
+        $this->assertCount(28, $planes);
     }
 
     public function testTriangleVoxelSize(): void
@@ -88,7 +89,7 @@ class PlaneBuilderTest extends BaseTest
             null,
             3.9,
         );
-        $this->assertCount(9, $planes);
+        $this->assertCount(12, $planes);
     }
 
     public function testTriangleBoundary(): void
@@ -98,8 +99,10 @@ class PlaneBuilderTest extends BaseTest
             new Point(2, 1, 6),
             new Point(12, 4, 22),
             new Point(5, 11, -1),
+            null,
+            1.0,
         );
-        $this->assertCount(426, $planes);
+        $this->assertCount(568, $planes);
 
         $boundaryMin = (new Point())->setScalar(PHP_INT_MAX);
         $boundaryMax = (new Point())->setScalar(PHP_INT_MIN);
@@ -129,7 +132,7 @@ class PlaneBuilderTest extends BaseTest
             null,
             -1.0,
         );
-        $this->assertCount(438, $planes);
+        $this->assertCount(584, $planes);
 
         $boundaryMin = (new Point())->setScalar(PHP_INT_MAX);
         $boundaryMax = (new Point())->setScalar(PHP_INT_MIN);
@@ -357,8 +360,8 @@ class PlaneBuilderTest extends BaseTest
             new Point(50, 3, 0),
             new Point(1, 2, 2),
             new Point(50, 2, 2),
+            1.0,
         ];
-        shuffle($points);
 
         $planes = $pb->fromQuad(...$points);
         $this->assertCount(3, $planes);
@@ -419,8 +422,8 @@ class PlaneBuilderTest extends BaseTest
             new Point(0, 0, 40),
             new Point(200, 200, 0),
             new Point(200, 200, 40),
+            1.0,
         ];
-        shuffle($points);
 
         $planes = $pb->fromQuad(...$points);
         $this->assertCount(400, $planes);
@@ -445,6 +448,63 @@ class PlaneBuilderTest extends BaseTest
         $this->assertPositionSame(new Point(200, 0, 40), $planes[0]->getEnd());
         $this->assertPositionSame(new Point(200, 0, 0), $planes[1]->getStart());
         $this->assertPositionSame(new Point(200, 200, 40), $planes[1]->getEnd());
+    }
+
+    public function testStairs(): void
+    {
+        $pb = new PlaneBuilder();
+        $points = [
+            new Point(0, 0, 0),
+            new Point(0, 0, 60),
+            new Point(30, 10, 10),
+            new Point(30, 10, 50),
+            8,
+        ];
+
+        $planes = $pb->fromQuad(...$points);
+        $this->assertCount(10, $planes);
+        $this->assertPositionSame(new Point(), $planes[0]->getStart());
+        $this->assertPositionSame(new Point(30, 8, 0), $planes[0]->getEnd());
+        $this->assertPositionSame(new Point(15, 10, 5), $planes[9]->getStart());
+        $this->assertPositionSame(new Point(30, 10, 55), $planes[9]->getEnd());
+    }
+
+    public function testStairs2(): void
+    {
+        $pb = new PlaneBuilder();
+        $points = [
+            new Point(0, 10, 10),
+            new Point(0, 10, 50),
+            new Point(30, 0, 0),
+            new Point(30, 0, 60),
+            8,
+        ];
+
+        $planes = $pb->fromQuad(...$points);
+        $this->assertCount(10, $planes);
+        $this->assertPositionSame(new Point(), $planes[0]->getStart());
+        $this->assertPositionSame(new Point(30, 8, 0), $planes[0]->getEnd());
+        $this->assertPositionSame(new Point(0, 10, 5), $planes[9]->getStart());
+        $this->assertPositionSame(new Point(15, 10, 55), $planes[9]->getEnd());
+    }
+
+    public function testStairs3(): void
+    {
+        $pb = new PlaneBuilder();
+        $points = [
+            new Point(10, 50, 0),
+            new Point(50, 50, 0),
+            new Point(0, 0, 60),
+            new Point(60, 0, 60),
+        ];
+        shuffle($points);
+
+        $planes = $pb->fromQuad(...$points);
+        $this->assertCount(20, $planes);
+        $this->assertPositionSame(new Point(), $planes[0]->getStart());
+        $this->assertPositionSame(new Point(60, 15, 0), $planes[0]->getEnd());
+        $this->assertPositionSame(new Point(2, 30, 0), $planes[9]->getStart());
+        $this->assertPositionSame(new Point(58, 30, 45), $planes[9]->getEnd());
     }
 
 }
