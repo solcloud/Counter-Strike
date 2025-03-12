@@ -159,6 +159,7 @@ final class World
         foreach ($this->game->getAlivePlayers() as $player) {
             $floor = $player->getHeadFloor();
             if ($floor->intersect($point, $radius)) {
+                $player->getBoostFloor()?->getPlayer()->suicide();
                 return $floor;
             }
         }

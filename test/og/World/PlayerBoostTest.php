@@ -153,4 +153,20 @@ class PlayerBoostTest extends BaseTestCase
         $this->assertFalse($player1->isJumping());
     }
 
+    public function testPunishTripleBoost(): void
+    {
+        $game = $this->createTestGameNoPause(20);
+        $p1 = $game->getPlayer(1);
+        $p2 = new Player(2, Color::GREEN, false);
+        $p3 = new Player(3, Color::ORANGE, false);
+        $game->addPlayer($p2);
+        $game->addPlayer($p3);
+        $p1->setPosition(new Point(500, 0, 500));
+        $p2->setPosition($p1->getPositionClone()->addY($p1->getHeadHeight() + 2));
+        $p3->setPosition($p2->getPositionClone()->addY($p1->getHeadHeight() + 2));
+
+        $game->start();
+        $this->assertFalse($p1->isAlive());
+    }
+
 }
