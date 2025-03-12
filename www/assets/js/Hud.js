@@ -208,7 +208,8 @@ export class HUD {
                 return
             }
 
-            grenade += `<span${slotId === slot ? ' class="highlight"' : ''}>${Enum.ItemIdToIcon[item.id]}</span>`
+            let grenadeCount = (item.pcs > 1) ? `<span class="count">x${item.pcs}</span>` : ''
+            grenade += `<span${slotId === slot ? ' class="highlight"' : ''}>${Enum.ItemIdToIcon[item.id]}${grenadeCount}</span>`
         })
         this.#elements.inventory.innerHTML = html + `<div class="grenades">${grenade}</div>`
     }

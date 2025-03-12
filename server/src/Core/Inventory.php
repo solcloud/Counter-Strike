@@ -87,6 +87,11 @@ class Inventory
         return $this->items[$this->equippedSlot];
     }
 
+    public function getItemSlot(InventorySlot $slot): ?Item
+    {
+        return ($this->items[$slot->value] ?? null);
+    }
+
     private function tryRemoveLastEquippedGrenade(Item $item): void
     {
         $index = array_search($item->getSlot()->value, $this->lastEquippedGrenadeSlots, true);

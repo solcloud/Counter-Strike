@@ -588,8 +588,10 @@ class InventoryTest extends BaseTestCase
         $this->assertSame($itemPrice, $item->getPrice());
         $this->assertFalse($game->getPlayer(1)->getInventory()->canBuy($item));
         $this->assertSame(2, $item->getQuantity());
+        $this->assertSame(2, $game->getPlayer(1)->serialize()['slots'][InventorySlot::SLOT_GRENADE_FLASH->value]['pcs'] ?? false); // @phpstan-ignore-line
 
         $flashBang1 = $game->getPlayer(1)->dropEquippedItem();
+        $this->assertSame(1, $game->getPlayer(1)->serialize()['slots'][InventorySlot::SLOT_GRENADE_FLASH->value]['pcs'] ?? false); // @phpstan-ignore-line
         $this->assertInstanceOf(Flashbang::class, $flashBang1);
         $flashBang2 = $game->getPlayer(1)->dropEquippedItem();
         $this->assertInstanceOf(Flashbang::class, $flashBang2);
@@ -597,6 +599,7 @@ class InventoryTest extends BaseTestCase
         $this->assertTrue($item === $flashBang2);
         $this->assertSame(1, $flashBang1->getQuantity());
         $this->assertSame(1, $flashBang2->getQuantity());
+        $this->assertNull($game->getPlayer(1)->serialize()['slots'][InventorySlot::SLOT_GRENADE_FLASH->value]['pcs'] ?? null); // @phpstan-ignore-line
     }
 
     public function testPlayerBuyMaxFourGrenades(): void
