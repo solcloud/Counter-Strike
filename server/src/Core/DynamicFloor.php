@@ -12,6 +12,11 @@ final class DynamicFloor extends Floor
         $this->pointReference = $player->getReferenceToPosition();
     }
 
+    public function getPlayer(): Player
+    {
+        return $this->player;
+    }
+
     #[\Override]
     public function getY(): int
     {

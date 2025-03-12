@@ -271,6 +271,11 @@ final class Player
         return $this->headFloor;
     }
 
+    public function getBoostFloor(): ?DynamicFloor
+    {
+        return ($this->activeFloor instanceof DynamicFloor) ? $this->activeFloor : null;
+    }
+
     /**
      * @return list<Point>
      */
