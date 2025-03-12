@@ -32,7 +32,7 @@ trait CrouchTrait
             $candidate = $this->position->clone();
             for ($h = $this->headHeight + 1; $h <= $targetHeadHeight; $h++) {
                 $candidate->setY($this->position->y + $h);
-                if ($this->world->findFloor($candidate, $this->getBoundingRadius())) {
+                if ($this->world->findFloorSquare($candidate, $this->getBoundingRadius())) {
                     $event->restartTimer();
                     break;
                 }

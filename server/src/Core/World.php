@@ -125,19 +125,32 @@ final class World
         $this->floors[$floor->getY()][] = $floor;
     }
 
+    private function isFloorAt(Point $point): ?Floor
+    {
+        if ($point->y < 0) {
+            throw new GameException("Y value cannot be lower than zero"); // @codeCoverageIgnore
+        }
+
+        foreach ($this->floors[$point->y] ?? [] as $floor) {
+            if (Collision::circleWithPlane($point->x, $point->z, 0, $floor)) {
+                return $floor;
+            }
+        }
+        return null;
+    }
+
     public function isWallAt(Point $point): ?Wall
     {
         foreach (($this->walls[self::WALL_Z][$point->z] ?? []) as $wall) {
-            if ($wall->intersect($point)) {
+            if (Collision::circleWithPlane($point->x, $point->y, 0, $wall)) {
                 return $wall;
             }
         }
         foreach (($this->walls[self::WALL_X][$point->x] ?? []) as $wall) {
-            if ($wall->intersect($point)) {
+            if (Collision::circleWithPlane($point->z, $point->y, 0, $wall)) {
                 return $wall;
             }
         }
-
         return null;
     }
 
@@ -149,7 +162,6 @@ final class World
                 return $floor;
             }
         }
-
         return null;
     }
 
@@ -158,50 +170,19 @@ final class World
         if ($point->y < 0) {
             throw new GameException("Y value cannot be lower than zero"); // @codeCoverageIgnore
         }
-        $floors = $this->floors[$point->y] ?? [];
-        if ($floors === []) {
+        if (!isset($this->floors[$point->y])) {
             return null;
         }
 
         $distance = 2 * $radius;
         $candidateX = $point->x - $radius;
         $candidateZ = $point->z - $radius;
-        foreach ($floors as $floor) {
+        foreach ($this->floors[$point->y] as $floor) {
             if (Collision::planeWithPlane($floor->getPoint2DStart(), $floor->width, $floor->depth, $candidateX, $candidateZ, $distance, $distance)) {
                 return $floor;
             }
         }
         return null;
-    }
-
-    public function findFloor(Point $point, int $radius = 0): ?Floor
-    {
-        if ($point->y < 0) {
-            throw new GameException("Y value cannot be lower than zero"); // @codeCoverageIgnore
-        }
-
-        $floors = $this->floors[$point->y] ?? [];
-        if ($floors === []) {
-            return null;
-        }
-
-        $px = $point->x;
-        $py = $point->z;
-        $targetRadiusSquared = $radius * $radius;
-        $smallestRadiusSquared = $targetRadiusSquared;
-        $targetFloor = null;
-        foreach ($floors as $floor) {
-            $distanceSquared = Collision::circleCenterToPlaneBoundaryDistanceSquared($px, $py, $floor);
-            if ($distanceSquared === $targetRadiusSquared || $distanceSquared === 0) {
-                return $floor;
-            }
-            if ($distanceSquared < $smallestRadiusSquared) {
-                $smallestRadiusSquared = $distanceSquared;
-                $targetFloor = $floor;
-            }
-        }
-
-        return $targetFloor;
     }
 
     public function findHighestWall(Point $bottomCenter, int $height, int $radius, int $maxWallCeiling, bool $xWall): int
@@ -235,22 +216,6 @@ final class World
         }
 
         return $highestWallCeiling;
-    }
-
-    public function isPlayerOnFloor(Player $player, Floor $floor): bool
-    {
-        $point = $player->getReferenceToPosition();
-        $radius = $player->getBoundingRadius();
-        if ($floor instanceof DynamicFloor) {
-            return $floor->intersect($point, $radius);
-        }
-
-        return (
-            $floor->getY() === $point->y && Collision::planeWithPlane(
-                $floor->getPoint2DStart(), $floor->width, $floor->depth,
-                $point->x - $radius, $point->z - $radius, 2 * $radius, 2 * $radius,
-            )
-        );
     }
 
     public function getPlayerSpawnRotationHorizontal(bool $isAttacker, int $maxRandomOffset): int
@@ -404,7 +369,7 @@ final class World
             if (Collision::pointWithSphere($candidate, $targetCenter, $targetRadius)) {
                 return true;
             }
-            if ($this->findFloor($candidate)) {
+            if ($this->isFloorAt($candidate)) {
                 return false;
             }
             if ($this->isWallAt($candidate)) {
@@ -475,7 +440,7 @@ final class World
             }
         }
 
-        $floor = $this->findFloor($bulletPosition);
+        $floor = $this->isFloorAt($bulletPosition);
         if ($floor) {
             $hits[] = $floor;
         }
@@ -529,9 +494,7 @@ final class World
 
     private function processSmokeExpansion(Player $initiator, Point $start, Smoke $item): void
     {
-        $event = new SmokeEvent(
-            $initiator, $item, $this, $this->getGrenadeNavigationMesh(), $start,
-        );
+        $event = new SmokeEvent($initiator, $item, $this, $this->getGrenadeNavigationMesh(), $start);
         $event->onComplete[] = function (SmokeEvent $event): void {
             unset($this->activeSmokes[$event->id]);
         };
@@ -541,9 +504,7 @@ final class World
 
     private function processFlammableExplosion(Player $thrower, Point $start, Flammable $item): void
     {
-        $event = new GrillEvent(
-            $thrower, $item, $this, $this->getGrenadeNavigationMesh(), $start,
-        );
+        $event = new GrillEvent($thrower, $item, $this, $this->getGrenadeNavigationMesh(), $start);
         $event->onComplete[] = function (GrillEvent $event): void {
             unset($this->activeMolotovs[$event->id]);
         };
@@ -879,7 +840,7 @@ final class World
 
     public function isWallOrFloorCollision(Point $start, Point $candidate, int $radius): bool
     {
-        if ($this->findFloor($candidate, $radius)) {
+        if ($this->findFloorSquare($candidate, $radius)) {
             return true;
         }
 

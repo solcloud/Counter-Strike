@@ -7,6 +7,7 @@ use cs\Core\Floor;
 use cs\Core\NavigationMesh;
 use cs\Core\PathFinder;
 use cs\Core\Point;
+use cs\Core\Wall;
 use cs\Core\World;
 use Test\BaseTestCase;
 
@@ -200,6 +201,17 @@ final class NavigationMeshTest extends BaseTestCase
         $path = $game->getWorld()->buildNavigationMesh(3, 10);
         $this->assertSame(1, $path->getGraph()->getNodesCount());
         $this->assertSame(0, $path->getGraph()->getEdgeCount());
+    }
+
+    public function testWallWithoutFloorOnTop(): void
+    {
+        $game = $this->createTestGame();
+        $game->getTestMap()->startPointForNavigationMesh->set(1, 0, 1);
+        $game->getWorld()->addBox(new Box(new Point(), 10, 2000, 10));
+        $game->getWorld()->addWall(new Wall(new Point(5, -3, 5), true, 1, 6));
+
+        $this->expectExceptionMessageMatches('/Wall we can step over but no floor there/');
+        $game->getWorld()->buildNavigationMesh(3, 10);
     }
 
     public function testOneWayDirection(): void

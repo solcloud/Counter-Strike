@@ -19,6 +19,14 @@ class Floor extends Plane
         return $this->getStart()->y;
     }
 
+    public function intersect(Point $point, int $radius): bool
+    {
+        return $this->getY() === $point->y && Collision::planeWithPlane(
+            $this->point2DStart, $this->width, $this->depth,
+            $point->x - $radius, $point->z - $radius, 2 * $radius, 2 * $radius,
+        );
+    }
+
     public static function fromArray(array $data): self
     {
         $start = new Point($data['s']['x'], $data['s']['y'], $data['s']['z']);

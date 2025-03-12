@@ -19,7 +19,7 @@ final class DynamicFloor extends Floor
     }
 
     #[\Override]
-    public function intersect(Point $point, int $radius = 0): bool
+    public function intersect(Point $point, int $radius): bool
     {
         return (
             $this->pointReference->y + $this->player->getHeadHeight() + 1 === $point->y

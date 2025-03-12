@@ -120,6 +120,7 @@ class PlayerKillTest extends BaseTestCase
         $player2Position = $player1->getPositionClone()->addY($player1->getHeadHeight() + 10);
         $game->getWorld()->addFloor(new Floor($player2Position->clone()->addX(-10)));
         $player2->setPosition($player2Position);
+        $this->assertFalse($game->getPlayer(2)->isFlying());
         $player2->getSight()->look(0, -90);
 
         $result = $player2->attack();

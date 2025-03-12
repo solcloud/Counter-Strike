@@ -88,13 +88,13 @@ final class PathFinder
             return false;
         }
 
-        $floor = $this->world->findFloor($start->clone()->setY($highestWallCeiling), $radius);
+        $floor = $this->world->findFloorSquare($start->clone()->setY($highestWallCeiling), $radius);
         if ($floor) {
             $start->setY($floor->getY()); // side effect
             return true;
         }
 
-        return false;
+        throw new GameException('Wall we can step over but no floor there ' . $start);
     }
 
     public function findTile(Point $pointOnFloor, int $radius): ?Point

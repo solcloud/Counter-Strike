@@ -145,37 +145,10 @@ class Collision
         );
     }
 
-    public static function circleCenterToPlaneBoundaryDistanceSquared(int $circleCenterX, int $circleCenterY, Plane $plane): int
+    public static function circleWithPlane(int $circleX, int $circleY, int $circleRadius, Plane $plane): bool
     {
         $planeStart = $plane->getPoint2DStart();
         $planeEnd = $plane->getPoint2DEnd();
-
-        if ($circleCenterX < $planeStart->x) {
-            $testX = $planeStart->x;
-        } elseif ($circleCenterX > $planeEnd->x) {
-            $testX = $planeEnd->x;
-        } else {
-            $testX = $circleCenterX;
-        }
-        if ($circleCenterY < $planeStart->y) {
-            $testY = $planeStart->y;
-        } elseif ($circleCenterY > $planeEnd->y) {
-            $testY = $planeEnd->y;
-        } else {
-            $testY = $circleCenterY;
-        }
-
-        $a = $circleCenterX - $testX;
-        $b = $circleCenterY - $testY;
-        return (($a * $a) + ($b * $b));
-    }
-
-    public static function circleWithPlane(Point2D $circleCenter, int $circleRadius, Plane $plane): bool
-    {
-        $planeStart = $plane->getPoint2DStart();
-        $planeEnd = $plane->getPoint2DEnd();
-        $circleX = $circleCenter->x;
-        $circleY = $circleCenter->y;
 
         if ($circleX < $planeStart->x) {
             $testX = $planeStart->x;

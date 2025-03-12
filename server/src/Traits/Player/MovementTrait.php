@@ -71,7 +71,7 @@ trait MovementTrait
     public function setPosition(Point $newPosition): void
     {
         $this->position->setFrom($newPosition);
-        $this->setActiveFloor($this->world->findFloor($this->position, $this->playerBoundingRadius));
+        $this->setActiveFloor($this->world->findFloorSquare($this->position, $this->playerBoundingRadius));
     }
 
     public function stop(): void
@@ -246,7 +246,7 @@ trait MovementTrait
                 break;
             }
 
-            if ($this->activeFloor && !$this->world->isPlayerOnFloor($this, $this->activeFloor)) {
+            if ($this->activeFloor && !$this->activeFloor->intersect($this->position, $this->playerBoundingRadius)) {
                 $this->setActiveFloor(null);
             }
             if (!$looseFloor && !$this->activeFloor && !$this->isJumping()) { // do initial (one-shot) gravity bump
