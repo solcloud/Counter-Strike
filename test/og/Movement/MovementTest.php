@@ -576,30 +576,18 @@ class MovementTest extends BaseTestCase
         $this->assertSame($box->heightY, $p->getPositionClone()->y);
         $this->assertPositionSame(new Point(44, $height, 248), $p->getPositionClone());
 
-        $world = $game->getWorld();
         $floor = new Floor(new Point(0, 2, 0), 1, 1);
+        $this->assertTrue($floor->intersect(new Point(-$br, 2, $br), $br));
+        $this->assertTrue($floor->intersect(new Point($br, 2, $br), $br));
+        $this->assertTrue($floor->intersect(new Point(1, 2, 1), $br));
+        $this->assertTrue($floor->intersect(new Point($br + 1, 2, 1), $br));
+        $this->assertTrue($floor->intersect(new Point(1, 2, $br + 1), $br));
+        $this->assertTrue($floor->intersect(new Point(1, 2, $br + 1), $br));
 
-        $p->setPosition(new Point(-$br, 2, $br));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point($br, 2, $br));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point(1, 2, 1));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point($br + 1, 2, 1));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point(1, 2, $br + 1));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point(1, 2, $br + 1));
-        $this->assertTrue($world->isPlayerOnFloor($p, $floor));
-
-        $p->setPosition(new Point($br + 2, 2, 1));
-        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point(-$br - 2, 2, 1));
-        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point($br + 2, 2, $br + 2));
-        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
-        $p->setPosition(new Point(1, 2, $br + 2));
-        $this->assertFalse($world->isPlayerOnFloor($p, $floor));
+        $this->assertFalse($floor->intersect(new Point($br + 2, 2, 1), $br));
+        $this->assertFalse($floor->intersect(new Point(-$br - 2, 2, 1), $br));
+        $this->assertFalse($floor->intersect(new Point($br + 2, 2, $br + 2), $br));
+        $this->assertFalse($floor->intersect(new Point(1, 2, $br + 2), $br));
     }
 
 }

@@ -56,17 +56,6 @@ abstract class Plane extends SolidSurface
         return $this->hitAntiForce;
     }
 
-    public function intersect(Point $point, int $radius = 0): bool
-    {
-        return Collision::circleWithRect(
-            $point->{$this->axis2d[0]}, // @phpstan-ignore argument.type
-            $point->{$this->axis2d[1]}, // @phpstan-ignore argument.type
-            $radius,
-            $this->point2DStart->x, $this->point2DEnd->x,
-            $this->point2DStart->y, $this->point2DEnd->y
-        );
-    }
-
     public function getPoint2DStart(): Point2D
     {
         return $this->point2DStart;
