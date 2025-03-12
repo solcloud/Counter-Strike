@@ -496,6 +496,14 @@
     padding: 8px;
 }
 
+#hud .inventory .grenades span > span.count {
+    padding: 0;
+    font-size: 12px;
+    color: #ffebc5;
+    position: relative;
+    left: -6px;
+}
+
 #hud .inventory .highlight {
     font-weight: bold;
     color: #ffebc5;

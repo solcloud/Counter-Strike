@@ -329,6 +329,10 @@ final class Player
             $ammoReserve = $equippedItem->getAmmoReserve();
             $reloading = $equippedItem->isReloading();
         }
+        $filledSlots = $this->inventory->getFilledSlots();
+        if (isset($filledSlots[InventorySlot::SLOT_GRENADE_FLASH->value])) {
+            $filledSlots[InventorySlot::SLOT_GRENADE_FLASH->value]['pcs'] = $this->inventory->getItemSlot(InventorySlot::SLOT_GRENADE_FLASH)?->getQuantity();
+        }
 
         return [
             'id'          => $this->id,
@@ -338,7 +342,7 @@ final class Player
             'canAttack'   => $canAttack,
             'canBuy'      => $this->world->canBuy($this),
             'canPlant'    => $this->world->canPlant($this),
-            'slots'       => $this->inventory->getFilledSlots(),
+            'slots'       => $filledSlots,
             'health'      => $this->health,
             'position'    => $this->position->toArray(),
             'look'        => $this->sight->toArray(),

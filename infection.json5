@@ -32,6 +32,7 @@
         "Minus": false,
         "Modulus": false,
         "Multiplication": false,
+        "NullSafeMethodCall": false,
         "Plus": false,
         "RoundingFamily": false,
         "TrueValue": false,
