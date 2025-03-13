@@ -71,6 +71,15 @@ final class PlaneBuilder
             $widthOnXAxis = ($minZ === $maxZ);
             $width = ($widthOnXAxis ? $maxX - $minX : $maxZ - $minZ);
 
+            if (false === (
+                    ($a->y === $minY || $a->y === $maxY)
+                    && ($b->y === $minY || $b->y === $maxY)
+                    && ($c->y === $minY || $c->y === $maxY)
+                    && ($d->y === $minY || $d->y === $maxY)
+                )) {
+                GameException::invalid('Skew wall Y coord');
+            }
+
             return [new Wall(new Point($minX, $minY, $minZ), $widthOnXAxis, $width, $maxY - $minY)];
         }
 
