@@ -3,6 +3,7 @@
 namespace Test\Unit;
 
 use cs\Core\Floor;
+use cs\Core\GameException;
 use cs\Core\PlaneBuilder;
 use cs\Core\Point;
 use cs\Core\Wall;
@@ -505,6 +506,21 @@ class PlaneBuilderTest extends BaseTest
         $this->assertPositionSame(new Point(60, 15, 0), $planes[0]->getEnd());
         $this->assertPositionSame(new Point(2, 30, 0), $planes[9]->getStart());
         $this->assertPositionSame(new Point(58, 30, 45), $planes[9]->getEnd());
+    }
+
+    public function testBadWall(): void
+    {
+        $pb = new PlaneBuilder();
+        $points = [
+            new Point(11494, 1169, 12109),
+            new Point(11494, 1228, 12710),
+            new Point(11494, 1162, 12710),
+            new Point(11494, 1103, 12109),
+        ];
+        shuffle($points);
+
+        $this->expectException(GameException::class);
+        $pb->fromQuad(...$points);
     }
 
 }

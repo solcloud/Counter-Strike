@@ -23,7 +23,6 @@ class Parser
     private int $lineNumber = 1;
     private string $activeGroup = 'NONE';
     private ?string $activeCategory = null;
-    private string $activeObject = 'NONE';
     private string $data = '';
 
     public int $quadCount = 0;
@@ -68,7 +67,6 @@ class Parser
 
     public function activeObject(string $line): void
     {
-        $this->activeObject = $line;
         $this->append("\n        // {$line}\n");
     }
 
@@ -163,6 +161,12 @@ class Parser
     public function createPolygons(string $line): void
     {
         assert($this->activeGroup === 'Map');
+        $supportNavmesh = true;
+        $penetrable = true;
+        if ($this->activeCategory === 'Boundary') {
+            $penetrable = false;
+            $supportNavmesh = false;
+        }
 
         $polygonPoints = $this->parsePoints($line);
         if (count($polygonPoints) === 3) {
@@ -180,8 +184,11 @@ class Parser
             $polygon .= $point === null ? 'null' : $this->constructPoint($point);
             $polygon .= ",\n";
         }
-        if ($this->activeObject[0] === 'todo') {
-            $polygon .= "penetrable: false,\n"; // todo
+        if (!$penetrable) {
+            $polygon .= "penetrable: false,\n";
+        }
+        if (!$supportNavmesh) {
+            $polygon .= "navmesh: false,\n";
         }
         $polygon .= ");\n";
         $this->append($polygon);
@@ -246,8 +253,8 @@ final class {_CLASSNAME_} extends Map
         $this->buyAreaAttackers = new BoxGroup();
         $this->buyAreaDefenders = new BoxGroup();
         $builder = new PlaneBuilder();
-        $add = function (Point $a, Point $b, Point $c, ?Point $d, ?float $jaggedness = null, bool $penetrable = false, bool $supportNavmesh = true) use ($builder): void {
-            $this->addPlanes($builder->create($a, $b, $c, $d, $jaggedness), $penetrable, $supportNavmesh);
+        $add = function (Point $a, Point $b, Point $c, ?Point $d, ?float $jaggedness = null, bool $penetrable = true, bool $navmesh = true) use ($builder): void {
+            $this->addPlanes($builder->create($a, $b, $c, $d, $jaggedness), $penetrable, $navmesh);
         };
 
 /** START DATA */
