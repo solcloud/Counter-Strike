@@ -768,23 +768,19 @@ final class World
 
         if ($hit instanceof SolidSurface) {
             $this->surfaceHit(
-                $bullet->getPosition()->clone(),
-                $hit,
-                $bullet->getOriginPlayerId(),
                 $bullet->getOrigin(),
+                $bullet->getPosition()->clone(),
+                $bullet->getOriginPlayerId(),
                 $item,
-                $hit->getDamage()
             );
         }
     }
 
-    private function surfaceHit(Point $hitPoint, SolidSurface $hit, int $attackerId, Point $origin, Item $item, int $damage): void
+    private function surfaceHit(Point $origin, Point $hitPoint, int $attackerId, Item $item): void
     {
         $soundEvent = new SoundEvent($hitPoint, SoundType::BULLET_HIT);
         $soundEvent->setItem($item);
-        $soundEvent->setSurface($hit);
         $soundEvent->addExtra('origin', $origin->toArray());
-        $soundEvent->addExtra('damage', min(100, $damage));
         $soundEvent->addExtra('shooter', $attackerId);
 
         $this->makeSound($soundEvent);

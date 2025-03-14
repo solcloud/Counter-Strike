@@ -11,6 +11,7 @@ export class World {
     #soundListener
     #audioLoader
     #modelRepository
+    #raycaster
     #decals = []
     #cache = {}
     volume = 30
@@ -20,6 +21,7 @@ export class World {
 
         this.#audioLoader = new THREE.AudioLoader()
         this.#modelRepository = new ModelRepository()
+        this.#raycaster = new THREE.Raycaster()
     }
 
     init(mapName, setting) {
@@ -206,18 +208,30 @@ export class World {
         return mesh
     }
 
-    bulletWallHit(position, surface, radius) {
-        const hit = new THREE.Mesh(
-            new THREE.CylinderGeometry(radius, radius, .4, 8, 1),
-            new THREE.MeshBasicMaterial({color: new THREE.Color(`hsl(23, 24%, ${Math.random() * 18}%, 1)`)})
-        )
-        hit.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
-        if (surface.plane === 'zy') {
-            hit.rotateOnWorldAxis(new THREE.Vector3(0, 0, 1), Utils.degreeToRadian(90))
-        } else if (surface.plane === 'xy') {
-            hit.rotateOnWorldAxis(new THREE.Vector3(1, 0, 0), Utils.degreeToRadian(90))
+    bulletWallHit(origin, hitPosition, item) {
+        const rayHit = new THREE.Vector3(hitPosition.x, hitPosition.y, -hitPosition.z)
+        const rayDirection = rayHit.clone().sub(new THREE.Vector3(origin.x, origin.y, -origin.z)).normalize()
+        rayHit.addScaledVector(rayDirection, -50); // offset a bit back to give raycaster more space to match server-client geometry
+
+        this.#raycaster.near = 1
+        this.#raycaster.far = 100
+        this.#raycaster.layers.set(Utils.LAYER_WORLD)
+        this.#raycaster.set(rayHit, rayDirection)
+        const intersects = this.#raycaster.intersectObject(this.getScene())
+        if (intersects.length === 0) {
+            return
         }
-        hit.position.set(position.x + 0.1, position.y + 0.1, -position.z + 0.1)
+
+        const radius = (item.slot === Enum.InventorySlot.SLOT_PRIMARY ? 1.8 : (item.slot === Enum.InventorySlot.SLOT_SECONDARY ? 1.5 : 1.1))
+        const hit = new THREE.Mesh(
+            this.loadCache(`bulletHit-wc-${radius}`, () => new THREE.CylinderGeometry(radius, radius, 2, 8, 1)),
+            new THREE.MeshBasicMaterial({color: new THREE.Color(`hsl(23, 24%, ${Math.random() * 18}%, 1)`)}),
+        )
+        hit.position.copy(rayHit)
+        hit.lookAt(intersects[0].point)
+        hit.rotateX(Utils.degreeToRadian(90))
+        hit.rotateY(Math.random() * 6.28)
+        hit.translateY(intersects[0].distance)
 
         this.#scene.add(hit)
         this.#decals.push(hit)

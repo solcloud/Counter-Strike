@@ -19,7 +19,7 @@ export class SoundRepository {
     }
 
     play(data, spectatorId, tickId) {
-        let soundName = this.#getSoundName(data.type, data.item, data.player, data.surface, spectatorId, tickId)
+        let soundName = this.#getSoundName(data.type, data.item, data.player, spectatorId, tickId)
         if (!soundName) {
             return
         }
@@ -28,7 +28,7 @@ export class SoundRepository {
         this.#soundPlayer(soundName, data.position, inPlayerSpectateHead)
     }
 
-    #getSoundName(type, item, playerId, surface, playerSpectateId, tickId) {
+    #getSoundName(type, item, playerId, playerSpectateId, tickId) {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
                 if (tickId > this.#lastSpectatorMoveSoundTick + Utils.msToTick(400)) {
@@ -71,14 +71,13 @@ export class SoundRepository {
         }
 
         if (type === SoundType.BULLET_HIT) {
-            if (surface) {
-                if (surface.force > 1000) {
-                    return '51381__robinhood76__00119-trzepak-3.wav'
-                }
-                return '108737__branrainey__boing.wav'
-            } else if (playerId) {
+            if (playerId) {
                 return '512138__beezlefm__item-sound.wav'
             }
+            if (item.id === ItemId.Knife) {
+                return '108737__branrainey__boing.wav'
+            }
+            return '51381__robinhood76__00119-trzepak-3.wav'
         }
 
         if (type === SoundType.PLAYER_GROUND_TOUCH) {
