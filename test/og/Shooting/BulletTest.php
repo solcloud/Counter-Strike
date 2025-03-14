@@ -77,6 +77,7 @@ class BulletTest extends BaseTestCase
         $this->assertSame($maxDistance, $result->getBullet()->getDistanceTraveled());
         $floor = $result->getHits()[0];
         $this->assertInstanceOf(Floor::class, $floor);
+        $this->assertSame(0, $floor->getDamage());
 
         $result = $this->_testBulletHitFloor(0, -90);
         $this->assertSame($gunHeight, $result->getBullet()->getDistanceTraveled());

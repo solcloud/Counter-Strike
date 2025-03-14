@@ -191,8 +191,8 @@ export class Game {
         if (data.type === SoundType.BULLET_HIT) {
             if (data.player) {
                 this.playerHit(data, false)
-            } else if (data.surface && (data.item.slot === InventorySlot.SLOT_PRIMARY || data.item.slot === InventorySlot.SLOT_SECONDARY)) {
-                this.#world.bulletWallHit(data.position, data.surface, (data.item.slot === InventorySlot.SLOT_PRIMARY ? 1.5 : 1.1))
+            } else {
+                this.#world.bulletWallHit(data.extra.origin, data.position, data.item)
             }
         } else if (data.type === SoundType.BULLET_HIT_HEADSHOT) {
             this.playerHit(data, true)
