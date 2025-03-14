@@ -36,15 +36,4 @@ abstract class SolidSurface implements Hittable
 
     public abstract function getPlane(): string;
 
-    /**
-     * @return array<string,mixed>
-     */
-    public function serialize(Point $position): array
-    {
-        return [
-            'force' => $this->getHitAntiForce($position),
-            'plane' => $this->getPlane(),
-        ];
-    }
-
 }
