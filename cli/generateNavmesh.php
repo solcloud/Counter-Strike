@@ -22,6 +22,8 @@ $pathFinder = new PathFinder($game->getWorld(), $navmesh);
 foreach ($map->getStartingPointsForNavigationMesh() as $point) {
     $pathFinder->buildNavigationMesh($point->clone(), $navmesh->colliderHeight, 100_000);
 }
+assert($pathFinder->getGraph()->getEdgeCount() > 100);
+
 foreach ($map->getFloors() as $floor) {
     if (!$floor->supportNavmesh || $floor->width <= $tileSize || $floor->depth <= $tileSize) {
         continue;
