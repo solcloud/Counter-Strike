@@ -30,23 +30,23 @@ final class DefaultMap extends Map
             $this->addPlanes($builder->create($a, $b, $c, $d, $jaggedness), $penetrable, $navmesh);
         };
 
-        /** START DATA */
+/** START DATA */
 
         // Map - A Long
         if (true) {
 
             // a long to a side
             $add(
-                new Point(11494, 835, 11158),
+                new Point(11521, 835, 11158),
                 new Point(12539, 835, 11158),
-                new Point(12539, 1169, 12109),
-                new Point(11494, 1169, 12109),
+                new Point(12539, 1098, 12109),
+                new Point(11521, 1098, 12109),
             );
             $add(
-                new Point(11494, 1228, 12710),
-                new Point(12539, 1228, 12710),
-                new Point(12539, 1228, 13446),
-                new Point(11494, 1228, 13446),
+                new Point(11521, 1192, 12566),
+                new Point(12539, 1192, 12566),
+                new Point(12539, 1192, 13386),
+                new Point(11521, 1192, 13386),
             );
             $add(
                 new Point(11333, 835, 7887),
@@ -55,16 +55,10 @@ final class DefaultMap extends Map
                 new Point(11333, 835, 11158),
             );
             $add(
-                new Point(11494, 1169, 12109),
-                new Point(12539, 1169, 12109),
-                new Point(12539, 1228, 12710),
-                new Point(11494, 1228, 12710),
-            );
-            $add(
-                new Point(11494, 1228, 12710),
-                new Point(11494, 1228, 13446),
-                new Point(11494, 1162, 13612),
-                new Point(11494, 1162, 12710),
+                new Point(11521, 1098, 12109),
+                new Point(12539, 1098, 12109),
+                new Point(12539, 1192, 12566),
+                new Point(11521, 1192, 12566),
             );
             $add(
                 new Point(11333, 835, 7887),
@@ -205,16 +199,16 @@ final class DefaultMap extends Map
                 new Point(12545, 1121, 12454),
             );
             $add(
-                new Point(12885, 871, 9474),
-                new Point(12885, 871, 9702),
-                new Point(12885, 1637, 9702),
-                new Point(12885, 1637, 9474),
+                new Point(12901, 871, 9474),
+                new Point(12901, 871, 9676),
+                new Point(12901, 1637, 9676),
+                new Point(12901, 1637, 9474),
             );
             $add(
-                new Point(13184, 1645, 9692),
-                new Point(12884, 1645, 9692),
-                new Point(12884, 837, 9692),
-                new Point(13184, 837, 9692),
+                new Point(12901, 1637, 9676),
+                new Point(12901, 871, 9676),
+                new Point(13079, 871, 9676),
+                new Point(13079, 1637, 9676),
             );
             $add(
                 new Point(13056, 826, 9666),
@@ -459,20 +453,6 @@ final class DefaultMap extends Map
         // Map - A Side
         if (true) {
 
-            // a boundary
-            $add(
-                new Point(9327, 1192, 11389),
-                new Point(9271, 1192, 11389),
-                new Point(9271, 1192, 10202),
-                new Point(9327, 1192, 10202),
-            );
-            $add(
-                new Point(9271, 1192, 10202),
-                new Point(9271, 1192, 11389),
-                new Point(9271, 1099, 11389),
-                new Point(9271, 1099, 10202),
-            );
-
             // a boundary.001
             $add(
                 new Point(10812, 1192, 11389),
@@ -563,10 +543,10 @@ final class DefaultMap extends Map
 
             // a side
             $add(
-                new Point(10792, 1105, 13497),
+                new Point(10792, 1105, 12493),
                 new Point(10792, 1105, 11072),
-                new Point(11509, 1105, 11072),
-                new Point(11509, 1105, 13497),
+                new Point(11499, 1105, 11072),
+                new Point(11499, 1105, 12493),
             );
             $add(
                 new Point(8421, 1105, 11348),
@@ -589,22 +569,40 @@ final class DefaultMap extends Map
 
             // a side wall
             $add(
-                new Point(11529, 1192, 12518),
-                new Point(11479, 1192, 12518),
+                new Point(11529, 1192, 12535),
+                new Point(11479, 1192, 12535),
                 new Point(11479, 1192, 11047),
                 new Point(11529, 1192, 11047),
             );
             $add(
-                new Point(11529, 1192, 12518),
+                new Point(11529, 1192, 12535),
                 new Point(11529, 1192, 11047),
                 new Point(11529, 813, 11047),
-                new Point(11529, 813, 12518),
+                new Point(11529, 813, 12535),
             );
             $add(
                 new Point(11479, 1192, 11047),
-                new Point(11479, 1192, 12518),
-                new Point(11479, 817, 12518),
+                new Point(11479, 1192, 12535),
+                new Point(11479, 817, 12535),
                 new Point(11479, 817, 11047),
+            );
+            $add(
+                new Point(11529, 1192, 12535),
+                new Point(11529, 813, 12535),
+                new Point(10733, 813, 12535),
+                new Point(10733, 1192, 12535),
+            );
+            $add(
+                new Point(11529, 1192, 12535),
+                new Point(10733, 1192, 12535),
+                new Point(10733, 1192, 13393),
+                new Point(11529, 1192, 13393),
+            );
+            $add(
+                new Point(11529, 1192, 12535),
+                new Point(11529, 1192, 13393),
+                new Point(11529, 1129, 13393),
+                new Point(11529, 1129, 12535),
             );
 
             // a site to short walls
@@ -707,18 +705,10 @@ final class DefaultMap extends Map
 
             // Goose
             $add(
-                new Point(11498, 1225, 13355),
-                new Point(10746, 1225, 13355),
-                new Point(10746, 1225, 12541),
-                new Point(11498, 1225, 12541),
-            );
-
-            // goose stairs
-            $add(
-                new Point(11498, 1225, 12543),
-                new Point(10746, 1225, 12543),
-                new Point(10746, 1097, 12383),
-                new Point(11498, 1097, 12383),
+                new Point(11534, 1103, 12418),
+                new Point(11497, 1188, 12547),
+                new Point(10759, 1188, 12547),
+                new Point(10722, 1103, 12418),
             );
 
             // short boost wall
@@ -775,6 +765,18 @@ final class DefaultMap extends Map
                 new Point(9302, 833, 11047),
                 new Point(9302, 833, 11079),
                 new Point(9302, 436, 11079),
+            );
+            $add(
+                new Point(9329, 1190, 10281),
+                new Point(9329, 1190, 11391),
+                new Point(9272, 1190, 11391),
+                new Point(9272, 1190, 10281),
+            );
+            $add(
+                new Point(9272, 1190, 10281),
+                new Point(9272, 1190, 11391),
+                new Point(9272, 1102, 11391),
+                new Point(9272, 1102, 10281),
             );
         }
 
@@ -843,38 +845,32 @@ final class DefaultMap extends Map
             $add(
                 new Point(4268, 1025, 10299),
                 new Point(4268, 1025, 10579),
-                new Point(4268, 799, 10579),
-                new Point(4268, 799, 10299),
+                new Point(4268, 695, 10579),
+                new Point(4268, 695, 10299),
             );
             $add(
                 new Point(4268, 1025, 10579),
                 new Point(4547, 1025, 10579),
-                new Point(4547, 799, 10579),
-                new Point(4268, 799, 10579),
+                new Point(4547, 695, 10579),
+                new Point(4268, 695, 10579),
             );
             $add(
                 new Point(4547, 1025, 10579),
                 new Point(4547, 1025, 10299),
-                new Point(4547, 799, 10299),
-                new Point(4547, 799, 10579),
-            );
-            $add(
-                new Point(4547, 1025, 10299),
-                new Point(4268, 1025, 10299),
-                new Point(4268, 799, 10299),
-                new Point(4547, 799, 10299),
+                new Point(4547, 695, 10299),
+                new Point(4547, 695, 10579),
             );
             $add(
                 new Point(4268, 1025, 10579),
                 new Point(4268, 1025, 10299),
-                new Point(4268, 1069, 10299),
-                new Point(4268, 1069, 10579),
+                new Point(4307, 1069, 10299),
+                new Point(4307, 1069, 10579),
             );
             $add(
-                new Point(4268, 1069, 10579),
-                new Point(4268, 1069, 10299),
-                new Point(4312, 1069, 10299),
-                new Point(4312, 1069, 10579),
+                new Point(4307, 1069, 10579),
+                new Point(4307, 1069, 10299),
+                new Point(4411, 1021, 10299),
+                new Point(4411, 1021, 10579),
             );
 
             // b boxes bottom
@@ -1143,8 +1139,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(2365, 1477, 9520),
                 new Point(2365, 801, 9520),
-                new Point(1922, 801, 9520),
-                new Point(1922, 1477, 9520),
+                new Point(1918, 801, 9520),
+                new Point(1918, 1477, 9520),
             );
             $add(
                 new Point(2365, 801, 9520),
@@ -1242,19 +1238,13 @@ final class DefaultMap extends Map
                 new Point(1513, 1317, 9520),
                 new Point(1513, 1477, 9520),
             );
-            $add(
-                new Point(1922, 1477, 9520),
-                new Point(1922, 801, 9520),
-                new Point(1922, 801, 9503),
-                new Point(1922, 1477, 9503),
-            );
 
             // b window access
             $add(
-                new Point(3832, 1161, 12272),
-                new Point(3832, 905, 11867),
-                new Point(4402, 905, 11867),
-                new Point(4402, 1161, 12272),
+                new Point(3854, 1116, 12041),
+                new Point(3854, 905, 11853),
+                new Point(4364, 905, 11853),
+                new Point(4364, 1116, 12041),
             );
             $add(
                 new Point(4303, 905, 11867),
@@ -1263,16 +1253,22 @@ final class DefaultMap extends Map
                 new Point(4303, 815, 11542),
             );
             $add(
-                new Point(4402, 905, 11867),
-                new Point(3832, 905, 11867),
-                new Point(3832, 808, 11867),
-                new Point(4402, 808, 11867),
+                new Point(4364, 905, 11853),
+                new Point(3854, 905, 11853),
+                new Point(3832, 862, 11853),
+                new Point(4364, 862, 11853),
             );
             $add(
                 new Point(4288, 805, 11532),
-                new Point(4579, 806, 11872),
-                new Point(4325, 903, 11909),
+                new Point(4579, 700, 11872),
+                new Point(4317, 917, 11909),
                 null,
+            );
+            $add(
+                new Point(3849, 1111, 12041),
+                new Point(4311, 1111, 12041),
+                new Point(4311, 1158, 12252),
+                new Point(3849, 1158, 12252),
             );
         }
 
@@ -1281,10 +1277,60 @@ final class DefaultMap extends Map
 
             // door.008
             $add(
-                new Point(3853, 1340, 11074),
+                new Point(3853, 1340, 12003),
+                new Point(3660, 1340, 12003),
+                new Point(3660, 1340, 10456),
+                new Point(3853, 1340, 10456),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3853, 1477, 12003),
+                new Point(3853, 1477, 10456),
+                new Point(3660, 1477, 10456),
+                new Point(3660, 1477, 12003),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
                 new Point(3853, 1340, 10456),
                 new Point(3660, 1340, 10456),
-                new Point(3660, 1340, 11074),
+                new Point(3660, 1477, 10456),
+                new Point(3853, 1477, 10456),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3660, 1340, 10456),
+                new Point(3660, 1340, 12003),
+                new Point(3660, 1477, 12003),
+                new Point(3660, 1477, 10456),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3660, 1340, 12003),
+                new Point(3853, 1340, 12003),
+                new Point(3853, 1477, 12003),
+                new Point(3660, 1477, 12003),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3853, 1340, 12003),
+                new Point(3853, 1340, 10456),
+                new Point(3853, 1477, 10456),
+                new Point(3853, 1477, 12003),
+                penetrable: false,
+                navmesh: false,
+            );
+
+            // pit ceiling
+            $add(
+                new Point(12562, 825, 4585),
+                new Point(12562, 825, 5158),
+                new Point(11499, 825, 5158),
+                new Point(11499, 825, 4585),
                 penetrable: false,
                 navmesh: false,
             );
@@ -1348,6 +1394,584 @@ final class DefaultMap extends Map
                 penetrable: false,
                 navmesh: false,
             );
+
+            // plane.007
+            $add(
+                new Point(5006, 1959, 2460),
+                new Point(5006, 1959, 1104),
+                new Point(4802, 1959, 1104),
+                new Point(4802, 1959, 2460),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1959, 2460),
+                new Point(4802, 1959, 2460),
+                new Point(4802, 1813, 2460),
+                new Point(5006, 1813, 2460),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1813, 2460),
+                new Point(4802, 1813, 2460),
+                new Point(4802, 1813, 3662),
+                new Point(5006, 1813, 3662),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1813, 2460),
+                new Point(5006, 1813, 3662),
+                new Point(5006, 1568, 3662),
+                new Point(5006, 1568, 2460),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1568, 2417),
+                new Point(6152, 1568, 2417),
+                new Point(6152, 1790, 2417),
+                new Point(5006, 1790, 2417),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1568, 2417),
+                new Point(5006, 1568, 4164),
+                new Point(6152, 1568, 4164),
+                new Point(6152, 1568, 2417),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1790, 2417),
+                new Point(6152, 1790, 2417),
+                new Point(6152, 1790, 2229),
+                new Point(5006, 1790, 2229),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6152, 1568, 4164),
+                new Point(5006, 1568, 4164),
+                new Point(5006, 1777, 4164),
+                new Point(6152, 1777, 4164),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6152, 1777, 4164),
+                new Point(5772, 1777, 4164),
+                new Point(5772, 1777, 4726),
+                new Point(6152, 1777, 4726),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5772, 1913, 4164),
+                new Point(5006, 1913, 4164),
+                new Point(5006, 1913, 4726),
+                new Point(5772, 1913, 4726),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5772, 1777, 4726),
+                new Point(5772, 1913, 4726),
+                new Point(5643, 1913, 4726),
+                new Point(5643, 1777, 4726),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5772, 1777, 4726),
+                new Point(5772, 1777, 4164),
+                new Point(5772, 1913, 4164),
+                new Point(5772, 1913, 4726),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5772, 1777, 4164),
+                new Point(5006, 1777, 4164),
+                new Point(5006, 1913, 4164),
+                new Point(5772, 1913, 4164),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(4952, 1913, 4892),
+                new Point(5643, 1913, 4892),
+                new Point(5643, 1913, 4363),
+                new Point(4952, 1913, 4363),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5643, 1777, 4892),
+                new Point(5643, 1913, 4892),
+                new Point(5510, 1913, 4892),
+                new Point(5510, 1777, 4892),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5643, 1777, 4726),
+                new Point(5643, 1913, 4726),
+                new Point(5643, 1913, 4892),
+                new Point(5643, 1777, 4892),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5510, 1777, 4892),
+                new Point(5510, 1913, 4892),
+                new Point(4952, 1913, 4892),
+                new Point(4952, 1777, 4892),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5510, 1777, 4892),
+                new Point(4952, 1777, 4892),
+                new Point(4952, 1777, 5685),
+                new Point(5510, 1777, 5685),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5572, 1777, 5685),
+                new Point(4952, 1777, 5685),
+                new Point(4952, 1777, 6322),
+                new Point(5572, 1777, 6322),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6154, 1777, 6322),
+                new Point(6154, 1777, 6781),
+                new Point(5673, 1777, 6781),
+                new Point(5673, 1777, 6322),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6154, 1777, 6781),
+                new Point(6154, 1777, 6322),
+                new Point(6154, 2051, 6322),
+                new Point(6154, 2051, 6781),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6154, 1777, 6322),
+                new Point(5673, 1777, 6322),
+                new Point(5673, 2051, 6322),
+                new Point(6154, 2051, 6322),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5673, 1777, 6322),
+                new Point(5673, 1777, 6781),
+                new Point(5673, 2051, 6781),
+                new Point(5673, 2051, 6322),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5673, 1777, 6781),
+                new Point(6154, 1777, 6781),
+                new Point(6154, 2051, 6781),
+                new Point(5673, 2051, 6781),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6114, 2437, 6738),
+                new Point(6114, 2437, 6345),
+                new Point(6114, 1980, 6345),
+                new Point(6114, 1980, 6738),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6114, 2437, 6345),
+                new Point(5713, 2437, 6345),
+                new Point(5713, 1980, 6345),
+                new Point(6114, 1980, 6345),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5713, 2437, 6345),
+                new Point(5713, 2437, 6738),
+                new Point(5713, 1980, 6738),
+                new Point(5713, 1980, 6345),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5713, 2437, 6738),
+                new Point(6114, 2437, 6738),
+                new Point(6114, 1980, 6738),
+                new Point(5713, 1980, 6738),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6007, 2598, 6450),
+                new Point(5820, 2598, 6450),
+                new Point(5820, 2598, 6633),
+                new Point(6007, 2598, 6633),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6007, 2598, 6450),
+                new Point(6007, 2598, 6633),
+                new Point(6007, 2327, 6633),
+                new Point(6007, 2327, 6450),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5820, 2598, 6450),
+                new Point(6007, 2598, 6450),
+                new Point(6007, 2327, 6450),
+                new Point(5820, 2327, 6450),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5820, 2598, 6633),
+                new Point(5820, 2598, 6450),
+                new Point(5820, 2327, 6450),
+                new Point(5820, 2327, 6633),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(6007, 2598, 6633),
+                new Point(5820, 2598, 6633),
+                new Point(5820, 2327, 6633),
+                new Point(6007, 2327, 6633),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1813, 3662),
+                new Point(4802, 1813, 3662),
+                new Point(4802, 1574, 3662),
+                new Point(5006, 1574, 3662),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2168, 1840, 884),
+                new Point(2850, 1840, 884),
+                new Point(2846, 2295, 884),
+                new Point(2168, 2295, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(5006, 1574, 3662),
+                new Point(4161, 1574, 3662),
+                new Point(4161, 1574, 3994),
+                new Point(5006, 1574, 3994),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(4161, 1926, 3994),
+                new Point(3495, 1926, 3994),
+                new Point(3495, 1926, 3550),
+                new Point(4161, 1926, 3550),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(4161, 1926, 3550),
+                new Point(3495, 1926, 3550),
+                new Point(3495, 1537, 3550),
+                new Point(4161, 1537, 3550),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(4161, 1926, 3994),
+                new Point(4161, 1926, 3550),
+                new Point(4161, 1537, 3550),
+                new Point(4161, 1537, 3994),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3495, 1926, 3994),
+                new Point(4161, 1926, 3994),
+                new Point(4161, 1537, 3994),
+                new Point(3495, 1537, 3994),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3495, 1926, 3550),
+                new Point(3495, 1926, 3994),
+                new Point(3495, 1537, 3994),
+                new Point(3495, 1537, 3550),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(1432, 1840, 1104),
+                new Point(2847, 1840, 1104),
+                new Point(2847, 1840, 884),
+                new Point(1432, 1840, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3927, 1840, 1104),
+                new Point(5006, 1840, 1104),
+                new Point(5006, 1840, 884),
+                new Point(3927, 1840, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2847, 1840, 1104),
+                new Point(3927, 1840, 1104),
+                new Point(3927, 1840, 884),
+                new Point(2847, 1840, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2847, 1840, 884),
+                new Point(3927, 1840, 884),
+                new Point(3927, 2130, 884),
+                new Point(2847, 2130, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3927, 1840, 884),
+                new Point(4658, 1840, 884),
+                new Point(4658, 2286, 884),
+                new Point(3927, 2286, 884),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2168, 1840, 884),
+                new Point(2168, 2295, 884),
+                new Point(2168, 2295, 1026),
+                new Point(2168, 1840, 1026),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2168, 1840, 1026),
+                new Point(2168, 2295, 1026),
+                new Point(745, 2295, 1026),
+                new Point(745, 1840, 1026),
+                penetrable: false,
+                navmesh: false,
+            );
+
+            // plane.008
+            $add(
+                new Point(1447, 1679, 3861),
+                new Point(1447, 1679, 2081),
+                new Point(421, 1679, 2081),
+                new Point(421, 1679, 3861),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(421, 1679, 3861),
+                new Point(421, 1679, 2081),
+                new Point(421, 2161, 2081),
+                new Point(421, 2161, 3861),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(1447, 1679, 3861),
+                new Point(421, 1679, 3861),
+                new Point(421, 1457, 3861),
+                new Point(1447, 1457, 3861),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(1447, 1457, 3861),
+                new Point(421, 1457, 3861),
+                new Point(421, 1457, 6535),
+                new Point(1447, 1457, 6535),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(421, 1457, 3861),
+                new Point(421, 2161, 3861),
+                new Point(421, 2161, 4455),
+                new Point(421, 1457, 4455),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(421, 1457, 4455),
+                new Point(421, 2161, 4455),
+                new Point(620, 2161, 4455),
+                new Point(620, 1457, 4455),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(620, 1457, 4455),
+                new Point(620, 2161, 4455),
+                new Point(620, 2161, 5306),
+                new Point(620, 1457, 5306),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2346, 1457, 6982),
+                new Point(1030, 1457, 6982),
+                new Point(1030, 1457, 9515),
+                new Point(2346, 1457, 9515),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(4773, 1457, 6982),
+                new Point(3476, 1457, 6982),
+                new Point(3476, 1457, 9696),
+                new Point(4773, 1457, 9696),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3476, 1457, 6982),
+                new Point(2346, 1457, 6982),
+                new Point(2346, 1457, 8996),
+                new Point(3476, 1457, 8996),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3770, 944, 7988),
+                new Point(3770, 944, 8996),
+                new Point(6085, 944, 8996),
+                new Point(6085, 944, 7988),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(1156, 1457, 11437),
+                new Point(1156, 1457, 6982),
+                new Point(735, 1457, 6982),
+                new Point(735, 1457, 11437),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(1354, 1457, 11437),
+                new Point(735, 1457, 11437),
+                new Point(735, 1457, 14125),
+                new Point(1354, 1457, 14125),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2315, 1350, 14125),
+                new Point(735, 1350, 14125),
+                new Point(735, 1350, 15124),
+                new Point(2315, 1350, 15124),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(2032, 1460, 12992),
+                new Point(2032, 1460, 15917),
+                new Point(3522, 1460, 15917),
+                new Point(3522, 1460, 12992),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3522, 1460, 12992),
+                new Point(3522, 1460, 15917),
+                new Point(3522, 1737, 15917),
+                new Point(3522, 1737, 12992),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(3522, 1737, 12328),
+                new Point(3522, 1737, 14269),
+                new Point(5067, 1737, 14269),
+                new Point(5067, 1737, 12328),
+                penetrable: false,
+                navmesh: false,
+            );
+
+            // plane.009
+            $add(
+                new Point(9314, 974, 11822),
+                new Point(9314, 974, 10082),
+                new Point(7044, 974, 10082),
+                new Point(7044, 974, 11822),
+                penetrable: false,
+                navmesh: false,
+            );
+
+            // plane.010
+            $add(
+                new Point(11382, 1505, 10188),
+                new Point(11382, 1505, 7802),
+                new Point(9230, 1505, 7802),
+                new Point(9230, 1505, 10188),
+                penetrable: false,
+                navmesh: false,
+            );
+
+            // plane.011
+            $add(
+                new Point(9787, 1377, 5481),
+                new Point(9787, 1377, 5400),
+                new Point(9428, 1377, 5400),
+                new Point(9428, 1377, 5481),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(9787, 1377, 5910),
+                new Point(9787, 1377, 5829),
+                new Point(9428, 1377, 5829),
+                new Point(9428, 1377, 5910),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(9759, 1377, 6248),
+                new Point(10544, 1377, 6248),
+                new Point(10544, 1377, 5095),
+                new Point(9759, 1377, 5095),
+                penetrable: false,
+                navmesh: false,
+            );
+            $add(
+                new Point(9208, 1377, 6248),
+                new Point(9448, 1377, 6248),
+                new Point(9448, 1377, 5095),
+                new Point(9208, 1377, 5095),
+                penetrable: false,
+                navmesh: false,
+            );
         }
 
         // Map - CT spawn
@@ -1357,18 +1981,18 @@ final class DefaultMap extends Map
             $add(
                 new Point(4240, 818, 11948),
                 new Point(4240, 818, 10239),
-                new Point(4573, 818, 10239),
-                new Point(4573, 818, 11948),
+                new Point(4573, 705, 10239),
+                new Point(4573, 705, 11948),
             );
             $add(
-                new Point(4573, 818, 11948),
-                new Point(4573, 818, 10239),
-                new Point(5421, 637, 10239),
-                new Point(5421, 637, 11948),
+                new Point(4573, 705, 11948),
+                new Point(4573, 705, 10239),
+                new Point(5277, 542, 10239),
+                new Point(5277, 542, 11948),
             );
             $add(
-                new Point(5421, 637, 11948),
-                new Point(5421, 637, 10239),
+                new Point(5277, 542, 11948),
+                new Point(5277, 542, 10239),
                 new Point(5954, 440, 10239),
                 new Point(5954, 440, 11948),
             );
@@ -1628,6 +2252,12 @@ final class DefaultMap extends Map
                 new Point(5918, 1477, 9043),
                 new Point(5918, 312, 9043),
             );
+            $add(
+                new Point(5918, 312, 9043),
+                new Point(5918, 1477, 9043),
+                new Point(5692, 1477, 9043),
+                new Point(5692, 312, 9043),
+            );
         }
 
         // Map - Lower Tunnel
@@ -1839,8 +2469,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(6162, 1144, 8240),
                 new Point(6162, 913, 8240),
-                new Point(6162, 913, 8935),
-                new Point(6162, 1144, 8935),
+                new Point(6162, 913, 9136),
+                new Point(6162, 1144, 9136),
             );
             $add(
                 new Point(6162, 1144, 8935),
@@ -1850,8 +2480,8 @@ final class DefaultMap extends Map
             );
             $add(
                 new Point(6162, 1144, 8240),
-                new Point(6162, 1144, 8935),
-                new Point(5824, 1144, 8935),
+                new Point(6162, 1144, 9136),
+                new Point(5824, 1144, 9136),
                 new Point(5824, 1144, 8240),
             );
             $add(
@@ -1862,8 +2492,8 @@ final class DefaultMap extends Map
             );
             $add(
                 new Point(5824, 1144, 8240),
-                new Point(5824, 1144, 8935),
-                new Point(5824, 1574, 8935),
+                new Point(5824, 1144, 9136),
+                new Point(5824, 1574, 9136),
                 new Point(5824, 1574, 8240),
             );
             $add(
@@ -1889,6 +2519,12 @@ final class DefaultMap extends Map
                 new Point(6162, 946, 9134),
                 new Point(5865, 946, 9134),
                 new Point(5865, 1144, 9134),
+            );
+            $add(
+                new Point(5824, 1144, 7486),
+                new Point(5824, 1574, 7486),
+                new Point(5824, 1574, 6718),
+                new Point(5824, 1144, 6718),
             );
 
             // lower tunnel to upper
@@ -2179,8 +2815,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(6162, 1778, 6784),
                 new Point(6162, 726, 6784),
-                new Point(6048, 726, 6784),
-                new Point(6048, 1778, 6784),
+                new Point(5635, 726, 6784),
+                new Point(5635, 1778, 6784),
             );
             $add(
                 new Point(6157, 726, 2235),
@@ -2617,16 +3253,16 @@ final class DefaultMap extends Map
                 new Point(10576, 1481, 4628),
             );
             $add(
-                new Point(10806, 1487, 5039),
-                new Point(10806, 831, 5039),
-                new Point(10806, 831, 4699),
-                new Point(10806, 1487, 4699),
+                new Point(10781, 1487, 4935),
+                new Point(10781, 831, 4935),
+                new Point(10781, 831, 4699),
+                new Point(10781, 1487, 4699),
             );
             $add(
-                new Point(10806, 1487, 5039),
-                new Point(10548, 1487, 5039),
-                new Point(10548, 831, 5039),
-                new Point(10806, 831, 5039),
+                new Point(10781, 1487, 4935),
+                new Point(10548, 1487, 4935),
+                new Point(10548, 831, 4935),
+                new Point(10781, 831, 4935),
             );
             $add(
                 new Point(10576, 1481, 6305),
@@ -3549,38 +4185,6 @@ final class DefaultMap extends Map
                 new Point(9989, 1211, 11402),
             );
 
-            // prop.014
-            $add(
-                new Point(11599, 1211, 12666),
-                new Point(11599, 1076, 12666),
-                new Point(11661, 1076, 12666),
-                new Point(11661, 1211, 12666),
-            );
-            $add(
-                new Point(11661, 1211, 12666),
-                new Point(11661, 1076, 12666),
-                new Point(11661, 1076, 12605),
-                new Point(11661, 1211, 12605),
-            );
-            $add(
-                new Point(11599, 1076, 12666),
-                new Point(11599, 1211, 12666),
-                new Point(11599, 1211, 12605),
-                new Point(11599, 1076, 12605),
-            );
-            $add(
-                new Point(11661, 1211, 12605),
-                new Point(11661, 1076, 12605),
-                new Point(11604, 1076, 12605),
-                new Point(11604, 1211, 12605),
-            );
-            $add(
-                new Point(11599, 1211, 12666),
-                new Point(11661, 1211, 12666),
-                new Point(11661, 1211, 12603),
-                new Point(11599, 1211, 12603),
-            );
-
             // prop.015
             $add(
                 new Point(10294, 1234, 12279),
@@ -3679,66 +4283,72 @@ final class DefaultMap extends Map
 
             // prop.018
             $add(
-                new Point(11597, 1342, 12685),
-                new Point(11597, 1207, 12685),
-                new Point(11659, 1207, 12685),
-                new Point(11659, 1342, 12685),
+                new Point(11659, 1337, 12622),
+                new Point(11597, 1337, 12622),
+                new Point(11597, 1181, 12622),
+                new Point(11659, 1181, 12622),
             );
             $add(
-                new Point(11659, 1342, 12685),
-                new Point(11659, 1207, 12685),
-                new Point(11659, 1207, 12623),
-                new Point(11659, 1342, 12623),
+                new Point(11597, 1337, 12685),
+                new Point(11659, 1337, 12685),
+                new Point(11659, 1181, 12685),
+                new Point(11597, 1181, 12685),
             );
             $add(
-                new Point(11597, 1207, 12685),
-                new Point(11597, 1342, 12685),
-                new Point(11597, 1342, 12623),
-                new Point(11597, 1207, 12623),
+                new Point(11659, 1337, 12685),
+                new Point(11659, 1337, 12622),
+                new Point(11659, 1181, 12622),
+                new Point(11659, 1181, 12685),
             );
             $add(
-                new Point(11659, 1342, 12623),
-                new Point(11659, 1207, 12623),
-                new Point(11602, 1207, 12623),
-                new Point(11602, 1342, 12623),
+                new Point(11597, 1181, 12685),
+                new Point(11659, 1181, 12685),
+                new Point(11659, 1181, 12622),
+                new Point(11597, 1181, 12622),
             );
             $add(
-                new Point(11597, 1342, 12685),
-                new Point(11659, 1342, 12685),
-                new Point(11659, 1342, 12622),
-                new Point(11597, 1342, 12622),
+                new Point(11597, 1337, 12685),
+                new Point(11597, 1337, 12622),
+                new Point(11659, 1337, 12622),
+                new Point(11659, 1337, 12685),
+            );
+            $add(
+                new Point(11597, 1337, 12622),
+                new Point(11597, 1337, 12685),
+                new Point(11597, 1181, 12685),
+                new Point(11597, 1181, 12622),
             );
 
             // prop.019
             $add(
-                new Point(11727, 1342, 12699),
-                new Point(11727, 1207, 12699),
-                new Point(11789, 1207, 12699),
-                new Point(11789, 1342, 12699),
+                new Point(11727, 1337, 12699),
+                new Point(11789, 1337, 12699),
+                new Point(11789, 1179, 12699),
+                new Point(11727, 1179, 12699),
             );
             $add(
-                new Point(11789, 1342, 12699),
-                new Point(11789, 1207, 12699),
-                new Point(11789, 1207, 12638),
-                new Point(11789, 1342, 12638),
+                new Point(11789, 1337, 12699),
+                new Point(11789, 1337, 12637),
+                new Point(11789, 1179, 12637),
+                new Point(11789, 1179, 12699),
             );
             $add(
-                new Point(11727, 1207, 12699),
-                new Point(11727, 1342, 12699),
-                new Point(11727, 1342, 12638),
-                new Point(11727, 1207, 12638),
+                new Point(11727, 1337, 12637),
+                new Point(11727, 1337, 12699),
+                new Point(11727, 1179, 12699),
+                new Point(11727, 1179, 12637),
             );
             $add(
-                new Point(11789, 1342, 12638),
-                new Point(11789, 1207, 12638),
-                new Point(11732, 1207, 12638),
-                new Point(11732, 1342, 12638),
+                new Point(11727, 1337, 12699),
+                new Point(11727, 1337, 12637),
+                new Point(11789, 1337, 12637),
+                new Point(11789, 1337, 12699),
             );
             $add(
-                new Point(11727, 1342, 12699),
-                new Point(11789, 1342, 12699),
-                new Point(11789, 1342, 12637),
-                new Point(11727, 1342, 12637),
+                new Point(11789, 1337, 12637),
+                new Point(11727, 1337, 12637),
+                new Point(11727, 1179, 12637),
+                new Point(11789, 1179, 12637),
             );
 
             // prop.020
@@ -3967,34 +4577,70 @@ final class DefaultMap extends Map
 
             // prop.027
             $add(
-                new Point(1714, 1006, 5933),
-                new Point(1714, 872, 5933),
-                new Point(2258, 872, 5933),
-                new Point(2258, 1006, 5933),
-            );
-            $add(
-                new Point(2258, 1006, 5933),
-                new Point(2258, 872, 5933),
-                new Point(2258, 872, 5684),
-                new Point(2258, 1006, 5684),
-            );
-            $add(
-                new Point(1714, 872, 5933),
-                new Point(1714, 1006, 5933),
-                new Point(1714, 1006, 5684),
-                new Point(1714, 872, 5684),
-            );
-            $add(
-                new Point(2258, 1006, 5684),
-                new Point(2258, 872, 5684),
-                new Point(1759, 872, 5684),
-                new Point(1759, 1006, 5684),
-            );
-            $add(
-                new Point(1714, 1006, 5933),
-                new Point(2258, 1006, 5933),
                 new Point(2258, 1006, 5680),
                 new Point(1714, 1006, 5680),
+                new Point(1714, 880, 5680),
+                new Point(2258, 880, 5680),
+            );
+            $add(
+                new Point(1714, 1006, 5840),
+                new Point(2258, 1006, 5840),
+                new Point(2258, 880, 5840),
+                new Point(1714, 880, 5840),
+            );
+            $add(
+                new Point(2258, 1006, 5840),
+                new Point(2258, 1006, 5680),
+                new Point(2258, 880, 5680),
+                new Point(2258, 880, 5840),
+            );
+            $add(
+                new Point(1876, 996, 5910),
+                new Point(1876, 890, 5910),
+                new Point(1978, 890, 5910),
+                new Point(1978, 996, 5910),
+            );
+            $add(
+                new Point(1714, 1006, 5840),
+                new Point(1714, 1006, 5680),
+                new Point(2258, 1006, 5680),
+                new Point(2258, 1006, 5840),
+            );
+            $add(
+                new Point(1714, 1006, 5680),
+                new Point(1714, 1006, 5840),
+                new Point(1714, 880, 5840),
+                new Point(1714, 880, 5680),
+            );
+            $add(
+                new Point(1876, 996, 5823),
+                new Point(1978, 996, 5823),
+                new Point(1978, 890, 5823),
+                new Point(1876, 890, 5823),
+            );
+            $add(
+                new Point(1876, 996, 5910),
+                new Point(1978, 996, 5910),
+                new Point(1978, 996, 5823),
+                new Point(1876, 996, 5823),
+            );
+            $add(
+                new Point(1978, 890, 5910),
+                new Point(1876, 890, 5910),
+                new Point(1876, 890, 5823),
+                new Point(1978, 890, 5823),
+            );
+            $add(
+                new Point(1876, 890, 5910),
+                new Point(1876, 996, 5910),
+                new Point(1876, 996, 5823),
+                new Point(1876, 890, 5823),
+            );
+            $add(
+                new Point(1978, 996, 5910),
+                new Point(1978, 890, 5910),
+                new Point(1978, 890, 5823),
+                new Point(1978, 996, 5823),
             );
 
             // prop.028
@@ -4289,8 +4935,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(3449, 1145, 12306),
                 new Point(3449, 1145, 11901),
-                new Point(3855, 1145, 11901),
-                new Point(3855, 1145, 12306),
+                new Point(3851, 1145, 11901),
+                new Point(3851, 1145, 12306),
             );
             $add(
                 new Point(3449, 1145, 11901),
@@ -4300,27 +4946,21 @@ final class DefaultMap extends Map
             );
             $add(
                 new Point(3449, 1145, 12306),
-                new Point(3855, 1145, 12306),
-                new Point(3855, 814, 12306),
+                new Point(3851, 1145, 12306),
+                new Point(3851, 814, 12306),
                 new Point(3449, 814, 12306),
             );
             $add(
-                new Point(3855, 1145, 12306),
-                new Point(3855, 1145, 11901),
-                new Point(3855, 814, 11901),
-                new Point(3855, 814, 12306),
+                new Point(3851, 1145, 12306),
+                new Point(3851, 1145, 11901),
+                new Point(3851, 814, 11901),
+                new Point(3851, 814, 12306),
             );
             $add(
-                new Point(3855, 1145, 11901),
+                new Point(3851, 1145, 11901),
                 new Point(3449, 1145, 11901),
                 new Point(3449, 814, 11901),
-                new Point(3855, 814, 11901),
-            );
-            $add(
-                new Point(3855, 1125, 12008),
-                new Point(3855, 1125, 12266),
-                new Point(3954, 1012, 12340),
-                new Point(3954, 1012, 11934),
+                new Point(3851, 814, 11901),
             );
 
             // prop.038
@@ -4532,17 +5172,65 @@ final class DefaultMap extends Map
             // prop.050
             $add(
                 new Point(4993, 736, 11803),
+                new Point(5216, 736, 11803),
+                new Point(5216, 736, 11608),
                 new Point(4993, 736, 11608),
+            );
+            $add(
                 new Point(5216, 736, 11608),
                 new Point(5216, 736, 11803),
+                new Point(5216, 524, 11803),
+                new Point(5216, 524, 11608),
+            );
+            $add(
+                new Point(4993, 736, 11608),
+                new Point(5216, 736, 11608),
+                new Point(5216, 524, 11608),
+                new Point(4993, 524, 11608),
+            );
+            $add(
+                new Point(4993, 736, 11803),
+                new Point(4993, 736, 11608),
+                new Point(4993, 524, 11608),
+                new Point(4993, 524, 11803),
+            );
+            $add(
+                new Point(5216, 736, 11803),
+                new Point(4993, 736, 11803),
+                new Point(4993, 524, 11803),
+                new Point(5216, 524, 11803),
             );
 
             // prop.051
             $add(
-                new Point(5041, 720, 11546),
-                new Point(5041, 720, 11394),
-                new Point(5215, 720, 11394),
-                new Point(5215, 720, 11546),
+                new Point(5029, 720, 11546),
+                new Point(5203, 720, 11546),
+                new Point(5203, 720, 11394),
+                new Point(5029, 720, 11394),
+            );
+            $add(
+                new Point(5203, 720, 11546),
+                new Point(5029, 720, 11546),
+                new Point(5029, 507, 11546),
+                new Point(5203, 507, 11546),
+            );
+            $add(
+                new Point(5203, 720, 11394),
+                new Point(5203, 720, 11546),
+                new Point(5203, 507, 11546),
+                new Point(5203, 507, 11394),
+            );
+            $add(
+                new Point(5029, 720, 11394),
+                new Point(5203, 720, 11394),
+                new Point(5203, 507, 11394),
+                new Point(5029, 507, 11394),
+            );
+            $add(
+                new Point(5029, 720, 11546),
+                new Point(5029, 720, 11394),
+                new Point(5029, 507, 11394),
+                new Point(5029, 507, 11546),
             );
 
             // prop.052
@@ -5079,70 +5767,40 @@ final class DefaultMap extends Map
 
             // prop.071
             $add(
-                new Point(11508, 1073, 11330),
-                new Point(11508, 1073, 11415),
-                new Point(11719, 1073, 11415),
-                new Point(11719, 1073, 11330),
+                new Point(11719, 1029, 11409),
+                new Point(11719, 1029, 11207),
+                new Point(11719, 833, 11207),
+                new Point(11719, 833, 11409),
             );
             $add(
-                new Point(11508, 1027, 11415),
-                new Point(11508, 1027, 11208),
-                new Point(11508, 843, 11208),
-                new Point(11508, 843, 11415),
+                new Point(11719, 1029, 11207),
+                new Point(11508, 1029, 11207),
+                new Point(11508, 833, 11207),
+                new Point(11719, 833, 11207),
             );
             $add(
-                new Point(11508, 1027, 11208),
-                new Point(11719, 1027, 11208),
-                new Point(11719, 843, 11208),
-                new Point(11508, 843, 11208),
+                new Point(11508, 1029, 11409),
+                new Point(11719, 1029, 11409),
+                new Point(11719, 833, 11409),
+                new Point(11508, 833, 11409),
             );
             $add(
-                new Point(11719, 1027, 11208),
-                new Point(11719, 1027, 11415),
-                new Point(11719, 843, 11415),
-                new Point(11719, 843, 11208),
+                new Point(11719, 1029, 11207),
+                new Point(11719, 1029, 11409),
+                new Point(11508, 1029, 11409),
+                new Point(11508, 1029, 11207),
             );
             $add(
-                new Point(11719, 1027, 11415),
-                new Point(11508, 1027, 11415),
-                new Point(11508, 843, 11415),
-                new Point(11719, 843, 11415),
+                new Point(11719, 1029, 11409),
+                new Point(11508, 1029, 11409),
+                new Point(11508, 1080, 11409),
+                new Point(11719, 1080, 11409),
             );
             $add(
-                new Point(11508, 1027, 11330),
-                new Point(11719, 1027, 11330),
-                new Point(11719, 1027, 11415),
-                new Point(11508, 1027, 11415),
-            );
-            $add(
-                new Point(11508, 1027, 11415),
-                new Point(11719, 1027, 11415),
-                new Point(11719, 1073, 11415),
-                new Point(11508, 1073, 11415),
-            );
-            $add(
-                new Point(11508, 1027, 11330),
-                new Point(11508, 1027, 11415),
-                new Point(11508, 1073, 11415),
-                new Point(11508, 1073, 11330),
-            );
-            $add(
-                new Point(11719, 1027, 11330),
-                new Point(11508, 1027, 11330),
-                new Point(11508, 1073, 11330),
-                new Point(11719, 1073, 11330),
-            );
-            $add(
-                new Point(11719, 1027, 11415),
-                new Point(11719, 1027, 11330),
-                new Point(11719, 1073, 11330),
-                new Point(11719, 1073, 11415),
-            );
-            $add(
-                new Point(11508, 1027, 11330),
-                new Point(11719, 1027, 11330),
-                new Point(11719, 1027, 11209),
-                new Point(11508, 1027, 11209),
+                new Point(11719, 1080, 11409),
+                new Point(11508, 1080, 11409),
+                new Point(11508, 1024, 11217),
+                new Point(11719, 1024, 11217),
             );
 
             // prop.072
@@ -5489,172 +6147,532 @@ final class DefaultMap extends Map
 
             // t awp stairs
             $add(
-                new Point(6570, 810, 2320),
-                new Point(6570, 1186, 2320),
-                new Point(6133, 1186, 2320),
-                new Point(6133, 810, 2320),
+                new Point(7270, 987, 2320),
+                new Point(7341, 987, 2320),
+                new Point(7341, 987, 2225),
+                new Point(7270, 987, 2225),
             );
             $add(
-                new Point(6847, 810, 2320),
-                new Point(6847, 1111, 2320),
-                new Point(6570, 1111, 2320),
-                new Point(6570, 810, 2320),
+                new Point(7411, 952, 2320),
+                new Point(7482, 952, 2320),
+                new Point(7482, 952, 2225),
+                new Point(7411, 952, 2225),
             );
             $add(
-                new Point(7118, 810, 2320),
-                new Point(7118, 1045, 2320),
-                new Point(6847, 1045, 2320),
-                new Point(6847, 810, 2320),
+                new Point(7482, 812, 2320),
+                new Point(7482, 952, 2320),
+                new Point(7411, 952, 2320),
+                new Point(7411, 812, 2320),
             );
             $add(
-                new Point(7525, 810, 2320),
-                new Point(7525, 951, 2320),
-                new Point(7332, 951, 2320),
-                new Point(7332, 810, 2320),
+                new Point(7693, 812, 2320),
+                new Point(7693, 901, 2320),
+                new Point(7622, 901, 2320),
+                new Point(7622, 812, 2320),
             );
             $add(
-                new Point(7656, 810, 2320),
-                new Point(7656, 908, 2320),
-                new Point(7525, 908, 2320),
-                new Point(7525, 810, 2320),
+                new Point(6355, 1238, 2225),
+                new Point(6355, 1238, 2320),
+                new Point(6355, 1190, 2320),
+                new Point(6355, 1190, 2225),
             );
             $add(
-                new Point(7336, 810, 2320),
-                new Point(7336, 997, 2320),
-                new Point(7118, 997, 2320),
-                new Point(7118, 810, 2320),
+                new Point(7270, 812, 2320),
+                new Point(7270, 1005, 2320),
+                new Point(7200, 1005, 2320),
+                new Point(7200, 812, 2320),
             );
             $add(
-                new Point(6570, 1111, 2320),
-                new Point(6847, 1111, 2320),
-                new Point(6847, 1111, 2226),
-                new Point(6570, 1111, 2226),
+                new Point(6777, 812, 2320),
+                new Point(6777, 1141, 2320),
+                new Point(6707, 1141, 2320),
+                new Point(6707, 812, 2320),
             );
             $add(
-                new Point(7118, 997, 2320),
-                new Point(7336, 997, 2320),
-                new Point(7336, 997, 2226),
-                new Point(7118, 997, 2226),
+                new Point(6636, 812, 2320),
+                new Point(6636, 1167, 2320),
+                new Point(6566, 1167, 2320),
+                new Point(6566, 812, 2320),
             );
             $add(
-                new Point(7525, 908, 2320),
-                new Point(7656, 908, 2320),
-                new Point(7656, 908, 2226),
-                new Point(7525, 908, 2226),
+                new Point(6355, 812, 2320),
+                new Point(6355, 1238, 2320),
+                new Point(6284, 1238, 2320),
+                new Point(6284, 812, 2320),
             );
             $add(
-                new Point(6133, 1186, 2320),
-                new Point(6570, 1186, 2320),
-                new Point(6570, 1186, 2226),
-                new Point(6133, 1186, 2226),
+                new Point(7622, 812, 2320),
+                new Point(7622, 921, 2320),
+                new Point(7552, 921, 2320),
+                new Point(7552, 812, 2320),
             );
             $add(
-                new Point(7332, 951, 2320),
-                new Point(7525, 951, 2320),
-                new Point(7525, 951, 2226),
-                new Point(7332, 951, 2226),
+                new Point(6495, 812, 2320),
+                new Point(6495, 1203, 2320),
+                new Point(6425, 1203, 2320),
+                new Point(6425, 812, 2320),
             );
             $add(
-                new Point(6847, 1045, 2320),
-                new Point(7118, 1045, 2320),
-                new Point(7118, 1045, 2226),
-                new Point(6847, 1045, 2226),
+                new Point(7552, 812, 2320),
+                new Point(7552, 938, 2320),
+                new Point(7482, 938, 2320),
+                new Point(7482, 812, 2320),
             );
             $add(
-                new Point(7336, 997, 2226),
-                new Point(7336, 997, 2320),
-                new Point(7336, 863, 2320),
-                new Point(7336, 863, 2226),
+                new Point(7482, 938, 2320),
+                new Point(7552, 938, 2320),
+                new Point(7552, 938, 2225),
+                new Point(7482, 938, 2225),
             );
             $add(
-                new Point(6847, 1111, 2226),
-                new Point(6847, 1111, 2320),
-                new Point(6847, 977, 2320),
-                new Point(6847, 977, 2226),
+                new Point(7059, 1051, 2320),
+                new Point(7129, 1051, 2320),
+                new Point(7129, 1051, 2225),
+                new Point(7059, 1051, 2225),
             );
             $add(
-                new Point(7118, 1045, 2226),
-                new Point(7118, 1045, 2320),
-                new Point(7118, 911, 2320),
-                new Point(7118, 911, 2226),
+                new Point(7622, 901, 2320),
+                new Point(7693, 901, 2320),
+                new Point(7693, 901, 2225),
+                new Point(7622, 901, 2225),
             );
             $add(
-                new Point(7525, 951, 2226),
-                new Point(7525, 951, 2320),
-                new Point(7525, 817, 2320),
-                new Point(7525, 817, 2226),
+                new Point(6918, 1089, 2320),
+                new Point(6989, 1089, 2320),
+                new Point(6989, 1089, 2225),
+                new Point(6918, 1089, 2225),
             );
             $add(
-                new Point(6570, 1186, 2226),
-                new Point(6570, 1186, 2320),
-                new Point(6570, 1052, 2320),
-                new Point(6570, 1052, 2226),
+                new Point(7341, 969, 2320),
+                new Point(7411, 969, 2320),
+                new Point(7411, 969, 2225),
+                new Point(7341, 969, 2225),
             );
             $add(
-                new Point(6847, 1045, 2226),
-                new Point(7118, 1045, 2226),
-                new Point(7118, 817, 2226),
-                new Point(6847, 817, 2226),
+                new Point(6989, 812, 2320),
+                new Point(6989, 1089, 2320),
+                new Point(6918, 1089, 2320),
+                new Point(6918, 812, 2320),
             );
             $add(
-                new Point(6133, 1186, 2226),
-                new Point(6570, 1186, 2226),
-                new Point(6570, 958, 2226),
-                new Point(6133, 958, 2226),
+                new Point(7552, 921, 2320),
+                new Point(7622, 921, 2320),
+                new Point(7622, 921, 2225),
+                new Point(7552, 921, 2225),
             );
             $add(
-                new Point(7118, 997, 2226),
-                new Point(7336, 997, 2226),
-                new Point(7336, 830, 2226),
-                new Point(7118, 830, 2226),
+                new Point(6707, 812, 2320),
+                new Point(6707, 1153, 2320),
+                new Point(6636, 1153, 2320),
+                new Point(6636, 812, 2320),
             );
             $add(
-                new Point(7332, 951, 2226),
-                new Point(7525, 951, 2226),
-                new Point(7525, 825, 2226),
-                new Point(7332, 825, 2226),
+                new Point(6214, 1256, 2320),
+                new Point(6284, 1256, 2320),
+                new Point(6284, 1256, 2225),
+                new Point(6214, 1256, 2225),
             );
             $add(
-                new Point(6570, 1111, 2226),
-                new Point(6847, 1111, 2226),
-                new Point(6847, 883, 2226),
-                new Point(6570, 883, 2226),
+                new Point(7200, 1005, 2320),
+                new Point(7270, 1005, 2320),
+                new Point(7270, 1005, 2225),
+                new Point(7200, 1005, 2225),
             );
             $add(
-                new Point(7525, 908, 2226),
-                new Point(7656, 908, 2226),
-                new Point(7656, 816, 2226),
-                new Point(7525, 816, 2226),
+                new Point(7059, 1051, 2225),
+                new Point(7129, 1051, 2225),
+                new Point(7129, 896, 2225),
+                new Point(7059, 896, 2225),
             );
             $add(
-                new Point(7656, 908, 2226),
-                new Point(7656, 908, 2320),
-                new Point(7656, 868, 2320),
-                new Point(7656, 868, 2226),
+                new Point(7341, 969, 2225),
+                new Point(7411, 969, 2225),
+                new Point(7411, 824, 2225),
+                new Point(7341, 824, 2225),
             );
             $add(
-                new Point(7656, 829, 2226),
-                new Point(7656, 873, 2226),
-                new Point(7691, 873, 2226),
-                new Point(7691, 829, 2226),
+                new Point(6707, 1153, 2225),
+                new Point(6707, 1153, 2320),
+                new Point(6707, 1066, 2320),
+                new Point(6707, 1066, 2225),
             );
             $add(
-                new Point(7691, 829, 2226),
-                new Point(7691, 873, 2226),
-                new Point(7691, 873, 2320),
-                new Point(7691, 829, 2320),
+                new Point(7482, 938, 2225),
+                new Point(7552, 938, 2225),
+                new Point(7552, 783, 2225),
+                new Point(7482, 783, 2225),
             );
             $add(
-                new Point(7656, 873, 2226),
-                new Point(7656, 873, 2320),
-                new Point(7691, 873, 2320),
-                new Point(7691, 873, 2226),
+                new Point(6214, 1256, 2225),
+                new Point(6284, 1256, 2225),
+                new Point(6284, 1113, 2225),
+                new Point(6214, 1113, 2225),
             );
             $add(
-                new Point(7656, 873, 2320),
-                new Point(7656, 829, 2320),
-                new Point(7691, 829, 2320),
-                new Point(7691, 873, 2320),
+                new Point(7200, 1005, 2225),
+                new Point(7270, 1005, 2225),
+                new Point(7270, 864, 2225),
+                new Point(7200, 864, 2225),
+            );
+            $add(
+                new Point(7552, 921, 2225),
+                new Point(7622, 921, 2225),
+                new Point(7622, 766, 2225),
+                new Point(7552, 766, 2225),
+            );
+            $add(
+                new Point(7411, 952, 2225),
+                new Point(7482, 952, 2225),
+                new Point(7482, 797, 2225),
+                new Point(7411, 797, 2225),
+            );
+            $add(
+                new Point(6918, 1089, 2225),
+                new Point(6989, 1089, 2225),
+                new Point(6989, 934, 2225),
+                new Point(6918, 934, 2225),
+            );
+            $add(
+                new Point(7622, 901, 2225),
+                new Point(7693, 901, 2225),
+                new Point(7693, 746, 2225),
+                new Point(7622, 746, 2225),
+            );
+            $add(
+                new Point(6989, 1089, 2225),
+                new Point(6989, 1089, 2320),
+                new Point(6989, 988, 2320),
+                new Point(6989, 988, 2225),
+            );
+            $add(
+                new Point(6636, 1153, 2225),
+                new Point(6707, 1153, 2225),
+                new Point(6707, 1012, 2225),
+                new Point(6636, 1012, 2225),
+            );
+            $add(
+                new Point(7129, 1051, 2225),
+                new Point(7129, 1051, 2320),
+                new Point(7129, 950, 2320),
+                new Point(7129, 950, 2225),
+            );
+            $add(
+                new Point(7411, 969, 2225),
+                new Point(7411, 969, 2320),
+                new Point(7411, 878, 2320),
+                new Point(7411, 878, 2225),
+            );
+            $add(
+                new Point(7693, 901, 2225),
+                new Point(7693, 901, 2320),
+                new Point(7693, 800, 2320),
+                new Point(7693, 800, 2225),
+            );
+            $add(
+                new Point(6848, 1123, 2225),
+                new Point(6848, 1123, 2320),
+                new Point(6848, 1022, 2320),
+                new Point(6848, 1022, 2225),
+            );
+            $add(
+                new Point(6284, 1256, 2225),
+                new Point(6284, 1256, 2320),
+                new Point(6284, 1168, 2320),
+                new Point(6284, 1168, 2225),
+            );
+            $add(
+                new Point(7482, 952, 2225),
+                new Point(7482, 952, 2320),
+                new Point(7482, 851, 2320),
+                new Point(7482, 851, 2225),
+            );
+            $add(
+                new Point(7622, 921, 2225),
+                new Point(7622, 921, 2320),
+                new Point(7622, 820, 2320),
+                new Point(7622, 820, 2225),
+            );
+            $add(
+                new Point(7270, 1005, 2225),
+                new Point(7270, 1005, 2320),
+                new Point(7270, 918, 2320),
+                new Point(7270, 918, 2225),
+            );
+            $add(
+                new Point(7552, 938, 2225),
+                new Point(7552, 938, 2320),
+                new Point(7552, 837, 2320),
+                new Point(7552, 837, 2225),
+            );
+            $add(
+                new Point(6707, 1141, 2225),
+                new Point(6777, 1141, 2225),
+                new Point(6777, 975, 2225),
+                new Point(6707, 975, 2225),
+            );
+            $add(
+                new Point(6707, 1141, 2320),
+                new Point(6777, 1141, 2320),
+                new Point(6777, 1141, 2225),
+                new Point(6707, 1141, 2225),
+            );
+            $add(
+                new Point(6777, 1123, 2320),
+                new Point(6848, 1123, 2320),
+                new Point(6848, 1123, 2225),
+                new Point(6777, 1123, 2225),
+            );
+            $add(
+                new Point(6777, 1123, 2225),
+                new Point(6848, 1123, 2225),
+                new Point(6848, 975, 2225),
+                new Point(6777, 975, 2225),
+            );
+            $add(
+                new Point(6848, 812, 2320),
+                new Point(6848, 1123, 2320),
+                new Point(6777, 1123, 2320),
+                new Point(6777, 812, 2320),
+            );
+            $add(
+                new Point(7270, 987, 2225),
+                new Point(7341, 987, 2225),
+                new Point(7341, 862, 2225),
+                new Point(7270, 862, 2225),
+            );
+            $add(
+                new Point(7341, 812, 2320),
+                new Point(7341, 987, 2320),
+                new Point(7270, 987, 2320),
+                new Point(7270, 812, 2320),
+            );
+            $add(
+                new Point(7129, 812, 2320),
+                new Point(7129, 1051, 2320),
+                new Point(7059, 1051, 2320),
+                new Point(7059, 812, 2320),
+            );
+            $add(
+                new Point(6566, 1167, 2225),
+                new Point(6636, 1167, 2225),
+                new Point(6636, 1012, 2225),
+                new Point(6566, 1012, 2225),
+            );
+            $add(
+                new Point(6566, 1167, 2320),
+                new Point(6636, 1167, 2320),
+                new Point(6636, 1167, 2225),
+                new Point(6566, 1167, 2225),
+            );
+            $add(
+                new Point(6425, 1203, 2225),
+                new Point(6495, 1203, 2225),
+                new Point(6495, 1048, 2225),
+                new Point(6425, 1048, 2225),
+            );
+            $add(
+                new Point(6425, 1203, 2320),
+                new Point(6495, 1203, 2320),
+                new Point(6495, 1203, 2225),
+                new Point(6425, 1203, 2225),
+            );
+            $add(
+                new Point(6636, 1153, 2320),
+                new Point(6707, 1153, 2320),
+                new Point(6707, 1153, 2225),
+                new Point(6636, 1153, 2225),
+            );
+            $add(
+                new Point(6284, 1238, 2225),
+                new Point(6355, 1238, 2225),
+                new Point(6355, 1083, 2225),
+                new Point(6284, 1083, 2225),
+            );
+            $add(
+                new Point(6284, 1238, 2320),
+                new Point(6355, 1238, 2320),
+                new Point(6355, 1238, 2225),
+                new Point(6284, 1238, 2225),
+            );
+            $add(
+                new Point(6284, 812, 2320),
+                new Point(6284, 1256, 2320),
+                new Point(6214, 1256, 2320),
+                new Point(6214, 812, 2320),
+            );
+            $add(
+                new Point(6214, 812, 2320),
+                new Point(6214, 1269, 2320),
+                new Point(6144, 1269, 2320),
+                new Point(6144, 812, 2320),
+            );
+            $add(
+                new Point(6144, 1269, 2225),
+                new Point(6214, 1269, 2225),
+                new Point(6214, 1113, 2225),
+                new Point(6144, 1113, 2225),
+            );
+            $add(
+                new Point(6144, 1269, 2320),
+                new Point(6214, 1269, 2320),
+                new Point(6214, 1269, 2225),
+                new Point(6144, 1269, 2225),
+            );
+            $add(
+                new Point(6425, 812, 2320),
+                new Point(6425, 1222, 2320),
+                new Point(6355, 1222, 2320),
+                new Point(6355, 812, 2320),
+            );
+            $add(
+                new Point(6425, 1222, 2225),
+                new Point(6425, 1222, 2320),
+                new Point(6425, 1122, 2320),
+                new Point(6425, 1122, 2225),
+            );
+            $add(
+                new Point(6355, 1222, 2225),
+                new Point(6425, 1222, 2225),
+                new Point(6425, 1083, 2225),
+                new Point(6355, 1083, 2225),
+            );
+            $add(
+                new Point(6355, 1222, 2320),
+                new Point(6425, 1222, 2320),
+                new Point(6425, 1222, 2225),
+                new Point(6355, 1222, 2225),
+            );
+            $add(
+                new Point(6495, 1185, 2320),
+                new Point(6566, 1185, 2320),
+                new Point(6566, 1185, 2225),
+                new Point(6495, 1185, 2225),
+            );
+            $add(
+                new Point(6495, 1185, 2225),
+                new Point(6566, 1185, 2225),
+                new Point(6566, 1048, 2225),
+                new Point(6495, 1048, 2225),
+            );
+            $add(
+                new Point(6566, 1185, 2225),
+                new Point(6566, 1185, 2320),
+                new Point(6566, 1102, 2320),
+                new Point(6566, 1102, 2225),
+            );
+            $add(
+                new Point(6566, 812, 2320),
+                new Point(6566, 1185, 2320),
+                new Point(6495, 1185, 2320),
+                new Point(6495, 812, 2320),
+            );
+            $add(
+                new Point(6918, 812, 2320),
+                new Point(6918, 1104, 2320),
+                new Point(6848, 1104, 2320),
+                new Point(6848, 812, 2320),
+            );
+            $add(
+                new Point(6848, 1104, 2320),
+                new Point(6918, 1104, 2320),
+                new Point(6918, 1104, 2225),
+                new Point(6848, 1104, 2225),
+            );
+            $add(
+                new Point(6848, 1104, 2225),
+                new Point(6918, 1104, 2225),
+                new Point(6918, 934, 2225),
+                new Point(6848, 934, 2225),
+            );
+            $add(
+                new Point(7059, 812, 2320),
+                new Point(7059, 1069, 2320),
+                new Point(6989, 1069, 2320),
+                new Point(6989, 812, 2320),
+            );
+            $add(
+                new Point(6989, 1069, 2225),
+                new Point(7059, 1069, 2225),
+                new Point(7059, 896, 2225),
+                new Point(6989, 896, 2225),
+            );
+            $add(
+                new Point(6989, 1069, 2320),
+                new Point(7059, 1069, 2320),
+                new Point(7059, 1069, 2225),
+                new Point(6989, 1069, 2225),
+            );
+            $add(
+                new Point(6495, 1203, 2225),
+                new Point(6495, 1203, 2320),
+                new Point(6495, 1154, 2320),
+                new Point(6495, 1154, 2225),
+            );
+            $add(
+                new Point(6636, 1167, 2225),
+                new Point(6636, 1167, 2320),
+                new Point(6636, 1118, 2320),
+                new Point(6636, 1118, 2225),
+            );
+            $add(
+                new Point(7411, 812, 2320),
+                new Point(7411, 969, 2320),
+                new Point(7341, 969, 2320),
+                new Point(7341, 812, 2320),
+            );
+            $add(
+                new Point(7200, 812, 2320),
+                new Point(7200, 1025, 2320),
+                new Point(7129, 1025, 2320),
+                new Point(7129, 812, 2320),
+            );
+            $add(
+                new Point(7129, 1025, 2320),
+                new Point(7200, 1025, 2320),
+                new Point(7200, 1025, 2225),
+                new Point(7129, 1025, 2225),
+            );
+            $add(
+                new Point(7129, 1025, 2225),
+                new Point(7200, 1025, 2225),
+                new Point(7200, 864, 2225),
+                new Point(7129, 864, 2225),
+            );
+            $add(
+                new Point(7341, 987, 2225),
+                new Point(7341, 987, 2320),
+                new Point(7341, 938, 2320),
+                new Point(7341, 938, 2225),
+            );
+            $add(
+                new Point(6918, 1104, 2225),
+                new Point(6918, 1104, 2320),
+                new Point(6918, 1058, 2320),
+                new Point(6918, 1058, 2225),
+            );
+            $add(
+                new Point(6777, 1141, 2225),
+                new Point(6777, 1141, 2320),
+                new Point(6777, 1093, 2320),
+                new Point(6777, 1093, 2225),
+            );
+            $add(
+                new Point(7059, 1069, 2225),
+                new Point(7059, 1069, 2320),
+                new Point(7059, 1020, 2320),
+                new Point(7059, 1020, 2225),
+            );
+            $add(
+                new Point(7200, 1025, 2225),
+                new Point(7200, 1025, 2320),
+                new Point(7200, 976, 2320),
+                new Point(7200, 976, 2225),
+            );
+            $add(
+                new Point(6214, 1269, 2225),
+                new Point(6214, 1269, 2320),
+                new Point(6214, 1220, 2320),
+                new Point(6214, 1220, 2225),
             );
 
             // t ramp
@@ -6004,8 +7022,8 @@ final class DefaultMap extends Map
             // upper tunnel walls
             $add(
                 new Point(1918, 1445, 8359),
-                new Point(1918, 1445, 9518),
-                new Point(1918, 886, 9518),
+                new Point(1918, 1445, 9520),
+                new Point(1918, 886, 9520),
                 new Point(1918, 886, 8359),
             );
             $add(
@@ -6043,12 +7061,6 @@ final class DefaultMap extends Map
                 new Point(2890, 886, 7977),
                 new Point(4616, 886, 7977),
                 new Point(4616, 1445, 7977),
-            );
-            $add(
-                new Point(1918, 886, 9518),
-                new Point(1918, 1445, 9518),
-                new Point(1939, 1445, 9518),
-                new Point(1939, 886, 9518),
             );
 
             // upper tunnel walls.001
@@ -6151,8 +7163,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(1552, 1477, 7978),
                 new Point(1552, 859, 7978),
-                new Point(1552, 859, 9523),
-                new Point(1552, 1477, 9523),
+                new Point(1552, 859, 9520),
+                new Point(1552, 1477, 9520),
             );
         }
 
@@ -6197,7 +7209,7 @@ final class DefaultMap extends Map
             $this->buyAreaDefenders->add(new Box(new Point(6111, 423, 9974), 4292, 300, 1314));
         }
 
-        /** END DATA */
+/** END DATA */
     }
 
     /** @param list<Plane> $planes */

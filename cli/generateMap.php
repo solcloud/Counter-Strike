@@ -57,17 +57,17 @@ class Parser
     public function activeCategory(string $line): void
     {
         if ($this->activeCategory !== null) {
-            $this->append("}\n");
+            $this->append("        }\n");
         }
 
         $this->append("\n        // {$this->activeGroup} - {$line}\n");
-        $this->append("if (true) {\n");
+        $this->append("        if (true) {\n");
         $this->activeCategory = $line;
     }
 
     public function activeObject(string $line): void
     {
-        $this->append("\n        // {$line}\n");
+        $this->append("\n            // {$line}\n");
     }
 
     public function createAnchor(string $line): void
@@ -77,6 +77,7 @@ class Parser
         $point = $point[0];
 
         if ($this->activeGroup === 'Spawn') {
+            $this->append('            ');
             if ($this->activeCategory === 'Attackers') {
                 $this->append('$this->spawnPositionAttacker[] = ' . $this->constructPoint($point) . ";\n");
             } elseif ($this->activeCategory === 'Defenders') {
@@ -126,11 +127,13 @@ class Parser
 
     private function setupPlants(Box $box): void
     {
+        $this->append('            ');
         $this->append('$this->plantArea->add(' . $this->constructBox($box) . ");\n");
     }
 
     private function setupStore(Box $box, bool $forAttackers): void
     {
+        $this->append('            ');
         if ($forAttackers) {
             $this->append('$this->buyAreaAttackers->add(' . $this->constructBox($box) . ");\n");
             return;
@@ -179,24 +182,25 @@ class Parser
             $this->error();
         }
 
-        $polygon = '$add(' . "\n";
+        $polygon = '            $add(' . "\n";
         foreach ($polygonPoints as $point) {
+            $polygon .= '                ';
             $polygon .= $point === null ? 'null' : $this->constructPoint($point);
             $polygon .= ",\n";
         }
         if (!$penetrable) {
-            $polygon .= "penetrable: false,\n";
+            $polygon .= "                penetrable: false,\n";
         }
         if (!$supportNavmesh) {
-            $polygon .= "navmesh: false,\n";
+            $polygon .= "                navmesh: false,\n";
         }
-        $polygon .= ");\n";
+        $polygon .= "            );\n";
         $this->append($polygon);
     }
 
     public function flush(): string
     {
-        $this->append("}\n");
+        $this->append("        }\n");
         return $this->data;
     }
 

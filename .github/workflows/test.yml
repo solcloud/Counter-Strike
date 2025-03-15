@@ -31,9 +31,9 @@ jobs:
           sudo bash -c "echo 'zend.assertions = 1' >> /etc/php/*/cli/php.ini"
 
       - name: "Install Composer dependencies"
-        timeout-minutes: 2
+        timeout-minutes: 6
         run: |
-          composer install --no-scripts
+          composer install
 
       - name: "Run Composer check-full"
         timeout-minutes: 10
