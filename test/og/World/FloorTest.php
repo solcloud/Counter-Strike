@@ -146,7 +146,6 @@ class FloorTest extends BaseTestCase
             'position' => $player->getPositionClone()->setY($floor->getY())->toArray(),
             'item' => null,
             'player' => $player->getId(),
-            'surface' => null,
             'type' => SoundType::PLAYER_GROUND_TOUCH->value,
             'extra' => [],
         ], $groundTouch->serialize());

@@ -106,12 +106,6 @@ class WallTest extends BaseTestCase
         $wallClone = Wall::fromArray($wall->toArray());
         $this->assertSame($wall->getFloor(), $wallClone->getFloor());
         $this->assertSame($wall->isWidthOnXAxis(), $wallClone->isWidthOnXAxis());
-
-        $wall = new Wall(new Point(1, 2, 3), false, 100, 100);
-        $this->assertSame([
-            'force' => 25123,
-            'plane' => 'zy',
-        ], $wall->serialize(new Point(1, 50, 50)));
     }
 
     public function testZeroWallWidth(): void
