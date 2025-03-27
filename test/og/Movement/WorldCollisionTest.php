@@ -341,7 +341,7 @@ class WorldCollisionTest extends BaseTestCase
                 $state->getPlayer(1)->jump();
             }
             if ($state->getTickId() === 1 + Setting::tickCountJump()) {
-                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionClone()->y);
+                $this->assertSame(Setting::playerJumpHeight(), $state->getPlayer(1)->getPositionClone()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
@@ -363,7 +363,7 @@ class WorldCollisionTest extends BaseTestCase
                 $state->getPlayer(1)->jump();
             }
             if ($state->getTickId() === 1 + Setting::tickCountJump()) {
-                $this->assertSame(Setting::playerJumpHeight() - 1, $state->getPlayer(1)->getPositionClone()->y);
+                $this->assertSame(Setting::playerJumpHeight(), $state->getPlayer(1)->getPositionClone()->y);
             }
             $state->getPlayer(1)->moveRight();
         });
@@ -417,6 +417,30 @@ class WorldCollisionTest extends BaseTestCase
         }
         $this->playPlayer($game, $playerCommands);
         $this->assertPositionSame(new Point(0, $floor->getY(), $floor->getStart()->z), $game->getPlayer(1)->getPositionClone());
+    }
+
+    public function testCrouchJump(): void
+    {
+        $game = $this->createTestGameNoPause(Setting::tickCountJump() + 5);
+        $p = $game->getPlayer(1);
+        $p->setPosition(new Point(500, 0, 500));
+
+        $box = new Box($p->getPositionClone()->addPart(-100, 0, 1 + $p->getBoundingRadius()), 500, Setting::playerJumpHeight() + 6, 1500);
+        $game->getWorld()->addBox($box);
+
+        $p->getSight()->look(0, -10);
+        $p->moveForward();
+        $p->crouch();
+        $game->tick();
+        $p->jump();
+        $game->tick();
+        $game->onTick(fn() => $p->moveForward());
+        $game->start();
+
+        $this->assertSame($box->heightY, $p->getPositionClone()->y);
+        $this->assertFalse($p->isFlying());
+        $this->assertFalse($p->isJumping());
+        $this->assertGreaterThan($box->getBase()->z, $p->getPositionClone()->z);
     }
 
 
