@@ -63,10 +63,12 @@ export class World {
                 texture.toneMapped = true
                 scene.background = texture
                 scene.environment = texture
-                scene.environmentIntensity = 0.4
+                scene.environmentIntensity = 0.5
+                scene.backgroundRotation.set(0, 1.2, 0)
+                scene.environmentRotation.set(0, 0.9, 0)
             })
             renderer.shadowMap.enabled = true
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap
+            renderer.shadowMap.type = THREE.VSMShadowMap
             renderer.setPixelRatio(window.devicePixelRatio)
         }
 

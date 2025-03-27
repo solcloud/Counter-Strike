@@ -36,6 +36,7 @@ export class ModelRepository {
         return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
+                    object.castShadow = true
                     object.receiveShadow = true
                     object.matrixAutoUpdate = false
                     object.layers.enable(Utils.LAYER_WORLD)
@@ -43,16 +44,17 @@ export class ModelRepository {
             })
 
             const sun = new THREE.DirectionalLight(0xffeac2, 4)
-            sun.position.set(4000, 4999, -4000)
+            sun.position.set(10000, 11000, -9000)
             sun.castShadow = true
             sun.shadow.mapSize.width = 4096
             sun.shadow.mapSize.height = 4096
-            sun.shadow.camera.far = 10000
-            sun.shadow.camera.left = -2000
-            sun.shadow.camera.right = 2000
-            sun.shadow.camera.top = 0
-            sun.shadow.camera.bottom = -3000
-            model.scene.add(sun, new THREE.AmbientLight(0xcfe4bb, 1))
+            sun.shadow.camera.near = 3000
+            sun.shadow.camera.far = 15500
+            sun.shadow.camera.left = -5000
+            sun.shadow.camera.right = 9000
+            sun.shadow.camera.top = 1000
+            sun.shadow.camera.bottom = -11000
+            model.scene.add(sun, new THREE.AmbientLight(0xcfe4bb, 0.2))
             return model.scene
         })
     }
