@@ -27,7 +27,8 @@ final class DynamicFloor extends Floor
     public function intersect(Point $point, int $radius): bool
     {
         return (
-            $this->pointReference->y + $this->player->getHeadHeight() + 1 === $point->y
+            $this->player->isAlive()
+            && $this->pointReference->y + $this->player->getHeadHeight() + 1 === $point->y
             && Collision::pointWithCircle(
                 $this->pointReference->x,
                 $this->pointReference->z,

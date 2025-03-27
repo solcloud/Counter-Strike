@@ -18,7 +18,7 @@ class TickEvent extends Event
         if ($this->callback) {
             call_user_func($this->callback, $this, $tick);
         }
-        if ($this->onComplete !== [] && ($this->maxTickCount === 0 || $this->tickCount === $this->maxTickCount)) {
+        if ($this->onComplete !== [] && ($this->maxTickCount === 0 || $this->tickCount >= $this->maxTickCount)) {
             $this->runOnCompleteHooks();
         }
     }

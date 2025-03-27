@@ -32,17 +32,19 @@ trait JumpTrait
                     }
                 }
 
-                if ($this->position->y !== $y) {
+                if ($this->position->y === $y) {
+                    $this->removeEvent($this->eventIdJump);
+                } else {
                     $this->setActiveFloor(null);
                     $this->position->setY($y);
                 }
-            }, Setting::tickCountJump());
+            }, Setting::tickCountJump() * 2);
         }
 
         /** @var JumpEvent $event */
         $event = $this->eventsCache[$this->eventIdJump];
         $event->reset();
-        $event->maxYPosition = $this->position->y + Setting::playerJumpHeight();
+        $event->maxYPosition = $this->position->y + Setting::playerJumpHeight() + ($this->isCrouching() ? 10 : 0);
         $this->addEvent($event, $this->eventIdJump);
     }
 

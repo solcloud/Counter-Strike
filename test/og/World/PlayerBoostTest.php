@@ -88,32 +88,50 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
+        $player1->setPosition(new Point(500, 0, 500));
         $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
+        $game->addPlayer(new Player(3, Color::ORANGE, true));
+        $game->getPlayer(3)->setPosition(new Point(1500, 0, 1500));
 
         $game->start();
         $p2pos = $game->getPlayer(2)->getPositionClone();
         $this->assertGreaterThan(0, $p2pos->y);
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightStand());
-        $this->assertPositionSame(new Point(0, $player1->getHeadHeight() + 1, 0), $p2pos);
+        $this->assertPositionSame(new Point(500, $player1->getHeadHeight() + 1, 500), $p2pos);
         $this->assertFalse($player2->isFlying());
         $this->assertTrue($player2->canJump());
 
         $player1->crouch();
-        $startTickId = $game->getTickId();
-        for ($i = $startTickId; $i <= $startTickId + Setting::tickCountCrouch(); $i++) {
+        for ($i = 1; $i <= Setting::tickCountCrouch(); $i++) {
+            $game->tick();
+        }
+
+        $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightCrouch());
+        $this->assertPositionSame($p2pos->clone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
+        $player1->stand();
+        for ($i = 1; $i <= Setting::tickCountCrouch(); $i++) {
             $game->tick();
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightCrouch());
         $this->assertPositionSame($p2pos->clone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
 
-        $player1->stand();
         $player2->jump();
-        $startTickId = $game->getTickId();
-        for ($i = $startTickId; $i <= $startTickId + max(Setting::tickCountJump(), Setting::tickCountCrouch()); $i++) {
+        for ($i = 1; $i <= 2 * max(Setting::tickCountJump(), Setting::tickCountCrouch()); $i++) {
             $game->tick();
         }
         $this->assertSame($player1->getHeadHeight(), Setting::playerHeadHeightStand());
-        $this->assertPositionSame($player2->getPositionClone()->setY($player1->getHeadHeight() + 1), $player2->getPositionClone());
+        $boostPosition = $player2->getPositionClone()->setY($player1->getHeadHeight() + 1);
+        $this->assertPositionSame($boostPosition, $player2->getPositionClone());
+
+        $player1->suicide();
+        $game->tick();
+        $this->assertPositionNotSame($boostPosition, $player2->getPositionClone());
+        $this->assertSame($boostPosition->y - Setting::fallAmountPerTick(), $player2->getPositionClone()->y);
+        for ($i = 1; $i <= 2 * Setting::tickCountJump(); $i++) {
+            $game->tick();
+        }
+        $this->assertPositionSame($boostPosition->setY(0), $player2->getPositionClone());
+        $this->assertSame(1, $game->getRoundNumber());
     }
 
     public function testPlayerCanMoveAfterStandingOnTopOfOtherPlayer(): void
@@ -139,7 +157,11 @@ class PlayerBoostTest extends BaseTestCase
         $game = $this->createTestGameNoPause(20);
         $game->addPlayer($player2);
         $player1 = $game->getPlayer(1);
-        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 10));
+        $player2->setPosition($player1->getPositionClone()->addY($player1->getHeadHeight() + 4));
+        $player1->jump();
+        $this->assertTrue($player1->isJumping());
+        $game->tick();
+        $this->assertFalse($player1->isJumping());
 
         $game->start();
         $p2pos = $game->getPlayer(2)->getPositionClone();
