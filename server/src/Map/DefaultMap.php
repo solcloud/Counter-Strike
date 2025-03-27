@@ -7194,8 +7194,8 @@ final class DefaultMap extends Map
             $this->spawnPositionDefender[] = new Point(9111, 440, 10531);
             $this->spawnPositionDefender[] = new Point(9115, 440, 10943);
             $this->spawnPositionDefender[] = new Point(8984, 440, 11325);
-            $this->spawnPositionDefender[] = new Point(8705, 440, 11680);
-            $this->spawnPositionDefender[] = new Point(8141, 440, 11656);
+            $this->spawnPositionDefender[] = new Point(8705, 440, 11580);
+            $this->spawnPositionDefender[] = new Point(8141, 440, 11556);
             $this->spawnPositionDefender[] = new Point(8275, 440, 11270);
             $this->spawnPositionDefender[] = new Point(8705, 440, 11029);
             $this->spawnPositionDefender[] = new Point(8378, 440, 10613);
