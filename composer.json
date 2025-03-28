@@ -37,7 +37,6 @@
 
         "actived/graphphp": "0.2.2",
         "clue/socket-raw": "1.6.0",
-        "textalk/websocket": "1.5.8",
         "psr/log": "3.0.0"
     },
     "autoload": {
@@ -46,6 +45,7 @@
         }
     },
     "require-dev": {
+        "textalk/websocket": "1.5.8",
         "infection/infection": "*",
         "phpstan/phpstan-phpunit": "*",
         "phpunit/phpunit": "*"
