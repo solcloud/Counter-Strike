@@ -657,8 +657,9 @@ export class Game {
     #updateScopeState(player, scopeLevel) {
         const isPlayerSpectate = (this.playerSpectate.getId() === player.getId())
 
-        if (scopeLevel > 0 && isPlayerSpectate) {
-            this.#hud.scopeBlur((this.#playerAction.isMoving() && !this.#playerAction.isCrouching()) ? 3 : 0)
+        if (isPlayerSpectate) {
+            this.#hud.updateCrossHair(scopeLevel, this.playerSpectate.data.item.id)
+            scopeLevel > 0 && this.#hud.scopeBlur((this.#playerAction.isMoving() && !this.#playerAction.isCrouching()) ? 3 : 0)
         }
         if (player.data.scopeLevel === scopeLevel) {
             return
@@ -670,7 +671,6 @@ export class Game {
         if (isPlayerSpectate) {
             const isNotScopedIn = (scopeLevel === 0)
             this.#world.getCamera().getObjectByName('pov-item').visible = isNotScopedIn
-            this.#hud.updateCrossHair(scopeLevel)
             this.#world.updateCameraZoom(Utils.scopeLevelToZoom(scopeLevel))
             if (this.meIsAlive()) {
                 this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())

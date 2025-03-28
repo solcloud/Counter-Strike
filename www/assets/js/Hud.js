@@ -126,8 +126,8 @@ export class HUD {
         this.#flashInterval = setTimeout(callback, fullFlashTimeMs)
     }
 
-    updateCrossHair(scopeLevel) {
-        this.#elements.cross.style.opacity = (scopeLevel === 0 ? 1.0 : 0.0)
+    updateCrossHair(scopeLevel, itemId) {
+        this.#elements.cross.style.opacity = (scopeLevel === 0 && itemId !== Enum.ItemId.RifleAWP ? 1.0 : 0.0)
         this.#elements.scope.style.opacity = (scopeLevel === 0 ? 0.0 : 1.0)
     }
 
