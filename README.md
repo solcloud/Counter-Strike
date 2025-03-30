@@ -2,7 +2,7 @@
 
 Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team.
 
-![promo](https://github.com/solcloud/Counter-Strike/assets/74121353/dfca8ed0-4624-4199-8d4c-336e101e0922)
+![promo](https://github.com/user-attachments/assets/3246af5f-4289-470f-804c-37fc7104bf33)
 
 Teams are Attackers and Defenders. The Defenders team has a goal of protecting their fan base sanctuary every round from desecrating by attackers using their graffiti bomb ball.
 
