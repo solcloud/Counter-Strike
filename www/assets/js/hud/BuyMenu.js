@@ -35,6 +35,7 @@ export class BuyMenu {
         } else if (playerData.armorType === Enum.ArmorType.BODY_AND_HEAD) {
             kevlarHeadPrice = 650
         }
+        const grenadeCount = Enum.GrenadeSlots.reduce((sum, slot) => sum += playerData.slots[slot] ? playerData.slots[slot]['pcs'] || 1 : 0, 0)
 
         this.#element.innerHTML = `
             <p class="title">${teamName} Buy Store. Your money balance $ <strong>${money}</strong></p>
@@ -51,8 +52,11 @@ export class BuyMenu {
             : ``
         }
             <h3>Grenades</h3>
-            <div class="menu-grenades">
-        <p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_FLASH}" class="hud-action action-buy">Flash for ${this.#formatPrice(200)}</a></p>
+            <div class="menu-grenades${grenadeCount >= 4 ? ' hidden' : ''}">
+        ${playerData.slots[Enum.InventorySlot.SLOT_GRENADE_FLASH] === undefined || playerData.slots[Enum.InventorySlot.SLOT_GRENADE_FLASH]['pcs'] < 2
+            ? `<p${money < 200 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_FLASH}" class="hud-action action-buy">Flash for ${this.#formatPrice(200)}</a></p>`
+            : ``
+        }
         ${playerData.slots[Enum.InventorySlot.SLOT_GRENADE_SMOKE] === undefined
             ? `<p${money < 300 ? ' class="disabled"' : ''}><a data-buy-menu-item-id="${Enum.BuyMenuItem.GRENADE_SMOKE}" class="hud-action action-buy">Smoke for ${this.#formatPrice(300)}</a></p>`
             : ``

@@ -19,7 +19,7 @@ $bindAddress = "udp://0.0.0.0:$port";
 $settings = new ServerSetting($playersMax); // must be first for correctly setting the global tickRate (Util::$TICK_RATE)
 
 $logger = new ConsoleLogger();
-$logger->info("Preparing game for launch...");
+$logger->info("Preparing game for launch, please wait...");
 
 $game = ($debug ? GameFactory::createDebug() : GameFactory::createDefaultCompetitive());
 $game->loadMap(new Maps\DefaultMap());
