@@ -48,6 +48,7 @@ export class ModelRepository {
             sun.castShadow = true
             sun.shadow.mapSize.width = 4096
             sun.shadow.mapSize.height = 4096
+            sun.shadow.bias = -0.00018
             sun.shadow.camera.near = 3000
             sun.shadow.camera.far = 15500
             sun.shadow.camera.left = -5000
