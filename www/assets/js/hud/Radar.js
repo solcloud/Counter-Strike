@@ -50,7 +50,7 @@ export class Radar {
 
         this.#mapCenter = Math.round(mapSize.radarImgBoundary / 2)
         this.#scale = Math.round(canvas.width / mapSize.radarImgBoundary * 1000) / 1000
-        this.#scaleFont = Math.ceil(this.#scale * 20)
+        this.#scaleFont = Math.ceil(this.#scale * 30)
     }
 
     setZoom(zoom, keepCentered) {
