@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {KTX2Loader} from 'three/addons/loaders/KTX2Loader.js';
 import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 import {ItemId} from "./Enums.js";
 import {Utils} from "./Utils.js";
@@ -32,13 +33,19 @@ export class ModelRepository {
         return this.#textureLoader.loadAsync(url)
     }
 
-    loadMap(mapName) {
+    #loadMap(mapName) {
         return this.#loadModel(`./resources/map/${mapName}.glb`).then((model) => {
+            model.scene.matrixAutoUpdate = false
+            model.scene.matrixWorldAutoUpdate = false
             model.scene.traverse(function (object) {
                 if (object.isMesh) {
+                    if (object.material) {
+                        object.material.shadowSide = THREE.DoubleSide
+                    }
                     object.castShadow = true
                     object.receiveShadow = true
                     object.matrixAutoUpdate = false
+                    object.matrixWorldAutoUpdate = false
                     object.layers.enable(Utils.LAYER_WORLD)
                 }
             })
@@ -114,9 +121,15 @@ export class ModelRepository {
         return model.clone()
     }
 
-    loadAll() {
+    init(mapName, renderer, scene) {
+        const ktx2Loader = new KTX2Loader()
+        ktx2Loader.setTranscoderPath('assets/threejs/libs/basis/')
+        ktx2Loader.detectSupport(renderer)
+        this.#gltfLoader.setKTX2Loader(ktx2Loader)
+
         const self = this
         const promises = []
+        promises.push(this.#loadMap(mapName).then((model) => scene.add(model)))
 
         promises.push(this.#loadModel('./resources/model/player.glb').then((model) => {
             model.scene.traverse(function (object) {

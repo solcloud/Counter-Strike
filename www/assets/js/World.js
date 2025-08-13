@@ -29,10 +29,6 @@ export class World {
         scene.name = 'MainScene'
         scene.background = new THREE.Color(0xdadada)
 
-        const promises = []
-        promises.push(this.#modelRepository.loadAll())
-        promises.push(this.#modelRepository.loadMap(mapName).then((model) => scene.add(model)))
-
         const camera = new THREE.PerspectiveCamera(setting.getFieldOfView(), window.innerWidth / window.innerHeight, 1, 19999)
         camera.rotation.reorder("YXZ")
         const listener = new THREE.AudioListener()
@@ -84,7 +80,7 @@ export class World {
         this.volume = setting.getMasterVolume()
 
         const anisotropy = Math.min(setting.getAnisotropicFiltering(), renderer.capabilities.getMaxAnisotropy())
-        return Promise.all(promises).then(() => {
+        return this.#modelRepository.init(mapName, renderer, scene).then(() => {
             scene.traverse(function (object) {
                 if (object.isMesh && object.material.map) {
                     object.material.map.anisotropy = anisotropy
