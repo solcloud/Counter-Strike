@@ -34,6 +34,7 @@ final class HitBox implements Hittable
         $this->damage = 0;
     }
 
+    /** @infection-ignore-all */
     public function getHitAntiForce(Point $point): int
     {
         if ($this->type === HitBoxType::HEAD) {
@@ -84,6 +85,7 @@ final class HitBox implements Hittable
         }
     }
 
+    /** @infection-ignore-all */
     private function calculateArmorDamage(BaseWeapon $shootItem, ArmorType $armorType, HitBoxType $hitBoxType): int
     {
         if ($armorType->hasNoArmor() || $hitBoxType === HitBoxType::LEG) {

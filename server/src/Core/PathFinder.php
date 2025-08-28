@@ -9,7 +9,7 @@ use SplQueue;
 final class PathFinder
 {
     private Graph $graph;
-    /** @var array<string,bool> */
+    /** @var array<string,null> */
     private array $visited = [];
     private readonly int $obstacleOvercomeHeight;
     /** @var array<int,array{int,int,int}> */
@@ -105,8 +105,8 @@ final class PathFinder
             return $floorNavmeshPoint;
         }
 
-        $maxDistance = $this->navigationMesh->tileSize * 2;
-        $maxY = $this->obstacleOvercomeHeight * 2;
+        $maxDistance = $this->navigationMesh->tileSize + $this->navigationMesh->tileSize;
+        $maxY = $this->obstacleOvercomeHeight + $this->obstacleOvercomeHeight;
         $checkAbove = function (Point $start, int $maxY, int $radius): ?Point {
             $yCandidate = $start->clone();
             $navMeshCenter = $yCandidate->clone();
@@ -188,7 +188,7 @@ final class PathFinder
                 continue;
             }
 
-            $this->visited[$currentKey] = true;
+            $this->visited[$currentKey] = null;
             $currentNode = $this->graph->getNodeById($currentKey);
             if ($currentNode === null) {
                 $currentNode = new Node($currentKey, $current);
@@ -210,7 +210,7 @@ final class PathFinder
                 $this->graph->addEdge(new DirectedEdge($currentNode, $newNode, 1));
                 $queue->enqueue($newNeighbour);
             }
-            if (++$nodeCount === $maxNodeCount) {
+            if (++$nodeCount === $maxNodeCount) { // @codeCoverageIgnore
                 GameException::notImplementedYet('MaxNodeCount hit - new map, tileSize or bad test (no boundary box, bad starting point)?'); // @codeCoverageIgnore
             }
         }

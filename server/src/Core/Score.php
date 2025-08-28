@@ -73,7 +73,7 @@ class Score
         }
 
         if ($this->secondHalfScore !== []) {
-            $this->secondHalfScore[(int)$attackersWins]++;
+            $this->secondHalfScore[$attackersWins ? 1 : 0]++;
         }
         $this->lastRoundAttackerWins = $attackersWins;
         $this->roundsHistory[$this->roundNumber] = [
@@ -145,7 +145,7 @@ class Score
         $scoreboard = [[], []];
         foreach ($this->playerStats as $playerId => $playerStat) {
             $key = sprintf('%d-%d-%d', $playerStat->getKills(), $playerStat->getDamage(), $playerId);
-            $scoreboard[(int)$playerStat->isAttacker()][$key] = $playerStat->toArray();
+            $scoreboard[$playerStat->isAttacker() ? 1 : 0][$key] = $playerStat->toArray();
         }
         $teamDefenders = $scoreboard[0];
         $teamAttackers = $scoreboard[1];

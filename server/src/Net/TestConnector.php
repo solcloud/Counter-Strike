@@ -20,7 +20,7 @@ class TestConnector implements NetConnector
     {
     }
 
-    public function receive(?string &$peerAddress, ?int &$peerPort, int $readMaxBytes = 100): ?string
+    public function receive(?string &$peerAddress, ?int &$peerPort, int $readMaxBytes): ?string
     {
         if (!$this->expectReceive) {
             return null;

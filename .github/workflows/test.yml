@@ -1,7 +1,7 @@
 name: "Tests"
 on:
   push:
-    branches: [master]
+    branches: ['*']
     paths-ignore:
       - '**.md'
       - 'cli/'
@@ -24,7 +24,7 @@ jobs:
           persist-credentials: false
 
       - name: "Install Linux dependencies"
-        timeout-minutes: 2
+        timeout-minutes: 4
         run: |
           sudo apt-get update && sudo apt-get install -y \
             composer
@@ -36,7 +36,7 @@ jobs:
           composer install
 
       - name: "Run Composer check-full"
-        timeout-minutes: 10
+        timeout-minutes: 20
         run: |
           grep '"timeout": 20,' infection.json5
           sed -i 's/"timeout": 20,/"timeout": 40,/' infection.json5

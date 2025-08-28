@@ -47,9 +47,14 @@ class CollisionTest extends BaseTest
         $this->assertTrue(Collision::pointWithCircle(10, 10, 10, 10, 1));
         $this->assertTrue(Collision::pointWithCircle(11, 10, 10, 10, 1));
         $this->assertTrue(Collision::pointWithCircle(10, 11, 10, 10, 1));
+        $this->assertTrue(Collision::pointWithCircle(15, 10, 10, 10, 5));
+        $this->assertTrue(Collision::pointWithCircle(10, 15, 10, 10, 6));
 
         $this->assertFalse(Collision::pointWithCircle(10, 13, 10, 10, 2));
         $this->assertFalse(Collision::pointWithCircle(13, 10, 10, 10, 2));
+        $this->assertFalse(Collision::pointWithCircle(15, 15, 10, 10, 4));
+        $this->assertFalse(Collision::pointWithCircle(15, 10, 10, 10, 4));
+        $this->assertFalse(Collision::pointWithCircle(10, 15, 10, 10, 4));
     }
 
     public function testCircleWithPlaneFalse(): void
@@ -359,6 +364,10 @@ class CollisionTest extends BaseTest
         $this->assertFalse(Collision::boxWithBox(
             new Point(-5, 0, -5), new Point(5, 4, 5),
             new Point(1, -6, -5), new Point(3, -3, -3),
+        ));
+        $this->assertFalse(Collision::boxWithBox(
+            new Point(0, 0, 0), new Point(5, 1, 1),
+            new Point(-10, 0, 0), new Point(-3, 1, 1),
         ));
     }
 

@@ -437,6 +437,7 @@ class PlayerKillTest extends BaseTestCase
         $p2->getSight()->look(-90, -90);
         $p2->setPosition(new Point(300, 0, 500));
         $p2->buyItem(BuyMenuItem::KEVLAR_BODY);
+        $this->assertSame(150, $p2->getMoney());
 
         $game->addPlayer(new Player(3, Color::ORANGE, false));
         $game->getPlayer(3)->setPosition(new Point(350, 0, 500));
@@ -458,7 +459,7 @@ class PlayerKillTest extends BaseTestCase
                 $this->assertSame(HitBoxType::BACK, $bodyShot->getType());
 
                 $this->assertLessThan(100, $p2->getHealth());
-                $this->assertLessThan(100, $p2->getArmorValue());
+                $this->assertSame(90, $p2->getArmorValue());
                 $this->assertTrue($p->isAlive());
                 $this->assertTrue($p2->isAlive());
             },
@@ -610,6 +611,7 @@ class PlayerKillTest extends BaseTestCase
 
         $this->assertSame(3, $killEventsCount);
         $this->assertSame(3, $game->getScore()->getScoreDefenders());
+        $this->assertSame(3, $game->getScore()->getPlayerStat(2)->getHeadshotKills());
         $this->assertSame(3 + 1, $game->getRoundNumber());
         $this->assertSame(6500, $p1->getMoney());
         $this->assertSame(11450, $player2->getMoney());

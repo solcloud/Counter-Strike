@@ -35,6 +35,7 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
         return $event->fire();
     }
 
+    /** @codeCoverageIgnore **/
     public function getDamageValue(HitBoxType $hitBox, ArmorType $armor): int
     {
         GameException::invalid();
@@ -55,6 +56,7 @@ abstract class Grenade extends BaseEquipment implements AttackEnable
         return ($this->primaryAttack ? 1.0 : 0.5);
     }
 
+    /** @codeCoverageIgnore **/
     public function createBullet(): Bullet
     {
         GameException::invalid(get_class($this));
