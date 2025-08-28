@@ -41,6 +41,11 @@ class PlayerStat
         return $this->kills;
     }
 
+    public function getHeadshotKills(): int
+    {
+        return $this->killsHeadshot;
+    }
+
     public function getDeaths(): int
     {
         return $this->deaths;

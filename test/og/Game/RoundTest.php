@@ -12,8 +12,10 @@ use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\GameOverReason;
 use cs\Enum\InventorySlot;
+use cs\Enum\PauseReason;
 use cs\Enum\SoundType;
 use cs\Equipment\Bomb;
+use cs\Equipment\DefuseKit;
 use cs\Event\GameOverEvent;
 use cs\Event\KillEvent;
 use cs\Event\PauseEndEvent;
@@ -425,7 +427,7 @@ class RoundTest extends BaseTestCase
 
     public function testMultipleRoundsScoreAndEvents(): void
     {
-        $maxRounds = 4;
+        $maxRounds = 5;
         $gameProperty = $this->createNoPauseGameProperty($maxRounds);
         $gameProperty->bomb_plant_time_ms = 0;
         $gameProperty->bomb_defuse_time_ms = 0;
@@ -443,13 +445,16 @@ class RoundTest extends BaseTestCase
 
         $eventCounts = [];
         $eventObjects = [];
-        $game->onEvents(function (array $events) use (&$eventCounts, &$eventObjects): void {
+        $game->onEvents(function (array $events) use ($game, &$eventCounts, &$eventObjects): void {
             foreach ($events as $event) {
                 if (!isset($eventCounts[$event::class])) {
                     $eventCounts[$event::class] = 0;
                 }
                 $eventCounts[$event::class]++;
                 $eventObjects[$event::class] = $event;
+                if ($event instanceof PauseStartEvent && $event->reason === PauseReason::HALF_TIME) {
+                    $this->assertTrue($game->isPaused());
+                }
             }
         });
 
@@ -475,11 +480,18 @@ class RoundTest extends BaseTestCase
             fn() => $this->assertTrue($p1->buyItem(BuyMenuItem::GRENADE_FLASH)),
             fn() => $p1->buyItem(BuyMenuItem::DEFUSE_KIT),
             fn() => $this->assertTrue($p1->getInventory()->has(InventorySlot::SLOT_KIT->value)),
+            function () use ($p1) {
+                $kit = $p1->getInventory()->getItemSlot(InventorySlot::SLOT_KIT);
+                $this->assertInstanceOf(DefuseKit::class, $kit);
+                $this->assertFalse($kit->isUserDroppable());
+                $this->assertFalse($kit->canPurchaseMultipleTime($kit));
+            },
             fn() => $p2->buyItem(BuyMenuItem::DEFUSE_KIT),
             fn() => $this->assertFalse($p2->getInventory()->has(InventorySlot::SLOT_KIT->value)),
             fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_FLASH)),
             fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_FLASH)),
             fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn() => $this->assertTrue($p2->buyItem(BuyMenuItem::GRENADE_HE)),
             fn() => $p1->suicide(),
             fn() => $this->assertSame(4, $game->getRoundNumber()),
             function () use ($p1, $p2) {
@@ -489,9 +501,14 @@ class RoundTest extends BaseTestCase
                 $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_BOMB->value));
                 $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_GRENADE_FLASH->value));
                 $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+                $this->assertTrue($p2->getInventory()->has(InventorySlot::SLOT_GRENADE_HE->value));
+                $this->assertFalse($p2->buyItem(BuyMenuItem::GRENADE_MOLOTOV));
                 $this->assertFalse($p1->getInventory()->has(InventorySlot::SLOT_GRENADE_FLASH->value));
             },
             $this->waitNTicks(800),
+            fn() => $this->assertTrue($game->getScore()->isTie()),
+            fn() => $p1->suicide(),
+            $this->endGame(),
         ]);
 
         $this->assertNotEmpty($eventCounts);
@@ -502,11 +519,11 @@ class RoundTest extends BaseTestCase
         $this->assertSame($maxRounds, $eventCounts[RoundEndEvent::class]);
         $this->assertSame(2, $eventCounts[PlantEvent::class]);
         $this->assertSame($maxRounds - 2, $eventCounts[RoundEndCoolDownEvent::class]);
-        $this->assertTrue($game->getScore()->isTie());
+        $this->assertFalse($game->getScore()->isTie());
 
         $expectedScoreBoard = [
-            'score' => [2, 2],
-            'lossBonus' => [1400, 1400],
+            'score' => [2, 3],
+            'lossBonus' => [1400, 1900],
             'history' => [
                 1 => [
                     'attackersWins' => false,
@@ -532,16 +549,22 @@ class RoundTest extends BaseTestCase
                     'scoreAttackers' => 2,
                     'scoreDefenders' => 2,
                 ],
+                5 => [
+                    'attackersWins' => true,
+                    'reason' => 0,
+                    'scoreAttackers' => 3,
+                    'scoreDefenders' => 2,
+                ],
             ],
             'firstHalfScore' => [1, 1],
-            'secondHalfScore' => [1, 1],
+            'secondHalfScore' => [1, 2],
             'halfTimeRoundNumber' => 2,
             'scoreboard' => [
                 [
                     [
                         'id' => 1,
-                        'kills' => -1,
-                        'deaths' => 1,
+                        'kills' => -2,
+                        'deaths' => 2,
                         'damage' => 0,
                     ],
                 ],

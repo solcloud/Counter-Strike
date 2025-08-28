@@ -27,7 +27,7 @@ class HighExplosive extends Grenade
     {
         $distanceSquared = max(1, $distanceSquared);
         if ($distanceSquared >= self::MAX_BLAST_RADIUS_SQUARED) {
-            return 0;
+            return 0; // @codeCoverageIgnore
         }
 
         $damage = self::DAMAGE * (1 - ($distanceSquared / self::MAX_BLAST_RADIUS_SQUARED));

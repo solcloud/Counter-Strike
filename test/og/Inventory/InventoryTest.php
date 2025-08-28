@@ -18,6 +18,7 @@ use cs\Equipment\Bomb;
 use cs\Equipment\Decoy;
 use cs\Equipment\Flashbang;
 use cs\Equipment\HighExplosive;
+use cs\Equipment\Kevlar;
 use cs\Event\SoundEvent;
 use cs\Weapon\Knife;
 use cs\Weapon\PistolGlock;
@@ -227,6 +228,18 @@ class InventoryTest extends BaseTestCase
             fn(Player $p) => $p->getSight()->lookHorizontal(45),
             fn(Player $p) => $p->use(),
             fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_SECONDARY->value)),
+            // non primary nor secondary item already had in inventory pickup
+            fn(Player $p) => $p->getSight()->lookVertical(-90),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_FLASH)),
+            fn(Player $p) => $this->assertSame(2, $p->getEquippedItem()->getQuantity()),
+            fn(Player $p) => $this->assertNotNull($p->dropEquippedItem()),
+            fn(Player $p) => $this->assertSame(1, $p->getEquippedItem()->getQuantity()),
+            fn(Player $p) => $this->assertTrue($p->getInventory()->has(InventorySlot::SLOT_GRENADE_FLASH->value)),
+            $this->waitNTicks(200),
+            fn(Player $p) => $this->assertSame(1, $p->getEquippedItem()->getQuantity()),
+            fn(Player $p) => $p->use(),
+            fn(Player $p) => $this->assertSame(2, $p->getEquippedItem()->getQuantity()),
             $this->endGame(),
         ]);
     }
@@ -692,6 +705,10 @@ class InventoryTest extends BaseTestCase
                 $this->assertSame(1651, $p->getMoney());
                 $this->assertSame(ArmorType::BODY, $p->getArmorType());
                 $this->assertSame(100, $p->getArmorValue());
+                $kevlar = $p->getInventory()->getItemSlot(InventorySlot::SLOT_KEVLAR);
+                $this->assertInstanceOf(Kevlar::class, $kevlar);
+                $this->assertFalse($kevlar->isUserDroppable());
+                $this->assertFalse($kevlar->canPurchaseMultipleTime($kevlar));
             },
             fn(Player $p) => $p->lowerArmor(10),
             function (Player $p): void {

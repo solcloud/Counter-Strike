@@ -7,6 +7,8 @@
     },
     "timeout": 20,
     "testFramework": "phpunit",
+    "staticAnalysisTool": "phpstan",
+    "staticAnalysisToolOptions": "--memory-limit=300M",
     "mutators": {
         "global-ignoreSourceCodeByRegex": [
             "\\$this->log\\(.*\\);",
@@ -14,26 +16,22 @@
             "GameException::invalid\\(.*\\);",
             "GameException::notImplementedYet\\(.*\\);",
             "assert\\(.+?\\);",
+            "if\\s*\\(\\$count > 10 && \\$count % 2 === 0\\)\\s\\{",
         ],
         "@default": true,
         "@conditional_boundary": false,
         "@conditional_negotiation": false,
-        "CastInt": false,
         "Continue_": false,
         "DecrementInteger": false,
         "FalseValue": false,
-        "IfNegation": false,
         "Increment": false,
         "IncrementInteger": false,
-        "LogicalAnd": false,
         "LogicalAndAllSubExprNegation": false,
         "LogicalOr": false,
-        "LogicalOrAllSubExprNegation": false,
         "Minus": false,
-        "Modulus": false,
         "Multiplication": false,
-        "NullSafeMethodCall": false,
         "Plus": false,
+        "ReturnRemoval": false,
         "RoundingFamily": false,
         "TrueValue": false,
         "ArrayItem": {
@@ -69,11 +67,6 @@
                 "if\\s*\\(\\$this->ball->getResolutionAngleVertical\\(\\) > 0 && \\(.+",
             ],
         },
-        "LogicalAndNegation": {
-            "ignoreSourceCodeByRegex": [
-                "if\\s*\\(\\$count > 10 && \\$count % 2 === 0\\)\\s\\{",
-            ],
-        },
         "LogicalNot": {
             "ignoreSourceCodeByRegex": [
                 ".+\\$this->lastMoveX === -\\$moveX.+",
@@ -85,6 +78,9 @@
             ],
         },
         "MethodCallRemoval": {
+            "ignore": [
+                "cs\\Equipment\\Bomb::unEquip",
+            ],
             "ignoreSourceCodeByRegex": [
                 "\\$this->setActiveFloor\\(.+\\);",
                 "\\$prevPos->setFrom\\(\\$candidate\\);",

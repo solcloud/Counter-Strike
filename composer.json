@@ -2,8 +2,8 @@
     "scripts": {
         "post-install-cmd": "@php -d memory_limit=200M cli/generateNavmesh.php",
         "stan": "@php vendor/bin/phpstan --memory-limit=300M analyze",
-        "unit": "@php vendor/bin/phpunit -d memory_limit=70M",
-        "infection": "@php -d memory_limit=180M vendor/bin/infection --show-mutations --only-covered --threads=max --min-covered-msi=100",
+        "unit": "@php vendor/bin/phpunit -d memory_limit=200M",
+        "infection": "@php -d memory_limit=300M vendor/bin/infection --show-mutations --threads=max --min-covered-msi=100",
         "dev": "php cli/server.php 1 8080 --debug & php cli/udp-ws-bridge.php",
         "dev2": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & php cli/udp-ws-bridge.php 8082",
         "dev2c": "php cli/server.php 2 8080 --debug & php cli/udp-ws-bridge.php & sleep 2 && php cli/client.php acode 8080",
@@ -28,7 +28,7 @@
         "check-full": [
             "@check",
             "@coverage",
-            "@infection-cache"
+            "@infection-cache --skip-initial-tests"
         ]
     },
     "require": {
@@ -60,7 +60,7 @@
         "platform": {
             "php": "8.3"
         },
-        "process-timeout": 720,
+        "process-timeout": 0,
         "allow-plugins": {
             "infection/extension-installer": false
         }

@@ -315,6 +315,7 @@ class ShootTest extends BaseTestCase
 
         $this->assertSame(99, $game->getPlayer(2)->getHealth());
         $this->assertSame(1, $bulletHitHeadShotsCount);
+        $this->assertSame(0, $game->getScore()->getPlayerStat(1)->getHeadshotKills());
     }
 
 }

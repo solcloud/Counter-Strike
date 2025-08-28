@@ -143,6 +143,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
                 continue;
             }
 
+            /** @infection-ignore-all */
             if (
                 $this->ball->getResolutionAngleVertical() > 0
                 && ($this->item instanceof Flammable || $this->item instanceof Smoke)

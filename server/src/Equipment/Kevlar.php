@@ -29,6 +29,7 @@ class Kevlar extends BaseEquipment
         $this->armor = 100;
     }
 
+    /** @codeCoverageIgnore **/
     public function lowerArmor(int $armorDamage): void
     {
         assert($armorDamage >= 0);
@@ -86,11 +87,11 @@ class Kevlar extends BaseEquipment
     public function getPrice(?Item $alreadyHaveSlotItem = null): int
     {
         /** @var ?self $alreadyHaveSlotItem */
-        if ($alreadyHaveSlotItem && $this->type === ArmorType::BODY_AND_HEAD && $alreadyHaveSlotItem->type === ArmorType::BODY && $alreadyHaveSlotItem->armor === 100) {
-            return 350;
-        }
         if ($alreadyHaveSlotItem && $alreadyHaveSlotItem->type === ArmorType::BODY_AND_HEAD) {
             return 650;
+        }
+        if ($alreadyHaveSlotItem && $this->type === ArmorType::BODY_AND_HEAD && $alreadyHaveSlotItem->type === ArmorType::BODY && $alreadyHaveSlotItem->armor === 100) {
+            return 350;
         }
         return $this->bodyPlusHelmet ? 1000 : 650;
     }

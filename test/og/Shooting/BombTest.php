@@ -178,6 +178,7 @@ class BombTest extends BaseTestCase
         $gameProperty->bomb_plant_time_ms = self::TEST_TICK_RATE * 2;
         $gameProperty->bomb_explode_time_ms = 100;
         $game = $this->createTestGame(null, $gameProperty);
+        $game->addPlayer(new Player(2, Color::GREEN, false));
         $start = new Point(321, 0, 300);
 
         $this->playPlayer($game, [
@@ -203,6 +204,8 @@ class BombTest extends BaseTestCase
             function (Player $p) use ($game) {
                 $this->assertFalse($game->isBombActive());
                 $p->attack();
+                $this->assertTrue($p->isPlantingOrDefusing());
+                $this->assertFalse($game->getPlayer(2)->isPlantingOrDefusing());
                 $this->assertFalse($game->isBombActive());
             },
             fn(Player $p) => $p->attack(),

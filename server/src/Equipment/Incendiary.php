@@ -31,6 +31,7 @@ class Incendiary extends Grenade implements Flammable
         return 200_000;
     }
 
+    /** @codeCoverageIgnore **/
     public function calculateDamage(bool $hasKevlar): int
     {
         return $hasKevlar ? 7 : 3;

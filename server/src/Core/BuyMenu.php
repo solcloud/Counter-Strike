@@ -29,7 +29,7 @@ class BuyMenu
 
         foreach ($alreadyHaveItems as $item) {
             if ($item->getType() === ItemType::TYPE_GRENADE) {
-                $this->grenadeCount++;
+                $this->grenadeCount += $item->getQuantity();
             }
 
             if (!isset($this->itemBuyCount[$item->getId()])) {

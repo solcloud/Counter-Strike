@@ -25,7 +25,6 @@
             <directory>server/src/</directory>
         </include>
         <exclude>
-            <directory>server/src/Equipment/</directory>
             <directory>server/src/Map/</directory>
             <directory>server/src/Weapon/</directory>
         </exclude>
