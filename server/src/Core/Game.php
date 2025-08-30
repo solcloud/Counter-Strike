@@ -29,7 +29,7 @@ use cs\Map\Map;
 class Game
 {
 
-    private Bomb $bomb;
+    public readonly Bomb $bomb;
     private World $world;
     private Score $score;
     private GameState $state;
