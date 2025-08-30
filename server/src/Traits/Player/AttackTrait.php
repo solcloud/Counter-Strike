@@ -31,7 +31,7 @@ trait AttackTrait
 
         if ($item instanceof Bomb) {
             if ($item->canAttack($this->world->getTickId())) {
-                $this->world->tryPlantBomb($this, $item);
+                $this->world->tryPlantBomb($this);
             }
             return null;
         }

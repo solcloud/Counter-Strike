@@ -13,17 +13,22 @@ class Bomb extends BaseEquipment
 
     public const int equipReadyTimeMs = 80;
     private Point $position;
-    private int $plantTickStart = 0;
+    private int $plantTickStart;
     private int $plantTickCountMax;
-    private int $defuseTickStart = 0;
+    private int $defuseTickStart;
     private int $defuseTickCountMax;
     private int $tickToDefuseCount;
+    private int $lastBombActionTick = -1;
+    private int $lastBombPlayerId = -1;
 
-    public function __construct(int $plantTimeMs, int $defuseTimeMs, private int $maxBlastDistance = 1000)
+    public function __construct(int $plantTimeMs, int $defuseTimeMs, private int $maxBlastDistance = 1000, private int $bombActionTickBuffer = 1)
     {
         parent::__construct();
+        $this->position = new Point();
         $this->plantTickCountMax = Util::millisecondsToFrames($plantTimeMs);
+        $this->plantTickStart = -$this->plantTickCountMax;
         $this->defuseTickCountMax = Util::millisecondsToFrames($defuseTimeMs);
+        $this->defuseTickStart = -$this->defuseTickCountMax;
     }
 
     public function setMaxBlastDistance(int $maxBlastDistance): void
@@ -56,30 +61,61 @@ class Bomb extends BaseEquipment
         $this->reset();
     }
 
-    public function startPlanting(int $tickStart): void
+    public function tryPlant(Player $player, int $tickId): ?bool
     {
-        $this->plantTickStart = $tickStart;
+        $planted = false;
+        $playerId = $player->getId();
+        if ($playerId !== $this->lastBombPlayerId || $this->lastBombActionTick + $this->bombActionTickBuffer < $tickId) {
+            $player->stop();
+            $this->plantTickStart = $tickId;
+            $planted = null;
+        }
+        $this->lastBombActionTick = $tickId;
+        $this->lastBombPlayerId = $playerId;
+
+        if ($this->isPlanted($tickId)) {
+            $this->position->setFrom($player->getReferenceToPosition());
+            $this->lastBombActionTick = -1;
+            $this->lastBombPlayerId = -1;
+            $planted = true;
+        }
+        return $planted;
     }
 
-    public function isPlanted(int $tickId): bool
+    public function tryDefuse(Player $player, int $tickId): ?bool
+    {
+        $defused = false;
+        $playerId = $player->getId();
+        if ($playerId !== $this->lastBombPlayerId || $this->lastBombActionTick + $this->bombActionTickBuffer < $tickId) {
+            $player->stop();
+            $this->defuseTickStart = $tickId;
+            $this->tickToDefuseCount = $player->hasDefuseKit() ? (int)ceil($this->defuseTickCountMax / 2) : $this->defuseTickCountMax;;
+            $defused = null;
+        }
+        $this->lastBombActionTick = $tickId;
+        $this->lastBombPlayerId = $playerId;
+
+        if ($this->isDefused($tickId)) {
+            $this->lastBombActionTick = -1;
+            $this->lastBombPlayerId = -1;
+            $defused = true;
+        }
+        return $defused;
+    }
+
+    private function isPlanted(int $tickId): bool
     {
         return ($tickId - $this->plantTickStart >= $this->plantTickCountMax);
     }
 
-    public function startDefusing(int $tickId, bool $hasDefuseKit): void
-    {
-        $this->defuseTickStart = $tickId;
-        $this->tickToDefuseCount = $hasDefuseKit ? (int)ceil($this->defuseTickCountMax / 2) : $this->defuseTickCountMax;;
-    }
-
-    public function isDefused(int $tickId): bool
+    private function isDefused(int $tickId): bool
     {
         return ($tickId - $this->defuseTickStart >= $this->tickToDefuseCount);
     }
 
-    public function setPosition(Point $position): void
+    public function isPlantingOrDefusing(int $playerId, int $tickId): bool
     {
-        $this->position = $position;
+        return ($this->lastBombPlayerId === $playerId && $this->bombActionTickBuffer >= $tickId - $this->lastBombActionTick);
     }
 
     public function getPosition(): Point
@@ -87,6 +123,7 @@ class Bomb extends BaseEquipment
         return $this->position;
     }
 
+    /** @codeCoverageIgnore **/
     public function explodeDamageToPlayer(Player $player): void
     {
         $distanceSquared = Util::distanceSquared($player->getPositionClone(), $this->position);
