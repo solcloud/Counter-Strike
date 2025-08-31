@@ -32,9 +32,11 @@ jobs:
           cd electron/
           rm -rf build/
           npm run build
-          zip -r linux.zip build/build-linux*/
-          zip -r windows.zip build/build-win*/
-          zip -r macos.zip build/build-mas*/
+          mv build/ csf/
+          zip -r linux.zip csf/build-linux*/
+          zip -r windows.zip csf/build-win*/
+          zip -r macos.zip csf/build-mas*/
+          rm -rf csf/
 
       - name: "Publish Linux Artifact"
         timeout-minutes: 5
@@ -49,7 +51,7 @@ jobs:
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/zip" \
-              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-linux.zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=csf-client-linux.zip" \
               --data-binary "@electron/linux.zip"
 
       - name: "Publish Windows Artifact"
@@ -65,7 +67,7 @@ jobs:
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/zip" \
-              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-windows.zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=csf-client-windows.zip" \
               --data-binary "@electron/windows.zip"
 
       - name: "Publish MacOS Artifact"
@@ -81,5 +83,5 @@ jobs:
               -H "Authorization: Bearer ${GITHUB_TOKEN}" \
               -H "X-GitHub-Api-Version: 2022-11-28" \
               -H "Content-Type: application/zip" \
-              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=client-macos.zip" \
+              "https://uploads.github.com/repos/solcloud/Counter-Strike/releases/${RELEASE_ID}/assets?name=csf-client-macos.zip" \
               --data-binary "@electron/macos.zip"

@@ -1,0 +1,100 @@
+env:
+  PHP_VERSION: "8.4.12"
+
+name: "Server"
+on:
+  release:
+    types: [created]
+
+jobs:
+  server-build:
+    if: github.actor == 'solcloud'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: "Install Linux dependencies"
+        timeout-minutes: 4
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            composer zip tar curl
+
+      - name: "Install Composer dependencies"
+        timeout-minutes: 6
+        run: |
+          composer install -a --no-dev
+
+      - name: "Pack into phar"
+        timeout-minutes: 4
+        run: |
+          curl -Lo box.phar "https://github.com/box-project/box/releases/latest/download/box.phar"
+          ln -s cli/server.php index.php
+          php box.phar compile
+
+      - name: "Pack into static executable"
+        timeout-minutes: 6
+        run: |
+          echo "Packing for linux"
+          curl -Lo linux.tar.gz "https://dl.static-php.dev/static-php-cli/common/php-${PHP_VERSION}-micro-linux-x86_64.tar.gz"
+          tar xf linux.tar.gz
+          cat micro.sfx index.phar > server-linux-x86_64
+          rm micro.sfx
+          echo "Packing for mac"
+          curl -Lo mac.tar.gz "https://dl.static-php.dev/static-php-cli/common/php-${PHP_VERSION}-micro-macos-x86_64.tar.gz"
+          tar xf mac.tar.gz
+          cat micro.sfx index.phar > server-mac-x86_64
+          rm micro.sfx
+          echo "Packing for windows"
+          curl -Lo windows.zip "https://dl.static-php.dev/static-php-cli/windows/spc-max/php-${PHP_VERSION}-micro-win.zip"
+          unzip windows.zip
+          cat micro.sfx index.phar > server-windows-x86_64
+          rm micro.sfx
+
+      - name: "Publish Linux server executable"
+        timeout-minutes: 6
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/octet-stream" \
+              "https://uploads.github.com/repos/coopryan/csf/releases/${RELEASE_ID}/assets?name=csf-server-linux" \
+              --data-binary "@server-linux-x86_64"
+
+      - name: "Publish macOS server executable"
+        timeout-minutes: 6
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/octet-stream" \
+              "https://uploads.github.com/repos/coopryan/csf/releases/${RELEASE_ID}/assets?name=csf-server-mac" \
+              --data-binary "@server-mac-x86_64"
+
+      - name: "Publish Windows server executable"
+        timeout-minutes: 6
+        env:
+          RELEASE_ID: ${{ github.event.release.id }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -L \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              -H "Content-Type: application/octet-stream" \
+              "https://uploads.github.com/repos/coopryan/csf/releases/${RELEASE_ID}/assets?name=csf-server-windows.bat" \
+              --data-binary "@server-windows-x86_64"
