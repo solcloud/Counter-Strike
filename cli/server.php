@@ -14,7 +14,7 @@ $playersMax = (int)($argv[1] ?? 1);
 $port = (int)($argv[2] ?? 8080);
 $debug = in_array('--debug', $argv);
 $bindAddress = "udp://0.0.0.0:$port";
-$map = new Maps\DefaultMap();
+$map = Maps\DefaultMap::class;
 /////
 
 $settings = new ServerSetting($playersMax); // must be first for correctly setting the global tickRate (Util::$TICK_RATE)
@@ -23,7 +23,7 @@ $logger = new ConsoleLogger();
 $logger->info("Preparing game for launch, please wait...");
 
 $game = ($debug ? GameFactory::createDebug() : GameFactory::createDefaultCompetitive());
-$game->loadMap($map);
+$game->loadMap(new $map);
 
 $logger->info("Starting server on '{$bindAddress}', waiting maximum of '{$settings->warmupWaitSec}' sec for '{$playersMax}' player" . ($playersMax > 1 ? 's' : '') . " to connect.");
 $net = new ClueSocket($bindAddress);
