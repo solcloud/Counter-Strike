@@ -6,6 +6,8 @@ final class PlaneBuilder
 {
     /** @var array<string,Point> */
     private array $voxels = [];
+    /** @var array{?float,float} */
+    private array $voxelNormal;
 
     /** @return list<Plane> */
     public function create(Point $a, Point $b, Point $c, ?Point $d = null, ?float $jaggedness = null): array
@@ -32,10 +34,10 @@ final class PlaneBuilder
 
         $planes = [];
         foreach ($this->voxelizeTriangle($a, $b, $c, $voxelSize, $voxelThreshold, $matchSize) as $voxelPoint) {
-            $planes[] = new Wall($voxelPoint, true, $voxelSize, $voxelSize);
-            $planes[] = new Wall($voxelPoint, false, $voxelSize, $voxelSize);
-            $planes[] = new Wall($voxelPoint->clone()->addX($voxelSize), false, $voxelSize, $voxelSize);
-            $planes[] = new Floor($voxelPoint->clone()->addY($voxelSize), $voxelSize, $voxelSize);
+            $planes[] = (new Wall($voxelPoint, true, $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
+            $planes[] = (new Wall($voxelPoint, false, $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
+            $planes[] = (new Wall($voxelPoint->clone()->addX($voxelSize), false, $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
+            $planes[] = (new Floor($voxelPoint->clone()->addY($voxelSize), $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
         }
         return $planes;
     }
@@ -173,7 +175,7 @@ final class PlaneBuilder
             $width = abs($widthOnXAxis ? $previous->x - $current[0] : $previous->z - $current[2]);
             $leftPoint = ($direction[1] === 1 || $widthOnXAxis ? $previous->clone() : new Point($current[0], $start->y, $current[2]));
 
-            $walls[] = new Wall($leftPoint, $widthOnXAxis, $width, $height);
+            $walls[] = (new Wall($leftPoint, $widthOnXAxis, $width, $height))->setNormal(90 + $angleH, 0);
             $previous->set($current[0], $start->y, $current[2]);
             $widthOnXAxis = !$widthOnXAxis;
         }
@@ -189,6 +191,8 @@ final class PlaneBuilder
             GameException::invalid(); // @codeCoverageIgnore
         }
         assert($angleV !== 0.0);
+        $normalH = $angleH + 90; // fixme: embrace jaggedness
+        $normalV = $angleV + 90; // fixme: embrace jaggedness
 
         $planes = [];
         $previous = $start->clone();
@@ -218,13 +222,13 @@ final class PlaneBuilder
             $current = $points[$i - 1];
             if ($isFloor) {
                 if ($wallWidthOnXAxis) {
-                    $planes[] = new Floor($previous->clone(), $width, $current[2] - $previous->z);
+                    $planes[] = (new Floor($previous->clone(), $width, $current[2] - $previous->z))->setNormal($normalH, $normalV);
                 } else {
-                    $planes[] = new Floor($previous->clone(), $current[0] - $previous->x, $width);
+                    $planes[] = (new Floor($previous->clone(), $current[0] - $previous->x, $width))->setNormal($normalH, $normalV);
                 }
             } else {
                 $wallStart = ($stairsGoingUp ? $previous->clone() : new Point(...$current));
-                $planes[] = new Wall($wallStart, $wallWidthOnXAxis, $width, abs($current[1] - $previous->y));
+                $planes[] = (new Wall($wallStart, $wallWidthOnXAxis, $width, abs($current[1] - $previous->y)))->setNormal($normalH, $normalV);
             }
 
             $previous->set($current[0], $current[1], $current[2]);
@@ -288,6 +292,14 @@ final class PlaneBuilder
      */
     private function voxelizeTriangle(Point $a, Point $b, Point $c, int $voxelSize, int $voxelThreshold, bool $matchTriangleSize): array
     {
+        $u = [$b->x - $a->x, $b->y - $a->y, $b->z - $a->z];
+        $v = [$c->x - $a->x, $c->y - $a->y, $c->z - $a->z];
+        $this->voxelNormal = Util::worldAngle(new Point(
+            ($u[1] * $v[2]) - ($u[2] * $v[1]),
+            ($u[2] * $v[0]) - ($u[0] * $v[2]),
+            ($u[0] * $v[1]) - ($u[1] * $v[0]),
+        ));
+
         $this->voxels = [];
         $this->voxelizeLine($a, $b);
         $this->voxelizeLine($b, $c);

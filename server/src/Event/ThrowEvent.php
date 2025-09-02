@@ -139,7 +139,8 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
                 $pos->z = $z;
             }
 
-            if (!$this->ball->hasCollision($pos)) {
+            $ballCollision = $this->ball->hasCollision($pos);
+            if ($ballCollision === false) {
                 continue;
             }
 
@@ -162,7 +163,7 @@ final class ThrowEvent extends Event implements Attackable, ForOneRoundMax
             $this->setAngles($this->ball->getResolutionAngleHorizontal(), $this->ball->getResolutionAngleVertical());
             $this->bounceCount++;
             $this->velocity = $this->velocity / ($this->bounceCount > 4 ? $this->bounceCount : 1.5);
-            if ($this->velocity < 1) { // fixme some value based on velocity and gravity that will give lowest possible (angle 0.01/90) distance < 1
+            if ($ballCollision === null) {
                 $this->finishLanding($pos);
                 return;
             }

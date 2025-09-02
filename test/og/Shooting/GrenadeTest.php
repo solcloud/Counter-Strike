@@ -61,7 +61,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($floorY, $bounceEvent->position->y);
         $this->assertSame($floorY, $landEvent->position->y);
-        $this->assertPositionSame(new Point(152, $floorY, 720), $landEvent->position);
+        $this->assertPositionSame(new Point(153, $floorY, 707), $landEvent->position);
     }
 
     public function testThrowRun(): void
@@ -108,7 +108,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($floorY, $bounceEvent->position->y);
         $this->assertSame($floorY, $landEvent->position->y);
-        $this->assertPositionSame(new Point(220, $floorY, 1022), $landEvent->position);
+        $this->assertPositionSame(new Point(220, $floorY, 1008), $landEvent->position);
     }
 
     public function testThrow2(): void
@@ -195,7 +195,83 @@ class GrenadeTest extends BaseTestCase
         $this->assertGreaterThan($bounceEvent->position->z, $landEvent->position->z);
         $this->assertSame($y, $bounceEvent->position->y);
         $this->assertSame($y, $landEvent->position->y);
-        $this->assertPositionSame(new Point(470, $y, 470), $landEvent->position);
+        $this->assertPositionSame(new Point(464, $y, 464), $landEvent->position);
+    }
+
+    public function testThrow4(): void
+    {
+        $landEvent = null;
+        $bounceEvents = null;
+        $game = $this->createTestGame();
+        $game->getWorld()->addWall((new Wall(new Point(0, 0, 500), true, 100))->setNormal(45, 45));
+        $game->onEvents(function (array $events) use (&$landEvent, &$bounceEvent): void {
+            foreach ($events as $event) {
+                if (!($event instanceof SoundEvent)) {
+                    continue;
+                }
+                if ($event->type === SoundType::GRENADE_LAND) {
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
+                    $landEvent = $event;
+                }
+                if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
+                    $bounceEvent = $event;
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(10, 45),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(1700),
+            $this->endGame(),
+        ]);
+
+        $y = Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+        $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
+        $this->assertInstanceOf(SoundEvent::class, $landEvent);
+        $this->assertPositionSame(new Point(86, 430, 490), $bounceEvent->position);
+        $this->assertPositionSame(new Point(115, 10, 443), $landEvent->position);
+    }
+
+    public function testThrow5(): void
+    {
+        $landEvent = null;
+        $bounceEvents = null;
+        $game = $this->createTestGame();
+        $game->getWorld()->addWall((new Wall(new Point(0, 0, 500), true, 76))->setNormal(135, 45));
+        $game->onEvents(function (array $events) use (&$landEvent, &$bounceEvent): void {
+            foreach ($events as $event) {
+                if (!($event instanceof SoundEvent)) {
+                    continue;
+                }
+                if ($event->type === SoundType::GRENADE_LAND) {
+                    $this->assertTrue(is_null($landEvent), 'Only one landEvent please');
+                    $landEvent = $event;
+                }
+                if (!$bounceEvent && $event->type === SoundType::GRENADE_BOUNCE) {
+                    $bounceEvent = $event;
+                }
+            }
+        });
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(10, 45),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_DECOY)),
+            fn(Player $p) => $this->assertTrue($p->equip(InventorySlot::SLOT_GRENADE_DECOY)),
+            $this->waitNTicks(Decoy::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(1700),
+            $this->endGame(),
+        ]);
+
+        $y = Decoy::boundingRadius;
+        $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
+        $this->assertInstanceOf(SoundEvent::class, $bounceEvent);
+        $this->assertInstanceOf(SoundEvent::class, $landEvent);
+        $this->assertPositionSame(new Point(86, 430, 490), $bounceEvent->position);
+        $this->assertPositionSame(new Point(632, 10, 616), $landEvent->position);
     }
 
     public function testThrowFlashBang(): void
@@ -278,7 +354,7 @@ class GrenadeTest extends BaseTestCase
         ]);
 
         $this->assertFalse($game->getPlayer(1)->getInventory()->has(InventorySlot::SLOT_GRENADE_DECOY->value));
-        $this->assertCount(4, $bounceEvents);
+        $this->assertCount(5, $bounceEvents);
         $bounceEvent = array_pop($bounceEvents);
         $this->assertInstanceOf(SoundEvent::class, $bounceEvent); // @phpstan-ignore-line
         $this->assertInstanceOf(SoundEvent::class, $landEvent);
@@ -324,7 +400,7 @@ class GrenadeTest extends BaseTestCase
         $pp = $game->getPlayer(1)->getPositionClone();
         $this->assertGreaterThan($pp->x, $landEvent->position->x);
         $this->assertGreaterThan($pp->z, $landEvent->position->z);
-        $this->assertPositionSame(new Point(703, Decoy::boundingRadius, 374), $landEvent->position);
+        $this->assertPositionSame(new Point(708, Decoy::boundingRadius, 376), $landEvent->position);
     }
 
     public function testMultiThrow(): void
@@ -439,7 +515,7 @@ class GrenadeTest extends BaseTestCase
         $this->assertSame(Decoy::boundingRadius, $test->land->y);
         $this->assertSame(1, $test->bounceCount);
         $this->assertSame(-1 + Decoy::boundingRadius, $test->bounceX);
-        $this->assertSame(114, $test->airCount);
+        $this->assertSame(125, $test->airCount);
         $this->assertFalse($test->goingUp);
     }
 

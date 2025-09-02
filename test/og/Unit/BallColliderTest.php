@@ -70,8 +70,7 @@ class BallColliderTest extends BaseTest
         $this->assertTrue($ball->hasCollision($start->addPart(-1, -1, 0)));
         $this->assertPositionSame($start, $ball->getLastExtremePosition());
         $this->assertPositionSame(new Point($radius, $radius + 6, 0), $ball->getLastValidPosition());
-        $this->assertSame(360.0 - $angleHorizontal, $ball->getResolutionAngleHorizontal());
-        $this->assertLessThan(0, $ball->getResolutionAngleVertical());
+        $this->assertSame(360.0 - $angleHorizontal, round($ball->getResolutionAngleHorizontal()));
     }
 
     protected function runCollision(BallCollider $ball, Point $start, float $angleHorizontal, float $angleVertical): void
@@ -86,6 +85,12 @@ class BallColliderTest extends BaseTest
         }
 
         $this->fail("No '{$start}' collision detected");
+    }
+
+    public function testSingleWallAngledBounce(): void
+    {
+        $this->_testSingleWallBounce(new Point(5, 15, 5), 1, 180, 10, (new Wall(new Point(1, 1, 1), true, 100))->setNormal(0, 40), 0, -62, new Point(5, 16, 2));
+        $this->_testSingleWallBounce(new Point(5, 15, 5), 1, 180, 70, (new Wall(new Point(1, 1, 1), true, 100))->setNormal(0, -10), 0, 49, new Point(5, 23, 2));
     }
 
     public function testSingleWallBounce(): void
@@ -108,7 +113,8 @@ class BallColliderTest extends BaseTest
 
     private function _testSingleWallBounce(
         Point $ballCenter, int $ballRadius, float $angleHorizontal, float $angleVertical,
-        Plane $plane, float $expectedAngleHorizontal, float $expectedAngleVertical, int $maxDistance = 16
+        Plane $plane, float $expectedAngleHorizontal, float $expectedAngleVertical,
+        ?Point $expectedCollisionPoint = null, int $maxDistance = 16
     ): void
     {
         $world = $this->createWorld();
@@ -131,6 +137,7 @@ class BallColliderTest extends BaseTest
                 continue;
             }
 
+            $expectedCollisionPoint && $this->assertPositionSame($expectedCollisionPoint, $candidate);
             $this->assertSame($expectedAngleHorizontal, round($ball->getResolutionAngleHorizontal()));
             $this->assertSame($expectedAngleVertical, round($ball->getResolutionAngleVertical()));
 

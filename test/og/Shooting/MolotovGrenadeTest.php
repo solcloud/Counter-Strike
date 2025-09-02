@@ -8,6 +8,7 @@ use cs\Core\Player;
 use cs\Core\Point;
 use cs\Core\Ramp;
 use cs\Core\Setting;
+use cs\Core\Wall;
 use cs\Enum\BuyMenuItem;
 use cs\Enum\Color;
 use cs\Enum\InventorySlot;
@@ -458,6 +459,34 @@ class MolotovGrenadeTest extends BaseTestCase
         $this->assertTrue($game->getPlayer(4)->isAlive());
         $this->assertGreaterThan(10, $smokeSpawnCount);
         $this->assertSame(1, $smokeFadeCount, 'Smoke fade - single shrink event');
+    }
+
+    public function testRotatedWallBounce(): void
+    {
+        $game = $this->createNoPauseGame();
+        $game->getWorld()->addBox(new Box(new Point(), 500, 1000, 500));
+        $game->getWorld()->addWall(new Wall(new Point(-10, 0, 200), true, 999, 500));
+        $game->getWorld()->addWall(new Wall(new Point(-20, 550, 200), true, 999, 500));
+        $rotatedWall = new Wall(new Point(250, 400, 0), false, 999, 200);
+        $rotatedWall->setNormal(290, -25);
+        $game->getWorld()->addWall($rotatedWall);
+        $game->getPlayer(1)->setPosition(new Point(100, 0, 150));
+        $game->addPlayer(new Player(2, Color::BLUE, false));
+        $game->getPlayer(2)->setPosition(new Point(150, 0, 400));
+        $game->getTestMap()->startPointForNavigationMesh->setFrom($game->getPlayer(2)->getPositionClone());
+
+        $this->playPlayer($game, [
+            fn(Player $p) => $p->getSight()->look(100, 75),
+            fn(Player $p) => $this->assertTrue($p->buyItem(BuyMenuItem::GRENADE_MOLOTOV)),
+            $this->waitNTicks(Molotov::equipReadyTimeMs),
+            fn(Player $p) => $this->assertNotNull($p->attack()),
+            $this->waitNTicks(2000),
+            fn() => $this->assertTrue($game->getWorld()->activeMolotovExists()),
+            $this->waitNTicks(Molotov::MAX_TIME_MS),
+        ]);
+
+        $this->assertSame(2, $game->getRoundNumber());
+        $this->assertSame(1, $game->getScore()->getPlayerStat(1)->getKills());
     }
 
 }
