@@ -12,6 +12,7 @@ class Floor extends Plane
             throw new GameException("Width and depth cannot be lower than or equal zero");
         }
         parent::__construct($start, new Point($start->x + $width, $start->y, $start->z + $depth), 'xz');
+        $this->setNormal(0, 90);
     }
 
     public function getY(): int

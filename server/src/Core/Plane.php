@@ -11,6 +11,7 @@ abstract class Plane extends SolidSurface
     protected int $hitAntiForce = 25123;
     protected int $hitAntiForceMargin = 10;
     protected int $wallBangEdgeMarginDistance = 8;
+    protected int $normal;
     protected Point2D $point2DStart;
     protected Point2D $point2DEnd;
 
@@ -31,6 +32,40 @@ abstract class Plane extends SolidSurface
         $this->hitAntiForce = max(0, $hitAntiForceBody);
         $this->hitAntiForceMargin = max(0, $hitAntiForceMargin);
         $this->wallBangEdgeMarginDistance = max(0, $wallBangEdgeMarginDistance);
+    }
+
+    public function setNormal(int|float|null $angleHorizontal, int|float $angleVertical): static
+    {
+        $angleHorizontal = (int)Util::normalizeAngle($angleHorizontal ?? 0);
+        $angleHorizontal += $angleHorizontal > 180 ? -180 : 0;
+        $angleVertical = (int)Util::normalizeAngleVertical($angleVertical);
+        $this->normal = ($angleHorizontal << 8) | abs($angleVertical);
+        return $this;
+    }
+
+    /** @return array{int, int} **/
+    public function getNormal(): array
+    {
+        return [$this->normal >> 8, $this->normal & 0xFF];
+    }
+
+    /** @return array{float, float, float} **/
+    public function getNormalizedNormal(float $targetAngleHorizontal, float $targetAngleVertical, int $precision): array
+    {
+        [$normalHorizontal, $normalVertical] = $this->getNormal();
+        $deltaHorizontal = abs(Util::smallestDeltaAngle((int)round($targetAngleHorizontal), $normalHorizontal));
+        $deltaVertical = abs(Util::smallestDeltaAngle((int)round($targetAngleVertical), $normalVertical));
+        if ($deltaHorizontal < 90) {
+            $normalHorizontal = Util::normalizeAngle($normalHorizontal + 180);
+        }
+        if ($deltaVertical < 90) {
+            $normalVertical *= -1;
+        }
+
+        $normalVec = Util::movementXYZ($normalHorizontal, $normalVertical, $precision);
+        $precision = (float)$precision;
+        $normalVec = [$normalVec[0] / $precision, $normalVec[1] / $precision, $normalVec[2] / $precision];
+        return $normalVec;
     }
 
     public function getHitAntiForce(Point $point): int

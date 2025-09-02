@@ -22,6 +22,10 @@ class WallTest extends BaseTestCase
         $wallHorizontal = new Wall(new Point(0, 0, 0), true, 2, 1);
         $wallVertical = new Wall(new Point(0, 0, 0), false, 2, 1);
         $wallHorizontal->setHitAntiForce(123, 10, 1);
+        $this->assertSame([0, 0], $wallHorizontal->getNormal());
+        $this->assertSame([90, 0], $wallVertical->getNormal());
+        $this->assertSame([+1.0, 0.0, 0.0], $wallVertical->getNormalizedNormal(270, 0, 1000));
+        $this->assertSame([-1.0, 0.0, 0.0], $wallVertical->getNormalizedNormal(90, 0, 1000));
         $world = new World(new Game());
         $world->addWall($wallHorizontal);
         $world->addWall($wallVertical);

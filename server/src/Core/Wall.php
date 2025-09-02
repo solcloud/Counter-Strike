@@ -18,8 +18,10 @@ class Wall extends Plane
 
         if ($widthOnXAxis) {
             parent::__construct($start, new Point($start->x + $width, $start->y + $height, $start->z), 'xy');
+            $this->setNormal(0, 0);
         } else {
             parent::__construct($start, new Point($start->x, $start->y + $height, $start->z + $width), 'zy');
+            $this->setNormal(90, 0);
         }
     }
 

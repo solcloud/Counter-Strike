@@ -67,6 +67,11 @@
                 "if\\s*\\(\\$this->ball->getResolutionAngleVertical\\(\\) > 0 && \\(.+",
             ],
         },
+        "LogicalAndNegation": {
+            "ignoreSourceCodeByRegex": [
+                ".+\\$moveZ !== 0 && \\$planeCollision = \\$this->world->checkZSideWallCollision\\(\\$this->candidate, 2 \\* \\$r, \\$r.+",
+            ]
+        },
         "LogicalNot": {
             "ignoreSourceCodeByRegex": [
                 ".+\\$this->lastMoveX === -\\$moveX.+",
