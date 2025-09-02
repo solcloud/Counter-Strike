@@ -53,7 +53,7 @@ class TestGame extends Game
                 call_user_func($this->afterTickCallback, $this->getState());
             }
             if ($debug) {
-                $this->gameStates[$this->tick + 1] = json_decode($protocol->serialize($this->getPlayers(), $events));
+                $this->gameStates[$this->tick] = json_decode($protocol->serialize($this->getPlayers(), $events));
             }
             if ($gameOverEventOrNull) {
                 break;
