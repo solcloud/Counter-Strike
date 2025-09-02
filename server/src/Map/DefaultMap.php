@@ -6795,52 +6795,52 @@ final class DefaultMap extends Map
 
             // t spawn walls.001
             $add(
-                new Point(5871, 1210, 1068),
-                new Point(5871, 1210, 1232),
-                new Point(5871, 1960, 1232),
-                new Point(5871, 1960, 1068),
+                new Point(5867, 1210, 1068),
+                new Point(5867, 1210, 1222),
+                new Point(5867, 1960, 1222),
+                new Point(5867, 1960, 1068),
             );
             $add(
-                new Point(5871, 1960, 1232),
-                new Point(5871, 1210, 1232),
-                new Point(5015, 1210, 1232),
-                new Point(5015, 1960, 1232),
+                new Point(5867, 1960, 1222),
+                new Point(5867, 1210, 1222),
+                new Point(5003, 1210, 1222),
+                new Point(5003, 1960, 1222),
             );
             $add(
-                new Point(5015, 1960, 1232),
-                new Point(5015, 1210, 1232),
-                new Point(5015, 1210, 1404),
-                new Point(5015, 1960, 1404),
+                new Point(5003, 1960, 1222),
+                new Point(5003, 1210, 1222),
+                new Point(5003, 1210, 1361),
+                new Point(5003, 1960, 1361),
             );
             $add(
-                new Point(4809, 1960, 1404),
-                new Point(4809, 1210, 1404),
-                new Point(4809, 1210, 1080),
-                new Point(4809, 1960, 1080),
+                new Point(4811, 1960, 1361),
+                new Point(4811, 1210, 1361),
+                new Point(4811, 1210, 1080),
+                new Point(4811, 1960, 1080),
             );
             $add(
-                new Point(5015, 1960, 1368),
-                new Point(5015, 1780, 1368),
-                new Point(5015, 1780, 2062),
-                new Point(5015, 1960, 2062),
+                new Point(5003, 1960, 1368),
+                new Point(5003, 1780, 1368),
+                new Point(5003, 1780, 2062),
+                new Point(5003, 1960, 2062),
             );
             $add(
-                new Point(4809, 1780, 1368),
-                new Point(4809, 1960, 1368),
-                new Point(4809, 1960, 2062),
-                new Point(4809, 1780, 2062),
+                new Point(4811, 1780, 1368),
+                new Point(4811, 1960, 1368),
+                new Point(4811, 1960, 2062),
+                new Point(4811, 1780, 2062),
             );
             $add(
-                new Point(4809, 1781, 1327),
-                new Point(5015, 1781, 1327),
-                new Point(5015, 1781, 2044),
-                new Point(4809, 1781, 2044),
+                new Point(4811, 1781, 1327),
+                new Point(5003, 1781, 1327),
+                new Point(5003, 1781, 2044),
+                new Point(4811, 1781, 2044),
             );
             $add(
-                new Point(5015, 1960, 1404),
-                new Point(5015, 1210, 1404),
-                new Point(4810, 1210, 1404),
-                new Point(4810, 1960, 1404),
+                new Point(5003, 1960, 1361),
+                new Point(5003, 1210, 1361),
+                new Point(4811, 1210, 1361),
+                new Point(4811, 1960, 1361),
             );
 
             // t spawn walls.002
