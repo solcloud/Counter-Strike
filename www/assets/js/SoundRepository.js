@@ -32,13 +32,13 @@ export class SoundRepository {
         if (type === SoundType.PLAYER_STEP) {
             if (playerId === playerSpectateId) {
                 if (tickId > this.#lastSpectatorMoveSoundTick + Utils.msToTick(400)) {
-                    this.#lastSpectatorMoveSoundTick = tickId
+                    this.#lastSpectatorMoveSoundTick = tickId + Utils.msToTick(Utils.randomInt(-30, 30))
                     return '422990__dkiller2204__sfxrunground1.wav'
                 }
                 return null
             }
             if (tickId > this.#lastOtherPlayerMoveSoundTick + Utils.msToTick(300)) {
-                this.#lastOtherPlayerMoveSoundTick = tickId
+                this.#lastOtherPlayerMoveSoundTick = tickId + Utils.msToTick(Utils.randomInt(-30, 30))
                 return '221626__moodpie__body-impact.wav'
             }
             return null

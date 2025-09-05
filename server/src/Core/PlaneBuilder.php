@@ -22,6 +22,7 @@ final class PlaneBuilder
     /** @return list<Plane> */
     public function fromTriangle(Point $a, Point $b, Point $c, float $voxelSizeDotThreshold): array
     {
+        $this->voxels = [];
         $voxelSize = (int)$voxelSizeDotThreshold;
         $voxelThreshold = max(1, intval(str_replace('0.', '', abs($voxelSizeDotThreshold - $voxelSize)))); // @phpstan-ignore argument.type
         if ($voxelSize > 0) {
@@ -39,6 +40,7 @@ final class PlaneBuilder
             $planes[] = (new Wall($voxelPoint->clone()->addX($voxelSize), false, $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
             $planes[] = (new Floor($voxelPoint->clone()->addY($voxelSize), $voxelSize, $voxelSize))->setNormal($this->voxelNormal[0], $this->voxelNormal[1]);
         }
+        $this->voxels = [];
         return $planes;
     }
 
@@ -300,7 +302,6 @@ final class PlaneBuilder
             ($u[0] * $v[1]) - ($u[1] * $v[0]),
         ));
 
-        $this->voxels = [];
         $this->voxelizeLine($a, $b);
         $this->voxelizeLine($b, $c);
         $this->voxelizeLine($c, $a);
@@ -333,27 +334,24 @@ final class PlaneBuilder
         );
 
         $data = [];
-        for ($y = $bbMin->y; $y <= $bbMax->y; $y++) {
-            for ($x = $bbMin->x; $x <= $bbMax->x; $x++) {
-                for ($z = $bbMin->z; $z <= $bbMax->z; $z++) {
-                    if (!isset($this->voxels["$x,$y,$z"])) {
-                        continue;
-                    }
-
-                    $key = implode(',', [
-                        (int)ceil(($x - $bbMin->x) / $voxelSize),
-                        (int)ceil(($y - $bbMin->y) / $voxelSize),
-                        (int)ceil(($z - $bbMin->z) / $voxelSize),
-                    ]);
-                    if (!isset($data[$key])) {
-                        $data[$key] = 0;
-                    }
-                    $data[$key]++;
-                }
+        foreach ($this->voxels as $voxel) {
+            if ($matchTriangleSize && ($voxel->x > $bbMax->x || $voxel->y > $bbMax->y || $voxel->z > $bbMax->z)) {
+                continue;
             }
+
+            $key = implode(',', [
+                (int) ceil(($voxel->x - $bbMin->x) / $voxelSize),
+                (int) ceil(($voxel->y - $bbMin->y) / $voxelSize),
+                (int) ceil(($voxel->z - $bbMin->z) / $voxelSize),
+            ]);
+            if (!isset($data[$key])) {
+                $data[$key] = 0;
+            }
+            $data[$key]++;
         }
 
         $startPoints = [];
+        $halfHeight = (int)round($voxelSize / 2);
         foreach ($data as $key => $hits) {
             if ($hits < $voxelThreshold) {
                 continue;
@@ -362,7 +360,7 @@ final class PlaneBuilder
             $sizeIncrements = explode(',', $key);
             $startPoints[] = $bbMin->clone()->addPart(
                 $voxelSize * (int)$sizeIncrements[0],
-                $voxelSize * (int)$sizeIncrements[1],
+                $voxelSize * (int)$sizeIncrements[1] - $halfHeight,
                 $voxelSize * (int)$sizeIncrements[2],
             );
         }
