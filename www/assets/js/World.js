@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import * as Enum from "./Enums.js"
 import {RGBELoader} from "three/addons/loaders/RGBELoader.js"
 import {ModelRepository} from "./ModelRepository.js"
-import {Utils} from "./Utils.js";
+import {Utils} from "./Utils.js"
+import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js'
 
 export class World {
     #scene
@@ -14,6 +15,7 @@ export class World {
     #raycaster
     #decals = []
     #cache = {}
+    #smokes = {}
     volume = 30
 
     constructor() {
@@ -80,7 +82,7 @@ export class World {
         this.volume = setting.getMasterVolume()
 
         const anisotropy = Math.min(setting.getAnisotropicFiltering(), renderer.capabilities.getMaxAnisotropy())
-        return this.#modelRepository.init(mapName, renderer, scene).then(() => {
+        return this.#modelRepository.init(scene, renderer, mapName).then(() => {
             scene.traverse(function (object) {
                 if (object.isMesh && object.material.map) {
                     object.material.map.anisotropy = anisotropy
@@ -180,10 +182,10 @@ export class World {
             this.#cache[index] = loadCallback()
         }
 
-        return this.#cache[index];
+        return this.#cache[index]
     }
 
-    spawnFlame(size, height) {
+    spawnFlame(position, size, height) {
         const coneDetail = Utils.randomInt(5, 7)
         const lightnessValue = Utils.randomInt(30, 80)
         const geometry = this.loadCache(`flame-geo-c-${coneDetail}`, () => new THREE.ConeGeometry(1, 1, coneDetail))
@@ -196,20 +198,65 @@ export class World {
         mesh.castShadow = false
         mesh.receiveShadow = true
 
+        mesh.position.set(position.x, position.y + (height / 2), -1 * position.z)
+        mesh.rotation.x = Utils.randomInt(-10, 10) / 100
+        mesh.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
+
         this.#scene.add(mesh)
         return mesh
     }
 
-    spawnSmoke(geometry) {
-        const mesh = new THREE.Mesh(geometry, this.#modelRepository.getSmokeMaterial())
+    initSmoke(smokeId, size, maxPartCount) {
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), this.#modelRepository.getSmokeMaterial())
         this.#scene.add(mesh)
+
+        this.#smokes[smokeId] = {}
+        this.#smokes[smokeId]['size'] = size
+        this.#smokes[smokeId]['count'] = maxPartCount
+        this.#smokes[smokeId]['geometries'] = []
+        this.#smokes[smokeId]['mesh'] = mesh
+
         return mesh
+    }
+
+    spawnSmoke(position, height, smokeId) {
+        const size = this.#smokes[smokeId]['size']
+        const offset = Math.max(2, Math.ceil(size / 4))
+        const geo = new THREE.CylinderGeometry(size - Utils.randomInt(0, offset), size, height - Utils.randomInt(0, offset), Utils.randomInt(5, 22))
+        geo.translate(position.x, position.y + (geo.parameters.height / 2), -position.z)
+        this.#smokes[smokeId]['geometries'].push(geo)
+
+        let len = this.#smokes[smokeId]['geometries'].length
+        if (len % 10 !== 0 && len < this.#smokes[smokeId]['count']) {
+            return
+        }
+
+        let geometry = BufferGeometryUtils.mergeGeometries(this.#smokes[smokeId]['geometries'])
+        geometry.computeBoundingBox()
+
+        this.#smokes[smokeId]['range'] = Math.ceil(geometry.getIndex().count / 50)
+        geometry.setDrawRange(0, geometry.getIndex().count)
+
+        const mesh = this.#smokes[smokeId]['mesh']
+        mesh.geometry = geometry
+    }
+
+    fadeSmoke(smokeId) {
+        const mesh = this.#smokes[smokeId]['mesh']
+        const newRange = mesh.geometry.drawRange.count - this.#smokes[smokeId]['range']
+        mesh.geometry.setDrawRange(0, newRange)
+
+        if (newRange <= 0) {
+            delete this.#smokes[smokeId]
+            return true
+        }
+        return false
     }
 
     bulletWallHit(origin, hitPosition, item) {
         const rayHit = new THREE.Vector3(hitPosition.x, hitPosition.y, -hitPosition.z)
         const rayDirection = rayHit.clone().sub(new THREE.Vector3(origin.x, origin.y, -origin.z)).normalize()
-        rayHit.addScaledVector(rayDirection, -50); // offset a bit back to give raycaster more space to match server-client geometry
+        rayHit.addScaledVector(rayDirection, -50) // offset a bit back to give raycaster more space to match server-client geometry
 
         this.#raycaster.near = 1
         this.#raycaster.far = 100
