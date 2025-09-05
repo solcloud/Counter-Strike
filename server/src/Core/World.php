@@ -66,20 +66,24 @@ final class World
         }
     }
 
-    public function loadMap(Map $map): void
+    public function loadMap(Map $map): int
     {
+        $planeCount = 0;
         $this->roundReset();
         $this->map = $map;
 
         $this->walls = [];
         foreach ($map->getWalls() as $wall) {
             $this->addWall($wall);
+            $planeCount++;
         }
 
         $this->floors = [];
         foreach ($map->getFloors() as $floor) {
             $this->addFloor($floor);
+            $planeCount++;
         }
+        return $planeCount;
     }
 
     public function regenerateNavigationMeshes(): void

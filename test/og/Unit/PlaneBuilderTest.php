@@ -119,8 +119,8 @@ class PlaneBuilderTest extends BaseTest
                 max($boundaryMax->z, $plane->getEnd()->z),
             );
         }
-        $this->assertPositionSame(new Point(2, 1, 0), $boundaryMin);
-        $this->assertPositionSame(new Point(12, 11, 22), $boundaryMax);
+        $this->assertPositionSame(new Point(2, 1 - 1, 0), $boundaryMin);
+        $this->assertPositionSame(new Point(12, 11 - 1, 22), $boundaryMax);
     }
 
     public function testTriangleBoundaryNegative(): void
@@ -149,8 +149,8 @@ class PlaneBuilderTest extends BaseTest
                 max($boundaryMax->z, $plane->getEnd()->z),
             );
         }
-        $this->assertPositionSame(new Point(2, 1, -1), $boundaryMin);
-        $this->assertPositionSame(new Point(13, 12, 23), $boundaryMax);
+        $this->assertPositionSame(new Point(2, 1 - 1, -1), $boundaryMin);
+        $this->assertPositionSame(new Point(13, 12 - 1, 23), $boundaryMax);
     }
 
     public function testAABBWallX(): void

@@ -141,7 +141,7 @@ $slots = [
     animate()
 
     const modelRepository = new ModelRepository()
-    await modelRepository.loadAll()
+    await modelRepository.init(scene, renderer)
     const player = modelRepository.getPlayer(1, true)
     if (opacityPlayer < 1) {
         player.traverse((o) => {

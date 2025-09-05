@@ -215,10 +215,10 @@ class Game
         return ($this->isPaused() || $this->tick <= $this->roundStartTickId + $this->buyTimeTickCount);
     }
 
-    public function loadMap(Map $map): void
+    public function loadMap(Map $map): int
     {
         $this->bomb->setMaxBlastDistance($map->getBombMaxBlastDistance());
-        $this->world->loadMap($map);
+        return $this->world->loadMap($map);
     }
 
     public function getWorld(): World

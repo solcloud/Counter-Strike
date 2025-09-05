@@ -673,7 +673,7 @@ export class Game {
             this.#world.getCamera().getObjectByName('pov-item').visible = isNotScopedIn
             this.#world.updateCameraZoom(Utils.scopeLevelToZoom(scopeLevel))
             if (this.meIsAlive()) {
-                this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity())
+                this.#pointer.pointerSpeed = (isNotScopedIn ? this.#setting.getSensitivity() : this.#setting.getInScopeSensitivity() / scopeLevel)
             }
         }
     }

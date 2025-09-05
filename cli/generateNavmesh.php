@@ -12,7 +12,7 @@ $map = new DefaultMap();
 /////
 
 $game = new Game();
-$game->loadMap($map);
+$planeCount = $game->loadMap($map);
 $tileSize = $game->getWorld()::GRENADE_NAVIGATION_MESH_TILE_SIZE;
 $colliderHeight = $game->getWorld()::GRENADE_NAVIGATION_MESH_OBJECT_HEIGHT;
 
@@ -37,7 +37,8 @@ $pathFinder->saveAndClear();
 $path = $map->getNavigationMeshPath($map->generateNavigationMeshKey($tileSize, $colliderHeight));
 file_put_contents($path, $pathFinder->getNavigationMesh()->serialize());
 printf(
-    "Navmesh (Nodes: %d; Edges: %d) generated to '%s'%s",
+    "Navmesh (Planes: %d, Nodes: %d; Edges: %d) generated to '%s'%s",
+    $planeCount,
     $pathFinder->getGraph()->getNodesCount(),
     $pathFinder->getGraph()->getEdgeCount(),
     $path,

@@ -172,7 +172,7 @@ final class PathFinder
         $startPoint = $start->clone();
         $this->convertToNavMeshNode($startPoint);
         if (!$this->world->findFloorSquare($startPoint, 1)) {
-            throw new GameException('No floor on start point'); // @codeCoverageIgnore
+            throw new GameException('No floor on start: ' . $start); // @codeCoverageIgnore
         }
 
         /** @var SplQueue<Point> $queue */

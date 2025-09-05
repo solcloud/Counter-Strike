@@ -121,7 +121,7 @@ export class ModelRepository {
         return model.clone()
     }
 
-    init(mapName, renderer, scene) {
+    init(scene, renderer, mapName = null) {
         const ktx2Loader = new KTX2Loader()
         ktx2Loader.setTranscoderPath('assets/threejs/libs/basis/')
         ktx2Loader.detectSupport(renderer)
@@ -129,7 +129,7 @@ export class ModelRepository {
 
         const self = this
         const promises = []
-        promises.push(this.#loadMap(mapName).then((model) => scene.add(model)))
+        mapName && promises.push(this.#loadMap(mapName).then((model) => scene.add(model)))
 
         promises.push(this.#loadModel('./resources/model/player.glb').then((model) => {
             model.scene.traverse(function (object) {
@@ -254,7 +254,6 @@ export class ModelRepository {
             this.#materials.smoke = new THREE.MeshStandardMaterial({ // todo better material with cool displacement map etc.
                 color: 0x798aa0,
                 map: texture,
-                blending: THREE.AdditiveBlending,
                 side: THREE.FrontSide,
             })
 
