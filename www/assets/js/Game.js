@@ -1,5 +1,4 @@
 import * as THREE from 'three' // fixme try remove from game, maybe only allow import Vec3...
-import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js' // todo remove
 import {EventProcessor} from "./EventProcessor.js"
 import {Player} from "./Player.js"
 import {InventorySlot, SoundType} from "./Enums.js"
@@ -327,11 +326,7 @@ export class Game {
     spawnFlame(point, height, fireId, partId) {
         const size = this.#volumetrics[fireId]['size']
         height = Utils.lerp(height, Utils.randomInt(16, 26), Math.min(Math.sqrt(Object.keys(this.#volumetrics[fireId]).length) / Utils.randomInt(7, 9), 1))
-        const flame = this.#world.spawnFlame(size, height)
-        this.#volumetrics[fireId][partId] = flame
-        flame.position.set(point.x, point.y + (height / 2), -1 * point.z)
-        flame.rotation.x = Utils.randomInt(-10, 10) / 100
-        flame.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), Math.random() * 6.28)
+        this.#volumetrics[fireId][partId] = this.#world.spawnFlame(point, size, height)
     }
 
     destroyFlame(fireId, flameId) {
@@ -341,50 +336,19 @@ export class Game {
     }
 
     smokeStart(smokeId, position, size, maxTimeMs, maxPartCount) {
-        this.#volumetrics[smokeId] = {}
-        this.#volumetrics[smokeId]['size'] = size
-        this.#volumetrics[smokeId]['count'] = maxPartCount
-        this.#volumetrics[smokeId]['geometries'] = []
+        this.#volumetrics[smokeId] = {'mesh': this.#world.initSmoke(smokeId, size, maxPartCount)}
     }
 
     spawnSmoke(point, height, smokeId, partId) {
-        const size = this.#volumetrics[smokeId]['size']
-        const offset = Math.max(2, Math.ceil(size / 4));
-        const geo = new THREE.CylinderGeometry(size - Utils.randomInt(0, offset), size, height - Utils.randomInt(0, offset), Utils.randomInt(5, 22))
-        geo.translate(point.x, point.y + (geo.parameters.height / 2), -point.z)
-        this.#volumetrics[smokeId]['geometries'].push(geo)
-
-        const len = this.#volumetrics[smokeId]['geometries'].length
-        if (len % 10 !== 0 && len < this.#volumetrics[smokeId]['count']) {
-            return
-        }
-
-        let geometry = BufferGeometryUtils.mergeGeometries(this.#volumetrics[smokeId]['geometries'])
-        geometry = BufferGeometryUtils.mergeVertices(geometry, offset)
-        geometry.computeBoundingBox()
-        let mesh = this.#volumetrics[smokeId]['mesh']
-        if (mesh) {
-            this.#world.destroyObject(mesh)
-        }
-
-        mesh = this.#world.spawnSmoke(geometry)
-        this.#volumetrics[smokeId]['mesh'] = mesh
-        if (len === this.#volumetrics[smokeId]['count']) {
-            this.#volumetrics[smokeId]['range'] = Math.ceil(mesh.geometry.getIndex().count / 50)
-            mesh.geometry.setDrawRange(0, mesh.geometry.getIndex().count)
-        }
+        this.#world.spawnSmoke(point, height, smokeId)
     }
 
     smokeFade(smokeId) {
-        const range = this.#volumetrics[smokeId]['range']
-        const mesh = this.#volumetrics[smokeId]['mesh']
-
-        const intervalId = setInterval(function() {
-            const newRange = mesh.geometry.drawRange.count - range
-            if (newRange <= 0) {
+        const game = this
+        const intervalId = setInterval(function () {
+            if (game.#world.fadeSmoke(smokeId)) {
                 clearInterval(intervalId)
             }
-            mesh.geometry.setDrawRange(0, newRange)
         }, 50)
         this.#roundIntervalIds.push(intervalId)
     }
