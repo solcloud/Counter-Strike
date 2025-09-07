@@ -161,16 +161,16 @@ final class DefaultMap extends Map
                 new Point(9415, 823, 6446),
             );
             $add(
-                new Point(9225, 799, 5016),
+                new Point(9225, 799, 5103),
                 new Point(9225, 799, 7405),
                 new Point(9225, 1481, 7405),
-                new Point(9225, 1481, 5016),
+                new Point(9225, 1481, 5103),
             );
             $add(
-                new Point(9225, 799, 5016),
-                new Point(9225, 1481, 5016),
-                new Point(9346, 1481, 5016),
-                new Point(9346, 799, 5016),
+                new Point(9225, 799, 5103),
+                new Point(9225, 1481, 5103),
+                new Point(9321, 1481, 5103),
+                new Point(9321, 799, 5103),
             );
             $add(
                 new Point(9609, 764, 7837),
@@ -273,112 +273,88 @@ final class DefaultMap extends Map
 
             // a short main floor.001
             $add(
-                new Point(8889, 1022, 9444),
-                new Point(8889, 1022, 9384),
+                new Point(8889, 1025, 9418),
+                new Point(8889, 1025, 9384),
                 new Point(8889, 801, 9384),
-                new Point(8889, 801, 9444),
+                new Point(8889, 801, 9418),
             );
             $add(
-                new Point(8889, 994, 9384),
-                new Point(8889, 994, 9324),
-                new Point(8889, 801, 9324),
-                new Point(8889, 801, 9384),
-            );
-            $add(
-                new Point(8889, 964, 9324),
                 new Point(8889, 964, 9264),
-                new Point(8889, 801, 9264),
-                new Point(8889, 801, 9324),
+                new Point(8889, 964, 9298),
+                new Point(8841, 964, 9298),
+                new Point(8841, 964, 9264),
             );
             $add(
-                new Point(8889, 934, 9264),
                 new Point(8889, 934, 9204),
-                new Point(8889, 801, 9204),
-                new Point(8889, 801, 9264),
+                new Point(8889, 934, 9234),
+                new Point(8841, 934, 9234),
+                new Point(8841, 934, 9204),
             );
             $add(
-                new Point(8889, 899, 9204),
+                new Point(8889, 919, 9204),
+                new Point(8889, 919, 9171),
+                new Point(8889, 801, 9171),
+                new Point(8889, 801, 9204),
+            );
+            $add(
+                new Point(8889, 899, 9171),
                 new Point(8889, 899, 9133),
                 new Point(8889, 801, 9133),
-                new Point(8889, 801, 9204),
+                new Point(8889, 801, 9171),
             );
             $add(
-                new Point(8889, 1054, 9504),
+                new Point(8889, 1054, 9474),
                 new Point(8889, 1054, 9444),
                 new Point(8889, 801, 9444),
-                new Point(8889, 801, 9504),
+                new Point(8889, 801, 9474),
             );
             $add(
-                new Point(8889, 934, 9204),
-                new Point(8889, 934, 9264),
-                new Point(8841, 934, 9264),
-                new Point(8841, 934, 9204),
-            );
-            $add(
-                new Point(8889, 1022, 9384),
-                new Point(8889, 1022, 9444),
-                new Point(8841, 1022, 9444),
-                new Point(8841, 1022, 9384),
+                new Point(8889, 950, 9234),
+                new Point(8889, 950, 9264),
+                new Point(8841, 950, 9264),
+                new Point(8841, 950, 9234),
             );
             $add(
                 new Point(8889, 994, 9324),
-                new Point(8889, 994, 9384),
-                new Point(8841, 994, 9384),
+                new Point(8889, 994, 9354),
+                new Point(8841, 994, 9354),
                 new Point(8841, 994, 9324),
             );
             $add(
-                new Point(8889, 1054, 9444),
-                new Point(8889, 1054, 9504),
-                new Point(8841, 1054, 9504),
-                new Point(8841, 1054, 9444),
+                new Point(8889, 1010, 9354),
+                new Point(8889, 1010, 9384),
+                new Point(8841, 1010, 9384),
+                new Point(8841, 1010, 9354),
             );
             $add(
-                new Point(8889, 899, 9133),
-                new Point(8889, 899, 9204),
-                new Point(8841, 899, 9204),
-                new Point(8841, 899, 9133),
+                new Point(8889, 982, 9298),
+                new Point(8889, 982, 9324),
+                new Point(8841, 982, 9324),
+                new Point(8841, 982, 9298),
             );
             $add(
-                new Point(8889, 964, 9264),
-                new Point(8889, 964, 9324),
-                new Point(8841, 964, 9324),
-                new Point(8841, 964, 9264),
-            );
-            $add(
-                new Point(8841, 1054, 9444),
-                new Point(8841, 1054, 9504),
-                new Point(8841, 801, 9504),
-                new Point(8841, 801, 9444),
-            );
-            $add(
-                new Point(8841, 934, 9204),
-                new Point(8841, 934, 9264),
+                new Point(8841, 950, 9234),
+                new Point(8841, 950, 9264),
                 new Point(8841, 801, 9264),
-                new Point(8841, 801, 9204),
+                new Point(8841, 801, 9234),
+            );
+            $add(
+                new Point(8841, 1010, 9354),
+                new Point(8841, 1010, 9384),
+                new Point(8841, 801, 9384),
+                new Point(8841, 801, 9354),
             );
             $add(
                 new Point(8841, 994, 9324),
-                new Point(8841, 994, 9384),
-                new Point(8841, 801, 9384),
+                new Point(8841, 994, 9354),
+                new Point(8841, 801, 9354),
                 new Point(8841, 801, 9324),
             );
             $add(
-                new Point(8841, 1022, 9384),
-                new Point(8841, 1022, 9444),
-                new Point(8841, 801, 9444),
-                new Point(8841, 801, 9384),
-            );
-            $add(
-                new Point(8841, 899, 9133),
-                new Point(8841, 899, 9204),
-                new Point(8841, 801, 9204),
-                new Point(8841, 801, 9133),
-            );
-            $add(
-                new Point(8841, 964, 9264),
-                new Point(8841, 964, 9324),
+                new Point(8841, 982, 9298),
+                new Point(8841, 982, 9324),
                 new Point(8841, 801, 9324),
-                new Point(8841, 801, 9264),
+                new Point(8841, 801, 9298),
             );
             $add(
                 new Point(8841, 899, 9133),
@@ -387,34 +363,226 @@ final class DefaultMap extends Map
                 new Point(8889, 899, 9133),
             );
             $add(
-                new Point(8841, 934, 9204),
-                new Point(8841, 801, 9204),
-                new Point(8889, 801, 9204),
-                new Point(8889, 934, 9204),
+                new Point(8841, 1025, 9384),
+                new Point(8841, 1025, 9418),
+                new Point(8841, 801, 9418),
+                new Point(8841, 801, 9384),
+            );
+            $add(
+                new Point(8889, 1025, 9384),
+                new Point(8889, 1025, 9418),
+                new Point(8841, 1025, 9418),
+                new Point(8841, 1025, 9384),
+            );
+            $add(
+                new Point(8889, 994, 9354),
+                new Point(8889, 994, 9324),
+                new Point(8889, 801, 9324),
+                new Point(8889, 801, 9354),
             );
             $add(
                 new Point(8841, 964, 9264),
+                new Point(8841, 964, 9298),
+                new Point(8841, 801, 9298),
                 new Point(8841, 801, 9264),
+            );
+            $add(
+                new Point(8889, 964, 9298),
+                new Point(8889, 964, 9264),
+                new Point(8889, 801, 9264),
+                new Point(8889, 801, 9298),
+            );
+            $add(
+                new Point(8889, 1010, 9384),
+                new Point(8889, 1010, 9354),
+                new Point(8889, 801, 9354),
+                new Point(8889, 801, 9384),
+            );
+            $add(
+                new Point(8841, 934, 9204),
+                new Point(8841, 934, 9234),
+                new Point(8841, 801, 9234),
+                new Point(8841, 801, 9204),
+            );
+            $add(
+                new Point(8889, 934, 9234),
+                new Point(8889, 934, 9204),
+                new Point(8889, 801, 9204),
+                new Point(8889, 801, 9234),
+            );
+            $add(
+                new Point(8889, 982, 9324),
+                new Point(8889, 982, 9298),
+                new Point(8889, 801, 9298),
+                new Point(8889, 801, 9324),
+            );
+            $add(
+                new Point(8841, 919, 9171),
+                new Point(8841, 919, 9204),
+                new Point(8841, 801, 9204),
+                new Point(8841, 801, 9171),
+            );
+            $add(
+                new Point(8889, 919, 9171),
+                new Point(8889, 919, 9204),
+                new Point(8841, 919, 9204),
+                new Point(8841, 919, 9171),
+            );
+            $add(
+                new Point(8889, 950, 9264),
+                new Point(8889, 950, 9234),
+                new Point(8889, 801, 9234),
+                new Point(8889, 801, 9264),
+            );
+            $add(
+                new Point(8841, 899, 9133),
+                new Point(8841, 899, 9171),
+                new Point(8841, 801, 9171),
+                new Point(8841, 801, 9133),
+            );
+            $add(
+                new Point(8889, 899, 9133),
+                new Point(8889, 899, 9171),
+                new Point(8841, 899, 9171),
+                new Point(8841, 899, 9133),
+            );
+            $add(
+                new Point(8889, 1040, 9418),
+                new Point(8889, 1040, 9444),
+                new Point(8841, 1040, 9444),
+                new Point(8841, 1040, 9418),
+            );
+            $add(
+                new Point(8841, 1040, 9418),
+                new Point(8841, 1040, 9444),
+                new Point(8841, 801, 9444),
+                new Point(8841, 801, 9418),
+            );
+            $add(
+                new Point(8889, 1040, 9444),
+                new Point(8889, 1040, 9418),
+                new Point(8889, 801, 9418),
+                new Point(8889, 801, 9444),
+            );
+            $add(
+                new Point(8841, 1054, 9444),
+                new Point(8841, 1054, 9474),
+                new Point(8841, 801, 9474),
+                new Point(8841, 801, 9444),
+            );
+            $add(
+                new Point(8889, 1054, 9444),
+                new Point(8889, 1054, 9474),
+                new Point(8841, 1054, 9474),
+                new Point(8841, 1054, 9444),
+            );
+            $add(
+                new Point(8889, 1070, 9497),
+                new Point(8889, 1070, 9474),
+                new Point(8889, 801, 9474),
+                new Point(8889, 801, 9497),
+            );
+            $add(
+                new Point(8841, 1070, 9474),
+                new Point(8841, 1070, 9497),
+                new Point(8841, 801, 9497),
+                new Point(8841, 801, 9474),
+            );
+            $add(
+                new Point(8889, 1070, 9474),
+                new Point(8889, 1070, 9497),
+                new Point(8841, 1070, 9497),
+                new Point(8841, 1070, 9474),
+            );
+            $add(
+                new Point(8889, 1081, 9516),
+                new Point(8889, 1081, 9497),
+                new Point(8889, 801, 9497),
+                new Point(8889, 801, 9516),
+            );
+            $add(
+                new Point(8889, 1081, 9497),
+                new Point(8889, 1081, 9516),
+                new Point(8841, 1081, 9516),
+                new Point(8841, 1081, 9497),
+            );
+            $add(
+                new Point(8841, 1081, 9497),
+                new Point(8841, 1081, 9516),
+                new Point(8841, 801, 9516),
+                new Point(8841, 801, 9497),
+            );
+            $add(
+                new Point(8889, 801, 9171),
+                new Point(8889, 919, 9171),
+                new Point(8841, 919, 9171),
+                new Point(8841, 801, 9171),
+            );
+            $add(
+                new Point(8889, 801, 9204),
+                new Point(8889, 934, 9204),
+                new Point(8841, 934, 9204),
+                new Point(8841, 801, 9204),
+            );
+            $add(
+                new Point(8889, 801, 9234),
+                new Point(8889, 950, 9234),
+                new Point(8841, 950, 9234),
+                new Point(8841, 801, 9234),
+            );
+            $add(
                 new Point(8889, 801, 9264),
                 new Point(8889, 964, 9264),
+                new Point(8841, 964, 9264),
+                new Point(8841, 801, 9264),
             );
             $add(
-                new Point(8841, 994, 9324),
-                new Point(8841, 801, 9324),
+                new Point(8889, 801, 9298),
+                new Point(8889, 982, 9298),
+                new Point(8841, 982, 9298),
+                new Point(8841, 801, 9298),
+            );
+            $add(
                 new Point(8889, 801, 9324),
                 new Point(8889, 994, 9324),
+                new Point(8841, 994, 9324),
+                new Point(8841, 801, 9324),
             );
             $add(
-                new Point(8841, 1022, 9384),
+                new Point(8889, 801, 9354),
+                new Point(8889, 1010, 9354),
+                new Point(8841, 1010, 9354),
+                new Point(8841, 801, 9354),
+            );
+            $add(
+                new Point(8841, 1025, 9384),
                 new Point(8841, 801, 9384),
                 new Point(8889, 801, 9384),
-                new Point(8889, 1022, 9384),
+                new Point(8889, 1025, 9384),
+            );
+            $add(
+                new Point(8889, 801, 9418),
+                new Point(8889, 1040, 9418),
+                new Point(8841, 1040, 9418),
+                new Point(8841, 801, 9418),
             );
             $add(
                 new Point(8841, 1054, 9444),
                 new Point(8841, 801, 9444),
                 new Point(8889, 801, 9444),
                 new Point(8889, 1054, 9444),
+            );
+            $add(
+                new Point(8889, 801, 9474),
+                new Point(8889, 1070, 9474),
+                new Point(8841, 1070, 9474),
+                new Point(8841, 801, 9474),
+            );
+            $add(
+                new Point(8841, 1081, 9497),
+                new Point(8841, 801, 9497),
+                new Point(8889, 801, 9497),
+                new Point(8889, 1081, 9497),
             );
 
             // short walls
@@ -2765,8 +2933,8 @@ final class DefaultMap extends Map
             $add(
                 new Point(9321, 769, 4911),
                 new Point(9321, 1775, 4911),
-                new Point(9321, 1775, 5019),
-                new Point(9321, 769, 5019),
+                new Point(9321, 1775, 5103),
+                new Point(9321, 769, 5103),
             );
 
             // top mid main floor
@@ -6193,14 +6361,14 @@ final class DefaultMap extends Map
             $add(
                 new Point(9897, 1603, 4911),
                 new Point(9897, 769, 4911),
-                new Point(9897, 769, 5006),
-                new Point(9897, 1603, 5006),
+                new Point(9897, 769, 5103),
+                new Point(9897, 1603, 5103),
             );
             $add(
-                new Point(9897, 1603, 5006),
-                new Point(9897, 769, 5006),
-                new Point(10002, 769, 5006),
-                new Point(10002, 1603, 5006),
+                new Point(9897, 1603, 5103),
+                new Point(9897, 769, 5103),
+                new Point(10002, 769, 5103),
+                new Point(10002, 1603, 5103),
             );
             $add(
                 new Point(9992, 769, 4911),
@@ -7262,8 +7430,8 @@ final class DefaultMap extends Map
 
         // Plant - Plant
         if (true) {
-            $this->plantArea->add(new Box(new Point(10527, 1099, 11404), 309, 20, 557));
-            $this->plantArea->add(new Box(new Point(10826, 1099, 11113), 647, 20, 848));
+            $this->plantArea->add(new Box(new Point(10527, 1086, 11404), 309, 20, 557));
+            $this->plantArea->add(new Box(new Point(10826, 1086, 11113), 647, 20, 848));
             $this->plantArea->add(new Box(new Point(2525, 813, 11557), 1120, 20, 1195));
         }
 

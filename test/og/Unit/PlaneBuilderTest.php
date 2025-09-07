@@ -80,6 +80,21 @@ class PlaneBuilderTest extends BaseTest
         $this->assertCount(28, $planes);
     }
 
+    public function testTriangleNormal(): void
+    {
+        $pb = new PlaneBuilder();
+        $planes = $pb->fromTriangle(
+            new Point(-10, 10, 46),
+            new Point(10, 38, -10),
+            new Point(41, 10, 10),
+            20.0,
+        );
+        $this->assertCount(12, $planes);
+        $this->assertSame([35, 50], $planes[0]->getNormal());
+        $this->assertSame([35, 50], $planes[1]->getNormal());
+        $this->assertSame([35, 50], $planes[rand(2, 11)]->getNormal());
+    }
+
     public function testTriangleVoxelSize(): void
     {
         $pb = new PlaneBuilder();
@@ -91,6 +106,7 @@ class PlaneBuilderTest extends BaseTest
             3.9,
         );
         $this->assertCount(12, $planes);
+        $this->assertSame([48, 29], $planes[0]->getNormal());
     }
 
     public function testTriangleBoundary(): void
