@@ -1,8 +1,8 @@
 # Counter-Strike: Football [![Tests](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml/badge.svg)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml) [![Code coverage](https://img.shields.io/badge/Code%20coverage-100%25-green?style=flat)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml) [![Mutation score](https://img.shields.io/badge/Mutation%20score-100%25-green?style=flat)](https://github.com/solcloud/Counter-Strike/actions/workflows/test.yml)
 
-Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team.
+Competitive multiplayer FPS game where two football fan teams fight with the goal of winning more rounds than the opponent team. [Download game](https://github.com/solcloud/Counter-Strike/releases/latest)
 
-![promo](https://github.com/user-attachments/assets/3246af5f-4289-470f-804c-37fc7104bf33)
+![promo](https://github.com/user-attachments/assets/aeb395e7-1fbb-490b-a95a-5402f3262e57)
 
 Teams are Attackers and Defenders. The Defenders team has a goal of protecting their fan base sanctuary every round from desecrating by attackers using their graffiti bomb ball.
 
@@ -17,13 +17,11 @@ Attackers win round by:
 
 If attackers deploy graffiti bomb before round time ends, then round clock countdown is set to 40 sec and defenders has 30 sec (or 35 sec in case of using defuse kit) to defuse bomb.
 
-_This is low violence game so there is no red blood, chickens killing or similar violence visuals._
+## Installation
 
-## Setup
+Download executable asset for your OS platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest). Or build yourself locally from the project source folder.
 
 ### Client
-
-Download executable asset for your OS platform from the [latest release](https://github.com/solcloud/Counter-Strike/releases/latest). Or build by yourself locally from the project source folder.
 
 ```bash
 cd electron/
@@ -32,8 +30,6 @@ npm run dev
 ```
 
 ### Server
-
-Currently, there is no official public server available (as match making service is also WIP), but you can run server yourself (or somebody can host it for you).
 
 ```bash
 composer install -a --no-dev
