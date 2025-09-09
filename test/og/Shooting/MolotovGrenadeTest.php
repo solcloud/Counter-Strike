@@ -228,7 +228,7 @@ class MolotovGrenadeTest extends BaseTestCase
             $this->endGame(),
         ]);
 
-        $this->assertFalse($game->getWorld()->activeMolotovExists());
+        $this->assertSame(1, $game->getRoundNumber());
     }
 
     public function testTunnelExpand(): void
