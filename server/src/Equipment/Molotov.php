@@ -28,7 +28,7 @@ class Molotov extends Grenade implements Flammable
 
     public function getMaxAreaMetersSquared(): int
     {
-        return 200_000;
+        return 450_000;
     }
 
     public function calculateDamage(bool $hasKevlar): int

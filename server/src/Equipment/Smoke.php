@@ -29,6 +29,6 @@ class Smoke extends Grenade implements Volumetric
 
     public function getMaxAreaMetersSquared(): int
     {
-        return 210_000;
+        return 550_000;
     }
 }
