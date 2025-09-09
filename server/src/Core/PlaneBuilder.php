@@ -193,8 +193,8 @@ final class PlaneBuilder
             GameException::invalid(); // @codeCoverageIgnore
         }
         assert($angleV !== 0.0);
-        $normalH = $angleH + 90; // fixme: embrace jaggedness
-        $normalV = $angleV + 90; // fixme: embrace jaggedness
+        $normalH = $angleH; // fixme: embrace jaggedness
+        $normalV = $angleV - 90; // fixme: embrace jaggedness
 
         $planes = [];
         $previous = $start->clone();

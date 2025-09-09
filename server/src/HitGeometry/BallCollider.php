@@ -59,7 +59,6 @@ class BallCollider
             $normalVec = $planeCollision->getNormalizedNormal($this->angleHorizontal, $this->angleVertical, $precision);
             $directionVec = Util::movementXYZ($this->angleHorizontal, $this->angleVertical, $precision);
             $doubleDotProduct = 2 * ($directionVec[0] * $normalVec[0] + $directionVec[1] * $normalVec[1] + $directionVec[2] * $normalVec[2]);
-            assert($doubleDotProduct <= 0);
             if ($doubleDotProduct == 0) {
                 return null;
             }
